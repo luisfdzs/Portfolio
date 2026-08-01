@@ -2,7 +2,6 @@ import { ImageResponse } from 'next/og'
 import { profile } from '@/content/profile'
 import { site } from '@/content/site'
 import { isLocale, locales, type Locale } from '@/lib/i18n/config'
-import { getDictionary } from '@/lib/i18n/dictionaries'
 
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
@@ -38,8 +37,8 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
   // Un idioma desconocido no debería llegar aquí (las rutas se generan de `locales`), pero
   // esto es una imagen: fallar en silencio al castellano es mejor que romper la vista previa
   // del enlace, que es lo único que se vería.
+  // Lo único que cambia entre idiomas es el titular; el resto de la imagen es literal.
   const locale: Locale = isLocale(raw) ? raw : 'es'
-  const t = getDictionary(locale)
 
   return new ImageResponse(
     <div
@@ -56,15 +55,24 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
       {/* Filete en cobre: el mismo acento que el sitio, y hace de firma. */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
         <div style={{ width: 56, height: 3, background: '#e0a458' }} />
+        {/* El rótulo va como UNA sola cadena y con `display: flex` explícito.
+            Satori —el motor de `ImageResponse`— exige `display: flex`, `contents` o `none`
+            en cualquier `div` con más de un hijo, y `{t.nav.projects} · CV` creaba dos: la
+            variable y el texto. La ruta devolvía 500 con «failed to pipe response» y sin
+            más pista, y el favicon —que sólo tiene un hijo de texto— funcionaba, lo que
+            despistó al diagnosticar. Vale para cualquier `div` que se añada aquí. */}
         <div
           style={{
+            display: 'flex',
             color: '#6d747c',
             fontSize: 22,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
           }}
         >
-          {t.nav.projects} · CV
+          {/* Literal y no traducido: «Portfolio» y «CV» se escriben igual en los dos
+              idiomas, así que traducirlo sería mantenimiento para nada. */}
+          PORTFOLIO · CV
         </div>
       </div>
 
