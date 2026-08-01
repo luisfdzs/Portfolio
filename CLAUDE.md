@@ -63,6 +63,10 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   en la sección + `mx-auto` en las cajas con ancho máximo + `justify-center` en las filas flex; las
   tres cosas juntas, porque ninguna hace el trabajo de las otras. **En papel no**: `@media print` lo
   deshace. Qué quedó sin centrar y por qué, en [[decisiones-de-diseno]].
+- **Los proyectos destacados de la portada van en un carrusel «cover flow»** (bloque «COVER FLOW»
+  de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D dirigido por el scroll, sin
+  JavaScript salvo los dos botones. Fallback sin soporte o con `prefers-reduced-motion`: carrusel
+  horizontal plano. En papel se deshace en retícula de dos columnas. Ver [[cover-flow]].
 
 Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.claude/memory/`.
 
@@ -84,6 +88,11 @@ Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.
    trabajo.
 6. **El estado laboral que se muestra es el puesto actual, no «disponible».** Es un dato
    verificable en LinkedIn y no una señal de búsqueda activa que pueda leer un jefe.
+7. **El cover flow se mide por el ANCHO del carrusel, no con `view-timeline-inset`.** El inset es
+   el camino evidente y obliga a un `calc()` con porcentaje; medirlo por el ancho deja la
+   geometría en un sitio y, de paso, convierte el carrusel en una ventana centrada en vez de una
+   banda a sangre con medio metro de vacío a la izquierda en un monitor ancho. Ver
+   [[cover-flow]].
 
 ## 4. Reglas del proyecto
 

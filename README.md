@@ -148,6 +148,30 @@ En escritorio la navegación es la cabecera fija; en móvil (`< lg`), una **barr
 iconos** al alcance del pulgar. Nunca las dos: tenerlas sería robar 4 rem arriba y abajo en el
 dispositivo que menos tiene.
 
+### Los proyectos destacados van en un «cover flow»
+
+Los cuatro proyectos de la portada no están en una retícula, sino en un **carrusel 3D**: la
+tarjeta centrada se mira de frente y las de los lados se giran sobre su eje vertical, se alejan y
+se apagan. Es la única sección cuyo contenido es visual, y cuatro capturas de web puestas una al
+lado de otra no se miran: se hojean.
+
+Lo mueve **el scroll y nada más**. Las animaciones son `view-timeline` + `animation-timeline`, la
+misma técnica que las apariciones al hacer scroll, así que no hay JavaScript calculando
+posiciones. La geometría —lo único delicado— está razonada en el bloque «COVER FLOW» de
+`app/globals.css`; en resumen: `--cover-flow-card` es lo que mide la tarjeta,
+`--cover-flow-step` lo que avanza el scroll de una a la siguiente (más corto, y de ahí el
+solape), y **el ancho del carrusel es lo que decide cuánto dura el giro**, porque con
+`animation-range: contain` el giro ocupa `ancho − tarjeta`.
+
+Lo único con JavaScript son los **dos botones** de `components/ui/CoverFlow.tsx`: con el dedo se
+arrastra y con el tabulador el navegador trae al foco cada tarjeta, pero una rueda de ratón no
+hace scroll horizontal y la barra está oculta a propósito.
+
+Si el navegador no soporta animaciones dirigidas por scroll, o si el sistema pide menos
+movimiento, queda **un carrusel horizontal normal** con las tarjetas separadas y ninguna girada.
+Y en papel se deshace en la retícula de dos columnas que había antes: sin eso, un `overflow-x`
+imprimiría el primer proyecto y recortaría los otros tres.
+
 ### Las capturas de los proyectos
 
 Las seis capturas de `public/projects/` se toman de las webs en vivo y se procesan con
