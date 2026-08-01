@@ -493,12 +493,21 @@
 /* ============================================================================
    ESCENARIO CINÉTICO DE LA PORTADA
 
-   El fondo animado del hero. El razonamiento de diseño está en
-   `components/sections/HeroStage.tsx`; aquí sólo está la mecánica, y la mecánica
-   tiene una única regla: **nada que no sea `transform` u `opacity`**. Son las dos
-   propiedades que el navegador puede animar en el compositor, sin volver a medir
-   ni repintar. Animar `top`, `filter` o `background-position` en once elementos a
-   la vez es lo que convierte un fondo bonito en un ventilador encendido.
+   El fondo animado del hero, que aquí **es la primera pantalla completa**: un
+   mosaico de código, servidores, red y cacharrería que ocupa el alto de la
+   ventana, con el texto apoyado abajo sobre él. El razonamiento de diseño está
+   en `components/sections/HeroStage.tsx`; aquí está la mecánica.
+
+   Dos reglas gobiernan este bloque:
+
+   1. **Nada que no sea `transform` u `opacity`.** Son las dos propiedades que el
+      navegador puede animar en el compositor, sin volver a medir ni repintar.
+      Animar `top`, `filter` o `background-position` en cuarenta elementos a la
+      vez es lo que convierte un fondo bonito en un ventilador encendido.
+
+   2. **La geometría se mide en unidades de VENTANA, no de columna.** El alto de
+      teja va en `vh` a propósito, y es lo que hace que el bucle no pueda tener
+      costura: ver `.hero-stage__tile`.
    ========================================================================= */
 
 /* El bucle. Hasta el −50 % exacto porque la lista de tejas está duplicada: al
@@ -526,13 +535,13 @@
   }
 }
 
-/* La entrada, una sola vez. El escenario no aparece de golpe con la página: sube
-   y se revela en algo menos de dos segundos, que es lo que hace que se lea como
-   una escena que se enciende y no como una imagen que tardó en cargar. */
+/* La entrada, una sola vez. El escenario no aparece de golpe con la página: se
+   revela en algo menos de dos segundos, que es lo que hace que se lea como una
+   escena que se enciende y no como una imagen que tardó en cargar. */
 @keyframes hero-stage-enter {
   from {
     opacity: 0;
-    transform: translate3d(0, 3rem, 0);
+    transform: scale(1.06);
   }
   to {
     opacity: 1;
@@ -540,28 +549,44 @@
   }
 }
 
-/* La flotación del retrato. Amplitud mínima (10 px en catorce segundos): lo justo
-   para que la tarjeta no parezca pegada al fondo. */
+/* La flotación del retrato. Amplitud mínima (6 px en catorce segundos): lo justo
+   para que el avatar no parezca pegado al fondo. */
 @keyframes hero-float {
   0%,
   100% {
     transform: translate3d(0, 0, 0);
   }
   50% {
-    transform: translate3d(0, -0.625rem, 0);
+    transform: translate3d(0, -0.375rem, 0);
+  }
+}
+
+/* El aviso de que hay más abajo. Recorrido corto y pausa larga: una flecha que
+   bota sin parar es un elemento parpadeante más, y esto sólo tiene que insinuar. */
+@keyframes hero-hint {
+  0%,
+  55%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  75% {
+    transform: translate3d(0, 0.3rem, 0);
   }
 }
 
 @layer components {
   /* --- La caja del escenario -------------------------------------------------
      `overflow: hidden` no es cosmético: es lo que impide que las columnas —que
-     salen del encuadre a propósito— ensanchen el documento. `check:mobile`
-     comprueba que la portada no desborde ni un píxel a 390 px, y un carrusel de
-     fondo es el sospechoso número uno de ese fallo.
+     salen del encuadre por arriba y por abajo— ensanchen o alarguen el
+     documento. `check:mobile` comprueba que la portada no desborde ni un píxel a
+     390 px, y un mosaico de fondo es el sospechoso número uno de ese fallo.
 
-     La máscara vertical apaga el escenario contra el borde de arriba (donde está
-     la cabecera fija) y contra el de abajo (donde empieza la sección siguiente),
-     así que el hero no tiene costuras: las tejas nacen y mueren en el grafito. */
+     No lleva máscara. En la versión anterior el escenario era una banda en la
+     mitad derecha y hacían falta dos máscaras y un velo coordinados en la misma
+     unidad para que el texto se leyera. Ahora el escenario es la pantalla
+     entera y el contraste lo resuelve un único degradado vertical, el velo, que
+     además es el mismo en móvil y en escritorio. Una pieza menos que
+     desincronizar. */
   .hero-stage {
     position: absolute;
     inset: 0;
@@ -571,169 +596,103 @@
     /* Detrás de todo el contenido del hero, y por encima del lienzo. */
     z-index: 0;
 
-    /*
-     * EN MÓVIL EL ESCENARIO ES UNA FRANJA, NO UN FONDO.
-     *
-     * En 390 px no hay una mitad libre donde poner el mosaico: el texto ocupa
-     * todo el ancho, así que cualquier teja cae DEBAJO de una línea de texto. La
-     * primera versión hacía justo eso, y la captura a 390 px lo dejó claro — el
-     * párrafo de la entradilla y la línea de «Vigo, Galicia» se leían sobre una
-     * foto de un portátil y costaba leerlas. Un fondo bonito que estropea la
-     * lectura del CV en el dispositivo con el que la mitad de la gente lo abre no
-     * es un fondo bonito.
-     *
-     * Así que en móvil vive sólo en la franja de arriba —detrás del retrato y del
-     * rótulo de estado— y se ha apagado del todo antes de que empiece «Hola, soy».
-     *
-     * El corte va en `rem` y no en porcentaje **a propósito**: el porcentaje se
-     * mide contra el alto del hero, que en móvil cambia con la longitud de la
-     * entradilla y con el tamaño de letra del sistema. En `rem` el escenario
-     * termina siempre en el mismo sitio respecto al retrato, que es lo que hay
-     * que respetar. 14rem cubre el `pt-24` más el retrato de 10rem; a 19rem ya no
-     * queda nada.
-     *
-     * Los primeros 2rem también se desvanecen: sin ellos las tejas se cortaban a
-     * cuchillo contra el borde de arriba de la ventana y la franja parecía una
-     * imagen recortada en vez de una escena que asoma.
-     */
-    mask-image: linear-gradient(
-      to bottom,
-      transparent 0%,
-      #000 2rem,
-      #000 14rem,
-      transparent 19rem
-    );
+    /* La separación entre tejas, en un solo sitio: la usan el carril (entre
+       columnas) y la pista (entre tejas), y tienen que ser la misma o el mosaico
+       se lee como una retícula mal cuadrada. */
+    --hero-gap: clamp(0.5rem, 0.9vw, 1rem);
   }
 
-  @media (width >= 64rem) {
-    .hero-stage {
-      /* En escritorio sí es un fondo de verdad: el reparto lo hace la máscara
-         lateral del carril, y ésta sólo suaviza los bordes de arriba (la cabecera
-         fija) y de abajo (la sección siguiente). */
-      mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 72%, transparent 100%);
-    }
-  }
-
-  /* --- La zona alineada con la retícula --------------------------------------
-     El escenario es a sangre (ocupa el ancho completo de la ventana), pero el
-     carril tiene que empezar justo donde acaba la columna de texto, y esa columna
-     vive dentro de un contenedor centrado de 80rem. Sin este elemento intermedio,
-     un «42 %» del carril sería el 42 % de la VENTANA: en una pantalla de 1920 px
-     caería en mitad del titular, y en una de 1280 px caería bien. El fondo se
-     rompería sólo en las pantallas grandes, que son las de quien decide.
-
-     Con la zona, los porcentajes del carril se miden contra la misma retícula que
-     el texto, y el desbordamiento lateral (`-25vw`) es lo que devuelve la sangre. */
+  /* --- La zona --------------------------------------------------------------
+     Existe sólo para llevar la animación de entrada. La lleva ella y no el
+     carril **a propósito**: el fotograma final de `hero-stage-enter` declara
+     `transform: none`, y una animación gana siempre a una declaración normal.
+     Puesta en el carril machacaría cualquier `transform` estático que se le
+     ponga en el futuro; ya pasó una vez con la inclinación de la versión
+     anterior y costó de diagnosticar, porque el CSS «se ve bien». */
   .hero-stage__area {
-    position: relative;
-    margin-inline: auto;
-    max-width: 80rem; /* = max-w-7xl, el ancho del contenido del hero */
-    height: 100%;
-    /* La entrada va AQUÍ y no en el carril, y no es un detalle de estilo: el
-       fotograma final de `hero-stage-enter` declara `transform: none`, y una
-       animación gana siempre a una declaración normal. Puesta en el carril, ese
-       `none` machacaba el `rotate(-5deg)` de escritorio en cuanto la animación
-       terminaba — y quedaba una cuadrícula de fotos rectas donde tenía que haber
-       un plano inclinado. Se vio a la primera captura. */
+    position: absolute;
+    inset: 0;
     animation: hero-stage-enter 1.8s var(--ease-out-soft) 0.15s both;
   }
 
   /* --- El carril de columnas -------------------------------------------------
-     La máscara HORIZONTAL vive aquí y no en `.hero-stage` a propósito: dos
-     máscaras en el mismo elemento obligan a `mask-composite`, que tiene sintaxis
-     distinta con y sin prefijo y falla de formas difíciles de ver. Anidadas, cada
-     elemento tiene una sola máscara y el resultado es la intersección, que es
-     justo lo que se busca.
-
-     En móvil ocupa todo el ancho y se apaga por completo antes de llegar al
-     titular; en escritorio se va a la parte derecha, la mitad de la retícula
-     donde no hay texto. */
+     A sangre: ocupa la ventana completa. Ya no hay un «empieza en el 62 %»,
+     porque ya no hay una columna de texto al lado que respetar — el texto va
+     debajo, no al lado. Ese número era el acoplamiento más frágil del hero
+     anterior: dependía de la proporción de la retícula y de si el texto estaba
+     centrado o no. */
   .hero-stage__rail {
     position: absolute;
     inset: 0;
     display: flex;
-    gap: clamp(0.75rem, 1.4vw, 1.25rem);
-    /* Más alto que la caja: las columnas tienen que poder desplazarse sin que se
-       vea el final del carril. */
-    align-items: flex-start;
-    /* En móvil el recorte vertical lo hace ya la máscara de `.hero-stage`; aquí
-       sólo se baja la intensidad, para que la franja sea atmósfera y no un collage
-       compitiendo con el retrato que tiene delante. */
-    opacity: 0.55;
-  }
-
-  @media (width >= 64rem) {
-    .hero-stage__rail {
-      /*
-       * Arranca en el 62 % de la retícula y sale 25vw por la derecha, para llegar
-       * al borde de la ventana en cualquier pantalla; lo que sobra lo recorta el
-       * `overflow: hidden` de `.hero-stage`.
-       *
-       * El 62 % no es un valor buscado a ojo: la columna de texto es `1.5fr` de
-       * `1.5fr 1fr`, o sea **el 60 %** de la retícula. Las tejas empiezan justo
-       * después, y así **por construcción** ninguna nace debajo del texto en
-       * ningún ancho.
-       *
-       * Estaba en el 58 % y colaba porque el texto iba alineado a la izquierda y
-       * no llenaba su columna. Al centrarlo (merge de `centrar-textos`) los
-       * bloques se reparten a los dos lados y la entradilla —`max-w-measure`, que
-       * a 1024 px casi llena la columna— alcanza el 56 %: quedaban dos puntos de
-       * holgura y a 1024 px el párrafo y el mosaico se tocaban. Con el 62 % la
-       * holgura no depende de cómo esté alineado el texto.
-       */
-      inset-inline: 62% -25vw;
-      /* En escritorio las tejas están en su mitad y no debajo de nada, así que
-         casi no hace falta bajarlas: ese 8 % es sólo para que el mosaico no gane
-         en peso visual al titular, que es lo único que tiene que destacar. */
-      opacity: 0.92;
-      /* La inclinación. Cinco grados y un `scale` que compensa las esquinas que
-         la rotación deja fuera del encuadre. Es lo que separa esto de una
-         cuadrícula de fotos: las columnas dejan de ser verticales y el conjunto
-         empieza a leerse como un plano en perspectiva. */
-      transform: rotate(-5deg) scale(1.25);
-      /* En escritorio el desvanecido es lateral (el texto está a la izquierda),
-         no hacia abajo. */
-      mask-image: linear-gradient(to right, transparent 0%, #000 34%);
-    }
+    gap: var(--hero-gap);
+    /* El mosaico no puede ganarle en peso visual al nombre. El resto del
+       contraste lo pone el velo. */
+    opacity: 0.85;
   }
 
   /* --- Una columna ---------------------------------------------------------- */
   .hero-stage__column {
     position: relative;
     flex: 1 1 0;
+    height: 100%;
     /* Recorta su propia pista: sin esto, la segunda copia de las tejas se vería
        asomar por encima de la columna de al lado. */
     overflow: hidden;
-    /* Dos veces el alto del hero: garantiza que la pista siempre tenga tejas por
-       delante y por detrás del encuadre. */
-    height: 200%;
   }
 
-  /* La tercera columna. `display: none` y no una opacidad: así un móvil estrecho no
-     descarga sus cuatro fotografías —`next/image` con `loading="lazy"` no pide nada
-     de un contenedor oculto—.
-
-     Aparece a partir de 40rem (640 px) y no en `lg`, y la razón es una tableta: a
-     834 px de ancho, dos columnas dan tejas de más de 400 px y la franja de arriba
-     deja de leerse como atmósfera y se convierte en un banner de fotos con el
-     retrato encima. Con tres, la teja baja a ~265 px y vuelve a ser un mosaico.
-     Por debajo de 40rem sí caben sólo dos: a 390 px, tres columnas darían tejas de
-     115 px en las que no se distingue de qué son. */
+  /*
+   * Las columnas que sólo aparecen al haber ancho. `display: none` y no una
+   * opacidad: así un móvil estrecho **no descarga** las fotos que no va a ver
+   * —`next/image` con `loading="lazy"` no pide nada de un contenedor oculto—.
+   *
+   * Los tres tramos salen del ancho de teja que queda, que es lo que decide si
+   * el mosaico se lee o no:
+   *
+   * - 2 columnas por debajo de 40rem: a 390 px son tejas de ~185 px, que es el
+   *   mínimo para reconocer de qué es una foto. Con tres bajarían a 120 px y el
+   *   fondo se convertiría en confeti.
+   * - 3 desde 40rem: a 834 px (tableta) dos columnas darían tejas de 410 px y el
+   *   fondo dejaría de ser mosaico para ser un carrusel de fotos grandes.
+   * - 4 desde 64rem y 5 desde 90rem, por lo mismo al revés: en un monitor de
+   *   1920 px, cuatro columnas dan tejas de 470 px de ancho y el conjunto pierde
+   *   la densidad que lo hace parecer una pared de pantallas.
+   */
+  .hero-stage__column--tablet,
+  .hero-stage__column--desktop,
   .hero-stage__column--wide {
     display: none;
   }
 
   @media (width >= 40rem) {
+    .hero-stage__column--tablet {
+      display: block;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .hero-stage__column--desktop {
+      display: block;
+    }
+  }
+
+  @media (width >= 90rem) {
     .hero-stage__column--wide {
       display: block;
     }
   }
 
-  /* --- La pista que se desplaza -------------------------------------------- */
+  /* --- La pista que se desplaza --------------------------------------------
+     `--hero-phase` desfasa el arranque de cada columna con un margen negativo, y
+     va en margen y no en `transform` porque el `transform` de la pista está
+     ocupado por la animación del bucle. Sin el desfase, las cinco columnas
+     empiezan con una teja alineada en la misma línea y el mosaico se lee como
+     una tabla que se mueve, no como cinco planos independientes. */
   .hero-stage__track {
     display: flex;
     flex-direction: column;
-    gap: clamp(0.75rem, 1.4vw, 1.25rem);
+    gap: var(--hero-gap);
+    margin-block-start: var(--hero-phase, 0);
     /* `linear` y no una curva: cualquier aceleración en un bucle infinito se
        percibe como un tirón cada vuelta. */
     animation: hero-drift var(--hero-drift, 80s) linear infinite;
@@ -748,26 +707,50 @@
     animation-direction: reverse;
   }
 
-  /* --- Una teja ------------------------------------------------------------ */
-  .hero-stage__tile {
+  /* --- Una teja ------------------------------------------------------------
+     EL ALTO VA EN `vh`, Y ES LA PIEZA QUE EVITA LA COSTURA DEL BUCLE.
+
+     El bucle funciona porque la pista lleva la lista de tejas dos veces y se
+     desplaza exactamente un 50 %. Para que no se vea el final de la pista, una
+     copia tiene que ser **más alta que la ventana**. Con el alto derivado del
+     ancho de la columna (una proporción 3:2, como en la versión anterior) eso
+     dependía de la forma de la pantalla: en una tableta de 1024×1366 las tejas
+     salían de 165 px, ocho copias no llegaban al alto de la ventana y aparecía
+     un hueco al final de cada vuelta. En `vh`, las siete tejas de una columna
+     miden 112 vh + huecos **en cualquier pantalla**, y el problema no puede
+     volver. Si alguien cambia el número de tejas por columna en `HeroStage.tsx`,
+     este es el cálculo que hay que rehacer: siete × 16 vh > 100 vh.
+
+     `max()` y no `clamp()`: el mínimo protege las ventanas bajas (un portátil en
+     1366×768) y no hay máximo a propósito — un tope volvería a romper la
+     garantía justo en las pantallas más altas, que es donde importa.
+
+     Con el alto fijado, la proporción de la teja la pone el ancho de la columna,
+     así que cambia con el tramo. No es un problema: **todas las tejas comparten
+     forma en cada ancho dado**, y eso es lo que hace que el ritmo se lea como
+     ritmo. Por eso las fotos van con `object-fit: cover`. */
+  .hero-stage__tile,
+  .hero-panel {
+    flex: none;
     width: 100%;
-    height: auto;
+    height: max(7.5rem, 16vh);
     border-radius: 0.5rem;
     border: 1px solid var(--color-line-strong);
-    /* El grado fotográfico va horneado en el archivo (ver `CREDITS.md`); aquí
-       sólo queda el peso visual que separa la teja del fondo. */
     box-shadow: 0 1.25rem 2.5rem -1rem #000;
   }
 
-  /* --- Los dos paneles dibujados ------------------------------------------- */
+  .hero-stage__tile {
+    /* El grado fotográfico va horneado en el archivo (ver `CREDITS.md`); aquí
+       sólo queda el recorte y el peso visual que separa la teja del fondo. */
+    object-fit: cover;
+  }
+
+  /* --- Los paneles dibujados ----------------------------------------------- */
   .hero-panel {
     /* `overflow: hidden` recorta el código que se sale: el panel es una ventana
        a un editor, no una caja que se estira hasta caber. */
     overflow: hidden;
-    border-radius: 0.5rem;
-    border: 1px solid var(--color-line-strong);
     background: color-mix(in srgb, var(--color-ink-raised) 92%, transparent);
-    box-shadow: 0 1.25rem 2.5rem -1rem #000;
   }
 
   .hero-panel__bar {
@@ -823,88 +806,185 @@
     color: var(--color-signal);
   }
 
+  /* El panel de red: un diagrama de nodos dibujado con la retícula del sistema.
+     Es SVG y no una foto porque una foto de un armario de red a 200 px es una
+     mancha azul, y esto se lee como una topología a cualquier tamaño. */
+  .hero-panel__svg {
+    display: block;
+    width: 100%;
+    height: calc(100% - 1.35rem);
+    color: var(--color-signal);
+  }
+
   /* --- El resplandor ------------------------------------------------------- */
   .hero-stage__glow {
     position: absolute;
-    /* Centrado en la mitad derecha, que es donde están las tejas. */
-    inset-block: -20%;
-    inset-inline: 30% -20%;
+    /* A sangre y centrado en la franja donde el mosaico se ve de verdad: la
+       mitad de arriba. Abajo lo tapa el velo, así que allí no aportaría nada. */
+    inset: -25% -15% 25%;
     border-radius: 50%;
     background: radial-gradient(
       circle at 50% 50%,
-      color-mix(in srgb, var(--color-signal) 28%, transparent) 0%,
+      color-mix(in srgb, var(--color-signal) 26%, transparent) 0%,
       color-mix(in srgb, var(--color-signal) 8%, transparent) 45%,
       transparent 70%
     );
     /* El desenfoque es estático: `filter` NO se anima (ver la regla de arriba).
-       Lo que se anima es la opacidad y la escala de un elemento ya desenfocado. */
-    filter: blur(2.5rem);
+       Lo que se anima es la opacidad y la escala de algo ya desenfocado. */
+    filter: blur(3rem);
     animation: hero-glow 37s ease-in-out infinite;
     will-change: opacity, transform;
   }
 
-  /* --- El velo -------------------------------------------------------------
-     Encima de las tejas. Devuelve el fondo a grafito puro donde vive el texto:
-     en móvil por arriba (el titular ocupa la mitad superior) y en escritorio por
-     la izquierda. Sin él, el escenario puede llevarse por delante el contraste
-     del nombre justo en el ancho donde a alguna teja le toque una zona clara. */
+  /* --- El velo del escenario ----------------------------------------------
+     ENCIMA de las tejas, y es ATMÓSFERA: baja el mosaico entero para que no le
+     gane en peso visual al titular, y protege dos bordes.
+
+     1. Grafito casi opaco en los primeros 4 rem (el 8 %): ahí vive la cabecera
+        fija, que es translúcida (`bg-ink/80`) y sobre una teja clara perdería
+        contraste.
+     2. Abierto de ahí para abajo, que es donde se ve el mosaico.
+     3. Y una vuelta suave al final, para que la costura con la sección siguiente
+        no se note.
+
+     **El contraste del texto NO lo hace este velo**, lo hace `.hero-copy::before`,
+     que va anclado al bloque de texto. Ese reparto es deliberado y está explicado
+     ahí abajo: es la corrección de un fallo real de la primera versión.
+
+     La segunda capa, plana y muy floja, cierra el caso de la foto clara que llena
+     toda la franja abierta. */
   .hero-stage__scrim {
     position: absolute;
     inset: 0;
-    /* En móvil acompaña a la máscara de la franja, y en los mismos `rem`: apaga la
-       parte de arriba (que queda detrás de la cabecera), deja respirar las tejas a
-       la altura del retrato y devuelve el grafito puro justo donde empieza el
-       titular. Los dos degradados tienen que hablar en la misma unidad; en cuanto
-       uno vaya en `%` y el otro en `rem`, dejan de coincidir en el momento en que
-       cambie el alto del hero. */
+    background:
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--color-ink) 92%, transparent) 0%,
+        color-mix(in srgb, var(--color-ink) 42%, transparent) 8%,
+        color-mix(in srgb, var(--color-ink) 20%, transparent) 50%,
+        color-mix(in srgb, var(--color-ink) 34%, transparent) 100%
+      ),
+      linear-gradient(
+        color-mix(in srgb, var(--color-ink) 14%, transparent),
+        color-mix(in srgb, var(--color-ink) 14%, transparent)
+      );
+  }
+
+  /* --- El velo del texto ---------------------------------------------------
+     LA PIEZA QUE HACE LEGIBLE EL BLOQUE DE TEXTO, Y VA ANCLADA AL TEXTO.
+
+     Se mide **desde el propio bloque de texto, no desde un porcentaje del hero**,
+     y la diferencia no es de estilo. La primera versión cerraba el degradado del
+     escenario en el 62 % del alto del hero, un número sacado a ojo de una
+     captura. Fallaba, y se vio en la primera captura: el bloque de texto mide lo
+     que miden sus líneas —unos 40 rem con las cifras dentro—, así que en una
+     ventana de 900 px empieza bastante más arriba de ese 62 %, y el rótulo del
+     puesto y la línea de «Vigo, Galicia» caían sobre la parte abierta del velo.
+     Son los dos textos más pequeños y más apagados de la portada, justo los que
+     menos aguantan una fotografía detrás. Con el nombre no pasaba —es enorme y
+     casi blanco—, y por eso una revisión rápida lo deja pasar.
+
+     Anclado al texto, el degradado empieza 3,5 rem por encima del rótulo pase lo
+     que pase: da igual el alto de la ventana, el idioma (el rótulo en inglés
+     ocupa una línea menos) o que alguien tenga el tipo del sistema a 24 px. Y los
+     topes van en `rem` por la misma razón: se miden contra las líneas que tienen
+     que proteger, no contra una ventana que no sabemos cuánto mide.
+
+     **El avatar queda fuera a propósito**, por encima de este bloque: es una
+     imagen con su propio halo y su propia sombra, no necesita contraste de texto,
+     y dejarlo en la zona abierta es lo que mantiene una franja de mosaico visible
+     arriba incluso a 390 px, donde el texto ocupa todo el ancho.
+
+     `inset-inline: calc(50% - 50vw)` lo saca a sangre desde un contenedor
+     centrado de 80 rem, y el sobrante lo recorta el `overflow-hidden` de la
+     sección. El `-10rem` de abajo cubre el hueco que el contenedor reserva para
+     la barra de iconos de móvil: sin él se veían tejas por debajo de las cifras.
+
+     `z-index: -1` y `pointer-events: none`: se pinta detrás del texto de su
+     propio contenedor —que ya está en `z-10`, o sea por encima del escenario— y
+     no puede interceptar el clic de un botón. */
+  .hero-copy {
+    position: relative;
+  }
+
+  .hero-copy::before {
+    content: '';
+    position: absolute;
+    inset-block: -3.5rem -10rem;
+    inset-inline: calc(50% - 50vw);
+    z-index: -1;
+    pointer-events: none;
+    /*
+     * LOS TOPES SON EL EQUILIBRIO ENTRE «SE LEE» Y «SE VE EL FONDO», y están puestos
+     * línea por línea, no a ojo:
+     *
+     * - 0–4 rem, transparente: aquí está el rótulo del puesto, y no depende de este
+     *   degradado — lleva su propia pastilla (`.hero-chip`). Es lo que permite que el
+     *   velo empiece tarde y flojo en vez de tener que tapar el mosaico desde arriba.
+     * - 4–12 rem, del 28 % al 58 %: el saludo y el NOMBRE. El nombre mide 4,5 rem y es
+     *   casi blanco, así que se lee sobre una teja con muy poca ayuda — y es justo la
+     *   franja donde interesa que el mosaico siga viéndose, porque es el centro de la
+     *   pantalla.
+     * - 12–20 rem, hasta el 88 %: la línea de la ubicación y los botones. Texto pequeño
+     *   y apagado: aquí sí hace falta el velo.
+     * - 26 rem en adelante, grafito puro: las cifras y su filete. Son el resumen del CV
+     *   y se comparan de un vistazo; una foto por detrás las convierte en decoración.
+     *
+     * La primera versión llegaba al 88 % en 9 rem y a grafito puro en 16 rem: se leía
+     * todo perfectamente y el mosaico desaparecía de la mitad inferior de la pantalla,
+     * que es medio encargo tirado a la basura. Se vio comparando dos capturas.
+     */
     background: linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--color-ink) 85%, transparent) 0%,
-      color-mix(in srgb, var(--color-ink) 55%, transparent) 7rem,
-      color-mix(in srgb, var(--color-ink) 80%, transparent) 15rem,
-      var(--color-ink) 20rem
+      transparent 0,
+      color-mix(in srgb, var(--color-ink) 28%, transparent) 4rem,
+      color-mix(in srgb, var(--color-ink) 58%, transparent) 12rem,
+      color-mix(in srgb, var(--color-ink) 88%, transparent) 20rem,
+      var(--color-ink) 26rem
     );
   }
 
-  @media (width >= 64rem) {
-    .hero-stage__scrim {
-      /*
-       * Los porcentajes se miden contra la ZONA, no contra la ventana — el velo va
-       * dentro de `.hero-stage__area`, igual que el carril.
-       *
-       * Es la única forma de que velo y carril no se separen al cambiar el ancho.
-       * Cuando el velo iba en `%` de la ventana y el carril en `%` de la zona
-       * centrada de 80rem, las dos referencias coincidían a 1024 px y divergían a
-       * 1920 px: en pantalla grande el velo tapaba de más y en la pequeña de menos,
-       * o sea que el fondo se comportaba distinto justo en las dos pantallas donde
-       * hay que mirarlo. Ahora la relación entre «dónde empieza el mosaico» (62 %)
-       * y «hasta dónde llega el grafito» (56 %) es la misma en todas.
-       */
-      background: linear-gradient(
-        to right,
-        var(--color-ink) 0%,
-        var(--color-ink) 56%,
-        color-mix(in srgb, var(--color-ink) 62%, transparent) 70%,
-        color-mix(in srgb, var(--color-ink) 22%, transparent) 84%,
-        transparent 96%
-      );
-    }
+  /* --- La pastilla del rótulo de estado ------------------------------------
+     El puesto actual va en un texto pequeño, en versalitas y apagado: es el texto
+     menos legible de la portada y está en la parte ALTA del hero, que es
+     precisamente donde el velo tiene que estar abierto para que se vea el
+     mosaico. Las dos cosas no caben.
+
+     La pastilla lo resuelve donde está el problema en vez de a manotazos: un
+     fondo propio, casi opaco, con desenfoque detrás y un filete. Así el rótulo se
+     lee sobre cualquier teja, y el velo puede empezar cuatro rem más abajo y con
+     la mitad de intensidad. De paso, un chip de estado con su punto es como se
+     enseña «lo que estoy haciendo ahora» en cualquier interfaz reciente, así que
+     el arreglo técnico coincide con lo que pedía el encargo. */
+  .hero-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-line-strong);
+    background: color-mix(in srgb, var(--color-ink-raised) 78%, transparent);
+    padding: 0.4rem 0.9rem;
+    /* El desenfoque es lo que evita que se lea el borde de una teja a través de la
+       pastilla, que es lo que la haría parecer un recuadro sucio en vez de una
+       superficie. */
+    backdrop-filter: blur(0.5rem);
   }
 
-  /* --- El retrato, flotando sobre el escenario ----------------------------- */
+  /* --- El retrato, flotando sobre el escenario -----------------------------
+     Ahora es un avatar pequeño: el protagonista de la primera pantalla es el
+     escenario, y una foto de 20 rem en el centro lo partía en dos. El tamaño lo
+     pone `Hero.tsx`; aquí sólo está lo que lo despega del fondo. */
   .hero-portrait {
     position: relative;
     animation: hero-float 14s ease-in-out infinite;
-    /* `drop-shadow` y no `box-shadow`: el retrato es redondo en móvil y
-       rectangular con esquinas en escritorio, y este envoltorio no sabe cuál de
-       las dos formas tiene dentro. `drop-shadow` sigue el contorno real del
-       contenido, así que la sombra vale para las dos sin duplicar reglas ni
-       repetir el radio en dos sitios que luego se desincronizan.
+    /* `drop-shadow` y no `box-shadow`: sigue el contorno real del contenido, así
+       que vale igual para el círculo del avatar sin repetir el radio en dos
+       sitios que luego se desincronizan.
 
        Es la sombra la que hace el trabajo de despegar la cara del mosaico. Sin
        ella, con una teja clara pasando justo por detrás, el retrato se lee como
        una foto más del escenario. */
-    filter: drop-shadow(0 1.5rem 2.5rem rgb(0 0 0 / 0.7));
+    filter: drop-shadow(0 1rem 1.75rem rgb(0 0 0 / 0.7));
   }
 
   /* El halo de cobre detrás del retrato. Cumple una función además de la
@@ -913,16 +993,23 @@
   .hero-portrait::before {
     content: '';
     position: absolute;
-    inset: -18%;
+    inset: -22%;
     z-index: -1;
     border-radius: 50%;
     background: radial-gradient(
       circle at 50% 45%,
-      color-mix(in srgb, var(--color-signal) 22%, transparent) 0%,
+      color-mix(in srgb, var(--color-signal) 26%, transparent) 0%,
       color-mix(in srgb, var(--color-ink) 88%, transparent) 55%,
       transparent 78%
     );
-    filter: blur(0.75rem);
+    filter: blur(0.6rem);
+  }
+
+  /* --- El aviso de que hay más abajo --------------------------------------
+     Un hero que ocupa la ventana entera y acaba en un filete de cifras se puede
+     leer como una página completa. Esto es lo único que dice que no lo es. */
+  .hero-hint__arrow {
+    animation: hero-hint 2.6s ease-in-out infinite;
   }
 }
 
@@ -933,23 +1020,22 @@
    pero sigue ejecutando el ciclo miles de veces por segundo. `animation: none`
    lo apaga de verdad. */
 @media (prefers-reduced-motion: reduce) {
-  /* `__area` y no `__rail`: la animación de entrada está en la zona (el `rail`
-     lleva el `rotate` estático, y una animación que acabe en `transform: none` lo
-     machacaría). Apuntar al elemento equivocado aquí no se vería —el atajo general
-     de 0,01 ms deja el resultado correcto igual—, y por eso conviene que la lista
-     nombre exactamente lo que está animado. */
+  /* `__area` y no `__rail`: la animación de entrada está en la zona. Apuntar al
+     elemento equivocado aquí no se vería —el atajo general de 0,01 ms deja el
+     resultado correcto igual—, y por eso conviene que la lista nombre
+     exactamente lo que está animado. */
   .hero-stage__area,
   .hero-stage__track,
   .hero-stage__glow,
-  .hero-portrait {
+  .hero-portrait,
+  .hero-hint__arrow {
     animation: none !important;
   }
 
   /* `opacity: 1` sólo donde la animación podía dejarlo a cero: la zona arranca su
      entrada desde `opacity: 0`, y sin esto un escenario congelado se quedaría
      invisible en vez de quieto. */
-  .hero-stage__area,
-  .hero-stage__track {
+  .hero-stage__area {
     opacity: 1;
   }
 
@@ -1074,5 +1160,60 @@
      —y con `print-color-adjust` de por medio, puede que en negro sólido—. */
   .hero-stage {
     display: none !important;
+  }
+
+  /* Y el velo del texto tampoco. Es un degradado a grafito sólido: sin quitarlo, el
+     bloque del nombre y las cifras saldría impreso sobre un rectángulo negro —el
+     escenario que justificaba el velo ya no está, pero el velo sí—. */
+  .hero-copy::before {
+    display: none !important;
+  }
+
+  /* EL HALO DEL RETRATO, FUERA. En pantalla es un resplandor de cobre que separa la
+     silueta de las tejas; en papel, con el escenario ya quitado, es un nubarrón
+     negro de cuatro centímetros alrededor de la cara — se vio en la captura de
+     impresión. Van los dos: el degradado radial del `::before` y el `drop-shadow`
+     del contenedor, porque cada uno pinta la mitad de la nube. */
+  .hero-portrait {
+    filter: none !important;
+  }
+
+  .hero-portrait::before {
+    display: none !important;
+  }
+
+  /* La pastilla del rótulo, deshecha. Su fondo es grafito translúcido y su texto es
+     claro: impresa, sale una píldora gris oscuro con el puesto ilegible dentro.
+     En papel no hay teja de la que defenderse, así que se queda el texto solo. */
+  .hero-chip {
+    border: 0;
+    background: none;
+    padding: 0;
+    backdrop-filter: none;
+  }
+
+  /* Las cifras del hero, en negro. `text-paper` es un gris casi blanco: sobre papel
+     las cuatro cifras que resumen el CV salían en gris claro, al borde de no
+     imprimirse en una impresora doméstica. Es el bloque que un recruiter mira
+     primero en la hoja, así que no puede ser lo más flojo de la página. */
+  .hero-copy .figure-num {
+    color: #000;
+  }
+
+  /* EL HERO DEJA DE MEDIR UNA PANTALLA. En la web ocupa `min-h-svh` con el texto
+     apoyado abajo, que es lo que deja sitio al escenario. En papel el escenario no
+     se imprime, así que ese alto se convierte en una hoja casi en blanco con el
+     nombre al final — la primera página del CV, precisamente. Se vio en la captura
+     de impresión: el titular caía a dos tercios de la hoja.
+
+     Con el alto suelto, el bloque sube al principio de la página y el CV empieza
+     donde tiene que empezar. El `padding-top` de 7 rem que en pantalla despeja la
+     cabecera fija tampoco tiene sentido aquí: en papel no hay cabecera. */
+  .hero-section {
+    min-height: 0;
+  }
+
+  .hero-shell {
+    padding-block: 0 1.5rem;
   }
 }
