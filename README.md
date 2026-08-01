@@ -30,7 +30,7 @@ principal del proyecto y está explicada abajo, en «El contenido: dos fuentes y
 | `npm run build`          | Build de producción                                               |
 | `npm start`              | Sirve el build de producción                                      |
 | `npm run check`          | **Puerta de calidad**: typecheck + ESLint + formato               |
-| `npm run check:mobile`   | 19 comprobaciones en un Chrome real a 390×844 (requiere servidor) |
+| `npm run check:mobile`   | 21 comprobaciones en un Chrome real a 390×844 (requiere servidor) |
 | `npm run format`         | Aplica Prettier                                                   |
 | `npm run migrate:build`  | Convierte `content/` en el NDJSON de importación a Sanity         |
 | `npm run migrate:import` | Importa ese NDJSON al dataset (sube también las imágenes)         |

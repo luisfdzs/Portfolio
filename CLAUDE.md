@@ -27,10 +27,10 @@ heredó de `C:\Proyectos\sangilstudio`.
 **Estado (2026-08-01): DESPLEGADO.**
 [luisfernandezsangil.vercel.app](https://luisfernandezsangil.vercel.app) (producción, rama `main`)
 y [luisfernandezsangiltest.vercel.app](https://luisfernandezsangiltest.vercel.app) (test, rama
-`test`, con `Disallow: /`). `npm run check` limpio y `npm run check:mobile` **19/19 en local y
-19/19 contra el entorno de test desplegado**, en los dos idiomas. El flujo `develop` → `test` →
-`main` está verificado: `develop` no despliega nada y cada push a `test` y a `main` despliega en su
-entorno. IDs y detalles en la memoria [[despliegue]].
+`test`, con `Disallow: /`). `npm run check` limpio y `npm run check:mobile` **21/21 en local, en
+test y en producción**, en los dos idiomas. El flujo `develop` → `test` → `main` está verificado:
+`develop` no despliega nada y cada push a `test` y a `main` despliega en su entorno. IDs y detalles
+en la memoria [[despliegue]].
 
 **Todavía no hay proyecto de Sanity**, y la web funciona igual sirviendo `content/` — es
 exactamente lo que la arquitectura contempla (ver [[contenido-dos-fuentes]]). Enchufarlo es el
@@ -53,7 +53,7 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   arrastrando.
 - **Despliegue: Vercel**, dos entornos (`main` → producción, `test` → test con `noindex`).
   Framework declarado en `vercel.json`.
-- **Calidad:** `npm run check` (typecheck + ESLint + Prettier) y `npm run check:mobile` (19
+- **Calidad:** `npm run check` (typecheck + ESLint + Prettier) y `npm run check:mobile` (21
   comprobaciones en Chrome real a 390×844, por idioma).
 - **Tipografía:** Instrument Serif (titulares), Inter (cuerpo) y JetBrains Mono (datos), las tres
   autoalojadas por `next/font` — ninguna petición a Google en tiempo de ejecución.
