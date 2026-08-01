@@ -7,6 +7,7 @@ import { getProfile } from '@/lib/content'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { Footer } from '@/components/layout/Footer'
+import { HashCleaner } from '@/components/layout/HashCleaner'
 import { Header } from '@/components/layout/Header'
 import { MobileNav } from '@/components/layout/MobileNav'
 import '@/app/globals.css'
@@ -142,6 +143,11 @@ export default async function SiteLayout({
         <main id="main">{children}</main>
         <Footer locale={locale} profile={profile} />
         <MobileNav locale={locale} />
+
+        {/* No pinta nada: borra el `#seccion` de la barra de direcciones una vez el
+            navegador lo ha usado, para que el menú deje siempre una URL con la misma
+            forma. Todo el razonamiento, en el propio componente. */}
+        <HashCleaner />
       </body>
     </html>
   )

@@ -62,7 +62,9 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
 - **Tipografía:** Instrument Serif (titulares), Inter (cuerpo) y JetBrains Mono (datos), las tres
   autoalojadas por `next/font` — ninguna petición a Google en tiempo de ejecución.
 - **Navegación:** cabecera fija en escritorio; en móvil (`< lg`), barra inferior de cinco iconos.
-  Nunca las dos a la vez.
+  Nunca las dos a la vez. **La URL nunca enseña `#seccion`**: los `href` siguen llevando el
+  ancla, pero `components/layout/HashCleaner.tsx` la borra en cuanto ha hecho su trabajo, y en
+  las navegaciones entre páginas no llega ni a escribirse. Ver [[urls-sin-anclas]].
 - **Alineación: el texto va centrado** en el espacio que ocupa, como en `sangilstudio`. `text-center`
   en la sección + `mx-auto` en las cajas con ancho máximo + `justify-center` en las filas flex; las
   tres cosas juntas, porque ninguna hace el trabajo de las otras. **En papel no**: `@media print` lo
@@ -110,6 +112,9 @@ Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.
 9. **Sólo entran imágenes CC0 o dominio público**, y cada una queda documentada en
    `public/hero/CREDITS.md`. Nada de CC-BY: obligaría a mostrar once líneas de crédito detrás del
    titular. El script comprueba la licencia y descarta lo que no lo sea.
+10. **Las secciones de la portada no se convierten en rutas** para quitar la almohadilla de la
+    URL. Serían cinco páginas por idioma con el mismo CV compitiendo con la portada por «Luis
+    Fernández Sangil». La almohadilla se quita en cliente; ver [[urls-sin-anclas]].
 
 ## 4. Reglas del proyecto
 
