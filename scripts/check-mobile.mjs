@@ -293,6 +293,48 @@ async function main() {
     .getAttribute('href')
   check(Boolean(backHref?.startsWith('/')), `el enlace de vuelta es absoluto (${backHref})`)
 
+  // --- Metadatos que sólo piden los rastreadores -------------------------------------------
+  /**
+   * La imagen de apertura social y el favicon, pedidos **a mano**.
+   *
+   * Hacen falta porque un navegador normal no descarga la imagen de `og:image`: sólo la piden
+   * LinkedIn, WhatsApp o Slack al desplegar la vista previa de un enlace. Así que un fallo ahí
+   * es invisible en local, invisible en producción y visible justo el día que se comparte el
+   * enlace en una candidatura.
+   *
+   * Y pasó: `ImageResponse` devolvía 500 porque Satori exige `display: flex` explícito en
+   * cualquier `div` con más de un hijo, y una interpolación de texto creaba dos. El error era
+   * «failed to pipe response», sin más pista. Ver `app/(site)/[locale]/opengraph-image.tsx`.
+   */
+  console.log('\nMetadatos sociales')
+  await page.goto(`${BASE}/${LOCALE}`, { waitUntil: 'networkidle' })
+
+  const metaUrls = await page.evaluate(() => ({
+    ogImage: document.querySelector('meta[property="og:image"]')?.getAttribute('content') ?? null,
+    icon: document.querySelector('link[rel="icon"]')?.getAttribute('href') ?? null,
+  }))
+
+  for (const [label, url] of Object.entries(metaUrls)) {
+    if (!url) {
+      check(false, `${label}: no se declara en el HTML`)
+      continue
+    }
+    /**
+     * Se reconstruye contra `BASE` quedándose sólo con la ruta y la query.
+     *
+     * `og:image` se escribe **absoluta y apuntando al dominio canónico de producción** (lo
+     * exige `metadataBase`), así que usar la URL tal cual haría que una revisión en local
+     * comprobara producción. Sonaba a error del script y era lo contrario: la primera vez que
+     * se ejecutó, delató que producción seguía con el build roto.
+     */
+    const target = new URL(url, BASE)
+    const response = await page.request.get(`${BASE}${target.pathname}${target.search}`)
+    check(
+      response.ok(),
+      `${label} se sirve (${response.status()} ${response.headers()['content-type'] ?? '?'})`,
+    )
+  }
+
   // --- Sin errores de consola -------------------------------------------------------------
   console.log('\nConsola')
   if (errors.length > 0) console.log('    ', errors.join('\n     '))
