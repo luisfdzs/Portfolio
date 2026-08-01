@@ -88,6 +88,12 @@ const es = {
       'No son ejercicios de curso: son webs de clientes reales en producción, con panel de administración para que el cliente edite su propio contenido sin pasar por mí.',
     viewAll: 'Ver los {count} proyectos',
     viewProject: 'Ver el proyecto',
+    // El carrusel de la portada. Los rótulos de los dos botones son de lector de
+    // pantalla: en pantalla sólo hay una flecha, porque «Siguiente» al lado de una flecha
+    // que apunta a la derecha es la misma información dos veces.
+    carousel: 'Proyectos destacados',
+    carouselPrevious: 'Proyecto anterior',
+    carouselNext: 'Proyecto siguiente',
     liveSite: 'Web en vivo',
     sourceCode: 'Código',
     role: 'Mi papel',
@@ -226,6 +232,9 @@ const en: Dictionary = {
       'Not course exercises: real client websites in production, each with an admin panel so the client edits their own content without going through me.',
     viewAll: 'See all {count} projects',
     viewProject: 'View project',
+    carousel: 'Featured projects',
+    carouselPrevious: 'Previous project',
+    carouselNext: 'Next project',
     liveSite: 'Live site',
     sourceCode: 'Source',
     role: 'My role',

@@ -302,6 +302,194 @@
 }
 
 /* ============================================================================
+   COVER FLOW — los cuatro proyectos destacados de la portada
+
+   Un carrusel 3D: la tarjeta centrada se mira de frente y las demás se giran
+   sobre su eje vertical, se alejan y se apagan. Lo mueve el scroll y nada más
+   —`view-timeline` + `animation-timeline`, la misma técnica que `reveal`—, así
+   que no hay JavaScript calculando posiciones ni un bucle de animación
+   corriendo detrás. Los dos botones de `CoverFlow.tsx` son lo único con JS, y
+   sólo porque una rueda de ratón no hace scroll horizontal.
+
+   La geometría es lo único delicado:
+
+   - `--cover-flow-card` es lo que MIDE la tarjeta y `--cover-flow-step` lo que
+     AVANZA el scroll de una a la siguiente. Al ser el paso más corto que la
+     tarjeta, las tarjetas se solapan, y ese solape ES el efecto. Se consigue
+     con márgenes laterales negativos y no con posicionamiento absoluto: así
+     cada tarjeta conserva su alto natural y la fila se iguala sola con
+     `align-items: stretch`.
+   - Cuánto scroll dura el giro lo fija **el ancho del carrusel**, y no un
+     `view-timeline-inset` como en la mayoría de los ejemplos. Con
+     `animation-range: contain` el giro ocupa `ancho − tarjeta` de scroll, así
+     que con un `max-width` de `tarjeta + 2,6 · paso` el giro dura 2,6 pasos: la
+     vecina inmediata queda a media vuelta y la siguiente, al máximo. Con un
+     tramo más corto todas las laterales estarían clavadas a 52° y el movimiento
+     parecería un salto en vez de un giro.
+     Medirlo por el ancho en vez de por el inset tiene una segunda ventaja, que
+     es la que decidió: el carrusel no es de ancho completo, es una ventana
+     centrada de 2,6 pasos. A ancho completo, en un monitor de 1900 px quedaba
+     medio metro de vacío a la izquierda de la primera tarjeta, porque un
+     carrusel centrado sólo tiene tarjetas a un lado cuando está al principio.
+     En móvil el `max-width` no llega a aplicarse —la ventana es más estrecha que
+     2,6 pasos— y el giro dura lo que dé el viewport, que es cerca de un paso.
+   - El `z-index` se anima también, en una ventana estrecha alrededor del centro
+     (ver el comentario del fotograma). Sin él la tarjeta de la derecha
+     —posterior en el DOM— taparía el borde de la centrada justo cuando ésta
+     pasa al frente.
+
+   Si el navegador no soporta scroll-driven animations, o si el sistema pide
+   menos movimiento, queda un carrusel horizontal normal: tarjetas separadas,
+   ninguna girada y el mismo contenido. Es el criterio de `reveal`: el fallback
+   nunca esconde nada.
+   ========================================================================= */
+
+.cover-flow {
+  --cover-flow-card: clamp(15rem, 64vw, 28rem);
+  --cover-flow-step: calc(var(--cover-flow-card) * 0.6);
+  --cover-flow-turn: 52deg;
+
+  /* El ancho del propio carrusel, que es lo que decide cuánto scroll dura el
+     giro: con `animation-range: contain`, el giro completo ocupa
+     `ancho − tarjeta`, o sea 2,6 pasos. Ver el por qué arriba. */
+  max-width: calc(var(--cover-flow-card) + var(--cover-flow-step) * 2.6);
+  margin-inline: auto;
+  /* Posicionado a propósito: es el `offsetParent` que miden los botones para
+     saber dónde está el sitio de cada tarjeta en la fila. */
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  /* Aire para el anillo de foco del teclado y para lo que crece la tarjeta
+     central al acercarse, que `overflow-y: hidden` recortaría. */
+  padding-block: 1.5rem;
+  /* La barra de scroll sobra: debajo de un carrusel 3D una barra de sistema
+     canta, y el gesto ya es la barra. El teclado (tabulador) y los dos botones
+     dan la alternativa a quien no arrastra. */
+  scrollbar-width: none;
+}
+
+.cover-flow::-webkit-scrollbar {
+  display: none;
+}
+
+.cover-flow-track {
+  display: flex;
+  align-items: stretch; /* las cuatro tarjetas, del mismo alto */
+  /* La pista mide lo que miden sus tarjetas, no lo que mide la ventana. Un
+     `<ul>` es de bloque y con el ancho automático se quedaría clavado al ancho
+     del contenedor: el recorrido del scroll se calcularía contra esa caja y las
+     últimas tarjetas quedarían fuera de alcance. */
+  width: max-content;
+  gap: 1.25rem; /* sólo lo usa el fallback: con 3D lo sustituye el solape */
+  /* Los medios huecos que centran la primera tarjeta y la última: sin ellos la
+     primera nace pegada al borde y la última no se puede llegar a mirar de
+     frente.
+     Van en la PISTA y no en el contenedor con scroll, que es donde se pondrían
+     por instinto. Puesto ahí, el relleno se come el ancho de contenido —deja
+     265 px de caja útil en una pantalla de 1900— y el desbordamiento a la
+     derecha se calcula contra esa caja: el scroll se quedaba en 185 px cuando
+     hacen falta 807 para centrar la cuarta tarjeta, así que las dos últimas no
+     se podían mirar de frente. En la pista el relleno forma parte de su propio
+     ancho y el recorrido sale exacto. */
+  padding-inline: calc(50% - var(--cover-flow-card) / 2);
+}
+
+.cover-flow-item {
+  flex: 0 0 var(--cover-flow-card);
+  scroll-snap-align: center;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cover-flow-track {
+      gap: 0;
+      /* El paso y no el ancho de la tarjeta: los márgenes negativos de abajo
+         corren la fila justo esa diferencia. */
+      padding-inline: calc(50% - var(--cover-flow-step) / 2);
+    }
+
+    .cover-flow-item {
+      /* El solape: la caja mide una tarjeta y ocupa un paso. */
+      margin-inline: calc((var(--cover-flow-step) - var(--cover-flow-card)) / 2);
+      view-timeline-name: --cover-flow;
+      view-timeline-axis: inline;
+    }
+
+    .cover-flow-stage {
+      position: relative; /* para que el z-index animado cuente */
+      height: 100%;
+      /* La perspectiva va en cada tarjeta y no en la pista: con un único punto
+         de fuga para toda la fila, las de los extremos saldrían deformadas por
+         estar lejos del centro de la escena. */
+      perspective: calc(var(--cover-flow-card) * 2.4);
+      animation: cover-flow-slide linear both;
+      animation-timeline: --cover-flow;
+      animation-range: contain;
+    }
+
+    .cover-flow-card {
+      height: 100%;
+      animation: cover-flow-turn linear both;
+      animation-timeline: --cover-flow;
+      animation-range: contain;
+    }
+  }
+}
+
+/* El desplazamiento lateral y el orden de pintado. Va en el elemento exterior,
+   en 2D, para no mezclarlo con el giro: así el `translateZ` del interior se
+   proyecta contra la perspectiva y no arrastra el desplazamiento. */
+@keyframes cover-flow-slide {
+  0% {
+    z-index: 1;
+    transform: translateX(24%);
+  }
+  /* La ventana del `z-index` es estrecha a propósito. `z-index` NO se anima a
+     saltos: se interpola como entero y se redondea, así que con los fotogramas
+     repartidos (0 %, 40 %, 60 %) la vecina de la derecha llegaba al mismo valor
+     que la centrada, empataba, y al ser posterior en el DOM la tapaba. Entre el
+     46 % y el 54 % sólo puede estar una tarjeta —las vecinas van a 38 puntos de
+     progreso— y el empate no existe. */
+  44% {
+    z-index: 1;
+  }
+  46% {
+    z-index: 3;
+  }
+  50% {
+    transform: translateX(0);
+  }
+  54% {
+    z-index: 3;
+  }
+  56% {
+    z-index: 1;
+  }
+  100% {
+    z-index: 1;
+    transform: translateX(-24%);
+  }
+}
+
+/* El giro. `translateZ` antes de `rotateY` para que la profundidad se mida en
+   el eje de la escena y no en el de la tarjeta ya girada. */
+@keyframes cover-flow-turn {
+  0% {
+    opacity: 0.55;
+    transform: translateZ(-3rem) rotateY(calc(var(--cover-flow-turn) * -1));
+  }
+  50% {
+    opacity: 1;
+    transform: translateZ(1.5rem) rotateY(0deg);
+  }
+  100% {
+    opacity: 0.55;
+    transform: translateZ(-3rem) rotateY(var(--cover-flow-turn));
+  }
+}
+
+/* ============================================================================
    Impresión
 
    Un recruiter que quiere guardar el CV pulsa Ctrl+P: es el camino más corto
@@ -360,6 +548,42 @@
 
   .reveal {
     opacity: 1 !important;
+    animation: none !important;
+  }
+
+  /* El carrusel, deshecho: en papel no hay scroll, así que un `overflow-x`
+     imprimiría el primer proyecto y recortaría los otros tres. Se convierte en
+     la retícula de dos columnas que tenía la sección antes del carrusel, sin
+     giro, sin solape y sin opacidad.
+     Dos columnas y no una lista en vertical: a lo ancho de una hoja, una tarjeta
+     por fila deja la captura a 19 cm y su hueco de 2:1 mide 9,5 cm de alto, así
+     que los cuatro proyectos se comían dos páginas de papel. */
+  .cover-flow {
+    overflow: visible;
+    max-width: none;
+    padding: 0;
+  }
+
+  .cover-flow-track {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    width: auto;
+    padding-inline: 0;
+  }
+
+  .cover-flow-item {
+    width: auto;
+    margin-inline: 0;
+    view-timeline-name: none;
+  }
+
+  .cover-flow-stage,
+  .cover-flow-card {
+    perspective: none;
+    height: auto;
+    opacity: 1 !important;
+    transform: none !important;
     animation: none !important;
   }
 }
