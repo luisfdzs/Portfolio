@@ -30,7 +30,10 @@ export function Education({
   const t = getDictionary(locale)
 
   return (
-    <section id={sections.education} className="page-gutter mx-auto max-w-7xl section-block">
+    <section
+      id={sections.education}
+      className="page-gutter mx-auto max-w-7xl section-block text-center"
+    >
       <SectionHeading
         index="04"
         title={t.education.title}
@@ -73,7 +76,7 @@ export function Education({
                 </p>
 
                 {entry.note ? (
-                  <p className="mt-4 max-w-measure text-paper-soft">{entry.note[locale]}</p>
+                  <p className="mt-4 mx-auto max-w-measure text-paper-soft">{entry.note[locale]}</p>
                 ) : null}
               </div>
             </div>

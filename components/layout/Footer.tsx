@@ -31,8 +31,8 @@ export function Footer({ locale, profile }: { locale: Locale; profile: Profile }
 
   return (
     <footer className="border-t border-line bg-ink-sunken">
-      <div className="page-gutter mx-auto max-w-7xl py-12 lg:py-16">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
+      <div className="page-gutter mx-auto max-w-7xl py-12 text-center lg:py-16">
+        <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="font-display text-xl text-paper">{profile.name}</p>
             <p className="mt-1 text-small text-paper-faint">{profile.headline[locale]}</p>
@@ -57,7 +57,7 @@ export function Footer({ locale, profile }: { locale: Locale; profile: Profile }
             ))}
           </ul>
 
-          <div className="lg:text-right">
+          <div>
             <Link
               href={site.repo}
               target="_blank"
@@ -67,13 +67,16 @@ export function Footer({ locale, profile }: { locale: Locale; profile: Profile }
               <span className="link-underline">{t.footer.sourceCode}</span>
               <span className="sr-only">({t.a11y.externalLink})</span>
             </Link>
-            <p className="mt-3 max-w-[34ch] text-small text-paper-faint lg:ml-auto">
+            <p className="mt-3 mx-auto max-w-[34ch] text-small text-paper-faint">
               {t.footer.builtWith}
             </p>
           </div>
         </div>
 
-        <div className="mt-12 flex items-center justify-between gap-4 border-t border-line pt-6">
+        {/* En columna y centrado, no `justify-between`: con el copyright a la izquierda y la
+            flecha a la derecha, la última línea del sitio sería la única que rompe el eje
+            central. La flecha debajo y centrada cierra la página en el mismo eje. */}
+        <div className="mt-12 flex flex-col items-center gap-4 border-t border-line pt-6">
           <p className="figure-num text-small text-paper-faint">
             © {year} {profile.name}. {t.footer.rights}
           </p>

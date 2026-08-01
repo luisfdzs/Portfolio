@@ -59,6 +59,10 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   autoalojadas por `next/font` — ninguna petición a Google en tiempo de ejecución.
 - **Navegación:** cabecera fija en escritorio; en móvil (`< lg`), barra inferior de cinco iconos.
   Nunca las dos a la vez.
+- **Alineación: el texto va centrado** en el espacio que ocupa, como en `sangilstudio`. `text-center`
+  en la sección + `mx-auto` en las cajas con ancho máximo + `justify-center` en las filas flex; las
+  tres cosas juntas, porque ninguna hace el trabajo de las otras. **En papel no**: `@media print` lo
+  deshace. Qué quedó sin centrar y por qué, en [[decisiones-de-diseno]].
 
 Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.claude/memory/`.
 
@@ -137,3 +141,6 @@ Sanity + Vercel) con dos diferencias deliberadas: contenido de doble fuente para
 dependa de Sanity para existir, y bilingüe es/en en vez de trilingüe. Datos del CV tomados del
 perfil de LinkedIn (el portfolio anterior en Astro los tenía desactualizados: faltaba el puesto
 de Mobile Smart City, la ubicación decía otra cosa y no había formación)._
+
+_2026-08-01 — todo el texto de la web pasa a estar centrado en el espacio que ocupa, con el criterio
+de `sangilstudio`. El bloque `@media print` lo deshace: en papel el CV sigue alineado a la izquierda._

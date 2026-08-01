@@ -22,7 +22,10 @@ export function Stack({ locale, groups }: { locale: Locale; groups: readonly Ski
   const t = getDictionary(locale)
 
   return (
-    <section id={sections.stack} className="page-gutter mx-auto max-w-7xl section-block">
+    <section
+      id={sections.stack}
+      className="page-gutter mx-auto max-w-7xl section-block text-center"
+    >
       <SectionHeading index="05" title={t.stack.title} kicker={t.stack.kicker} icon={Layers} />
 
       <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
@@ -31,7 +34,7 @@ export function Stack({ locale, groups }: { locale: Locale; groups: readonly Ski
             <h3 className="figure-num border-b border-line pb-3 text-small text-signal uppercase">
               {group.title[locale]}
             </h3>
-            <ul className="mt-5 flex flex-wrap gap-2">
+            <ul className="mt-5 flex flex-wrap justify-center gap-2">
               {group.items.map((item) => (
                 <Tag key={item}>{item}</Tag>
               ))}
@@ -41,7 +44,7 @@ export function Stack({ locale, groups }: { locale: Locale; groups: readonly Ski
       </div>
 
       <Reveal className="mt-12">
-        <p className="max-w-measure text-small text-paper-faint">{t.stack.note}</p>
+        <p className="mx-auto max-w-measure text-small text-paper-faint">{t.stack.note}</p>
       </Reveal>
     </section>
   )

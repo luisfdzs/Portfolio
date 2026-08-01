@@ -36,6 +36,13 @@ type Props = {
  *   entre las cifras y la primera sección, y en móvil apaisado el bloque se recortaba. La
  *   altura la pone el contenido; el aire de abajo lo pone el `section-block` de la sección
  *   siguiente, y así no se suman dos paddings.
+ *
+ * **El texto va centrado dentro de su columna**, no dentro de la página: en escritorio la
+ * portada sigue siendo dos columnas —texto y retrato— y lo que se centra es cada bloque en
+ * el espacio que ocupa. Eso obliga a tres cosas que el `text-center` no hace solo:
+ * `justify-center` en las filas que son flex (el rótulo de estado, la ubicación y los
+ * botones), `mx-auto` en las dos cajas con ancho máximo, e `items-center` en la columna
+ * para que nada quede anclado al borde izquierdo.
  */
 export function Hero({ locale, profile, years, stats }: Props) {
   const t = getDictionary(locale)
@@ -53,11 +60,11 @@ export function Hero({ locale, profile, years, stats }: Props) {
       // nacería debajo. En móvil no hay cabecera arriba, pero sí hace falta aire.
       className="page-gutter mx-auto max-w-7xl pt-24 pb-4 lg:pt-36"
     >
-      <div className="grid items-center gap-12 lg:grid-cols-[1.5fr_1fr] lg:gap-20">
-        <div>
+      <div className="grid items-center gap-12 text-center lg:grid-cols-[1.5fr_1fr] lg:gap-20">
+        <div className="flex flex-col items-center">
           {/* Estado actual, no «disponible para trabajar»: es un dato verificable en
               LinkedIn y no una señal que pueda leer un jefe actual. */}
-          <p className="eyebrow flex items-center gap-2.5">
+          <p className="eyebrow flex items-center justify-center gap-2.5">
             <span
               aria-hidden="true"
               className="size-1.5 rounded-full bg-signal shadow-[0_0_0_3px] shadow-signal/20"
@@ -76,20 +83,20 @@ export function Hero({ locale, profile, years, stats }: Props) {
             {profile.name}
           </h1>
 
-          <p className="mt-6 max-w-[30ch] font-display text-title text-signal">
+          <p className="mt-6 mx-auto max-w-[30ch] font-display text-title text-signal">
             {profile.headline[locale]}
           </p>
 
-          <p className="mt-8 max-w-measure text-lead text-paper-soft">
+          <p className="mt-8 mx-auto max-w-measure text-lead text-paper-soft">
             {interpolate(t.hero.lead, { years })}
           </p>
 
-          <p className="figure-num mt-6 flex items-center gap-2 text-small text-paper-faint">
+          <p className="figure-num mt-6 flex items-center justify-center gap-2 text-small text-paper-faint">
             <MapPin className="size-4" />
             {profile.location[locale]}
           </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-3">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Action href={href(locale, 'projects')} variant="primary">
               {t.hero.primaryCta}
             </Action>
@@ -130,7 +137,7 @@ export function Hero({ locale, profile, years, stats }: Props) {
 
       {/* Cifras. Al final del bloque y con un filete encima: son el resumen del CV, así
           que se leen después del titular, nunca antes. */}
-      <dl className="mt-16 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-line pt-10 lg:mt-20 lg:grid-cols-4">
+      <dl className="mt-16 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-line pt-10 text-center lg:mt-20 lg:grid-cols-4">
         {stats.map((stat) => (
           <div key={stat.label}>
             <dd className="figure-num text-figure text-paper">{stat.value}</dd>
