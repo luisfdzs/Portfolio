@@ -214,14 +214,23 @@ Las secciones de la portada son anclas y `/es/projects` es una página. Es una d
 fragmento es la única parte de una URL que no llega al servidor—, pero al visitante le llega como
 una incoherencia: unas entradas del mismo menú dejan `/es/projects` y otras `/es#experience`.
 
-`components/layout/HashCleaner.tsx` la borra, y **sin tocar los `href`**: siguen llevando el
-ancla, así que la navegación funciona sin JavaScript, se puede abrir en otra pestaña, y los
-enlaces viejos de LinkedIn siguen llevando a su sección. Son dos mecanismos porque los dos casos
-no se parecen: dentro de la misma página se deja actuar al navegador y se borra el fragmento
-cuando ya ha desplazado; cambiando de página el ancla no llega a escribirse, porque el router de
-Next se quedaría con ella como URL canónica suya y el clic siguiente compondría
-`/es#contact#about`. Los dos esperan a que la sección exista de verdad antes de tocar nada: borrar
-el fragmento antes de tiempo no descoloca la URL, **cancela el salto**.
+`components/layout/HashCleaner.tsx` quita esa diferencia, y **sin tocar los `href`**: siguen
+llevando el ancla, así que la navegación funciona sin JavaScript, se puede abrir en otra pestaña,
+y los enlaces viejos de LinkedIn siguen llevando a su sección. Lo que cambia es que un clic normal
+no llega a escribirla: se intercepta, se desplaza a mano —descontando la cabecera fija— y se
+mueve el foco a la sección, que es lo que hace de más un ancla nativa.
+
+**La regla que lo sostiene: el ancla nunca entra en el router.** Next lleva su propia URL
+canónica, y en cuanto tiene un fragmento dentro, cualquier arreglo por debajo la desincroniza y el
+clic siguiente compone sobre lo que él cree que hay: `/es#education#contact`. Se probó a limpiar
+después con `history.replaceState` —se desincroniza— y con `router.replace` —no actualiza la
+barra—; la única forma estable es no generar el fragmento.
+
+Queda un caso en el que el ancla sí llega, la visita que entra con ella puesta desde un enlace
+viejo. Ahí no hay clic que interceptar, así que se deja actuar al navegador y se borra después,
+**esperando a que la sección exista de verdad**: quitar el fragmento antes de tiempo no descoloca
+la URL, cancela el salto —la portada llega por streaming y el navegador tiene el salto pendiente
+hasta que la sección aparece—.
 
 A cambio se pierden dos cosas, y conviene saberlo antes de tocarlo: copiar la URL ya no comparte
 la sección, y «atrás» sale de la página en vez de recorrer las secciones visitadas.

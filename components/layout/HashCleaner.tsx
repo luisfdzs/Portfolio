@@ -9,18 +9,32 @@ const POLL_INTERVAL_MS = 100
 /**
  * Cuántas veces, como mucho. Se cuentan intentos y no milisegundos a propósito: en una
  * pestaña de segundo plano el navegador estira los temporizadores, y un plazo en tiempo real
- * se agotaría sin haber llegado a mirar. Al acabarse no se borra nada — la URL se queda como
- * estaba, que es lo que pasaba antes de que este componente existiera.
+ * se agotaría sin haber llegado a mirar.
  */
 const MAX_POLLS = 100
 
-/** Red de seguridad por si `scrollend` no llega. Ver `waitForScrollEnd`. */
-const SCROLL_TIMEOUT_MS = 1200
+/**
+ * A dónde hay que desplazarse para dejar una sección arriba del todo **sin que la tape la
+ * cabecera fija**. En móvil no hay cabecera —la navegación es la barra inferior— y entonces
+ * el descuento es cero, que es justo lo que devuelve medir el elemento: está oculto.
+ */
+function scrollTargetFor(element: Element) {
+  const header = document.querySelector('header')
+  const offset = header ? header.getBoundingClientRect().height : 0
+  return element.getBoundingClientRect().top + window.scrollY - offset
+}
 
-/** ¿Se ve algo del elemento en la pantalla? */
-function isOnScreen(element: Element) {
-  const { top, bottom } = element.getBoundingClientRect()
-  return bottom > 0 && top < window.innerHeight
+/**
+ * Llevar el foco a la sección, además de la vista.
+ *
+ * Es lo que hace de más un ancla nativa y se pierde al interceptar el clic: mover el punto de
+ * partida del tabulador. Sin esto, quien navega con teclado pulsa «Formación», ve la formación
+ * y al tabular sigue en la cabecera. `tabindex="-1"` porque un `<section>` no es enfocable por
+ * sí mismo, y `preventScroll` porque del desplazamiento ya nos hemos encargado.
+ */
+function focusSection(element: HTMLElement) {
+  element.setAttribute('tabindex', '-1')
+  element.focus({ preventScroll: true })
 }
 
 /**
@@ -29,133 +43,55 @@ function isOnScreen(element: Element) {
  * Las secciones de la portada son anclas (`/es#experience`, ver `lib/i18n/routes.ts`) y
  * `/es/projects` es una página. Es una diferencia real —el fragmento es la única parte de la
  * URL que no llega al servidor—, pero al visitante le llega como una incoherencia: unas
- * entradas del mismo menú dejan una barra y otras una almohadilla. Aquí se quita esa
- * diferencia, y **los `href` no se tocan**: siguen llevando el ancla, así que se conserva
- * todo lo que el navegador da gratis —funciona sin JavaScript, se puede abrir en otra
- * pestaña, y un `/es#experience` viejo de LinkedIn o de las redirecciones de
- * `next.config.ts` sigue llevando a su sitio—.
+ * entradas del mismo menú dejan una barra y otras una almohadilla.
  *
- * Son dos mecanismos y no uno, porque los dos casos no se parecen:
+ * Se quita esa diferencia **sin tocar los `href`**: siguen llevando el ancla, y con ella todo
+ * lo que el navegador da gratis —navegación sin JavaScript, «abrir en otra pestaña», y los
+ * `/es#experience` viejos de LinkedIn o de las redirecciones de `next.config.ts` siguen
+ * llevando a su sección—. Lo que cambia es que un clic normal no llega a escribir el ancla:
+ * se desplaza a mano y la URL se queda como está.
  *
- * 1. **Dentro de la misma página** (y al llegar de fuera con ancla): se deja actuar al
- *    navegador y se borra el fragmento cuando ya ha hecho su trabajo. Es lo barato, y es lo
- *    que cubre también el enlace de «saltar al contenido» (`#main`).
- * 2. **Cambiando de página** —pulsar «Contacto» desde una ficha de proyecto—: ahí el ancla
- *    no llega a escribirse. Hay que hacerlo así; el porqué está en `pushToSection`.
+ * **La regla que lo sostiene: el ancla nunca entra en el router.** Next lleva su propia URL
+ * canónica, y en cuanto tiene un fragmento dentro, cualquier arreglo por debajo la
+ * desincroniza y el clic siguiente compone sobre lo que él cree que hay: `/es#education#contact`,
+ * dos almohadillas y ninguna sección que corresponda. Se probó a limpiar después con
+ * `history.replaceState` —se desincroniza— y con `router.replace` —no actualiza la barra—.
+ * La única forma estable es no generar el fragmento.
  *
- * Se monta en el layout y no en la portada porque el segundo caso empieza en otra página.
+ * Queda un caso en el que el ancla sí llega: **la visita que entra con ella puesta**, de un
+ * enlace viejo. Ahí no hay clic que interceptar, así que se deja actuar al navegador y se borra
+ * el fragmento cuando ya ha desplazado. Como después ningún clic escribe anclas, no hay nada
+ * que se pueda componer encima.
  *
- * Lo que se pierde a cambio, dicho en voz alta: **copiar la URL ya no comparte la sección**,
- * y «atrás» después de pulsar una entrada del menú sale de la página en vez de recorrer las
+ * Se monta en el layout y no en la portada porque los enlaces de sección están en todas las
+ * páginas, incluido el de «saltar al contenido» (`#main`).
+ *
+ * Lo que se pierde a cambio, dicho en voz alta: **copiar la URL ya no comparte la sección**, y
+ * «atrás» después de pulsar una entrada del menú sale de la página en vez de recorrer las
  * secciones visitadas. Es el precio de que el menú se comporte igual en sus seis entradas.
  */
 export function HashCleaner() {
   const router = useRouter()
 
   useEffect(() => {
-    /**
-     * EL ORDEN ES TODO EL COMPONENTE
-     *
-     * Borrar el ancla antes de tiempo no la deja «un poco desincronizada»: **cancela el
-     * salto**. El caso que lo destapó es el que más importa, el enlace que llega de fuera.
-     * El navegador guarda el salto pendiente hasta que la sección aparece —la portada llega
-     * por streaming, así que no está en el documento desde el primer instante—, y si para
-     * entonces el fragmento ya no está en la URL, se queda arriba del todo: un enlace
-     * profundo roto en silencio.
-     *
-     * De ahí que no se borre nada hasta comprobar las dos cosas: que el fragmento esté
-     * puesto —al pulsar una entrada del menú lo escribe Next un momento después del clic— y
-     * que su sección exista de verdad en el documento.
-     *
-     */
     let cancelled = false
     let pollTimer: ReturnType<typeof setTimeout> | undefined
-    let scrollTimer: ReturnType<typeof setTimeout> | undefined
-
-    function clean() {
-      if (!window.location.hash) return
-      /**
-       * `replaceState` y no `pushState`: sustituir la entrada en vez de añadir otra. Con
-       * `push`, cada sección dejaría dos entradas —la del ancla y la limpia— y «atrás»
-       * habría que pulsarlo dos veces para salir de la página.
-       *
-       * Se escribe en el historial por debajo del router a sabiendas. Es seguro **sólo**
-       * mientras el router no tenga a su vez un ancla en su URL canónica, que es justo lo que
-       * garantiza `pushToSection`.
-       */
-      window.history.replaceState(null, '', window.location.pathname + window.location.search)
-    }
 
     /**
-     * Segunda espera: el desplazamiento suave de `app/globals.css` tarda en llegar, y aunque
-     * quitar el fragmento a mitad de camino no lo detiene, sí impide que el navegador corrija
-     * la posición si el contenido se mueve mientras tanto.
+     * Desplazarse a la sección sin tocar la URL.
      *
-     * El temporizador cubre los tres casos en que `scrollend` no llega nunca: los navegadores
-     * que aún no lo implementan, pulsar la sección en la que ya se está —sin scroll no hay
-     * final de scroll— y una pestaña en segundo plano, donde no se anima nada.
+     * No se pasa `behavior`: así hereda el `scroll-behavior` de `app/globals.css`, que es
+     * suave y pasa a instantáneo con `prefers-reduced-motion`. Escribir `'smooth'` aquí se lo
+     * impondría también a quien ha pedido que no se mueva nada.
      */
-    function waitForScrollEnd() {
-      function finish() {
-        clearTimeout(scrollTimer)
-        document.removeEventListener('scrollend', finish)
-        if (!cancelled) clean()
-      }
-
-      document.addEventListener('scrollend', finish, { once: true })
-      scrollTimer = setTimeout(finish, SCROLL_TIMEOUT_MS)
+    function goTo(target: HTMLElement) {
+      window.scrollTo({ top: scrollTargetFor(target) })
+      focusSection(target)
     }
 
     /**
-     * Primera espera: hasta que haya fragmento y exista su sección.
-     *
-     * Se sondea en vez de observar el DOM porque lo que hay que ver no es una mutación
-     * concreta sino un estado —fragmento puesto y sección presente— al que se llega por tres
-     * caminos distintos: el clic, la hidratación de una visita que ya traía ancla, y la
-     * navegación de Next desde otra página.
-     */
-    function poll(remaining: number, anchor: boolean) {
-      if (cancelled) return
-
-      const id = window.location.hash.slice(1)
-      const target = id ? document.getElementById(id) : null
-
-      if (!target) {
-        if (remaining > 0) {
-          pollTimer = setTimeout(() => poll(remaining - 1, anchor), POLL_INTERVAL_MS)
-        }
-        return
-      }
-
-      /**
-       * El rescate, y sólo eso.
-       *
-       * Si la sección ya se ve, el navegador ha hecho su trabajo y no se le toca: la coloca
-       * mejor que nosotros, porque descuenta la cabecera fija. Sólo se interviene cuando el
-       * salto no ha ocurrido —hay fragmento y la sección está fuera de pantalla—, que es lo
-       * que pasa cuando la portada tarda en montarse y el borrado llegaría antes que el
-       * salto.
-       *
-       * `instant` porque es un aterrizaje, no un recorrido: heredar el `scroll-behavior:
-       * smooth` de `app/globals.css` haría desfilar seis mil píxeles delante de alguien que
-       * acaba de abrir el enlace, y dejaría la posición final a merced de una animación que
-       * el navegador puede decidir no ejecutar.
-       *
-       * Tras un clic no se toca el scroll: de eso ya se encarga `next/link`, y ahí el
-       * desplazamiento suave sí es el que se quiere.
-       */
-      if (anchor && !isOnScreen(target)) target.scrollIntoView({ behavior: 'instant' })
-      waitForScrollEnd()
-    }
-
-    function start(anchor: boolean) {
-      clearTimeout(pollTimer)
-      poll(MAX_POLLS, anchor)
-    }
-
-    /**
-     * El otro sondeo: esperar a que una sección concreta aparezca tras cambiar de página, sin
-     * que su nombre pase nunca por la URL. Es la mitad de `pushToSection`.
+     * Cambiar de página y buscar la sección al llegar. El nombre de la sección viaja en una
+     * variable, no en la URL — que es de lo que va todo esto.
      */
     function pollForSection(id: string, remaining: number) {
       if (cancelled) return
@@ -168,99 +104,102 @@ export function HashCleaner() {
         return
       }
 
-      target.scrollIntoView({ behavior: 'instant' })
-      /**
-       * Lo que se pierde al no dejar navegar al ancla: el navegador, además de desplazar,
-       * mueve el punto de partida del tabulador a la sección de destino. Sin esto, alguien
-       * que navega con teclado pulsa «Formación», ve la formación y al tabular sigue en la
-       * cabecera. `tabindex="-1"` porque un `<section>` no es enfocable por sí mismo, y
-       * `preventScroll` porque el desplazamiento ya está hecho.
-       */
-      target.setAttribute('tabindex', '-1')
-      target.focus({ preventScroll: true })
-    }
-
-    /**
-     * Ir a una sección **de otra página** sin escribir el ancla en la URL.
-     *
-     * Es el caso que obliga a intervenir en vez de limpiar después. Si se deja navegar al
-     * enlace, Next se queda con `/es#contact` como URL canónica suya, y a partir de ahí
-     * cualquier borrado por debajo la desincroniza: el clic siguiente compone sobre lo que él
-     * cree que hay y sale `/es#contact#about`. Así que aquí no se genera el ancla siquiera —
-     * se navega a la página limpia y se busca la sección al llegar.
-     */
-    function pushToSection(link: HTMLAnchorElement, event: MouseEvent) {
-      const id = link.hash.slice(1)
-      if (!id) return
-
-      event.preventDefault()
-      clearTimeout(pollTimer)
-      // `next/link` comprueba `defaultPrevented` **después** de llamar al `onClick` del
-      // enlace, así que la barra de móvil sigue cerrándose sola al pulsar.
-      router.push(link.pathname + link.search)
-      pollForSection(id, MAX_POLLS)
+      // Instantáneo y no suave: se acaba de aterrizar en otra página, y recorrer seis mil
+      // píxeles en animación delante de alguien que acaba de pulsar no es llegar, es viajar.
+      window.scrollTo({ top: scrollTargetFor(target), behavior: 'instant' })
+      focusSection(target)
     }
 
     /**
      * El clic se escucha en el documento y no en cada enlace porque el ancla la ponen tres
      * sitios —cabecera, barra de móvil y el enlace de salto del layout— y ninguno debería
-     * tener que saber que esto existe. En fase de captura, para verlo antes de que
-     * `next/link` se lleve la navegación.
+     * tener que saber que esto existe. En fase de captura, para verlo antes que `next/link`.
      *
-     * Los dos caminos son distintos porque el problema es distinto. Dentro de la misma
-     * página, dejar hacer y limpiar después funciona y es lo más barato: el fragmento
-     * todavía no está en la URL al pulsar, y de esperarlo se ocupa el sondeo. Cambiando de
-     * página no vale, y el porqué está en `pushToSection`.
+     * `next/link` comprueba `defaultPrevented` **después** de llamar al `onClick` del enlace,
+     * así que el panel de la barra de móvil se sigue cerrando solo al pulsar.
      *
-     * Se ignoran los clics que no son «abrir aquí» —botón central, `ctrl`/`cmd`, `shift`—
-     * para no robarle al visitante el «abrir en otra pestaña», donde el ancla es justo lo
-     * que hace falta.
+     * Se dejan pasar los clics que no son «abrir aquí» —botón central, `ctrl`/`cmd`, `shift`,
+     * `target="_blank"`— para no robarle a nadie el «abrir en otra pestaña», donde el ancla es
+     * justo lo que hace falta.
      */
     function onClick(event: MouseEvent) {
-      const target = event.target
-      if (!(target instanceof Element)) return
+      if (event.defaultPrevented || event.button !== 0) return
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
 
-      const link = target.closest('a[href*="#"]')
+      const from = event.target
+      if (!(from instanceof Element)) return
+
+      const link = from.closest('a[href*="#"]')
       if (!(link instanceof HTMLAnchorElement)) return
-
-      if (link.pathname === window.location.pathname) {
-        start(false)
-        return
-      }
-
-      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
-        return
-      }
       if (link.origin !== window.location.origin || link.target === '_blank') return
 
-      pushToSection(link, event)
+      const id = link.hash.slice(1)
+      if (!id) return
+
+      event.preventDefault()
+      clearTimeout(pollTimer)
+
+      const target = document.getElementById(id)
+      if (link.pathname === window.location.pathname && target instanceof HTMLElement) {
+        goTo(target)
+        return
+      }
+
+      router.push(link.pathname + link.search)
+      pollForSection(id, MAX_POLLS)
     }
 
     /**
-     * Al llegar con el fragmento ya puesto. La comprobación no es cosmética: sin ella, cada
-     * borrado propio arrancaría un sondeo entero buscando el ancla que se acaba de quitar,
-     * porque Next avisa del cambio de historial.
+     * El único camino que sí trae un ancla: entrar con ella puesta.
+     *
+     * Aquí el orden importa y no es el evidente. Borrar el fragmento antes de tiempo no deja la
+     * URL «un poco desincronizada»: **cancela el salto**. El navegador lo guarda pendiente hasta
+     * que la sección aparece —la portada llega por streaming, así que el layout hidrata antes— y
+     * si para entonces el ancla ya no está, se queda arriba del todo. Un enlace profundo roto en
+     * silencio, que es exactamente lo que este componente no debe provocar.
+     *
+     * Por eso se espera a que la sección exista, se comprueba que el navegador la haya traído a
+     * la pantalla —y si no, se corrige— y sólo entonces se borra.
      */
-    function onHashPresent() {
-      if (window.location.hash) start(true)
+    function cleanInboundHash(remaining: number) {
+      if (cancelled || !window.location.hash) return
+
+      const id = window.location.hash.slice(1)
+      const target = document.getElementById(id)
+      if (!target) {
+        if (remaining > 0) {
+          pollTimer = setTimeout(() => cleanInboundHash(remaining - 1), POLL_INTERVAL_MS)
+        }
+        return
+      }
+
+      const { top, bottom } = target.getBoundingClientRect()
+      const arrived = bottom > 0 && top < window.innerHeight
+      if (!arrived) window.scrollTo({ top: scrollTargetFor(target), behavior: 'instant' })
+
+      window.history.replaceState(null, '', window.location.pathname + window.location.search)
+    }
+
+    function onInbound() {
+      if (!window.location.hash) return
+      clearTimeout(pollTimer)
+      cleanInboundHash(MAX_POLLS)
     }
 
     document.addEventListener('click', onClick, { capture: true })
-    // Un salto de ancla que no pasa por `next/link` —el enlace de «saltar al contenido», o
-    // escribir el fragmento a mano en la barra— no dispara el clic de arriba.
-    window.addEventListener('hashchange', onHashPresent)
-    window.addEventListener('popstate', onHashPresent)
+    // Escribir el fragmento a mano en la barra, o volver con «atrás» a una entrada que lo
+    // tuviera: no hay clic que interceptar.
+    window.addEventListener('hashchange', onInbound)
+    window.addEventListener('popstate', onInbound)
 
-    // Al montar: se ha llegado de fuera con ancla, que es el caso delicado explicado arriba.
-    onHashPresent()
+    onInbound()
 
     return () => {
       cancelled = true
       clearTimeout(pollTimer)
-      clearTimeout(scrollTimer)
       document.removeEventListener('click', onClick, { capture: true })
-      window.removeEventListener('hashchange', onHashPresent)
-      window.removeEventListener('popstate', onHashPresent)
+      window.removeEventListener('hashchange', onInbound)
+      window.removeEventListener('popstate', onInbound)
     }
   }, [router])
 
