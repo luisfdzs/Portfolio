@@ -1,17 +1,17 @@
 import type { Profile } from '@/content/types'
 import type { Locale } from '@/lib/i18n/config'
-import { getDictionary, interpolate } from '@/lib/i18n/dictionaries'
+import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href } from '@/lib/i18n/routes'
 import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
-import { GitHub, LinkedIn, Mail, MapPin } from '@/components/ui/Icons'
+import { ArrowDown, GitHub, LinkedIn, Mail, MapPin } from '@/components/ui/Icons'
+import { HeroStage } from '@/components/sections/HeroStage'
 
 type Stat = { value: string; label: string }
 
 type Props = {
   locale: Locale
   profile: Profile
-  years: number
   stats: readonly Stat[]
 }
 
@@ -22,22 +22,42 @@ type Props = {
  * sepa en cinco segundos **quién eres, qué haces y por qué deberías interesarle**, y tenga
  * a un clic las dos únicas cosas que puede querer hacer (ver el trabajo o escribir).
  *
- * Tres decisiones que responden a eso:
+ * **Ocupa la ventana entera y el escenario cinético es el protagonista.** Lo primero que se ve
+ * al abrir la web es el mosaico de código, servidores y red moviéndose —no un titular sobre
+ * negro—, y el bloque de texto se apoya abajo, encima de él. El encargo era explícito: que el
+ * fondo dinámico se vea desde el primer segundo, con la referencia de la portada de
+ * `swiftmet.vercel.app` y del collage de sanity.io.
+ *
+ * Las cuatro decisiones que responden a eso:
  *
  * - **El nombre es el titular**, en la serif y al tamaño más grande del sitio. En un
  *   portfolio el producto es la persona; poner «Desarrollador Full Stack» de titular y el
  *   nombre en pequeño es esconder lo que se busca en Google.
+ * - **Menos texto, y por esto.** La entradilla de tres líneas que había aquí —la que enumeraba
+ *   Santander, INDRA, ABB e Ingeteam— se quitó: sobre un fondo en movimiento, un párrafo largo
+ *   obliga a elegir entre leerlo o mirar, y quien decide en treinta segundos no hace ni una
+ *   cosa ni la otra. Los clientes no se han perdido, están en la sección de experiencia, que es
+ *   donde se pueden comprobar con las fechas al lado. Lo que queda aquí es lo irreducible: el
+ *   puesto actual, el nombre, una línea de qué haces y dónde estás.
+ * - **El retrato es un avatar pequeño.** Ocupaba una de las dos columnas del hero, y a ese
+ *   tamaño partía la pantalla en dos y le disputaba el sitio al escenario. Pequeño y arriba del
+ *   todo hace lo que tiene que hacer —ponerle cara a un nombre— sin ser el asunto.
  * - **Las cifras salen del contenido**, no escritas a mano: los años se suman de las
  *   fechas reales de los puestos y los proyectos se cuentan de la lista. Un titular con
  *   una cifra a mano dice «+4 años» tres años después. Le pasó al portfolio anterior.
- * - **Ni `h-screen` ni `min-h-screen`.** El contenido —titular, entradilla, botones y cuatro
- *   cifras— ya llena la pantalla por sí solo en cualquier tamaño razonable, así que forzar
- *   una altura sólo servía para meter un hueco muerto: con `justify-center` sobraba espacio
- *   entre las cifras y la primera sección, y en móvil apaisado el bloque se recortaba. La
- *   altura la pone el contenido; el aire de abajo lo pone el `section-block` de la sección
- *   siguiente, y así no se suman dos paddings.
+ *
+ * **`min-h-svh` y no `h-screen`.** `svh` es el alto de la ventana con las barras del navegador
+ * móvil desplegadas, que es el estado en el que se abre una web; con `vh` el hero mide más que
+ * la pantalla y el bloque de texto nace medio cortado por abajo hasta que el usuario hace
+ * scroll. Y `min-` y no una altura fija: si alguien tiene el tipo de letra del sistema muy
+ * grande, el bloque crece y empuja hacia abajo en vez de recortarse.
+ *
+ * **El hueco de abajo en móvil no es decorativo**: la barra de iconos es fija y se dibuja
+ * encima del hero, así que sin él las cifras —el resumen del CV— quedan medio tapadas justo en
+ * la primera pantalla. Va en `--spacing-nav-mobile`, que ya suma la franja del gesto del
+ * iPhone, y no en un número puesto a ojo.
  */
-export function Hero({ locale, profile, years, stats }: Props) {
+export function Hero({ locale, profile, stats }: Props) {
   const t = getDictionary(locale)
 
   const socials = [
@@ -49,15 +69,53 @@ export function Hero({ locale, profile, years, stats }: Props) {
   return (
     <section
       aria-labelledby="hero-name"
-      // `pt` grande: la cabecera es fija y mide 4rem, así que sin él el rótulo de estado
-      // nacería debajo. En móvil no hay cabecera arriba, pero sí hace falta aire.
-      className="page-gutter mx-auto max-w-7xl pt-24 pb-4 lg:pt-36"
+      // A sangre y recortando: el escenario tiene que llegar al borde de la ventana por los
+      // cuatro lados. `overflow-hidden` es lo que impide que las columnas —que salen del
+      // encuadre por arriba y por abajo— alarguen el documento; `check:mobile` no tolera ni un
+      // píxel de desbordamiento.
+      // `isolate` crea el contexto de apilamiento donde el `z-0` del escenario y el `z-10` del
+      // contenido se ordenan sin poder afectar a las secciones de al lado.
+      // `justify-end`: el texto se apoya en el borde de abajo y el mosaico se queda con la
+      // mitad de arriba de la pantalla, que es el reparto que pedía el encargo.
+      // `hero-section` y `hero-shell` sólo existen para la hoja de impresión: en papel el
+      // hero deja de medir una pantalla (ver `globals.css`).
+      className="hero-section relative isolate flex min-h-svh flex-col justify-end overflow-hidden"
     >
-      <div className="grid items-center gap-12 lg:grid-cols-[1.5fr_1fr] lg:gap-20">
-        <div>
+      <HeroStage />
+
+      <div className="hero-shell page-gutter relative z-10 mx-auto w-full max-w-7xl pt-28 pb-[calc(var(--spacing-nav-mobile)+1.5rem)] text-center lg:pb-14">
+        {/*
+         * El retrato, ahora avatar. `hero-portrait` es lo que lo pone POR ENCIMA del
+         * escenario en vez de al lado: flota con una oscilación mínima y lleva un halo de
+         * cobre y una sombra que lo despegan de las tejas que pasan por debajo. Sin esa
+         * sombra, en el momento en que a una teja clara le toca pasar justo detrás, la
+         * silueta se pierde y la cara parece una foto más del fondo.
+         *
+         * **Va FUERA de `.hero-copy`**, y eso es lo que deja una franja de mosaico visible
+         * arriba: el velo del texto empieza justo debajo del avatar, así que el avatar flota
+         * sobre las tejas en vez de sobre grafito. Es una imagen con su propio halo — no
+         * necesita el contraste que necesitan las líneas de texto.
+         */}
+        <div className="hero-portrait mx-auto w-20 lg:w-24">
+          <Figure
+            image={profile.photo}
+            locale={locale}
+            ratio="square"
+            priority
+            sizes="6rem"
+            className="rounded-full"
+          />
+        </div>
+
+        <div className="hero-copy flex flex-col items-center">
           {/* Estado actual, no «disponible para trabajar»: es un dato verificable en
-              LinkedIn y no una señal que pueda leer un jefe actual. */}
-          <p className="eyebrow flex items-center gap-2.5">
+              LinkedIn y no una señal que pueda leer un jefe actual.
+
+              `hero-chip` le da fondo propio. No es adorno: es el texto más pequeño y más
+              apagado de la portada, y está en la franja alta, que es la que tiene que quedar
+              abierta para que se vea el mosaico. Con la pastilla se lee sobre cualquier teja y
+              el velo del texto puede empezar más abajo y más flojo. */}
+          <p className="hero-chip eyebrow mt-6">
             <span
               aria-hidden="true"
               className="size-1.5 rounded-full bg-signal shadow-[0_0_0_3px] shadow-signal/20"
@@ -65,7 +123,7 @@ export function Hero({ locale, profile, years, stats }: Props) {
             {t.hero.availability}
           </p>
 
-          <p className="mt-8 font-display text-lead text-paper-soft">{t.hero.greeting}</p>
+          <p className="mt-7 font-display text-lead text-paper-soft">{t.hero.greeting}</p>
           <h1
             id="hero-name"
             className="mt-1 text-display text-paper"
@@ -76,20 +134,16 @@ export function Hero({ locale, profile, years, stats }: Props) {
             {profile.name}
           </h1>
 
-          <p className="mt-6 max-w-[30ch] font-display text-title text-signal">
+          <p className="mx-auto mt-5 max-w-[30ch] font-display text-title text-signal">
             {profile.headline[locale]}
           </p>
 
-          <p className="mt-8 max-w-measure text-lead text-paper-soft">
-            {interpolate(t.hero.lead, { years })}
-          </p>
-
-          <p className="figure-num mt-6 flex items-center gap-2 text-small text-paper-faint">
+          <p className="figure-num mt-5 flex items-center justify-center gap-2 text-small text-paper-faint">
             <MapPin className="size-4" />
             {profile.location[locale]}
           </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Action href={href(locale, 'projects')} variant="primary">
               {t.hero.primaryCta}
             </Action>
@@ -112,32 +166,38 @@ export function Hero({ locale, profile, years, stats }: Props) {
               ))}
             </ul>
           </div>
-        </div>
 
-        {/* El retrato. En móvil va detrás del texto (`order`), porque lo primero que hace
-            falta leer es el nombre y no verle la cara a nadie. */}
-        <div className="order-first mx-auto w-40 lg:order-none lg:w-full lg:max-w-xs">
-          <Figure
-            image={profile.photo}
-            locale={locale}
-            ratio="square"
-            priority
-            sizes="(min-width: 1024px) 20rem, 10rem"
-            className="rounded-full lg:rounded-lg"
-          />
+          {/* Cifras. Al final del bloque y con un filete encima: son el resumen del CV, así
+              que se leen después del titular, nunca antes. `w-full` porque el contenedor es
+              una columna flex centrada: sin él la retícula se encoge a lo que miden las
+              cifras y el filete deja de sostener el bloque de lado a lado. */}
+          <dl className="mt-10 grid w-full grid-cols-2 gap-x-8 gap-y-7 border-t border-line pt-8 text-center lg:mt-12 lg:grid-cols-4">
+            {stats.map((stat) => (
+              <div key={stat.label}>
+                <dd className="figure-num text-figure text-paper">{stat.value}</dd>
+                <dt className="eyebrow mt-2">{stat.label}</dt>
+              </div>
+            ))}
+          </dl>
+
+          {/*
+           * El aviso de que hay más abajo. Un hero que ocupa la ventana entera y acaba en un
+           * filete de cifras se puede leer como una página completa, y quien no baja se queda
+           * sin ver la experiencia, que es el CV.
+           *
+           * Sólo en escritorio: en móvil el borde de abajo lo ocupa la barra de iconos fija, y
+           * meter una flecha ahí sería competir con la navegación. Y `data-print="hide"`,
+           * porque en papel no hay nada que desplazar.
+           */}
+          <p
+            data-print="hide"
+            className="mt-12 hidden items-center justify-center gap-2 text-small text-paper-faint lg:flex"
+          >
+            {t.hero.scrollHint}
+            <ArrowDown className="hero-hint__arrow size-4" />
+          </p>
         </div>
       </div>
-
-      {/* Cifras. Al final del bloque y con un filete encima: son el resumen del CV, así
-          que se leen después del titular, nunca antes. */}
-      <dl className="mt-16 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-line pt-10 lg:mt-20 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.label}>
-            <dd className="figure-num text-figure text-paper">{stat.value}</dd>
-            <dt className="eyebrow mt-2">{stat.label}</dt>
-          </div>
-        ))}
-      </dl>
     </section>
   )
 }

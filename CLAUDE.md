@@ -55,10 +55,37 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   Framework declarado en `vercel.json`.
 - **Calidad:** `npm run check` (typecheck + ESLint + Prettier) y `npm run check:mobile` (21
   comprobaciones en Chrome real a 390×844, por idioma).
+- **Imágenes locales: lo que hay en `public/` es lo que viaja.** El cargador
+  (`sanity/imageLoader.ts`) sólo transforma URLs de la CDN de Sanity y devuelve las rutas locales
+  intactas, así que en las capturas y en las tejas del hero **`sizes` y `quality` no ahorran ni un
+  byte**: el peso se decide al generar el archivo.
 - **Tipografía:** Instrument Serif (titulares), Inter (cuerpo) y JetBrains Mono (datos), las tres
   autoalojadas por `next/font` — ninguna petición a Google en tiempo de ejecución.
 - **Navegación:** cabecera fija en escritorio; en móvil (`< lg`), barra inferior de cinco iconos.
-  Nunca las dos a la vez.
+  Nunca las dos a la vez. **La URL nunca enseña `#seccion`**: los `href` siguen llevando el
+  ancla, pero `components/layout/HashCleaner.tsx` la borra en cuanto ha hecho su trabajo, y en
+  las navegaciones entre páginas no llega ni a escribirse. Ver [[urls-sin-anclas]].
+- **Alineación: el texto va centrado** en el espacio que ocupa, como en `sangilstudio`. `text-center`
+  en la sección + `mx-auto` en las cajas con ancho máximo + `justify-center` en las filas flex; las
+  tres cosas juntas, porque ninguna hace el trabajo de las otras. **En papel no**: `@media print` lo
+  deshace. Qué quedó sin centrar y por qué, en [[decisiones-de-diseno]].
+- **Los proyectos destacados de la portada van en un carrusel «cover flow»** (bloque «COVER FLOW»
+  de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D dirigido por el scroll, sin
+  JavaScript salvo los dos botones. Fallback sin soporte o con `prefers-reduced-motion`: carrusel
+  horizontal plano. En papel se deshace en retícula de dos columnas. Ver [[cover-flow]].
+- **La primera pantalla ES el escenario cinético.** El hero ocupa `min-h-svh` con el texto apoyado
+  abajo y, detrás, un mosaico a sangre de dieciséis fotografías CC0 y cuatro paneles de interfaz
+  dibujados en CSS, en hasta cinco columnas sobre un resplandor de cobre.
+  `components/sections/HeroStage.tsx` + bloque «Escenario cinético» de `globals.css`. **Sin
+  JavaScript**, `aria-hidden`, se congela con `prefers-reduced-motion` y no se imprime. El texto
+  del hero es corto a propósito —puesto, nombre, una línea, ubicación y las cuatro cifras—: la
+  entradilla larga se quitó porque sobre un fondo en movimiento no se lee. Ver
+  [[escenario-cinetico]].
+- **El contraste del hero lo da un velo anclado al TEXTO** (`.hero-copy::before`), no un
+  porcentaje del alto del hero, y el rótulo del puesto lleva pastilla propia (`.hero-chip`). Las
+  dos cosas son la corrección de un fallo real. Regla corta: **si tocas el velo, vuelve a mirar el
+  rótulo del puesto y la línea de la ubicación**, que son los dos textos que fallan primero — no
+  el nombre, que es enorme y aguanta cualquier foto detrás. Ver [[escenario-cinetico]].
 
 Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.claude/memory/`.
 
@@ -80,6 +107,22 @@ Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.
    trabajo.
 6. **El estado laboral que se muestra es el puesto actual, no «disponible».** Es un dato
    verificable en LinkedIn y no una señal de búsqueda activa que pueda leer un jefe.
+7. **El cover flow se mide por el ANCHO del carrusel, no con `view-timeline-inset`.** El inset es
+   el camino evidente y obliga a un `calc()` con porcentaje; medirlo por el ancho deja la
+   geometría en un sitio y, de paso, convierte el carrusel en una ventana centrada en vez de una
+   banda a sangre con medio metro de vacío a la izquierda en un monitor ancho. Ver
+   [[cover-flow]].
+8. **El escenario de la portada nunca compite con el texto.** Es decoración, aunque ahora ocupe la
+   primera pantalla: si al tocar el velo o las tejas hay que esforzarse para leer **cualquier**
+   línea del hero a 390 px, el cambio está mal. Y el listón es el rótulo del puesto y la
+   ubicación, no el nombre. Lo que garantiza el contraste va anclado al texto y con los topes en
+   `rem`, nunca en porcentajes del alto del hero. Ver [[escenario-cinetico]].
+9. **Sólo entran imágenes CC0 o dominio público**, y cada una queda documentada en
+   `public/hero/CREDITS.md`. Nada de CC-BY: obligaría a mostrar dieciséis líneas de crédito detrás
+   del titular. El script comprueba la licencia y descarta lo que no lo sea.
+10. **Las secciones de la portada no se convierten en rutas** para quitar la almohadilla de la
+    URL. Serían cinco páginas por idioma con el mismo CV compitiendo con la portada por «Luis
+    Fernández Sangil». La almohadilla se quita en cliente; ver [[urls-sin-anclas]].
 
 ## 4. Reglas del proyecto
 
@@ -132,8 +175,32 @@ proyecto.**
 
 ---
 
+_2026-08-01 (rama `feature/hero-inmersivo`): **el escenario pasa a ser la primera pantalla.** El
+hero ocupa `min-h-svh` con el texto apoyado abajo; el mosaico es a sangre, con cinco columnas en
+monitor ancho, dieciséis fotografías CC0 (cinco nuevas: panel de métricas, panel de parcheo, fibra
+óptica y dos de código) y cuatro paneles dibujados (editor, build, terminal y topología). Se
+quitaron la entradilla de tres líneas y la retícula de dos columnas del hero, y el retrato pasó a
+avatar de 5 rem. **Se retiraron tres piezas frágiles** —el «el carril empieza en el 62 %», la
+máscara de franja de móvil y el velo lateral—: el contraste lo dan ahora un velo anclado al texto
+(`.hero-copy::before`, topes en `rem`) y una pastilla en el rótulo del puesto. El alto de teja va
+en `vh`, que es lo que impide que el bucle enseñe la costura en pantallas altas y estrechas. Se
+arreglaron de paso tres defectos de la hoja de impresión que la captura destapó: el halo del
+retrato salía como un nubarrón negro, la pastilla como una píldora ilegible y el hero reservaba una
+hoja casi en blanco. `npm run check` limpio y `check:mobile` 21/21 en los dos idiomas sobre el
+build de producción, con cero desbordamiento a 390, 834, 1440 y 1920 px._
+
+_2026-08-01 (rama `feature/hero-cinetico`): la portada estrena el
+**escenario cinético**. Once fotografías CC0 descargadas vía Openverse (`public/hero/`, 152 KB,
+procedencia en `CREDITS.md`, reconstruibles con `scripts/build-hero-tiles.mjs`), dos paneles de
+interfaz dibujados en CSS y `HeroStage.tsx`. Sin JavaScript ni dependencias nuevas: `npm run check`
+limpio, `check:mobile` 21/21 en los dos idiomas sobre el build de producción, y cero desbordamiento
+a 390, 834, 1440 y 1920 px. El hero sigue siendo estático y el titular sigue siendo el nombre._
+
 _Última actualización: 2026-08-01 — montaje inicial del proyecto. Stack de Swiftmet (Next 16 +
 Sanity + Vercel) con dos diferencias deliberadas: contenido de doble fuente para que la web no
 dependa de Sanity para existir, y bilingüe es/en en vez de trilingüe. Datos del CV tomados del
 perfil de LinkedIn (el portfolio anterior en Astro los tenía desactualizados: faltaba el puesto
 de Mobile Smart City, la ubicación decía otra cosa y no había formación)._
+
+_2026-08-01 — todo el texto de la web pasa a estar centrado en el espacio que ocupa, con el criterio
+de `sangilstudio`. El bloque `@media print` lo deshace: en papel el CV sigue alineado a la izquierda._

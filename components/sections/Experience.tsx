@@ -23,6 +23,11 @@ import { TagList } from '@/components/ui/Tag'
  *   es la verdad completa; cualquiera de las dos mitades sola engaña en una dirección.
  * - **El filete vertical y el punto** dan continuidad visual sin bordes de tarjeta: cuatro
  *   tarjetas serían cuatro bloques sueltos, y esto es una trayectoria.
+ *
+ * El texto va centrado en cada una de las dos columnas —fechas y puesto—, y el filete y los
+ * puntos siguen a la izquierda: son la línea del tiempo, no texto, y moverlos al centro
+ * partiría cada entrada en dos mitades. La columna de fechas mantiene `tabular-nums`, así
+ * que las tres líneas de cada entrada siguen midiendo lo mismo y se leen como un bloque.
  */
 export function Experience({
   locale,
@@ -34,7 +39,10 @@ export function Experience({
   const t = getDictionary(locale)
 
   return (
-    <section id={sections.experience} className="page-gutter mx-auto max-w-7xl section-block">
+    <section
+      id={sections.experience}
+      className="page-gutter mx-auto max-w-7xl section-block text-center"
+    >
       <SectionHeading
         index="02"
         title={t.experience.title}
@@ -107,7 +115,7 @@ export function Experience({
                   ) : null}
                 </p>
 
-                <div className="mt-5 max-w-measure space-y-3.5">
+                <div className="mt-5 mx-auto max-w-measure space-y-3.5">
                   {entry.summary[locale].map((paragraph) => (
                     <p key={paragraph.slice(0, 40)} className="text-paper-soft">
                       {paragraph}

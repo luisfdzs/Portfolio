@@ -45,16 +45,17 @@ LOCALE=en npm run check:mobile
 
 ## Dónde se toca cada cosa
 
-| Quiero cambiar…                          | Fichero                      |
-| ---------------------------------------- | ---------------------------- |
-| Experiencia, formación, stack, perfil    | `content/profile.ts`         |
-| Proyectos (o el panel, en `/admin`)      | `content/projects.ts`        |
-| Nombre, dominio canónico, repositorio    | `content/site.ts`            |
-| Textos de interfaz y traducciones        | `lib/i18n/dictionaries.ts`   |
-| Colores, tipografías, ritmo, animaciones | `app/globals.css` (`@theme`) |
-| Menú y anclas de sección                 | `lib/i18n/routes.ts`         |
-| Idiomas                                  | `lib/i18n/config.ts`         |
-| Esquemas del panel                       | `sanity/schemas/`            |
+| Quiero cambiar…                          | Fichero                             |
+| ---------------------------------------- | ----------------------------------- |
+| Experiencia, formación, stack, perfil    | `content/profile.ts`                |
+| Proyectos (o el panel, en `/admin`)      | `content/projects.ts`               |
+| Nombre, dominio canónico, repositorio    | `content/site.ts`                   |
+| Textos de interfaz y traducciones        | `lib/i18n/dictionaries.ts`          |
+| Colores, tipografías, ritmo, animaciones | `app/globals.css` (`@theme`)        |
+| Menú y anclas de sección                 | `lib/i18n/routes.ts`                |
+| Que el ancla no se vea en la URL         | `components/layout/HashCleaner.tsx` |
+| Idiomas                                  | `lib/i18n/config.ts`                |
+| Esquemas del panel                       | `sanity/schemas/`                   |
 
 ---
 
@@ -140,13 +141,114 @@ sistema.
   números dentro.
 - **Un único acento, cobre.** Marca lo accionable y el dato destacado. Nunca decora.
 - **Las apariciones al hacer scroll son CSS puro** (`animation-timeline: view()`), sin
-  JavaScript, y respetan `prefers-reduced-motion`.
+  JavaScript, y respetan `prefers-reduced-motion`. El escenario animado de la portada también:
+  ver «El escenario cinético de la portada» más abajo.
 - **Hay hoja de impresión.** Un recruiter que quiere guardar el CV pulsa Ctrl+P: sale en papel
   blanco, sin la navegación y con las URLs de los enlaces escritas al lado.
 
 En escritorio la navegación es la cabecera fija; en móvil (`< lg`), una **barra inferior de cinco
 iconos** al alcance del pulgar. Nunca las dos: tenerlas sería robar 4 rem arriba y abajo en el
 dispositivo que menos tiene.
+
+### Los proyectos destacados van en un «cover flow»
+
+Los cuatro proyectos de la portada no están en una retícula, sino en un **carrusel 3D**: la
+tarjeta centrada se mira de frente y las de los lados se giran sobre su eje vertical, se alejan y
+se apagan. Es la única sección cuyo contenido es visual, y cuatro capturas de web puestas una al
+lado de otra no se miran: se hojean.
+
+Lo mueve **el scroll y nada más**. Las animaciones son `view-timeline` + `animation-timeline`, la
+misma técnica que las apariciones al hacer scroll, así que no hay JavaScript calculando
+posiciones. La geometría —lo único delicado— está razonada en el bloque «COVER FLOW» de
+`app/globals.css`; en resumen: `--cover-flow-card` es lo que mide la tarjeta,
+`--cover-flow-step` lo que avanza el scroll de una a la siguiente (más corto, y de ahí el
+solape), y **el ancho del carrusel es lo que decide cuánto dura el giro**, porque con
+`animation-range: contain` el giro ocupa `ancho − tarjeta`.
+
+Lo único con JavaScript son los **dos botones** de `components/ui/CoverFlow.tsx`: con el dedo se
+arrastra y con el tabulador el navegador trae al foco cada tarjeta, pero una rueda de ratón no
+hace scroll horizontal y la barra está oculta a propósito.
+
+Si el navegador no soporta animaciones dirigidas por scroll, o si el sistema pide menos
+movimiento, queda **un carrusel horizontal normal** con las tarjetas separadas y ninguna girada.
+Y en papel se deshace en la retícula de dos columnas que había antes: sin eso, un `overflow-x`
+imprimiría el primer proyecto y recortaría los otros tres.
+
+### El escenario cinético de la portada
+
+**La primera pantalla completa es el escenario.** Al abrir la web se ve una pared de pantallas,
+servidores, red y cacharrería en movimiento —hasta cinco columnas de tejas desplazándose despacio
+en direcciones alternas sobre un resplandor de cobre, con cuatro paneles de interfaz dibujados en
+CSS repartidos entre ellas: un editor, una salida de `build`, una terminal y una topología—, y el
+bloque de texto se apoya abajo, encima del mosaico. Vive en `components/sections/HeroStage.tsx` y
+su mecánica en el bloque «Escenario cinético» de `app/globals.css`; el razonamiento largo está en
+los comentarios de los dos.
+
+El texto del hero es deliberadamente corto: el puesto actual, el nombre, una línea de qué haces,
+dónde estás y las cuatro cifras. La entradilla de tres líneas que había antes se quitó —sobre un
+fondo en movimiento no se lee—, y los clientes que enumeraba están en la sección de experiencia,
+que es donde se pueden comprobar con las fechas al lado.
+
+Lo que hay que saber para no romperlo:
+
+- **Cero JavaScript.** Son animaciones CSS sobre `transform` y `opacity`, las dos propiedades que
+  el navegador anima en el compositor. Es un componente de servidor: la portada sigue siendo HTML
+  estático.
+- **Es decoración declarada.** `aria-hidden` en la raíz, `alt=""` en las fotos y
+  `pointer-events: none` en todo el escenario. No sale en la impresión, y con
+  `prefers-reduced-motion: reduce` **se congela** (no se esconde).
+- **El contraste del texto lo da un velo anclado AL TEXTO**, `.hero-copy::before`, no un
+  porcentaje del alto del hero. Esto es la corrección de un fallo real: con el velo medido en
+  porcentajes, el rótulo del puesto y la línea de la ubicación —los dos textos más pequeños y
+  apagados de la portada— caían sobre la parte abierta y no se leían. Anclado al texto y con los
+  topes en `rem`, el reparto no depende del alto de la ventana ni del idioma. El velo del
+  escenario (`__scrim`) se queda sólo como atmósfera.
+- **El rótulo del puesto lleva pastilla propia** (`.hero-chip`): fondo casi opaco y desenfoque
+  detrás. Es lo que permite que el velo empiece tarde y flojo, y por tanto que se siga viendo el
+  mosaico en el centro de la pantalla.
+- **El alto de teja va en `vh`, y no es un detalle estético.** El bucle repite la lista de tejas
+  dos veces y se desplaza un 50 %: para que no se vea la costura, una copia tiene que ser más
+  alta que la ventana. Con el alto derivado del ancho de columna eso dependía de la forma de la
+  pantalla; en `vh`, siete tejas × 16 vh cubren cualquier ventana. **Si cambias el número de
+  tejas por columna, rehaz esa cuenta.**
+- **Verificar a 390 px antes de cerrar.** `overflow-hidden` en la sección es lo único que impide
+  que el mosaico ensanche el documento, y es el fallo nº 1 de `check:mobile`.
+
+Las dieciséis fotografías son **CC0 1.0** (dominio público, uso comercial, sin atribución
+exigida), localizadas con la API de Openverse. La procedencia de cada una está en
+`public/hero/CREDITS.md`, y se reconstruyen con `node scripts/build-hero-tiles.mjs`, que además
+imprime la tabla de procedencia lista para pegar. Pesan **281 KB** entre las dieciséis, y ese
+número es literal: el cargador de imágenes del proyecto devuelve las rutas locales sin
+transformar, así que el archivo que hay en `public/hero/` es exactamente el que se descarga —
+`sizes` y `quality` no recortan nada aquí. Si hay que aligerar el escenario, se aligera en el
+script.
+
+### En la barra de direcciones nunca se ve una almohadilla
+
+Las secciones de la portada son anclas y `/es/projects` es una página. Es una diferencia real —el
+fragmento es la única parte de una URL que no llega al servidor—, pero al visitante le llega como
+una incoherencia: unas entradas del mismo menú dejan `/es/projects` y otras `/es#experience`.
+
+`components/layout/HashCleaner.tsx` quita esa diferencia, y **sin tocar los `href`**: siguen
+llevando el ancla, así que la navegación funciona sin JavaScript, se puede abrir en otra pestaña,
+y los enlaces viejos de LinkedIn siguen llevando a su sección. Lo que cambia es que un clic normal
+no llega a escribirla: se intercepta, se desplaza a mano —descontando la cabecera fija— y se
+mueve el foco a la sección, que es lo que hace de más un ancla nativa.
+
+**La regla que lo sostiene: el ancla nunca entra en el router.** Next lleva su propia URL
+canónica, y en cuanto tiene un fragmento dentro, cualquier arreglo por debajo la desincroniza y el
+clic siguiente compone sobre lo que él cree que hay: `/es#education#contact`. Se probó a limpiar
+después con `history.replaceState` —se desincroniza— y con `router.replace` —no actualiza la
+barra—; la única forma estable es no generar el fragmento.
+
+Queda un caso en el que el ancla sí llega, la visita que entra con ella puesta desde un enlace
+viejo. Ahí no hay clic que interceptar, así que se deja actuar al navegador y se borra después,
+**esperando a que la sección exista de verdad**: quitar el fragmento antes de tiempo no descoloca
+la URL, cancela el salto —la portada llega por streaming y el navegador tiene el salto pendiente
+hasta que la sección aparece—.
+
+A cambio se pierden dos cosas, y conviene saberlo antes de tocarlo: copiar la URL ya no comparte
+la sección, y «atrás» sale de la página en vez de recorrer las secciones visitadas.
 
 ### Las capturas de los proyectos
 

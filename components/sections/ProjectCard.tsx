@@ -28,15 +28,27 @@ const statusStyles: Record<ProjectEntry['status'], string> = {
  * Las **etiquetas de stack se cortan a cinco** con un «+n»: Swiftmet declara siete y la
  * fila se comía la tarjeta. La lista completa está en la ficha, que es donde alguien que
  * ha llegado hasta ahí quiere el detalle.
+ *
+ * Todo el texto va centrado en la tarjeta. La fila de estado y año es la excepción a medias:
+ * sigue siendo `estado —— año` con el filete estirándose en medio, porque ahí los dos datos
+ * están anclados a los bordes de la imagen a propósito y centrarlos los juntaría en un
+ * amontonamiento sin significado.
+ *
+ * `framed` la convierte en un panel con borde y fondo propios. Lo pide el carrusel de la
+ * portada: una tarjeta girada en el espacio tiene que parecer un objeto con cantos, y sin
+ * fondo el giro se lee como un texto torcido. En la retícula del índice el panel sobraría —
+ * ahí las tarjetas ya están separadas por el hueco de la cuadrícula.
  */
 export function ProjectCard({
   locale,
   project,
   priority = false,
+  framed = false,
 }: {
   locale: Locale
   project: ProjectEntry
   priority?: boolean
+  framed?: boolean
 }) {
   const t = getDictionary(locale)
   const stack = project.stack ?? []
@@ -44,12 +56,20 @@ export function ProjectCard({
   const hidden = stack.length - visible.length
 
   return (
-    <article className="group relative flex flex-col">
+    <article
+      className={cn(
+        'group relative flex flex-col text-center',
+        framed && 'h-full rounded-xl border border-line-strong bg-ink-raised p-4 sm:p-5',
+      )}
+    >
       <Figure
         image={project.image}
         locale={locale}
         priority={priority}
-        sizes="(min-width: 1024px) 45vw, 100vw"
+        // En el carrusel la tarjeta nunca pasa de 28rem, que es el tope de
+        // `--cover-flow-card`: pedir 45vw ahí descargaría una captura del doble de lo
+        // que se va a ver.
+        sizes={framed ? '(min-width: 34rem) 28rem, 70vw' : '(min-width: 1024px) 45vw, 100vw'}
         className="transition-opacity duration-500 group-hover:opacity-85"
       />
 
@@ -79,7 +99,7 @@ export function ProjectCard({
       {visible.length > 0 ? (
         <ul
           aria-label={`${t.projects.stackLabel} — ${project.name}`}
-          className="mt-5 flex flex-wrap gap-2"
+          className="mt-5 flex flex-wrap justify-center gap-2"
         >
           {visible.map((item) => (
             <Tag key={item}>{item}</Tag>
@@ -88,7 +108,15 @@ export function ProjectCard({
         </ul>
       ) : null}
 
-      <p className="mt-5 inline-flex items-center gap-2 text-small text-signal">
+      {/* Con `framed` las tarjetas están todas al mismo alto y los textos no miden lo
+          mismo: `mt-auto` baja esta línea al pie de cada una para que las cuatro flechas
+          queden en la misma altura y la fila no parezca descuadrada. */}
+      <p
+        className={cn(
+          'flex items-center justify-center gap-2 text-small text-signal',
+          framed ? 'mt-auto pt-5' : 'mt-5',
+        )}
+      >
         {t.projects.viewProject}
         <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
       </p>

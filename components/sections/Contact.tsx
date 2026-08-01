@@ -42,7 +42,10 @@ export function Contact({ locale, profile }: { locale: Locale; profile: Profile 
   ]
 
   return (
-    <section id={sections.contact} className="page-gutter mx-auto max-w-7xl section-block">
+    <section
+      id={sections.contact}
+      className="page-gutter mx-auto max-w-7xl section-block text-center"
+    >
       <SectionHeading index="06" title={t.contact.title} kicker={t.contact.kicker} icon={Mail}>
         <p>{t.contact.lead}</p>
       </SectionHeading>

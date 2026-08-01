@@ -46,8 +46,11 @@ const es = {
     // tipográfico distinto: el saludo es pequeño, el nombre es el titular.
     greeting: 'Hola, soy',
     availability: 'Analista programador senior en Mobile Smart City',
-    // {years} lo rellena la portada con la cifra calculada de las fechas reales.
-    lead: 'Ingeniero industrial y desarrollador web con {years} años de experiencia. He construido y mantenido aplicaciones para Banco Santander Portugal, INDRA, ABB Robotics e Ingeteam a través de consultoría, y webs completas de producción por mi cuenta: diseño, CMS, despliegue y mantenimiento.',
+    // Aquí había una entradilla de tres líneas con los clientes (Santander, INDRA, ABB,
+    // Ingeteam). Se quitó al pasar la portada al escenario a pantalla completa: sobre un fondo
+    // en movimiento un párrafo largo no se lee, y esos clientes están en la sección de
+    // experiencia con las fechas al lado, que es donde se pueden comprobar. El porqué completo
+    // está en `components/sections/Hero.tsx`.
     primaryCta: 'Ver proyectos',
     secondaryCta: 'Hablemos',
     scrollHint: 'Sigue bajando',
@@ -88,6 +91,12 @@ const es = {
       'No son ejercicios de curso: son webs de clientes reales en producción, con panel de administración para que el cliente edite su propio contenido sin pasar por mí.',
     viewAll: 'Ver los {count} proyectos',
     viewProject: 'Ver el proyecto',
+    // El carrusel de la portada. Los rótulos de los dos botones son de lector de
+    // pantalla: en pantalla sólo hay una flecha, porque «Siguiente» al lado de una flecha
+    // que apunta a la derecha es la misma información dos veces.
+    carousel: 'Proyectos destacados',
+    carouselPrevious: 'Proyecto anterior',
+    carouselNext: 'Proyecto siguiente',
     liveSite: 'Web en vivo',
     sourceCode: 'Código',
     role: 'Mi papel',
@@ -191,7 +200,6 @@ const en: Dictionary = {
   hero: {
     greeting: "Hi, I'm",
     availability: 'Senior developer/analyst at Mobile Smart City',
-    lead: 'Industrial engineer and web developer with {years} years of experience. I have built and maintained applications for Banco Santander Portugal, INDRA, ABB Robotics and Ingeteam through consultancies, and complete production websites on my own: design, CMS, deployment and maintenance.',
     primaryCta: 'See projects',
     secondaryCta: "Let's talk",
     scrollHint: 'Keep scrolling',
@@ -226,6 +234,9 @@ const en: Dictionary = {
       'Not course exercises: real client websites in production, each with an admin panel so the client edits their own content without going through me.',
     viewAll: 'See all {count} projects',
     viewProject: 'View project',
+    carousel: 'Featured projects',
+    carouselPrevious: 'Previous project',
+    carouselNext: 'Next project',
     liveSite: 'Live site',
     sourceCode: 'Source',
     role: 'My role',

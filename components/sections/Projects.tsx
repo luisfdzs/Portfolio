@@ -3,18 +3,36 @@ import type { Locale } from '@/lib/i18n/config'
 import { getDictionary, interpolate } from '@/lib/i18n/dictionaries'
 import { href } from '@/lib/i18n/routes'
 import { Action } from '@/components/ui/Action'
+import { CoverFlow } from '@/components/ui/CoverFlow'
 import { Code } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { ProjectCard } from './ProjectCard'
 
 /**
- * Proyectos en la portada: sólo los destacados, a dos columnas.
+ * Proyectos en la portada: sólo los destacados, en un carrusel «cover flow».
  *
  * No están todos a propósito. El índice de `/projects` existe para quien quiera el
  * catálogo completo; la portada tiene que enseñar los cuatro que mejor representan el
  * trabajo y dejar paso a la siguiente sección. Seis tarjetas aquí serían dos pantallas de
  * scroll antes de llegar a la formación.
+ *
+ * **Por qué un carrusel y no la retícula de dos columnas que había antes.** Es la única
+ * sección de la página cuyo contenido es visual, y una captura de web a 45 vw compitiendo
+ * con otra al lado no se mira: se hojea. El cover flow pone una tarjeta de frente y deja
+ * las otras giradas al lado, que es exactamente cómo alguien elige entre cuatro cosas
+ * parecidas. Y de paso ahorra media pantalla de scroll en la mitad de la página donde se
+ * decide si se sigue leyendo.
+ *
+ * Lo que **cuesta** es honesto y conviene tenerlo escrito: en la retícula se veían los
+ * cuatro proyectos de un golpe y aquí hay uno de frente y dos asomando. Se compensa con el
+ * solape —que hace evidente que hay más a los lados—, con los botones y con el enlace al
+ * índice completo justo debajo. Si alguna vez se mide que la gente no pasa de la primera
+ * tarjeta, la retícula sigue viva en `/projects` y volver es cambiar este fichero.
+ *
+ * El efecto es CSS puro dirigido por el scroll (bloque «COVER FLOW» de `globals.css`); el
+ * carrusel va a ancho completo y sólo el titular y el pie se quedan dentro de la retícula
+ * de la página, porque centrar la tarjeta contra el viewport es lo que hace el efecto.
  *
  * El id de la sección es `projects` igual que la ruta `/projects`. No colisionan —uno es
  * un ancla y el otro un segmento de URL— y compartir nombre es lo que permite que el menú
@@ -35,26 +53,42 @@ export function Projects({
     // El id es una cadena literal y no una clave de `sections`: «proyectos» no es un
     // ancla del sistema de navegación —el menú y la barra de móvil llevan a la página
     // `/projects`— pero conviene poder enlazar el bloque de la portada directamente.
-    <section id="projects" className="page-gutter mx-auto max-w-7xl section-block">
-      <SectionHeading index="03" title={t.projects.title} kicker={t.projects.kicker} icon={Code}>
-        <p>{t.projects.intro}</p>
-      </SectionHeading>
-
-      <div className="grid gap-12 lg:grid-cols-2 lg:gap-x-10 lg:gap-y-16">
-        {featured.map((project, index) => (
-          <Reveal key={project.slug} step={index}>
-            <ProjectCard locale={locale} project={project} />
-          </Reveal>
-        ))}
+    // El `section-block` va aquí y el `page-gutter` en cada bloque de dentro: el carrusel
+    // tiene que llegar a los dos bordes de la pantalla y el margen lateral de la página se
+    // lo comería.
+    <section id="projects" className="section-block text-center">
+      <div className="page-gutter mx-auto max-w-7xl">
+        <SectionHeading index="03" title={t.projects.title} kicker={t.projects.kicker} icon={Code}>
+          <p>{t.projects.intro}</p>
+        </SectionHeading>
       </div>
+
+      {/* Un solo `Reveal`, y por fuera del contenedor con scroll. Uno por tarjeta —como en
+          la retícula— dejaría las cuatro invisibles: `reveal` se mide con
+          `animation-timeline: view()` en el eje de bloque, y dentro de un carrusel
+          horizontal el contenedor con scroll más cercano es el propio carrusel, donde las
+          tarjetas no se mueven nunca en vertical. La animación no llegaría a arrancar. */}
+      <Reveal>
+        <CoverFlow
+          label={t.projects.carousel}
+          previousLabel={t.projects.carouselPrevious}
+          nextLabel={t.projects.carouselNext}
+        >
+          {featured.map((project) => (
+            <ProjectCard key={project.slug} locale={locale} project={project} framed />
+          ))}
+        </CoverFlow>
+      </Reveal>
 
       {/* El enlace al índice sólo aparece si de verdad hay más que enseñar. */}
       {total > featured.length ? (
-        <Reveal className="mt-14 border-t border-line pt-8">
-          <Action href={href(locale, 'projects')} variant="secondary">
-            {interpolate(t.projects.viewAll, { count: total })}
-          </Action>
-        </Reveal>
+        <div className="page-gutter mx-auto max-w-7xl">
+          <Reveal className="mt-12 border-t border-line pt-8">
+            <Action href={href(locale, 'projects')} variant="secondary">
+              {interpolate(t.projects.viewAll, { count: total })}
+            </Action>
+          </Reveal>
+        </div>
       ) : null}
     </section>
   )
