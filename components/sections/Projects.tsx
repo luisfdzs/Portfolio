@@ -35,7 +35,7 @@ export function Projects({
     // El id es una cadena literal y no una clave de `sections`: «proyectos» no es un
     // ancla del sistema de navegación —el menú y la barra de móvil llevan a la página
     // `/projects`— pero conviene poder enlazar el bloque de la portada directamente.
-    <section id="projects" className="page-gutter mx-auto max-w-7xl section-block">
+    <section id="projects" className="page-gutter mx-auto max-w-7xl section-block text-center">
       <SectionHeading index="03" title={t.projects.title} kicker={t.projects.kicker} icon={Code}>
         <p>{t.projects.intro}</p>
       </SectionHeading>

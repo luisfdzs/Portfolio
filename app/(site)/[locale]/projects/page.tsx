@@ -50,12 +50,14 @@ export default async function ProjectsPage({ params }: { params: Promise<{ local
   const projects = await getProjects()
 
   return (
-    <div className="page-gutter mx-auto max-w-7xl pt-28 pb-section lg:pt-40">
+    <div className="page-gutter mx-auto max-w-7xl pt-28 pb-section text-center lg:pt-40">
       <header className="mb-16 border-b border-line pb-10 lg:mb-20">
         <Reveal>
           <p className="eyebrow">{t.projects.title}</p>
           <h1 className="mt-4 text-display text-paper">{t.projects.index.title}</h1>
-          <p className="mt-6 max-w-measure text-lead text-paper-soft">{t.projects.index.lead}</p>
+          <p className="mt-6 mx-auto max-w-measure text-lead text-paper-soft">
+            {t.projects.index.lead}
+          </p>
         </Reveal>
       </header>
 

@@ -24,6 +24,9 @@ import { Home } from '@/components/ui/Icons'
  * del rango cómodo— y el bloque ocupa el ancho que le corresponde. Sólo se parten los
  * párrafos que van después de la entradilla: partir también la entradilla obligaría a subir y
  * bajar la vista para leer las tres primeras frases, que son las que más importan.
+ *
+ * Con el texto centrado, las dos columnas siguen siendo la maquetación correcta: cada
+ * párrafo se centra en la columna que ocupa, y el bloque no deja media página en blanco.
  */
 export function About({ locale, profile }: { locale: Locale; profile: Profile }) {
   const t = getDictionary(locale)
@@ -33,12 +36,15 @@ export function About({ locale, profile }: { locale: Locale; profile: Profile })
   const [lead, ...rest] = profile.bio[locale]
 
   return (
-    <section id={sections.about} className="page-gutter mx-auto max-w-7xl section-block">
+    <section
+      id={sections.about}
+      className="page-gutter mx-auto max-w-7xl section-block text-center"
+    >
       <SectionHeading index="01" title={t.about.title} kicker={t.about.kicker} icon={Home} />
 
       {lead ? (
         <Reveal>
-          <p className="max-w-measure text-lead text-paper">{lead}</p>
+          <p className="mx-auto max-w-measure text-lead text-paper">{lead}</p>
         </Reveal>
       ) : null}
 

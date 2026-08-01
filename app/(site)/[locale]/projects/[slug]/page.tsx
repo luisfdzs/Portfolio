@@ -86,7 +86,7 @@ export default async function ProjectPage({
   ]
 
   return (
-    <article className="page-gutter mx-auto max-w-5xl pt-28 pb-section lg:pt-40">
+    <article className="page-gutter mx-auto max-w-5xl pt-28 pb-section text-center lg:pt-40">
       <Reveal>
         <Link
           href={href(locale, 'projects')}
@@ -100,12 +100,12 @@ export default async function ProjectPage({
       <header className="mt-8">
         <Reveal>
           <h1 className="text-display text-paper">{project.name}</h1>
-          <p className="mt-5 max-w-measure font-display text-title text-signal">
+          <p className="mt-5 mx-auto max-w-measure font-display text-title text-signal">
             {project.tagline[locale]}
           </p>
         </Reveal>
 
-        <Reveal step={1} className="mt-10 flex flex-wrap items-center gap-3">
+        <Reveal step={1} className="mt-10 flex flex-wrap items-center justify-center gap-3">
           {project.liveUrl ? (
             <Action
               href={project.liveUrl}
@@ -143,7 +143,7 @@ export default async function ProjectPage({
         ))}
       </dl>
 
-      <div className="mt-14 max-w-measure space-y-5">
+      <div className="mt-14 mx-auto max-w-measure space-y-5">
         {project.summary[locale].map((paragraph, index) => (
           <Reveal key={paragraph.slice(0, 40)} step={index}>
             <p className={index === 0 ? 'text-lead text-paper' : 'text-paper-soft'}>{paragraph}</p>
@@ -153,9 +153,13 @@ export default async function ProjectPage({
 
       {/* La nota, cuando hay algo que matizar: dominio pendiente, datos de ejemplo… Va en
           un bloque marcado y no dentro del resumen, porque es una advertencia y tiene que
-          leerse como tal. Es la sección que hace que el resto se crea. */}
+          leerse como tal. Es la sección que hace que el resto se crea.
+
+          El filete es SUPERIOR y no lateral: un filete a la izquierda marca el margen desde
+          el que arranca cada línea, y con el texto centrado ninguna línea arranca ahí. Arriba
+          señala el bloque entero, que es lo que hace falta, y no una alineación que no existe. */}
       {project.note ? (
-        <Reveal className="mt-10 max-w-measure border-l-2 border-signal-dim bg-ink-raised px-5 py-4">
+        <Reveal className="mt-10 mx-auto max-w-measure border-t-2 border-signal-dim bg-ink-raised px-5 py-4">
           <p className="text-small text-paper-soft">{project.note[locale]}</p>
         </Reveal>
       ) : null}
@@ -168,14 +172,14 @@ export default async function ProjectPage({
           <ol className="mt-8 space-y-7">
             {project.highlights.map((highlight, index) => (
               <Reveal as="li" key={highlight[locale].slice(0, 40)} step={index}>
-                <div className="flex gap-4">
-                  <span
-                    className="figure-num pt-0.5 text-small text-paper-faint"
-                    aria-hidden="true"
-                  >
+                {/* El número, ENCIMA del texto y no a su izquierda: en una fila el número
+                    fija el margen izquierdo del párrafo, y un párrafo centrado no tiene ese
+                    margen. Arriba y centrado numera el punto sin fingir una alineación. */}
+                <div className="flex flex-col items-center gap-2">
+                  <span className="figure-num text-small text-paper-faint" aria-hidden="true">
                     {String(index + 1).padStart(2, '0')}
                   </span>
-                  <p className="max-w-measure text-paper-soft">{highlight[locale]}</p>
+                  <p className="mx-auto max-w-measure text-paper-soft">{highlight[locale]}</p>
                 </div>
               </Reveal>
             ))}
@@ -201,7 +205,7 @@ export default async function ProjectPage({
         >
           <Link
             href={href(locale, 'projects', neighbours.previous.slug)}
-            className="group flex flex-col gap-1"
+            className="group flex flex-col items-center gap-1"
           >
             <span className="eyebrow inline-flex items-center gap-2">
               <ArrowLeft className="size-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
@@ -214,7 +218,7 @@ export default async function ProjectPage({
 
           <Link
             href={href(locale, 'projects', neighbours.next.slug)}
-            className="group flex flex-col gap-1 sm:items-end sm:text-right"
+            className="group flex flex-col items-center gap-1"
           >
             <span className="eyebrow inline-flex items-center gap-2">
               {t.projects.next}

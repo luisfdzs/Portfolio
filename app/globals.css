@@ -235,9 +235,10 @@
   font-feature-settings: 'zero' 1;
 }
 
-/* Enlace con subrayado que se dibuja al pasar por encima. Crece desde la
-   izquierda, que es la dirección en la que se lee: el texto de este sitio está
-   alineado a la izquierda, no centrado. */
+/* Enlace con subrayado que se dibuja al pasar por encima. Crece desde el
+   CENTRO hacia los dos lados, porque el texto de este sitio está centrado: un
+   subrayado que nace en el borde izquierdo de una línea centrada arranca en un
+   punto que no coincide con nada y se lee como un desajuste. */
 @utility link-underline {
   position: relative;
   display: inline-block;
@@ -250,7 +251,7 @@
     height: 1px;
     background: currentColor;
     transform: scaleX(0);
-    transform-origin: left;
+    transform-origin: center;
     transition: transform 0.45s var(--ease-out-soft);
   }
 
@@ -321,6 +322,15 @@
     color: #000;
     font-size: 10.5pt;
     padding-block-end: 0;
+  }
+
+  /* En pantalla el texto va centrado; en papel, NO. Un CV impreso con los
+     párrafos centrados se lee peor —el ojo pierde el punto de retorno de cada
+     línea— y además es lo que hace un currículum de plantilla. La decisión de
+     centrar es de la web como pieza de diseño, no del documento imprimible, así
+     que aquí se deshace de una vez para todo el árbol. */
+  body * {
+    text-align: left !important;
   }
 
   /* Fuera lo que no significa nada en papel. */
