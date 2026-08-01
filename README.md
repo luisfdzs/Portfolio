@@ -140,13 +140,48 @@ sistema.
   números dentro.
 - **Un único acento, cobre.** Marca lo accionable y el dato destacado. Nunca decora.
 - **Las apariciones al hacer scroll son CSS puro** (`animation-timeline: view()`), sin
-  JavaScript, y respetan `prefers-reduced-motion`.
+  JavaScript, y respetan `prefers-reduced-motion`. El escenario animado de la portada también:
+  ver «El escenario cinético de la portada» más abajo.
 - **Hay hoja de impresión.** Un recruiter que quiere guardar el CV pulsa Ctrl+P: sale en papel
   blanco, sin la navegación y con las URLs de los enlaces escritas al lado.
 
 En escritorio la navegación es la cabecera fija; en móvil (`< lg`), una **barra inferior de cinco
 iconos** al alcance del pulgar. Nunca las dos: tenerlas sería robar 4 rem arriba y abajo en el
 dispositivo que menos tiene.
+
+### El escenario cinético de la portada
+
+Lo primero que se ve al abrir la web es un **mosaico de tejas en movimiento** detrás del titular:
+tres columnas de fotografías —servidores, código, cacharrería, puestos de trabajo— que se
+desplazan despacio en direcciones alternas sobre un resplandor de cobre, con dos paneles de
+interfaz dibujados en CSS entre ellas (un editor y una salida de `build`). Vive en
+`components/sections/HeroStage.tsx` y su mecánica en el bloque «Escenario cinético» de
+`app/globals.css`; el razonamiento largo está en los comentarios de los dos.
+
+Lo que hay que saber para no romperlo:
+
+- **Cero JavaScript.** Son animaciones CSS sobre `transform` y `opacity`, las dos propiedades que
+  el navegador anima en el compositor. Es un componente de servidor: la portada sigue siendo HTML
+  estático.
+- **Es decoración declarada.** `aria-hidden` en la raíz, `alt=""` en las once fotos y
+  `pointer-events: none` en todo el escenario. No sale en la impresión, y con
+  `prefers-reduced-motion: reduce` **se congela** (no se esconde).
+- **En móvil es una franja, no un fondo.** A 390 px no hay una mitad libre: el texto ocupa todo el
+  ancho. Así que por debajo de `lg` el escenario vive sólo en la franja de arriba, detrás del
+  retrato, y se apaga **antes** de que empiece el titular. El corte va en `rem` y no en `%` —el
+  porcentaje se mide contra el alto del hero, que cambia con la longitud de la entradilla—. La
+  primera versión no hacía esto y la entradilla se leía sobre la foto de un portátil.
+- **El texto manda sobre la imagen, siempre.** Una máscara reparte el escenario y un velo
+  (`__scrim`) devuelve el fondo a grafito puro donde hay texto. Al tocar cualquiera de los dos,
+  volver a mirar el hero a 390 px antes de cerrar.
+
+Las once fotografías son **CC0 1.0** (dominio público, uso comercial, sin atribución exigida),
+localizadas con la API de Openverse. La procedencia de cada una está en `public/hero/CREDITS.md`,
+y se reconstruyen con `node scripts/build-hero-tiles.mjs`. Pesan **152 KB** entre las once, y ese
+número es literal: el cargador de imágenes del proyecto devuelve las rutas locales sin
+transformar, así que el archivo que hay en `public/hero/` es exactamente el que se descarga —
+`sizes` y `quality` no recortan nada aquí. Si hay que aligerar el escenario, se aligera en el
+script.
 
 ### Las capturas de los proyectos
 

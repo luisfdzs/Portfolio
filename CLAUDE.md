@@ -55,10 +55,19 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   Framework declarado en `vercel.json`.
 - **Calidad:** `npm run check` (typecheck + ESLint + Prettier) y `npm run check:mobile` (21
   comprobaciones en Chrome real a 390×844, por idioma).
+- **Imágenes locales: lo que hay en `public/` es lo que viaja.** El cargador
+  (`sanity/imageLoader.ts`) sólo transforma URLs de la CDN de Sanity y devuelve las rutas locales
+  intactas, así que en las capturas y en las tejas del hero **`sizes` y `quality` no ahorran ni un
+  byte**: el peso se decide al generar el archivo.
 - **Tipografía:** Instrument Serif (titulares), Inter (cuerpo) y JetBrains Mono (datos), las tres
   autoalojadas por `next/font` — ninguna petición a Google en tiempo de ejecución.
 - **Navegación:** cabecera fija en escritorio; en móvil (`< lg`), barra inferior de cinco iconos.
   Nunca las dos a la vez.
+- **Portada con escenario cinético:** detrás del titular, un mosaico de once fotografías CC0 y dos
+  paneles de interfaz dibujados en CSS, desplazándose en tres columnas sobre un resplandor de
+  cobre. `components/sections/HeroStage.tsx` + bloque «Escenario cinético» de `globals.css`. **Sin
+  JavaScript**, `aria-hidden`, se congela con `prefers-reduced-motion` y no se imprime. Ver
+  [[escenario-cinetico]].
 
 Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.claude/memory/`.
 
@@ -80,6 +89,13 @@ Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.
    trabajo.
 6. **El estado laboral que se muestra es el puesto actual, no «disponible».** Es un dato
    verificable en LinkedIn y no una señal de búsqueda activa que pueda leer un jefe.
+7. **El escenario de la portada nunca compite con el titular.** Es decoración: si al tocar la
+   máscara, el velo o las tejas hay que esforzarse para leer el nombre a 390 px, el cambio está
+   mal. En móvil es una franja arriba, no un fondo — y el corte va en `rem`, no en `%`. Ver
+   [[escenario-cinetico]].
+8. **Sólo entran imágenes CC0 o dominio público**, y cada una queda documentada en
+   `public/hero/CREDITS.md`. Nada de CC-BY: obligaría a mostrar once líneas de crédito detrás del
+   titular. El script comprueba la licencia y descarta lo que no lo sea.
 
 ## 4. Reglas del proyecto
 
@@ -131,6 +147,13 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_Actualización 2026-08-01 (rama `feature/hero-cinetico`, en curso): la portada estrena el
+**escenario cinético**. Once fotografías CC0 descargadas vía Openverse (`public/hero/`, 152 KB,
+procedencia en `CREDITS.md`, reconstruibles con `scripts/build-hero-tiles.mjs`), dos paneles de
+interfaz dibujados en CSS y `HeroStage.tsx`. Sin JavaScript ni dependencias nuevas: `npm run check`
+limpio, `check:mobile` 21/21 en los dos idiomas sobre el build de producción, y cero desbordamiento
+a 390, 834, 1440 y 1920 px. El hero sigue siendo estático y el titular sigue siendo el nombre._
 
 _Última actualización: 2026-08-01 — montaje inicial del proyecto. Stack de Swiftmet (Next 16 +
 Sanity + Vercel) con dos diferencias deliberadas: contenido de doble fuente para que la web no
