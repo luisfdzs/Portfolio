@@ -70,6 +70,19 @@ export function buildYear(): number {
 }
 
 /**
+ * La fecha del build como `Date`, para el `lastModified` del sitemap.
+ *
+ * Se fija el día 1 del mes del build: el mes es toda la precisión que hay (ver
+ * `currentYearMonth`) y poner el día de hoy fingiría una exactitud que no existe. A un
+ * rastreador le sirve igual —usa `lastModified` para decidir cada cuánto volver, no para
+ * ordenar resultados— y así el valor no depende de a qué hora se despliegue.
+ */
+export function buildDate(): Date {
+  const [year, month] = currentYearMonth().split('-')
+  return new Date(Date.UTC(Number(year), Number(month) - 1, 1))
+}
+
+/**
  * Duración de un rango, en años y meses ya redactados: «2 años 3 meses».
  * Los rangos abiertos se cierran contra el mes del build (ver `currentYearMonth`).
  */
