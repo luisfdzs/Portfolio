@@ -181,5 +181,6 @@ const counts = documents.reduce((totals, document) => {
 }, {})
 
 console.log(`\n${documents.length} documentos escritos en scripts/migration/import.ndjson`)
-for (const [type, count] of Object.entries(counts)) console.log(`  ${count.toString().padStart(2)} × ${type}`)
+for (const [type, count] of Object.entries(counts))
+  console.log(`  ${count.toString().padStart(2)} × ${type}`)
 console.log('\nSiguiente paso:  npm run migrate:import')

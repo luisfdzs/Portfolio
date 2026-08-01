@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { site } from '@/content/site'
 import { getProjectSlugs } from '@/lib/content'
+import { buildDate } from '@/lib/format'
 import { locales } from '@/lib/i18n/config'
 import { href } from '@/lib/i18n/routes'
 
@@ -19,16 +20,22 @@ import { href } from '@/lib/i18n/routes'
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = []
   const slugs = await getProjectSlugs()
+  // El mismo `lastModified` para todo: lo que se publica es una foto del CV en un momento
+  // dado, y ese momento es el del despliegue. Fechas distintas por página darían a entender
+  // que cada una se revisa por separado, y no es así.
+  const lastModified = buildDate()
 
   for (const locale of locales) {
     entries.push({
       url: `${site.url}/${locale}`,
+      lastModified,
       changeFrequency: 'monthly',
       priority: 1,
     })
 
     entries.push({
       url: `${site.url}${href(locale, 'projects')}`,
+      lastModified,
       changeFrequency: 'monthly',
       priority: 0.8,
     })
@@ -36,6 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const slug of slugs) {
       entries.push({
         url: `${site.url}${href(locale, 'projects', slug)}`,
+        lastModified,
         changeFrequency: 'yearly',
         priority: 0.6,
       })
