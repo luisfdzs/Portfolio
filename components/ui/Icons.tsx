@@ -68,6 +68,15 @@ export function ArrowUp(props: IconProps) {
   )
 }
 
+export function ArrowDown(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 5v14" />
+      <path d="m6 13 6 6 6-6" />
+    </Icon>
+  )
+}
+
 export function Home(props: IconProps) {
   return (
     <Icon {...props}>

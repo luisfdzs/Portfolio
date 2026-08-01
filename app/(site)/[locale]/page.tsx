@@ -128,7 +128,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <Hero locale={locale} profile={profile} years={years} stats={stats} />
+      <Hero locale={locale} profile={profile} stats={stats} />
       <About locale={locale} profile={profile} />
       <Experience locale={locale} entries={experience} />
       <Projects locale={locale} featured={featured} total={projects.length} />

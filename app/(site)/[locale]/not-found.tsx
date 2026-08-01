@@ -16,10 +16,10 @@ export default function NotFound() {
   const t = getDictionary(defaultLocale)
 
   return (
-    <div className="page-gutter mx-auto flex min-h-[70svh] max-w-3xl flex-col justify-center py-section">
+    <div className="page-gutter mx-auto flex min-h-[70svh] max-w-3xl flex-col items-center justify-center py-section text-center">
       <p className="figure-num text-figure text-signal">404</p>
       <h1 className="mt-4 text-title text-paper">{t.notFound.title}</h1>
-      <p className="mt-5 max-w-measure text-paper-soft">{t.notFound.lead}</p>
+      <p className="mt-5 mx-auto max-w-measure text-paper-soft">{t.notFound.lead}</p>
       <div className="mt-10">
         <Action href={href(defaultLocale, 'home')} variant="primary">
           {t.notFound.cta}
