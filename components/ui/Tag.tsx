@@ -23,12 +23,18 @@ export function Tag({ children, className }: { children: string; className?: str
   )
 }
 
-/** La lista completa. Se separa del `Tag` porque el `<ul>` necesita su propio rótulo. */
+/**
+ * La lista completa. Se separa del `Tag` porque el `<ul>` necesita su propio rótulo.
+ *
+ * `justify-center` y no herencia del `text-center`: un flex reparte a sus hijos según
+ * `justify-content`, y sin esto la última fila de etiquetas —la que casi nunca está
+ * completa— se quedaría pegada a la izquierda debajo de un bloque centrado.
+ */
 export function TagList({ items, label }: { items: readonly string[]; label: string }) {
   if (items.length === 0) return null
 
   return (
-    <ul aria-label={label} className="flex flex-wrap gap-2">
+    <ul aria-label={label} className="flex flex-wrap justify-center gap-2">
       {items.map((item) => (
         <Tag key={item}>{item}</Tag>
       ))}

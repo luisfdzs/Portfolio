@@ -240,10 +240,13 @@ export function HeroStage() {
             </div>
           ))}
         </div>
-      </div>
 
-      {/* El velo, ENCIMA de todo: es lo que garantiza que el titular se lea. */}
-      <div className="hero-stage__scrim" />
+        {/* El velo, ENCIMA de las tejas: es lo que garantiza que el titular se lea. Va DENTRO
+            de la zona, y no suelto en el escenario, para que sus porcentajes se midan contra la
+            misma retícula que el carril; si no, velo y mosaico se separan al cambiar el ancho de
+            la ventana. El razonamiento completo está en `globals.css`. */}
+        <div className="hero-stage__scrim" />
+      </div>
     </div>
   )
 }

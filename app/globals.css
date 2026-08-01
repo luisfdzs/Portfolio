@@ -235,9 +235,10 @@
   font-feature-settings: 'zero' 1;
 }
 
-/* Enlace con subrayado que se dibuja al pasar por encima. Crece desde la
-   izquierda, que es la dirección en la que se lee: el texto de este sitio está
-   alineado a la izquierda, no centrado. */
+/* Enlace con subrayado que se dibuja al pasar por encima. Crece desde el
+   CENTRO hacia los dos lados, porque el texto de este sitio está centrado: un
+   subrayado que nace en el borde izquierdo de una línea centrada arranca en un
+   punto que no coincide con nada y se lee como un desajuste. */
 @utility link-underline {
   position: relative;
   display: inline-block;
@@ -250,7 +251,7 @@
     height: 1px;
     background: currentColor;
     transform: scaleX(0);
-    transform-origin: left;
+    transform-origin: center;
     transition: transform 0.45s var(--ease-out-soft);
   }
 
@@ -457,7 +458,7 @@
      justo lo que se busca.
 
      En móvil ocupa todo el ancho y se apaga por completo antes de llegar al
-     titular; en escritorio se va al 58 % derecho, que es la mitad de la retícula
+     titular; en escritorio se va a la parte derecha, la mitad de la retícula
      donde no hay texto. */
   .hero-stage__rail {
     position: absolute;
@@ -475,11 +476,24 @@
 
   @media (width >= 64rem) {
     .hero-stage__rail {
-      /* Arranca en el 56 % de la retícula —la columna de texto es `1.5fr` de
-         `1.5fr 1fr`, o sea el 60 %— y sale 25vw por la derecha para llegar al
-         borde de la ventana en cualquier pantalla. Lo que sobra lo recorta el
-         `overflow: hidden` de `.hero-stage`. */
-      inset-inline: 58% -25vw;
+      /*
+       * Arranca en el 62 % de la retícula y sale 25vw por la derecha, para llegar
+       * al borde de la ventana en cualquier pantalla; lo que sobra lo recorta el
+       * `overflow: hidden` de `.hero-stage`.
+       *
+       * El 62 % no es un valor buscado a ojo: la columna de texto es `1.5fr` de
+       * `1.5fr 1fr`, o sea **el 60 %** de la retícula. Las tejas empiezan justo
+       * después, y así **por construcción** ninguna nace debajo del texto en
+       * ningún ancho.
+       *
+       * Estaba en el 58 % y colaba porque el texto iba alineado a la izquierda y
+       * no llenaba su columna. Al centrarlo (merge de `centrar-textos`) los
+       * bloques se reparten a los dos lados y la entradilla —`max-w-measure`, que
+       * a 1024 px casi llena la columna— alcanza el 56 %: quedaban dos puntos de
+       * holgura y a 1024 px el párrafo y el mosaico se tocaban. Con el 62 % la
+       * holgura no depende de cómo esté alineado el texto.
+       */
+      inset-inline: 62% -25vw;
       /* En escritorio las tejas están en su mitad y no debajo de nada, así que
          casi no hace falta bajarlas: ese 8 % es sólo para que el mosaico no gane
          en peso visual al titular, que es lo único que tiene que destacar. */
@@ -666,13 +680,25 @@
 
   @media (width >= 64rem) {
     .hero-stage__scrim {
+      /*
+       * Los porcentajes se miden contra la ZONA, no contra la ventana — el velo va
+       * dentro de `.hero-stage__area`, igual que el carril.
+       *
+       * Es la única forma de que velo y carril no se separen al cambiar el ancho.
+       * Cuando el velo iba en `%` de la ventana y el carril en `%` de la zona
+       * centrada de 80rem, las dos referencias coincidían a 1024 px y divergían a
+       * 1920 px: en pantalla grande el velo tapaba de más y en la pequeña de menos,
+       * o sea que el fondo se comportaba distinto justo en las dos pantallas donde
+       * hay que mirarlo. Ahora la relación entre «dónde empieza el mosaico» (62 %)
+       * y «hasta dónde llega el grafito» (56 %) es la misma en todas.
+       */
       background: linear-gradient(
         to right,
         var(--color-ink) 0%,
-        var(--color-ink) 30%,
-        color-mix(in srgb, var(--color-ink) 72%, transparent) 48%,
-        color-mix(in srgb, var(--color-ink) 30%, transparent) 72%,
-        transparent 100%
+        var(--color-ink) 56%,
+        color-mix(in srgb, var(--color-ink) 62%, transparent) 70%,
+        color-mix(in srgb, var(--color-ink) 22%, transparent) 84%,
+        transparent 96%
       );
     }
   }
@@ -768,6 +794,15 @@
     color: #000;
     font-size: 10.5pt;
     padding-block-end: 0;
+  }
+
+  /* En pantalla el texto va centrado; en papel, NO. Un CV impreso con los
+     párrafos centrados se lee peor —el ojo pierde el punto de retorno de cada
+     línea— y además es lo que hace un currículum de plantilla. La decisión de
+     centrar es de la web como pieza de diseño, no del documento imprimible, así
+     que aquí se deshace de una vez para todo el árbol. */
+  body * {
+    text-align: left !important;
   }
 
   /* Fuera lo que no significa nada en papel. */

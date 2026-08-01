@@ -96,7 +96,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
                 <Link
                   href={href(locale, key)}
                   onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-paper transition-colors hover:bg-ink hover:text-signal"
+                  className="block rounded-md px-3 py-3 text-center text-paper transition-colors hover:bg-ink hover:text-signal"
                 >
                   {t.nav[key]}
                 </Link>

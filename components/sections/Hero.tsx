@@ -38,10 +38,24 @@ type Props = {
  *   altura la pone el contenido; el aire de abajo lo pone el `section-block` de la sección
  *   siguiente, y así no se suman dos paddings.
  *
+ * **El texto va centrado dentro de su columna**, no dentro de la página: en escritorio la
+ * portada sigue siendo dos columnas —texto y retrato— y lo que se centra es cada bloque en
+ * el espacio que ocupa. Eso obliga a tres cosas que el `text-center` no hace solo:
+ * `justify-center` en las filas que son flex (el rótulo de estado, la ubicación y los
+ * botones), `mx-auto` en las dos cajas con ancho máximo, e `items-center` en la columna
+ * para que nada quede anclado al borde izquierdo.
+ *
  * Detrás de todo esto va el **escenario cinético** (`HeroStage`): el fondo animado de tejas
  * que dice a qué se dedica quien firma antes de que nadie lea una palabra. Es decoración
  * (`aria-hidden`) y no cambia nada de lo anterior — el titular sigue siendo el nombre, las
  * cifras siguen calculándose y la altura la sigue poniendo el contenido.
+ *
+ * **El texto centrado y el escenario se condicionan**, y conviene saberlo antes de tocar
+ * cualquiera de los dos: al centrar, el bloque más ancho de la columna (la entradilla, a
+ * `max-w-measure`) deja de empezar en el borde izquierdo y se reparte a los dos lados, así
+ * que su **borde derecho avanza hacia el mosaico**. Por eso el carril del escenario arranca
+ * más a la derecha de lo que pediría la retícula a solas. Si mañana el texto vuelve a
+ * alinearse a la izquierda, ese reparto se puede recuperar (ver `globals.css`).
  */
 export function Hero({ locale, profile, years, stats }: Props) {
   const t = getDictionary(locale)
@@ -69,11 +83,11 @@ export function Hero({ locale, profile, years, stats }: Props) {
         // nacería debajo. En móvil no hay cabecera arriba, pero sí hace falta aire.
         className="page-gutter relative z-10 mx-auto max-w-7xl pt-24 pb-4 lg:pt-36"
       >
-        <div className="grid items-center gap-12 lg:grid-cols-[1.5fr_1fr] lg:gap-20">
-          <div>
+        <div className="grid items-center gap-12 text-center lg:grid-cols-[1.5fr_1fr] lg:gap-20">
+          <div className="flex flex-col items-center">
             {/* Estado actual, no «disponible para trabajar»: es un dato verificable en
                 LinkedIn y no una señal que pueda leer un jefe actual. */}
-            <p className="eyebrow flex items-center gap-2.5">
+            <p className="eyebrow flex items-center justify-center gap-2.5">
               <span
                 aria-hidden="true"
                 className="size-1.5 rounded-full bg-signal shadow-[0_0_0_3px] shadow-signal/20"
@@ -92,20 +106,20 @@ export function Hero({ locale, profile, years, stats }: Props) {
               {profile.name}
             </h1>
 
-            <p className="mt-6 max-w-[30ch] font-display text-title text-signal">
+            <p className="mx-auto mt-6 max-w-[30ch] font-display text-title text-signal">
               {profile.headline[locale]}
             </p>
 
-            <p className="mt-8 max-w-measure text-lead text-paper-soft">
+            <p className="mx-auto mt-8 max-w-measure text-lead text-paper-soft">
               {interpolate(t.hero.lead, { years })}
             </p>
 
-            <p className="figure-num mt-6 flex items-center gap-2 text-small text-paper-faint">
+            <p className="figure-num mt-6 flex items-center justify-center gap-2 text-small text-paper-faint">
               <MapPin className="size-4" />
               {profile.location[locale]}
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-3">
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <Action href={href(locale, 'projects')} variant="primary">
                 {t.hero.primaryCta}
               </Action>
@@ -135,10 +149,11 @@ export function Hero({ locale, profile, years, stats }: Props) {
            * falta leer es el nombre y no verle la cara a nadie.
            *
            * `hero-portrait` es lo que lo pone POR ENCIMA del escenario en vez de al lado:
-           * flota con una oscilación de 10 px y lleva detrás un halo que lo despega de las
-           * tejas que pasan por debajo. Sin ese halo, en el momento en que a una teja clara
-           * le toca pasar justo detrás, la silueta se pierde y la cara parece una foto más
-           * del fondo. Es la única pieza del hero que se ha tocado por el escenario.
+           * flota con una oscilación de 10 px y lleva una sombra que lo despega de las
+           * tejas que pasan por debajo. Sin esa sombra, en el momento en que a una teja
+           * clara le toca pasar justo detrás, la silueta se pierde y la cara parece una
+           * foto más del fondo. Es la única pieza del hero que se ha tocado por el
+           * escenario.
            */}
           <div className="hero-portrait order-first mx-auto w-40 lg:order-none lg:w-full lg:max-w-xs">
             <Figure
@@ -154,7 +169,7 @@ export function Hero({ locale, profile, years, stats }: Props) {
 
         {/* Cifras. Al final del bloque y con un filete encima: son el resumen del CV, así
             que se leen después del titular, nunca antes. */}
-        <dl className="mt-16 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-line pt-10 lg:mt-20 lg:grid-cols-4">
+        <dl className="mt-16 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-line pt-10 text-center lg:mt-20 lg:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.label}>
               <dd className="figure-num text-figure text-paper">{stat.value}</dd>
