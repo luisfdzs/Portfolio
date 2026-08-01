@@ -1,0 +1,76 @@
+# === PORTFOLIO · Luis Fernández Sangil — .gitignore ===
+# REGLA DE SEGURIDAD (proyecto): NUNCA se sincronizan credenciales, keys, API keys,
+# tokens de MCPs ni variables de entorno con GitHub. Cada vez que se añada un secreto
+# nuevo o un fichero local de configuración para una integración, hay que incluirlo
+# aquí ANTES de subir nada.
+
+# --- Secretos y variables de entorno ---
+.env
+.env.*
+*.env
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+credentials.json
+secrets.json
+service-account*.json
+*.secret
+*.secrets
+*_secret*
+*apikey*
+*api-key*
+*.token
+*token*.json
+
+# --- Códigos de recuperación / ficheros sensibles sueltos ---
+recovery-codes.txt
+*recovery-code*
+*recovery-codes*
+
+# --- MCPs con tokens / credenciales ---
+.mcp.local.json
+mcp.local.json
+**/mcp-credentials*.json
+
+# --- Config local de cada desarrollador para integraciones ---
+*.local.env
+.vscode/*.local.json
+.idea/
+
+# --- Contexto de Claude (memoria local de la máquina, no del repo) ---
+.claude/
+
+# --- Dependencias / build ---
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- Sistema operativo ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# --- Next.js / Vercel ---
+.vercel
+next-env.d.ts
+*.tsbuildinfo
+
+# --- Migración a Sanity ---
+# Generado por `npm run migrate:build` a partir de content/.
+scripts/migration/import.ndjson
+
+# `vercel link` añade aquí `.vercel` y `.env*` por su cuenta. Ya están declarados
+# arriba, así que si vuelven a aparecer duplicados tras un `vercel link` se pueden
+# borrar sin pensar.

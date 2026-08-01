@@ -1,0 +1,365 @@
+@import 'tailwindcss';
+
+/* ============================================================================
+   PORTFOLIO · Luis Fernández Sangil — Sistema de diseño
+
+   Los tokens viven aquí y SÓLO aquí. Las utilidades de Tailwind se generan a
+   partir de este @theme, así que no existe forma de usar un color o un espaciado
+   que no esté en el sistema. Regla: si algo no está en esta lista, no se usa.
+
+   Quien lee esto es un recruiter o un cliente potencial que dedica entre treinta
+   segundos y dos minutos. De ahí las cuatro decisiones de fondo:
+
+   1. OSCURO, y sin conmutador de tema. Un portfolio de desarrollador oscuro es
+      lo que el lector espera, y comprometerse con un solo modo permite ajustar
+      el contraste de cada tono en vez de buscar el valor que aguante los dos.
+      Lo que sí hay es un bloque @media print: si alguien imprime esto como CV
+      —y pasa—, sale en papel blanco con tinta negra y sin gastar un cartucho.
+   2. UNA SERIF DE TITULAR sobre una sans neutra. Es la decisión que separa esto
+      de los cientos de portfolios que usan la misma sans para todo: la serif da
+      voz editorial a los titulares, y la sans se queda con el trabajo de que el
+      cuerpo se lea. Diferencia sin disfrazarse de agencia creativa.
+   3. LAS CIFRAS Y LOS DATOS TÉCNICOS, EN MONOESPACIADA. Fechas, duraciones,
+      nombres de tecnología, rótulos de sección. Es lo que hace que una línea
+      temporal se lea como una tabla y no como prosa con números dentro.
+   4. UN ÚNICO ACENTO (`signal`), cobre. Marca lo accionable y el dato
+      destacado. Nunca decora, y nunca dos veces en el mismo bloque: en cuanto
+      un acento aparece en todas partes deja de señalar nada.
+   ========================================================================= */
+
+@theme {
+  /* --- Color: grafito, papel frío y un acento de cobre ------------------- */
+  --color-ink: #08090b; /* lienzo, casi negro pero no negro puro */
+  --color-ink-raised: #0f1116; /* tarjetas, bloques elevados */
+  --color-ink-sunken: #050608; /* pie y bandas hundidas */
+  --color-paper: #edeef0; /* texto principal */
+  --color-paper-soft: #a2a8b0; /* texto secundario, párrafos largos */
+  --color-paper-faint: #6d747c; /* metadatos, unidades, numeración */
+  --color-line: #1b1f25; /* filetes de 1px: la retícula */
+  --color-line-strong: #2a3037; /* bordes de tarjeta, separadores fuertes */
+
+  /* Acento único. Cobre: metal, que es de donde viene este perfil, y el único
+     tono cálido de la paleta, así que destaca sobre el grafito sin necesitar
+     saturación. 8.9:1 sobre el lienzo — AAA para texto grande y AA para el
+     cuerpo, así que puede usarse en un enlace y no sólo en un adorno. */
+  --color-signal: #e0a458;
+  --color-signal-dim: #b8823f; /* hover y bordes: mismo tono, menos brillo */
+
+  /* --- Tipografía -------------------------------------------------------- */
+  /* Tres funciones, tres familias, sin solaparse:
+     display → titulares y el nombre; sans → todo el cuerpo; mono → datos. */
+  --font-display: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Escala fluida: un valor por peldaño, sin variantes intermedias.
+     clamp() evita media queries para tipografía y elimina saltos bruscos. */
+  --text-micro: 0.6875rem; /* 11px · rótulos, unidades, numeración */
+  --text-micro--line-height: 1.4;
+  --text-micro--letter-spacing: 0.14em;
+  --text-small: 0.8125rem; /* 13px · metadatos, etiquetas de stack */
+  --text-small--line-height: 1.5;
+  --text-body: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
+  --text-body--line-height: 1.7;
+  --text-lead: clamp(1.0625rem, 0.95rem + 0.6vw, 1.375rem);
+  --text-lead--line-height: 1.6;
+  --text-title: clamp(1.5rem, 1.15rem + 1.5vw, 2.5rem);
+  --text-title--line-height: 1.15;
+  --text-display: clamp(2.5rem, 1.2rem + 5.5vw, 6rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.025em;
+
+  /* Cifra grande de dato (años de experiencia, proyectos entregados). Va
+     siempre en mono con `tabular-nums`: dos cifras ocupan lo mismo aunque
+     cambien, así que la retícula no baila entre despliegues. */
+  --text-figure: clamp(1.75rem, 1.2rem + 2.2vw, 3rem);
+  --text-figure--line-height: 1;
+  --text-figure--letter-spacing: -0.03em;
+
+  /* --- Ritmo espacial ---------------------------------------------------- */
+  --spacing-gutter: clamp(1.25rem, 5vw, 4rem); /* margen lateral de página */
+  --spacing-section: clamp(4.5rem, 10vw, 10rem); /* aire vertical entre bloques */
+
+  /* Alto de la barra de navegación inferior de móvil. Vive en el sistema porque
+     lo necesitan tres sitios que tienen que cuadrar al píxel: la barra, el panel
+     del menú que se abre justo encima, y el hueco que el <body> se reserva bajo
+     el pie para que la barra no tape la última línea.
+     El env() es la franja del gesto de inicio del iPhone: sin sumarla, los
+     iconos caen debajo de la rayita del sistema. */
+  --spacing-nav-mobile: calc(4rem + env(safe-area-inset-bottom));
+
+  /* Medida de lectura. 62ch y no 75ch: el cuerpo es una sans a 17px sobre fondo
+     oscuro, y en oscuro la línea larga cansa antes porque el texto «irradia». */
+  --container-measure: 62ch;
+
+  /* --- Movimiento -------------------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-reveal: reveal 0.9s var(--ease-out-soft) both;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================================
+   Base
+   ========================================================================= */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Las secciones son anclas de la portada y la cabecera es fija: sin este
+       margen, pulsar «Experiencia» deja el titular de la sección debajo de la
+       cabecera y parece que el enlace ha fallado. */
+    scroll-padding-block-start: 5rem;
+    -webkit-text-size-adjust: 100%;
+    /* Fija el esquema para los controles nativos (barras de scroll, selects):
+       sin esto, en un sistema en modo claro salen barras blancas sobre el
+       lienzo negro. */
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    /* Hueco bajo el pie para la barra de navegación de móvil, que es fija y
+       taparía la última línea. En >= lg la barra no existe y se anula abajo. */
+    padding-block-end: var(--spacing-nav-mobile);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (width >= 64rem) {
+    body {
+      padding-block-end: 0;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 400; /* La Instrument Serif sólo tiene un peso: no se finge negrita. */
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Foco visible y coherente en todo el sitio (accesibilidad). */
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* La selección con el acento: detalle pequeño que se nota al copiar un correo. */
+  ::selection {
+    background-color: var(--color-signal);
+    color: var(--color-ink);
+  }
+
+  img,
+  video,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  img,
+  video {
+    height: auto;
+  }
+
+  /* Nadie debería marearse con nuestras animaciones. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ============================================================================
+   Utilidades del sistema
+   Sólo patrones que se repiten de verdad. Todo lo demás, utilidades de Tailwind.
+   ========================================================================= */
+
+@utility page-gutter {
+  padding-inline: var(--spacing-gutter);
+}
+
+/* Aire vertical de una sección: LA MITAD de `--spacing-section` arriba y abajo.
+   La mitad, y no el valor entero, porque las secciones son contiguas y sus
+   paddings se suman: con `py-section` en las seis, entre el final del texto de
+   una y el rótulo de la siguiente quedaban 18rem de vacío y la página parecía
+   partida. Así la suma de los dos paddings adyacentes es exactamente
+   `--spacing-section`, que es lo que ese token dice ser: el aire ENTRE bloques. */
+@utility section-block {
+  padding-block: calc(var(--spacing-section) / 2);
+}
+
+/* Rótulo en versalitas: títulos de sección, categorías, estados. */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: var(--text-micro--line-height);
+  letter-spacing: var(--text-micro--letter-spacing);
+  text-transform: uppercase;
+  color: var(--color-paper-faint);
+}
+
+/* Cifra o dato técnico. `tabular-nums` es lo que mantiene alineadas las columnas
+   de fechas de la línea temporal: sin ella, «ago. 2021» y «feb. 2024» empiezan
+   en sitios distintos y la columna deja de leerse en vertical. */
+@utility figure-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'zero' 1;
+}
+
+/* Enlace con subrayado que se dibuja al pasar por encima. Crece desde la
+   izquierda, que es la dirección en la que se lee: el texto de este sitio está
+   alineado a la izquierda, no centrado. */
+@utility link-underline {
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -0.15em;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--ease-out-soft);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Amplía el área pulsable a los 24px que exige WCAG 2.2 sin cambiar el diseño:
+   el texto sigue midiendo lo que mide; lo que crece es una capa invisible por
+   encima. Imprescindible en los enlaces pequeños (pie, contacto, etiquetas)
+   cuando se usan con el dedo. */
+@utility tap {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-inline: -0.25rem;
+    inset-block: -0.4rem;
+  }
+}
+
+/* Aparición al entrar en viewport. La hace CSS con scroll-driven animations
+   (cero JS); si el navegador no las soporta, el contenido se ve fijo — que es el
+   fallback correcto, nunca contenido invisible por una animación que no corre. */
+@utility reveal {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      opacity: 0;
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 20%;
+    }
+  }
+}
+
+/* Trama de placeholder para las capturas de proyecto que todavía no existen.
+   Debe verse como un hueco y no disimularse: cuando haya captura, <Figure> deja
+   de pintar esto y no hay nada que borrar. */
+@utility placeholder-grid {
+  background-color: var(--color-ink-raised);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 8px,
+    color-mix(in srgb, var(--color-line-strong) 70%, transparent) 8px 9px
+  );
+}
+
+/* ============================================================================
+   Impresión
+
+   Un recruiter que quiere guardar el CV pulsa Ctrl+P: es el camino más corto
+   entre esta web y una carpeta de candidaturas. Sin este bloque saldrían diez
+   páginas de fondo negro. Con él sale un CV en papel, con las URLs de los
+   enlaces escritas al lado —en papel un enlace no se puede pulsar— y sin la
+   navegación, que no lleva a ninguna parte impresa.
+   ========================================================================= */
+
+@media print {
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 10.5pt;
+    padding-block-end: 0;
+  }
+
+  /* Fuera lo que no significa nada en papel. */
+  header[data-print='hide'],
+  nav[data-print='hide'],
+  [data-print='hide'] {
+    display: none !important;
+  }
+
+  a {
+    color: #000;
+    text-decoration: underline;
+  }
+
+  /* La URL, junto al enlace. Se excluyen los `mailto:` porque el texto del
+     enlace ya ES la dirección y saldría dos veces. */
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 8.5pt;
+    color: #444;
+    word-break: break-all;
+  }
+
+  /* Nada de secciones partidas por la mitad de un salto de página. */
+  section,
+  li,
+  article {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+    color: #000;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+}
