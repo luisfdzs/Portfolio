@@ -1,0 +1,16 @@
+# Normaliza los finales de línea: en el repo siempre LF, en el disco lo que toque.
+# Sin esto, trabajar en Windows y desplegar en Linux mete diffs de todo el fichero.
+* text=auto eol=lf
+
+# Binarios: nunca convertir.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.ico binary
+*.pdf binary
+*.mp4 binary
+*.webm binary
+*.woff binary
+*.woff2 binary
