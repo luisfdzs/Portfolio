@@ -24,9 +24,17 @@ dedica entre treinta segundos y dos minutos. Todo lo que no ayude a eso, sobra.
 Reutiliza el stack, la arquitectura y la metodología de `C:\Proyectos\Swiftmet`, que a su vez los
 heredó de `C:\Proyectos\sangilstudio`.
 
-**Estado (2026-08-01): construido y verificado en local.** `npm run check` limpio,
-`npm run check:mobile` 19/19 en los dos idiomas. Ver la memoria [[despliegue]] para el estado
-real de Vercel y GitHub.
+**Estado (2026-08-01): DESPLEGADO.**
+[luisfernandezsangil.vercel.app](https://luisfernandezsangil.vercel.app) (producción, rama `main`)
+y [luisfernandezsangiltest.vercel.app](https://luisfernandezsangiltest.vercel.app) (test, rama
+`test`, con `Disallow: /`). `npm run check` limpio y `npm run check:mobile` **19/19 en local y
+19/19 contra el entorno de test desplegado**, en los dos idiomas. El flujo `develop` → `test` →
+`main` está verificado: `develop` no despliega nada y cada push a `test` y a `main` despliega en su
+entorno. IDs y detalles en la memoria [[despliegue]].
+
+**Todavía no hay proyecto de Sanity**, y la web funciona igual sirviendo `content/` — es
+exactamente lo que la arquitectura contempla (ver [[contenido-dos-fuentes]]). Enchufarlo es el
+siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del panel».
 
 ## 2. Stack técnico
 
