@@ -45,16 +45,17 @@ LOCALE=en npm run check:mobile
 
 ## Dónde se toca cada cosa
 
-| Quiero cambiar…                          | Fichero                      |
-| ---------------------------------------- | ---------------------------- |
-| Experiencia, formación, stack, perfil    | `content/profile.ts`         |
-| Proyectos (o el panel, en `/admin`)      | `content/projects.ts`        |
-| Nombre, dominio canónico, repositorio    | `content/site.ts`            |
-| Textos de interfaz y traducciones        | `lib/i18n/dictionaries.ts`   |
-| Colores, tipografías, ritmo, animaciones | `app/globals.css` (`@theme`) |
-| Menú y anclas de sección                 | `lib/i18n/routes.ts`         |
-| Idiomas                                  | `lib/i18n/config.ts`         |
-| Esquemas del panel                       | `sanity/schemas/`            |
+| Quiero cambiar…                          | Fichero                             |
+| ---------------------------------------- | ----------------------------------- |
+| Experiencia, formación, stack, perfil    | `content/profile.ts`                |
+| Proyectos (o el panel, en `/admin`)      | `content/projects.ts`               |
+| Nombre, dominio canónico, repositorio    | `content/site.ts`                   |
+| Textos de interfaz y traducciones        | `lib/i18n/dictionaries.ts`          |
+| Colores, tipografías, ritmo, animaciones | `app/globals.css` (`@theme`)        |
+| Menú y anclas de sección                 | `lib/i18n/routes.ts`                |
+| Que el ancla no se vea en la URL         | `components/layout/HashCleaner.tsx` |
+| Idiomas                                  | `lib/i18n/config.ts`                |
+| Esquemas del panel                       | `sanity/schemas/`                   |
 
 ---
 
@@ -147,6 +148,24 @@ sistema.
 En escritorio la navegación es la cabecera fija; en móvil (`< lg`), una **barra inferior de cinco
 iconos** al alcance del pulgar. Nunca las dos: tenerlas sería robar 4 rem arriba y abajo en el
 dispositivo que menos tiene.
+
+### En la barra de direcciones nunca se ve una almohadilla
+
+Las secciones de la portada son anclas y `/es/projects` es una página. Es una diferencia real —el
+fragmento es la única parte de una URL que no llega al servidor—, pero al visitante le llega como
+una incoherencia: unas entradas del mismo menú dejan `/es/projects` y otras `/es#experience`.
+
+`components/layout/HashCleaner.tsx` la borra, y **sin tocar los `href`**: siguen llevando el
+ancla, así que la navegación funciona sin JavaScript, se puede abrir en otra pestaña, y los
+enlaces viejos de LinkedIn siguen llevando a su sección. Son dos mecanismos porque los dos casos
+no se parecen: dentro de la misma página se deja actuar al navegador y se borra el fragmento
+cuando ya ha desplazado; cambiando de página el ancla no llega a escribirse, porque el router de
+Next se quedaría con ella como URL canónica suya y el clic siguiente compondría
+`/es#contact#about`. Los dos esperan a que la sección exista de verdad antes de tocar nada: borrar
+el fragmento antes de tiempo no descoloca la URL, **cancela el salto**.
+
+A cambio se pierden dos cosas, y conviene saberlo antes de tocarlo: copiar la URL ya no comparte
+la sección, y «atrás» sale de la página en vez de recorrer las secciones visitadas.
 
 ### Las capturas de los proyectos
 
