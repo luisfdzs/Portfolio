@@ -73,12 +73,19 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D dirigido por el scroll, sin
   JavaScript salvo los dos botones. Fallback sin soporte o con `prefers-reduced-motion`: carrusel
   horizontal plano. En papel se deshace en retícula de dos columnas. Ver [[cover-flow]].
-- **Portada con escenario cinético:** detrás del titular, un mosaico de once fotografías CC0 y dos
-  paneles de interfaz dibujados en CSS, desplazándose en tres columnas sobre un resplandor de
-  cobre. `components/sections/HeroStage.tsx` + bloque «Escenario cinético» de `globals.css`. **Sin
-  JavaScript**, `aria-hidden`, se congela con `prefers-reduced-motion` y no se imprime. Ojo: el
-  texto centrado y el escenario se condicionan — al centrar, la entradilla avanza hacia el mosaico
-  y el reparto del carril depende de eso. Ver [[escenario-cinetico]].
+- **La primera pantalla ES el escenario cinético.** El hero ocupa `min-h-svh` con el texto apoyado
+  abajo y, detrás, un mosaico a sangre de dieciséis fotografías CC0 y cuatro paneles de interfaz
+  dibujados en CSS, en hasta cinco columnas sobre un resplandor de cobre.
+  `components/sections/HeroStage.tsx` + bloque «Escenario cinético» de `globals.css`. **Sin
+  JavaScript**, `aria-hidden`, se congela con `prefers-reduced-motion` y no se imprime. El texto
+  del hero es corto a propósito —puesto, nombre, una línea, ubicación y las cuatro cifras—: la
+  entradilla larga se quitó porque sobre un fondo en movimiento no se lee. Ver
+  [[escenario-cinetico]].
+- **El contraste del hero lo da un velo anclado al TEXTO** (`.hero-copy::before`), no un
+  porcentaje del alto del hero, y el rótulo del puesto lleva pastilla propia (`.hero-chip`). Las
+  dos cosas son la corrección de un fallo real. Regla corta: **si tocas el velo, vuelve a mirar el
+  rótulo del puesto y la línea de la ubicación**, que son los dos textos que fallan primero — no
+  el nombre, que es enorme y aguanta cualquier foto detrás. Ver [[escenario-cinetico]].
 
 Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.claude/memory/`.
 
@@ -105,13 +112,14 @@ Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.
    geometría en un sitio y, de paso, convierte el carrusel en una ventana centrada en vez de una
    banda a sangre con medio metro de vacío a la izquierda en un monitor ancho. Ver
    [[cover-flow]].
-8. **El escenario de la portada nunca compite con el titular.** Es decoración: si al tocar la
-   máscara, el velo o las tejas hay que esforzarse para leer el nombre a 390 px, el cambio está
-   mal. En móvil es una franja arriba, no un fondo — y el corte va en `rem`, no en `%`. Ver
-   [[escenario-cinetico]].
+8. **El escenario de la portada nunca compite con el texto.** Es decoración, aunque ahora ocupe la
+   primera pantalla: si al tocar el velo o las tejas hay que esforzarse para leer **cualquier**
+   línea del hero a 390 px, el cambio está mal. Y el listón es el rótulo del puesto y la
+   ubicación, no el nombre. Lo que garantiza el contraste va anclado al texto y con los topes en
+   `rem`, nunca en porcentajes del alto del hero. Ver [[escenario-cinetico]].
 9. **Sólo entran imágenes CC0 o dominio público**, y cada una queda documentada en
-   `public/hero/CREDITS.md`. Nada de CC-BY: obligaría a mostrar once líneas de crédito detrás del
-   titular. El script comprueba la licencia y descarta lo que no lo sea.
+   `public/hero/CREDITS.md`. Nada de CC-BY: obligaría a mostrar dieciséis líneas de crédito detrás
+   del titular. El script comprueba la licencia y descarta lo que no lo sea.
 10. **Las secciones de la portada no se convierten en rutas** para quitar la almohadilla de la
     URL. Serían cinco páginas por idioma con el mismo CV compitiendo con la portada por «Luis
     Fernández Sangil». La almohadilla se quita en cliente; ver [[urls-sin-anclas]].
@@ -167,7 +175,21 @@ proyecto.**
 
 ---
 
-_Actualización 2026-08-01 (rama `feature/hero-cinetico`, en curso): la portada estrena el
+_2026-08-01 (rama `feature/hero-inmersivo`): **el escenario pasa a ser la primera pantalla.** El
+hero ocupa `min-h-svh` con el texto apoyado abajo; el mosaico es a sangre, con cinco columnas en
+monitor ancho, dieciséis fotografías CC0 (cinco nuevas: panel de métricas, panel de parcheo, fibra
+óptica y dos de código) y cuatro paneles dibujados (editor, build, terminal y topología). Se
+quitaron la entradilla de tres líneas y la retícula de dos columnas del hero, y el retrato pasó a
+avatar de 5 rem. **Se retiraron tres piezas frágiles** —el «el carril empieza en el 62 %», la
+máscara de franja de móvil y el velo lateral—: el contraste lo dan ahora un velo anclado al texto
+(`.hero-copy::before`, topes en `rem`) y una pastilla en el rótulo del puesto. El alto de teja va
+en `vh`, que es lo que impide que el bucle enseñe la costura en pantallas altas y estrechas. Se
+arreglaron de paso tres defectos de la hoja de impresión que la captura destapó: el halo del
+retrato salía como un nubarrón negro, la pastilla como una píldora ilegible y el hero reservaba una
+hoja casi en blanco. `npm run check` limpio y `check:mobile` 21/21 en los dos idiomas sobre el
+build de producción, con cero desbordamiento a 390, 834, 1440 y 1920 px._
+
+_2026-08-01 (rama `feature/hero-cinetico`): la portada estrena el
 **escenario cinético**. Once fotografías CC0 descargadas vía Openverse (`public/hero/`, 152 KB,
 procedencia en `CREDITS.md`, reconstruibles con `scripts/build-hero-tiles.mjs`), dos paneles de
 interfaz dibujados en CSS y `HeroStage.tsx`. Sin JavaScript ni dependencias nuevas: `npm run check`

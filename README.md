@@ -176,33 +176,48 @@ imprimiría el primer proyecto y recortaría los otros tres.
 
 ### El escenario cinético de la portada
 
-Lo primero que se ve al abrir la web es un **mosaico de tejas en movimiento** detrás del titular:
-tres columnas de fotografías —servidores, código, cacharrería, puestos de trabajo— que se
-desplazan despacio en direcciones alternas sobre un resplandor de cobre, con dos paneles de
-interfaz dibujados en CSS entre ellas (un editor y una salida de `build`). Vive en
-`components/sections/HeroStage.tsx` y su mecánica en el bloque «Escenario cinético» de
-`app/globals.css`; el razonamiento largo está en los comentarios de los dos.
+**La primera pantalla completa es el escenario.** Al abrir la web se ve una pared de pantallas,
+servidores, red y cacharrería en movimiento —hasta cinco columnas de tejas desplazándose despacio
+en direcciones alternas sobre un resplandor de cobre, con cuatro paneles de interfaz dibujados en
+CSS repartidos entre ellas: un editor, una salida de `build`, una terminal y una topología—, y el
+bloque de texto se apoya abajo, encima del mosaico. Vive en `components/sections/HeroStage.tsx` y
+su mecánica en el bloque «Escenario cinético» de `app/globals.css`; el razonamiento largo está en
+los comentarios de los dos.
+
+El texto del hero es deliberadamente corto: el puesto actual, el nombre, una línea de qué haces,
+dónde estás y las cuatro cifras. La entradilla de tres líneas que había antes se quitó —sobre un
+fondo en movimiento no se lee—, y los clientes que enumeraba están en la sección de experiencia,
+que es donde se pueden comprobar con las fechas al lado.
 
 Lo que hay que saber para no romperlo:
 
 - **Cero JavaScript.** Son animaciones CSS sobre `transform` y `opacity`, las dos propiedades que
   el navegador anima en el compositor. Es un componente de servidor: la portada sigue siendo HTML
   estático.
-- **Es decoración declarada.** `aria-hidden` en la raíz, `alt=""` en las once fotos y
+- **Es decoración declarada.** `aria-hidden` en la raíz, `alt=""` en las fotos y
   `pointer-events: none` en todo el escenario. No sale en la impresión, y con
   `prefers-reduced-motion: reduce` **se congela** (no se esconde).
-- **En móvil es una franja, no un fondo.** A 390 px no hay una mitad libre: el texto ocupa todo el
-  ancho. Así que por debajo de `lg` el escenario vive sólo en la franja de arriba, detrás del
-  retrato, y se apaga **antes** de que empiece el titular. El corte va en `rem` y no en `%` —el
-  porcentaje se mide contra el alto del hero, que cambia con la longitud de la entradilla—. La
-  primera versión no hacía esto y la entradilla se leía sobre la foto de un portátil.
-- **El texto manda sobre la imagen, siempre.** Una máscara reparte el escenario y un velo
-  (`__scrim`) devuelve el fondo a grafito puro donde hay texto. Al tocar cualquiera de los dos,
-  volver a mirar el hero a 390 px antes de cerrar.
+- **El contraste del texto lo da un velo anclado AL TEXTO**, `.hero-copy::before`, no un
+  porcentaje del alto del hero. Esto es la corrección de un fallo real: con el velo medido en
+  porcentajes, el rótulo del puesto y la línea de la ubicación —los dos textos más pequeños y
+  apagados de la portada— caían sobre la parte abierta y no se leían. Anclado al texto y con los
+  topes en `rem`, el reparto no depende del alto de la ventana ni del idioma. El velo del
+  escenario (`__scrim`) se queda sólo como atmósfera.
+- **El rótulo del puesto lleva pastilla propia** (`.hero-chip`): fondo casi opaco y desenfoque
+  detrás. Es lo que permite que el velo empiece tarde y flojo, y por tanto que se siga viendo el
+  mosaico en el centro de la pantalla.
+- **El alto de teja va en `vh`, y no es un detalle estético.** El bucle repite la lista de tejas
+  dos veces y se desplaza un 50 %: para que no se vea la costura, una copia tiene que ser más
+  alta que la ventana. Con el alto derivado del ancho de columna eso dependía de la forma de la
+  pantalla; en `vh`, siete tejas × 16 vh cubren cualquier ventana. **Si cambias el número de
+  tejas por columna, rehaz esa cuenta.**
+- **Verificar a 390 px antes de cerrar.** `overflow-hidden` en la sección es lo único que impide
+  que el mosaico ensanche el documento, y es el fallo nº 1 de `check:mobile`.
 
-Las once fotografías son **CC0 1.0** (dominio público, uso comercial, sin atribución exigida),
-localizadas con la API de Openverse. La procedencia de cada una está en `public/hero/CREDITS.md`,
-y se reconstruyen con `node scripts/build-hero-tiles.mjs`. Pesan **152 KB** entre las once, y ese
+Las dieciséis fotografías son **CC0 1.0** (dominio público, uso comercial, sin atribución
+exigida), localizadas con la API de Openverse. La procedencia de cada una está en
+`public/hero/CREDITS.md`, y se reconstruyen con `node scripts/build-hero-tiles.mjs`, que además
+imprime la tabla de procedencia lista para pegar. Pesan **281 KB** entre las dieciséis, y ese
 número es literal: el cargador de imágenes del proyecto devuelve las rutas locales sin
 transformar, así que el archivo que hay en `public/hero/` es exactamente el que se descarga —
 `sizes` y `quality` no recortan nada aquí. Si hay que aligerar el escenario, se aligera en el
