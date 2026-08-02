@@ -57,8 +57,8 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   comprobaciones en Chrome real a 390×844, por idioma).
 - **Imágenes locales: lo que hay en `public/` es lo que viaja.** El cargador
   (`sanity/imageLoader.ts`) sólo transforma URLs de la CDN de Sanity y devuelve las rutas locales
-  intactas, así que en las capturas y en las tejas del hero **`sizes` y `quality` no ahorran ni un
-  byte**: el peso se decide al generar el archivo.
+  intactas, así que en las capturas de proyecto **`sizes` y `quality` no ahorran ni un byte**: el
+  peso se decide al generar el archivo.
 - **Tipografía:** Instrument Serif (titulares), Inter (cuerpo) y JetBrains Mono (datos), las tres
   autoalojadas por `next/font` — ninguna petición a Google en tiempo de ejecución.
 - **Navegación:** cabecera fija en escritorio; en móvil (`< lg`), barra inferior de cinco iconos.
@@ -73,19 +73,21 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D dirigido por el scroll, sin
   JavaScript salvo los dos botones. Fallback sin soporte o con `prefers-reduced-motion`: carrusel
   horizontal plano. En papel se deshace en retícula de dos columnas. Ver [[cover-flow]].
-- **La primera pantalla ES el escenario cinético.** El hero ocupa `min-h-svh` con el texto apoyado
-  abajo y, detrás, un mosaico a sangre de dieciséis fotografías CC0 y cuatro paneles de interfaz
-  dibujados en CSS, en hasta cinco columnas sobre un resplandor de cobre.
-  `components/sections/HeroStage.tsx` + bloque «Escenario cinético» de `globals.css`. **Sin
-  JavaScript**, `aria-hidden`, se congela con `prefers-reduced-motion` y no se imprime. El texto
-  del hero es corto a propósito —puesto, nombre, una línea, ubicación y las cuatro cifras—: la
-  entradilla larga se quitó porque sobre un fondo en movimiento no se lee. Ver
-  [[escenario-cinetico]].
+- **La primera pantalla ES el campo interactivo.** El hero ocupa `min-h-svh` con el texto apoyado
+  abajo y, detrás, una retícula de mil a tres mil nodos dibujada en un `<canvas>` que **reacciona
+  al puntero**: pozo de luz que aparta y enciende los nodos, constelación que sólo existe donde hay
+  luz, onda al hacer clic y pulsos que viajan por filas y columnas.
+  `components/sections/HeroField.tsx` + bloque «Campo interactivo» de `globals.css`. Cero
+  dependencias, `aria-hidden`, `pointer-events: none` en toda la capa, el bucle se para al salir de
+  pantalla, con `prefers-reduced-motion` se dibuja un solo fotograma y no se imprime. Es el único
+  componente de cliente de la portada. El texto del hero es corto a propósito —puesto, nombre, una
+  línea, ubicación y las cuatro cifras—: la entradilla larga se quitó porque sobre un fondo que se
+  mueve no se lee. Ver [[campo-interactivo]].
 - **El contraste del hero lo da un velo anclado al TEXTO** (`.hero-copy::before`), no un
   porcentaje del alto del hero, y el rótulo del puesto lleva pastilla propia (`.hero-chip`). Las
   dos cosas son la corrección de un fallo real. Regla corta: **si tocas el velo, vuelve a mirar el
   rótulo del puesto y la línea de la ubicación**, que son los dos textos que fallan primero — no
-  el nombre, que es enorme y aguanta cualquier foto detrás. Ver [[escenario-cinetico]].
+  el nombre, que es enorme y aguanta cualquier cosa detrás. Ver [[campo-interactivo]].
 
 Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.claude/memory/`.
 
@@ -112,14 +114,16 @@ Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.
    geometría en un sitio y, de paso, convierte el carrusel en una ventana centrada en vez de una
    banda a sangre con medio metro de vacío a la izquierda en un monitor ancho. Ver
    [[cover-flow]].
-8. **El escenario de la portada nunca compite con el texto.** Es decoración, aunque ahora ocupe la
-   primera pantalla: si al tocar el velo o las tejas hay que esforzarse para leer **cualquier**
-   línea del hero a 390 px, el cambio está mal. Y el listón es el rótulo del puesto y la
-   ubicación, no el nombre. Lo que garantiza el contraste va anclado al texto y con los topes en
-   `rem`, nunca en porcentajes del alto del hero. Ver [[escenario-cinetico]].
-9. **Sólo entran imágenes CC0 o dominio público**, y cada una queda documentada en
-   `public/hero/CREDITS.md`. Nada de CC-BY: obligaría a mostrar dieciséis líneas de crédito detrás
-   del titular. El script comprueba la licencia y descarta lo que no lo sea.
+8. **El campo de la portada nunca compite con el texto, y tiene que verse sin tocarlo.** Son dos
+   condiciones a la vez y las dos salen de fallos reales. Si al tocar el velo o los nodos hay que
+   esforzarse para leer **cualquier** línea del hero a 390 px, el cambio está mal —y el listón es
+   el rótulo del puesto y la ubicación, no el nombre—; lo que garantiza el contraste va anclado al
+   texto y con los topes en `rem`, nunca en porcentajes del alto del hero. Y al revés: si el campo
+   sólo aparece bajo el puntero, en móvil no aparece nunca. Ver [[campo-interactivo]].
+9. **Sólo entran imágenes CC0 o dominio público**, y cada una queda documentada donde vive. Nada
+   de CC-BY: obligaría a mostrar el crédito en la propia página. La regla nació con las dieciséis
+   fotografías del escenario cinético, que ya no se usan pero siguen en `public/hero/` con su
+   `CREDITS.md`; sigue valiendo para cualquier imagen que entre al proyecto.
 10. **Las secciones de la portada no se convierten en rutas** para quitar la almohadilla de la
     URL. Serían cinco páginas por idioma con el mismo CV compitiendo con la portada por «Luis
     Fernández Sangil». La almohadilla se quita en cliente; ver [[urls-sin-anclas]].
@@ -174,6 +178,21 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-02 (rama `feature/hero-interactivo`): **el fondo de la portada se rehace con código y
+pasa a ser interactivo.** Se retira el escenario cinético entero —`HeroStage.tsx`, los cuatro
+paneles dibujados y el mosaico de dieciséis fotografías— y lo sustituye `HeroField.tsx`: una
+retícula de nodos en un `<canvas>` que se aparta y se enciende bajo el puntero, teje una
+constelación sólo donde hay luz, lanza una onda al hacer clic y deja pasar pulsos por filas y
+columnas. Sin dependencias nuevas; es el único componente de cliente de la portada. El encargo
+pedía explícitamente «una animación completamente interactiva creada con código», con la
+referencia de Sanity, Linear, Stripe y Vercel. **Dos fallos encontrados mirando capturas**: con el
+nodo en reposo demasiado apagado el fondo sólo existía bajo el puntero —o sea, en móvil no existía—
+y hubo que subir el suelo de brillo y tamaño; y al reescribir el bloque de CSS se comió el `*/` de
+un comentario de la hoja de impresión y el halo del retrato volvió a salir como un nubarrón gris
+alrededor de la cara. `npm run check` limpio y `check:mobile` 21/21 en los dos idiomas sobre el
+build de producción, con cero desbordamiento a 390, 834, 1440 y 1920 px. Las fotografías de
+`public/hero/` quedan huérfanas pero no se borran: es una decisión aparte._
 
 _2026-08-01 (rama `feature/hero-inmersivo`): **el escenario pasa a ser la primera pantalla.** El
 hero ocupa `min-h-svh` con el texto apoyado abajo; el mosaico es a sangre, con cinco columnas en

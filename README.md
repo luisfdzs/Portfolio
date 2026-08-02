@@ -141,8 +141,8 @@ sistema.
   números dentro.
 - **Un único acento, cobre.** Marca lo accionable y el dato destacado. Nunca decora.
 - **Las apariciones al hacer scroll son CSS puro** (`animation-timeline: view()`), sin
-  JavaScript, y respetan `prefers-reduced-motion`. El escenario animado de la portada también:
-  ver «El escenario cinético de la portada» más abajo.
+  JavaScript, y respetan `prefers-reduced-motion`. El fondo de la portada sí lleva JavaScript,
+  porque reacciona al puntero: ver «El campo interactivo de la portada» más abajo.
 - **Hay hoja de impresión.** Un recruiter que quiere guardar el CV pulsa Ctrl+P: sale en papel
   blanco, sin la navegación y con las URLs de los enlaces escritas al lado.
 
@@ -174,54 +174,54 @@ movimiento, queda **un carrusel horizontal normal** con las tarjetas separadas y
 Y en papel se deshace en la retícula de dos columnas que había antes: sin eso, un `overflow-x`
 imprimiría el primer proyecto y recortaría los otros tres.
 
-### El escenario cinético de la portada
+### El campo interactivo de la portada
 
-**La primera pantalla completa es el escenario.** Al abrir la web se ve una pared de pantallas,
-servidores, red y cacharrería en movimiento —hasta cinco columnas de tejas desplazándose despacio
-en direcciones alternas sobre un resplandor de cobre, con cuatro paneles de interfaz dibujados en
-CSS repartidos entre ellas: un editor, una salida de `build`, una terminal y una topología—, y el
-bloque de texto se apoya abajo, encima del mosaico. Vive en `components/sections/HeroStage.tsx` y
-su mecánica en el bloque «Escenario cinético» de `app/globals.css`; el razonamiento largo está en
-los comentarios de los dos.
+**La primera pantalla completa es el campo.** Al abrir la web se ve una retícula de nodos —de mil
+a tres mil, según el tamaño de la ventana— dibujada en un `<canvas>`, con el bloque de texto
+apoyado abajo, encima de ella. **Reacciona a quien la mira:** el puntero abre un pozo de luz, los
+nodos se apartan y se encienden en cobre y tejen entre ellos una constelación que sólo existe
+donde hay luz; un clic lanza una onda que recorre la pantalla entera; y cada dos o cuatro segundos
+un pulso viaja por una fila o una columna dejando estela, como un dato por un bus.
 
-El texto del hero es deliberadamente corto: el puesto actual, el nombre, una línea de qué haces,
-dónde estás y las cuatro cifras. La entradilla de tres líneas que había antes se quitó —sobre un
-fondo en movimiento no se lee—, y los clientes que enumeraba están en la sección de experiencia,
-que es donde se pueden comprobar con las fechas al lado.
+Vive en `components/sections/HeroField.tsx` —que es todo el motor— y su parte estática (la
+atmósfera de cobre desenfocada, la retícula de planos y el velo) en el bloque «Campo interactivo de
+la portada» de `app/globals.css`. El razonamiento largo está en los comentarios de los dos.
 
-Lo que hay que saber para no romperlo:
+**Sustituye al escenario cinético**, el mosaico de dieciséis fotografías CC0 que ocupaba esta
+pantalla hasta el 2026-08-02. El cambio no es de estilo: aquello era material grabado en bucle,
+indiferente a quien estuviera delante, y esto es un sistema que responde. En un portfolio de
+desarrollo, un fondo generado con código dice en tres segundos lo que el CV tarda dos pantallas en
+argumentar.
 
-- **Cero JavaScript.** Son animaciones CSS sobre `transform` y `opacity`, las dos propiedades que
-  el navegador anima en el compositor. Es un componente de servidor: la portada sigue siendo HTML
-  estático.
-- **Es decoración declarada.** `aria-hidden` en la raíz, `alt=""` en las fotos y
-  `pointer-events: none` en todo el escenario. No sale en la impresión, y con
-  `prefers-reduced-motion: reduce` **se congela** (no se esconde).
-- **El contraste del texto lo da un velo anclado AL TEXTO**, `.hero-copy::before`, no un
-  porcentaje del alto del hero. Esto es la corrección de un fallo real: con el velo medido en
-  porcentajes, el rótulo del puesto y la línea de la ubicación —los dos textos más pequeños y
-  apagados de la portada— caían sobre la parte abierta y no se leían. Anclado al texto y con los
-  topes en `rem`, el reparto no depende del alto de la ventana ni del idioma. El velo del
-  escenario (`__scrim`) se queda sólo como atmósfera.
+- **Un solo lienzo y cero dependencias.** Ni Three, ni una librería de animación: contexto 2D,
+  `Float32Array` y un bucle. Es el único componente de cliente de la portada; el resto sigue siendo
+  HTML estático.
+- **Es decoración declarada.** `aria-hidden` en la raíz y `pointer-events: none` en toda la capa: el
+  campo reacciona al puntero **sin recibirlo** —los eventos se escuchan en `window` y se descartan
+  los que caen fuera—, así que un clic destinado a un botón llega siempre al botón. No sale en la
+  impresión, y con `prefers-reduced-motion: reduce` no se registra ni un escuchador: se dibuja un
+  único fotograma.
+- **Trabaja sólo cuando se le ve.** El bucle se para al salir el hero de la pantalla y al cambiar
+  de pestaña.
+- **La legibilidad se resuelve en el origen.** Los nodos de la mitad inferior —donde vive el
+  texto— se dibujan cada vez más apagados hasta un suelo del 10 %, en vez de dibujarse enteros y
+  taparse después con un velo. El velo del texto (`.hero-copy::before`) sigue existiendo, con los
+  topes rebajados, y sigue **anclado AL TEXTO** y no a un porcentaje del alto del hero: esto es la
+  corrección de un fallo real, y lo que se cae primero es el rótulo del puesto y la línea de la
+  ubicación, no el nombre.
 - **El rótulo del puesto lleva pastilla propia** (`.hero-chip`): fondo casi opaco y desenfoque
   detrás. Es lo que permite que el velo empiece tarde y flojo, y por tanto que se siga viendo el
-  mosaico en el centro de la pantalla.
-- **El alto de teja va en `vh`, y no es un detalle estético.** El bucle repite la lista de tejas
-  dos veces y se desplaza un 50 %: para que no se vea la costura, una copia tiene que ser más
-  alta que la ventana. Con el alto derivado del ancho de columna eso dependía de la forma de la
-  pantalla; en `vh`, siete tejas × 16 vh cubren cualquier ventana. **Si cambias el número de
-  tejas por columna, rehaz esa cuenta.**
+  campo en el centro de la pantalla.
+- **El campo tiene que verse sin tocar nada.** Un fondo que sólo aparece bajo el puntero es
+  invisible en un móvil, donde no hay puntero — pasó en la primera captura, y por eso el nodo en
+  reposo tiene un tamaño y una opacidad mínimos que se ven solos. Lo que la interacción añade es
+  el relieve, no la existencia.
 - **Verificar a 390 px antes de cerrar.** `overflow-hidden` en la sección es lo único que impide
-  que el mosaico ensanche el documento, y es el fallo nº 1 de `check:mobile`.
+  que el campo ensanche el documento, y es el fallo nº 1 de `check:mobile`.
 
-Las dieciséis fotografías son **CC0 1.0** (dominio público, uso comercial, sin atribución
-exigida), localizadas con la API de Openverse. La procedencia de cada una está en
-`public/hero/CREDITS.md`, y se reconstruyen con `node scripts/build-hero-tiles.mjs`, que además
-imprime la tabla de procedencia lista para pegar. Pesan **281 KB** entre las dieciséis, y ese
-número es literal: el cargador de imágenes del proyecto devuelve las rutas locales sin
-transformar, así que el archivo que hay en `public/hero/` es exactamente el que se descarga —
-`sizes` y `quality` no recortan nada aquí. Si hay que aligerar el escenario, se aligera en el
-script.
+Las dieciséis fotografías CC0 del escenario anterior siguen en `public/hero/` con su
+`CREDITS.md` y su `scripts/build-hero-tiles.mjs`, **pero ya no las usa nadie**. Se dejaron ahí a
+propósito: borrarlas es una decisión aparte y son reconstruibles.
 
 ### En la barra de direcciones nunca se ve una almohadilla
 

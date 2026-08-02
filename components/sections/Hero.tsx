@@ -5,7 +5,7 @@ import { href } from '@/lib/i18n/routes'
 import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
 import { ArrowDown, GitHub, LinkedIn, Mail, MapPin } from '@/components/ui/Icons'
-import { HeroStage } from '@/components/sections/HeroStage'
+import { HeroField } from '@/components/sections/HeroField'
 
 type Stat = { value: string; label: string }
 
@@ -22,11 +22,12 @@ type Props = {
  * sepa en cinco segundos **quién eres, qué haces y por qué deberías interesarle**, y tenga
  * a un clic las dos únicas cosas que puede querer hacer (ver el trabajo o escribir).
  *
- * **Ocupa la ventana entera y el escenario cinético es el protagonista.** Lo primero que se ve
- * al abrir la web es el mosaico de código, servidores y red moviéndose —no un titular sobre
- * negro—, y el bloque de texto se apoya abajo, encima de él. El encargo era explícito: que el
- * fondo dinámico se vea desde el primer segundo, con la referencia de la portada de
- * `swiftmet.vercel.app` y del collage de sanity.io.
+ * **Ocupa la ventana entera y el campo interactivo es el protagonista.** Lo primero que se ve
+ * al abrir la web es una retícula de nodos que reacciona al puntero —no un titular sobre negro,
+ * y tampoco un mosaico de fotografías en bucle—, y el bloque de texto se apoya abajo, encima de
+ * ella. El encargo era explícito: un hero moderno, interactivo y **hecho con código**, con la
+ * referencia de las portadas de Linear, Stripe, Vercel y Sanity. La mecánica está en
+ * `HeroField.tsx`.
  *
  * Las cuatro decisiones que responden a eso:
  *
@@ -34,13 +35,13 @@ type Props = {
  *   portfolio el producto es la persona; poner «Desarrollador Full Stack» de titular y el
  *   nombre en pequeño es esconder lo que se busca en Google.
  * - **Menos texto, y por esto.** La entradilla de tres líneas que había aquí —la que enumeraba
- *   Santander, INDRA, ABB e Ingeteam— se quitó: sobre un fondo en movimiento, un párrafo largo
- *   obliga a elegir entre leerlo o mirar, y quien decide en treinta segundos no hace ni una
- *   cosa ni la otra. Los clientes no se han perdido, están en la sección de experiencia, que es
+ *   Santander, INDRA, ABB e Ingeteam— se quitó: sobre un fondo que se mueve y responde, un
+ *   párrafo largo obliga a elegir entre leerlo o jugar con él, y quien decide en treinta
+ *   segundos no hace ni una cosa ni la otra. Los clientes no se han perdido, están en la sección de experiencia, que es
  *   donde se pueden comprobar con las fechas al lado. Lo que queda aquí es lo irreducible: el
  *   puesto actual, el nombre, una línea de qué haces y dónde estás.
  * - **El retrato es un avatar pequeño.** Ocupaba una de las dos columnas del hero, y a ese
- *   tamaño partía la pantalla en dos y le disputaba el sitio al escenario. Pequeño y arriba del
+ *   tamaño partía la pantalla en dos y le disputaba el sitio al campo. Pequeño y arriba del
  *   todo hace lo que tiene que hacer —ponerle cara a un nombre— sin ser el asunto.
  * - **Las cifras salen del contenido**, no escritas a mano: los años se suman de las
  *   fechas reales de los puestos y los proyectos se cuentan de la lista. Un titular con
@@ -69,32 +70,32 @@ export function Hero({ locale, profile, stats }: Props) {
   return (
     <section
       aria-labelledby="hero-name"
-      // A sangre y recortando: el escenario tiene que llegar al borde de la ventana por los
-      // cuatro lados. `overflow-hidden` es lo que impide que las columnas —que salen del
-      // encuadre por arriba y por abajo— alarguen el documento; `check:mobile` no tolera ni un
-      // píxel de desbordamiento.
-      // `isolate` crea el contexto de apilamiento donde el `z-0` del escenario y el `z-10` del
+      // A sangre y recortando: el campo tiene que llegar al borde de la ventana por los cuatro
+      // lados. `overflow-hidden` es lo que impide que el retículo —que sangra por los cuatro
+      // bordes a propósito— ensanche el documento; `check:mobile` no tolera ni un píxel de
+      // desbordamiento.
+      // `isolate` crea el contexto de apilamiento donde el `z-0` del campo y el `z-10` del
       // contenido se ordenan sin poder afectar a las secciones de al lado.
-      // `justify-end`: el texto se apoya en el borde de abajo y el mosaico se queda con la
-      // mitad de arriba de la pantalla, que es el reparto que pedía el encargo.
+      // `justify-end`: el texto se apoya en el borde de abajo y el campo se queda con la mitad
+      // de arriba de la pantalla, que es el reparto que pedía el encargo.
       // `hero-section` y `hero-shell` sólo existen para la hoja de impresión: en papel el
       // hero deja de medir una pantalla (ver `globals.css`).
       className="hero-section relative isolate flex min-h-svh flex-col justify-end overflow-hidden"
     >
-      <HeroStage />
+      <HeroField />
 
       <div className="hero-shell page-gutter relative z-10 mx-auto w-full max-w-7xl pt-28 pb-[calc(var(--spacing-nav-mobile)+1.5rem)] text-center lg:pb-14">
         {/*
-         * El retrato, ahora avatar. `hero-portrait` es lo que lo pone POR ENCIMA del
-         * escenario en vez de al lado: flota con una oscilación mínima y lleva un halo de
-         * cobre y una sombra que lo despegan de las tejas que pasan por debajo. Sin esa
-         * sombra, en el momento en que a una teja clara le toca pasar justo detrás, la
-         * silueta se pierde y la cara parece una foto más del fondo.
+         * El retrato, ahora avatar. `hero-portrait` es lo que lo pone POR ENCIMA del campo
+         * en vez de al lado: flota con una oscilación mínima y lleva un halo de cobre y una
+         * sombra que lo despegan del retículo que pasa por debajo. Sin ese halo, cuando el
+         * puntero enciende los nodos que rodean la cara, la silueta se llena de puntos
+         * cobrizos y deja de leerse como una fotografía.
          *
-         * **Va FUERA de `.hero-copy`**, y eso es lo que deja una franja de mosaico visible
-         * arriba: el velo del texto empieza justo debajo del avatar, así que el avatar flota
-         * sobre las tejas en vez de sobre grafito. Es una imagen con su propio halo — no
-         * necesita el contraste que necesitan las líneas de texto.
+         * **Va FUERA de `.hero-copy`**, y eso es lo que deja el campo visible arriba: el velo
+         * del texto empieza justo debajo del avatar, así que el avatar flota sobre los nodos
+         * en vez de sobre grafito. Es una imagen con su propio halo — no necesita el
+         * contraste que necesitan las líneas de texto.
          */}
         <div className="hero-portrait mx-auto w-20 lg:w-24">
           <Figure
@@ -113,8 +114,8 @@ export function Hero({ locale, profile, stats }: Props) {
 
               `hero-chip` le da fondo propio. No es adorno: es el texto más pequeño y más
               apagado de la portada, y está en la franja alta, que es la que tiene que quedar
-              abierta para que se vea el mosaico. Con la pastilla se lee sobre cualquier teja y
-              el velo del texto puede empezar más abajo y más flojo. */}
+              abierta para que se vea el campo. Con la pastilla se lee pase lo que pase por
+              detrás y el velo del texto puede empezar más abajo y más flojo. */}
           <p className="hero-chip eyebrow mt-6">
             <span
               aria-hidden="true"
