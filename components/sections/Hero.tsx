@@ -5,7 +5,6 @@ import { href } from '@/lib/i18n/routes'
 import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
 import { ArrowDown, GitHub, LinkedIn, Mail, MapPin } from '@/components/ui/Icons'
-import { HeroField } from '@/components/sections/HeroField'
 
 type Stat = { value: string; label: string }
 
@@ -26,8 +25,13 @@ type Props = {
  * al abrir la web es una retícula de nodos que reacciona al puntero —no un titular sobre negro,
  * y tampoco un mosaico de fotografías en bucle—, y el bloque de texto se apoya abajo, encima de
  * ella. El encargo era explícito: un hero moderno, interactivo y **hecho con código**, con la
- * referencia de las portadas de Linear, Stripe, Vercel y Sanity. La mecánica está en
- * `HeroField.tsx`.
+ * referencia de las portadas de Linear, Stripe, Vercel y Sanity.
+ *
+ * **El campo ya no se monta aquí**, y conviene saberlo antes de buscarlo: es el fondo de todo el
+ * sitio y vive en el layout (`components/layout/SiteField.tsx`), en una capa fija que pasa por
+ * debajo de todas las secciones. Lo que esta portada aporta al conjunto no es el fondo, es el
+ * hueco: una pantalla entera sin más contenido que el nombre, que es donde el campo se ve de
+ * verdad. Por eso el hero sigue midiendo `min-h-svh` aunque el fondo ya no sea suyo.
  *
  * Las cuatro decisiones que responden a eso:
  *
@@ -70,20 +74,18 @@ export function Hero({ locale, profile, stats }: Props) {
   return (
     <section
       aria-labelledby="hero-name"
-      // A sangre y recortando: el campo tiene que llegar al borde de la ventana por los cuatro
-      // lados. `overflow-hidden` es lo que impide que el retículo —que sangra por los cuatro
-      // bordes a propósito— ensanche el documento; `check:mobile` no tolera ni un píxel de
-      // desbordamiento.
-      // `isolate` crea el contexto de apilamiento donde el `z-0` del campo y el `z-10` del
-      // contenido se ordenan sin poder afectar a las secciones de al lado.
-      // `justify-end`: el texto se apoya en el borde de abajo y el campo se queda con la mitad
-      // de arriba de la pantalla, que es el reparto que pedía el encargo.
+      // `overflow-hidden` sigue haciendo falta aunque el campo ya no esté aquí: el velo del
+      // texto se saca a sangre con `inset-inline: calc(50% - 50vw)`, y `vw` incluye la barra de
+      // desplazamiento. Sin el recorte eso son unos píxeles de scroll horizontal, y
+      // `check:mobile` no tolera ni uno.
+      // `isolate` acota el `z-index: -1` de ese velo a esta sección: sin él buscaría el contexto
+      // de apilamiento de arriba y podría colarse por detrás de la capa del campo.
+      // `justify-end`: el texto se apoya en el borde de abajo y la mitad superior de la pantalla
+      // se queda para el campo, que es el reparto que pedía el encargo.
       // `hero-section` y `hero-shell` sólo existen para la hoja de impresión: en papel el
       // hero deja de medir una pantalla (ver `globals.css`).
       className="hero-section relative isolate flex min-h-svh flex-col justify-end overflow-hidden"
     >
-      <HeroField />
-
       <div className="hero-shell page-gutter relative z-10 mx-auto w-full max-w-7xl pt-28 pb-[calc(var(--spacing-nav-mobile)+1.5rem)] text-center lg:pb-14">
         {/*
          * El retrato, ahora avatar. `hero-portrait` es lo que lo pone POR ENCIMA del campo

@@ -3,21 +3,21 @@
 import { useEffect, useRef } from 'react'
 
 /**
- * CAMPO INTERACTIVO DE LA PORTADA
+ * CAMPO INTERACTIVO DEL SITIO
  *
- * Lo primero que se ve al abrir la web: una retícula de varios miles de nodos que **reacciona a
- * quien la mira**. El puntero abre un pozo de luz —los nodos se apartan, se encienden en cobre y
- * tejen entre ellos una constelación que sólo existe donde hay luz—, un clic lanza una onda que
- * recorre la pantalla entera, y de vez en cuando un pulso viaja por una fila o una columna como
- * un paquete por un bus.
+ * El fondo de **toda la web**: una retícula de varios miles de nodos que reacciona a quien la
+ * mira. El puntero abre un pozo de luz —los nodos se apartan, se encienden en cobre y tejen entre
+ * ellos una constelación que sólo existe donde hay luz—, un clic lanza una onda que recorre la
+ * pantalla entera, y de vez en cuando un pulso viaja por una fila o una columna como un paquete
+ * por un bus.
  *
- * **Sustituye al mosaico de fotografías.** El encargo fue explícito y la diferencia es de
- * naturaleza, no de estilo: aquello era material grabado moviéndose en bucle —bonito, pero
- * indiferente a quien estuviera delante—, y esto es un sistema que responde. La referencia
- * declarada son las portadas de Linear, Stripe, Vercel y Sanity, y lo que las cuatro tienen en
- * común no es el collage: es que **el fondo está dibujado por el mismo oficio que vende la
- * página**. En un portfolio de desarrollo, un fondo generado con código dice en tres segundos lo
- * que el CV tarda dos pantallas en argumentar.
+ * **Nació en el hero y ahora es la superficie del sitio.** Antes vivía dentro de la sección de
+ * portada, en `absolute`, y se quedaba atrás al hacer scroll; ahora se monta una sola vez en el
+ * layout, en `fixed`, y las secciones pasan por encima de él. La diferencia no es de alcance sino
+ * de lectura: un fondo que sólo está en la primera pantalla es un efecto de entrada, y uno que
+ * está siempre es el material del que está hecha la página. La referencia declarada —las portadas
+ * de Linear, Stripe, Vercel y Sanity— hace exactamente esto: el fondo lo dibuja el mismo oficio
+ * que vende la página, y no se apaga al bajar.
  *
  * Las seis decisiones que lo sostienen:
  *
@@ -26,31 +26,40 @@ import { useEffect, useRef } from 'react'
  *    primera pantalla de un CV para dibujar puntos sería exactamente el error que este proyecto
  *    lleva evitando desde el primer commit. Todo el peso extra es este archivo.
  *
- * 2. **Es DECORACIÓN, y se declara como tal.** `aria-hidden` en la raíz y `pointer-events: none`
- *    en el lienzo: no se anuncia a un lector de pantalla —no hay nada que contar— y no puede
- *    interceptar el clic de un botón. Los eventos se escuchan en `window` y se descartan los que
- *    caen fuera del hero, que es la única forma de reaccionar al puntero **sin** ponerse en medio.
+ * 2. **`fixed` y del tamaño de la ventana, nunca del documento.** Un lienzo tan alto como la
+ *    página serían decenas de miles de nodos y un mapa de bits de varios megapíxeles; así son
+ *    siempre los mismos dos mil, y el coste por fotograma no depende de lo que mida el contenido.
+ *    De paso, el campo no se desplaza con el scroll: el texto viaja sobre una superficie quieta,
+ *    que es lo que impide que la retícula compita con la lectura.
  *
- * 3. **El texto manda sobre el campo, siempre.** El retículo se apaga hacia abajo por diseño
- *    (`rowFade`), no por un velo puesto encima: en la franja donde vive el bloque de texto los
- *    nodos casi no existen. Es la misma regla de siempre —si hay que esforzarse para leer el
- *    rótulo del puesto o la ubicación a 390 px, el cambio está mal—, resuelta en el origen en vez
- *    de tapando con un degradado lo que no debería haberse dibujado.
+ * 3. **Es DECORACIÓN, y se declara como tal.** `aria-hidden` en la raíz y `pointer-events: none`
+ *    en toda la capa: no se anuncia a un lector de pantalla —no hay nada que contar— y no puede
+ *    interceptar el clic de un botón. Los eventos se escuchan en `window`, que es la única forma
+ *    de reaccionar al puntero **sin** ponerse en medio. Y como la capa es fija y ocupa la ventana,
+ *    las coordenadas del evento ya son las del lienzo: no hay que corregir el scroll.
  *
- * 4. **Nunca se queda quieto esperando a un ratón.** En un móvil no hay puntero, y en un
+ * 4. **El texto manda sobre el campo, siempre.** Es la regla del proyecto, y ahora aplica a todas
+ *    las secciones y no sólo al hero: por eso el reposo es deliberadamente flojo —un punto de un
+ *    píxel en gris de metadatos— y lo llamativo pasa sólo donde está el puntero, que es donde el
+ *    visitante mira y no donde lee. Al salir del hero bajaron el techo de brillo, el umbral de los
+ *    filetes y la opacidad de los halos: encendido a tope era espectacular detrás de un titular de
+ *    seis rem y ruidoso detrás de un párrafo de diecisiete píxeles.
+ *
+ * 5. **Nunca se queda quieto esperando a un ratón.** En un móvil no hay puntero, y en un
  *    escritorio hay mucha gente que lee sin tocar nada. Cuando el puntero falta o lleva un rato
  *    parado, una luz autónoma recorre la escena y los pulsos siguen saliendo: la interacción
  *    **suma**, no es el requisito para que pase algo.
  *
- * 5. **Trabaja sólo cuando se le ve.** Un `IntersectionObserver` para el bucle en cuanto el hero
- *    sale de la pantalla, y `visibilitychange` lo para al cambiar de pestaña. Un `requestAnimationFrame`
- *    corriendo mientras alguien lee la sección de experiencia es batería quemada a cambio de nada.
- *
- * 6. **Se para si molesta.** Con `prefers-reduced-motion: reduce` no se esconde: se dibuja **un
+ * 6. **Se para si molesta, y también si no se le ve.** `visibilitychange` detiene el bucle al
+ *    cambiar de pestaña. Y con `prefers-reduced-motion: reduce` no se esconde: se dibuja **un
  *    fotograma** y no se registra ni un escuchador. Un campo de puntos que late y se aparta es
  *    justo el movimiento periférico continuo que provoca mareo a quien tiene sensibilidad
- *    vestibular. Y se escucha el cambio de preferencia en caliente, porque en el sistema
- *    operativo se activa sin recargar la página.
+ *    vestibular. Se escucha el cambio de preferencia en caliente, porque en el sistema operativo
+ *    se activa sin recargar la página.
+ *
+ * Lo que se perdió al salir del hero, y por qué no se echa de menos: el `IntersectionObserver` que
+ * paraba el bucle en cuanto la portada dejaba de verse. Una capa fija está siempre a la vista, así
+ * que no se dispararía nunca; quien apaga el bucle ahora es la pestaña.
  *
  * La mecánica de dibujo —por qué los nodos se pintan en doce grupos y no uno a uno, y por qué el
  * suavizado va en exponenciales y no en un factor fijo— está comentada junto a cada pieza.
@@ -86,30 +95,35 @@ const BUCKETS = 12
 /**
  * Radio y opacidad del nodo apagado y del nodo al máximo.
  *
- * **El mínimo se subió después de mirar la primera captura**, y merece la pena dejar dicho por
- * qué: con el nodo en reposo a 0,85 px y opacidad 0,14 el campo sólo existía alrededor del
- * puntero, y en un móvil —donde no hay puntero— la primera pantalla era negra con un chip. Un
- * fondo que sólo aparece si lo tocas no es interactivo, es invisible. El suelo tiene que verse
- * sin hacer nada; lo que la interacción añade es el relieve.
+ * **El reposo tiene que verse y el máximo no puede gritar**, y las dos mitades de esa frase son
+ * correcciones de fallos reales. El mínimo se subió al mirar la primera captura: a 0,85 px y
+ * opacidad 0,14 el retículo sólo existía alrededor del puntero, y en un móvil —donde no hay
+ * puntero— la pantalla era negra con un chip. Un fondo que sólo aparece si lo tocas no es
+ * interactivo, es invisible.
+ *
+ * El máximo bajó al pasar el campo a fondo de todo el sitio. Ahora la retícula pasa por debajo de
+ * **todo** el texto de la web, así que el techo se mide contra la línea más pequeña que tiene que
+ * dejar leer —un metadato de la experiencia, una etiqueta de tecnología—, no contra el nombre de
+ * la portada, que es enorme y aguanta cualquier cosa detrás.
  */
-const DOT_RADIUS = { min: 1, max: 2.9 }
-const DOT_ALPHA = { min: 0.22, max: 0.95 }
+const DOT_RADIUS = { min: 1, max: 2.6 }
+const DOT_ALPHA = { min: 0.24, max: 0.82 }
 
 /**
  * El latido de fondo: una onda diagonal lentísima que recorre el retículo.
  *
  * Sin ella el campo en reposo es una cuadrícula de puntos idénticos, que se lee como una textura
  * impresa y no como algo vivo. Con ella respira. La amplitud es deliberadamente ridícula —el
- * brillo se mueve entre 0,03 y 0,11— porque en cuanto se puede *seguir* la onda con la vista deja
- * de ser atmósfera y compite con el titular.
+ * brillo se mueve entre 0,08 y 0,2— porque en cuanto se puede *seguir* la onda con la vista deja
+ * de ser atmósfera y compite con el texto que tenga encima.
  */
-const AMBIENT = { base: 0.13, wave: 0.06, speed: 0.5 }
+const AMBIENT = { base: 0.14, wave: 0.06, speed: 0.5 }
 
 /** Desplazamiento máximo de un nodo, en píxeles CSS: lo que se aparta del puntero. */
 const PUSH = 15
 
 /** A partir de qué brillo dos nodos vecinos se unen con un filete. */
-const LINK_FROM = 0.24
+const LINK_FROM = 0.28
 
 /** La onda del clic: velocidad de expansión, grosor del frente y cuánto vive. */
 const PULSE = { speed: 620, band: 105, life: 1.5, push: 11 }
@@ -117,8 +131,14 @@ const PULSE = { speed: 620, band: 105, life: 1.5, push: 11 }
 /** El pulso que viaja por una fila o una columna: velocidad, cola y cabeza, en píxeles CSS. */
 const BEAM = { speed: 880, trail: 230, head: 26 }
 
-/** Cada cuánto sale un pulso, en segundos: un intervalo, no un reloj. */
-const BEAM_EVERY = { min: 1.9, max: 4.4 }
+/**
+ * Cada cuánto sale un pulso, en segundos: un intervalo, no un reloj.
+ *
+ * Se abrió al pasar el campo a fondo del sitio. En el hero se veía diez segundos y convenía que
+ * pasara algo pronto; aquí se ve durante toda la visita, y un pulso cada dos segundos delante de
+ * quien está leyendo la experiencia deja de ser un detalle y pasa a ser una distracción.
+ */
+const BEAM_EVERY = { min: 2.4, max: 5.2 }
 
 /** Cuánto aguanta el puntero «vivo» sin moverse antes de cederle la escena a la luz autónoma. */
 const IDLE_AFTER = 2.4
@@ -180,7 +200,7 @@ function readColor(name: string, fallback: [number, number, number]): [number, n
   return [(value >> 16) & 255, (value >> 8) & 255, value & 255]
 }
 
-export function HeroField() {
+export function SiteField() {
   const hostRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -236,8 +256,8 @@ export function HeroField() {
     const haloCtx = halo.getContext('2d')
     if (haloCtx) {
       const gradient = haloCtx.createRadialGradient(128, 128, 0, 128, 128, 128)
-      gradient.addColorStop(0, `rgba(${warm[0]},${warm[1]},${warm[2]},0.26)`)
-      gradient.addColorStop(0.45, `rgba(${warm[0]},${warm[1]},${warm[2]},0.08)`)
+      gradient.addColorStop(0, `rgba(${warm[0]},${warm[1]},${warm[2]},0.2)`)
+      gradient.addColorStop(0.45, `rgba(${warm[0]},${warm[1]},${warm[2]},0.06)`)
       gradient.addColorStop(1, `rgba(${warm[0]},${warm[1]},${warm[2]},0)`)
       haloCtx.fillStyle = gradient
       haloCtx.fillRect(0, 0, 256, 256)
@@ -264,12 +284,6 @@ export function HeroField() {
     let toEnergy = new Float32Array(0)
     let toX = new Float32Array(0)
     let toY = new Float32Array(0)
-    let rowFade = new Float32Array(0)
-
-    /** Dónde empieza el lienzo en la ventana. Se cachea: leerlo por evento fuerza un cálculo de
-        maquetación, y el puntero dispara eventos a la velocidad del ratón. */
-    let originLeft = 0
-    let originTop = 0
 
     const pulses: Pulse[] = []
     const beams: Beam[] = []
@@ -280,7 +294,6 @@ export function HeroField() {
     let clock = 0
     let frame = 0
     let previous = 0
-    let onScreen = true
     let running = false
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -290,8 +303,6 @@ export function HeroField() {
 
     const measure = () => {
       const box = host.getBoundingClientRect()
-      originLeft = box.left
-      originTop = box.top
 
       const nextWidth = Math.max(1, Math.round(box.width))
       const nextHeight = Math.max(1, Math.round(box.height))
@@ -326,31 +337,6 @@ export function HeroField() {
       toEnergy = new Float32Array(count)
       toX = new Float32Array(count)
       toY = new Float32Array(count)
-
-      /**
-       * EL DEGRADADO QUE PROTEGE EL TEXTO, Y ESTÁ EN EL ORIGEN.
-       *
-       * El bloque de texto se apoya en el borde de abajo del hero. En vez de dibujar el campo
-       * entero y taparlo después con un velo —que es lo que hacía la versión de fotografías, y
-       * costaba cuatro degradados coordinados—, aquí los nodos de la mitad inferior simplemente
-       * se dibujan cada vez más apagados hasta desaparecer. Se calcula por fila, una vez, porque
-       * es constante mientras no cambie el tamaño.
-       *
-       * El corte está en la mitad del alto: por encima, campo a plena potencia; por debajo, caída
-       * rápida. Multiplica **también** al desplazamiento, y eso es lo que evita el efecto raro de
-       * un nodo invisible que sigue apartándose.
-       *
-       * **No cae a cero, cae a un 10 %.** Con cero, la mitad inferior del hero era un rectángulo
-       * negro perfecto y la frontera con el campo se notaba como un borde. Con el suelo, el
-       * retículo sigue insinuándose hasta abajo —y donde de verdad estorbaría, a la altura de las
-       * cifras, ya lo tapa el velo del texto, que ahí es grafito puro.
-       */
-      rowFade = new Float32Array(rows)
-      for (let gy = 0; gy < rows; gy++) {
-        const y = (originY + gy * spacing) / height
-        const t = (y - 0.5) / 0.42
-        rowFade[gy] = t <= 0 ? 1 : t >= 1 ? 0.1 : 0.1 + 0.9 * (1 - t) * (1 - t)
-      }
     }
 
     // --- Fuerzas -----------------------------------------------------------
@@ -480,9 +466,11 @@ export function HeroField() {
       const drift = 1 - pointer.weight
       if (drift > 0.001) {
         // Lissajous con dos frecuencias que no son múltiplo una de la otra: el recorrido no se
-        // cierra nunca sobre sí mismo y no se le ve el bucle.
+        // cierra nunca sobre sí mismo y no se le ve el bucle. Ahora recorre la ventana entera y
+        // no sólo la mitad de arriba: la capa es fija y por debajo puede haber cualquier sección,
+        // así que ya no hay una franja reservada al texto.
         const x = width * (0.5 + 0.33 * Math.sin(clock * 0.11))
-        const y = height * (0.36 + 0.26 * Math.sin(clock * 0.157 + 1.1))
+        const y = height * (0.45 + 0.32 * Math.sin(clock * 0.157 + 1.1))
         light(x, y, lightRadius * 1.1, drift * 0.85, PUSH * 0.8)
       }
 
@@ -505,7 +493,6 @@ export function HeroField() {
       for (let gy = 0; gy < rows; gy++) {
         const base = gy * cols
         const y0 = originY + gy * spacing
-        const fade = rowFade[gy]!
 
         for (let gx = 0; gx < cols; gx++) {
           const index = base + gx
@@ -513,17 +500,16 @@ export function HeroField() {
 
           const ambient =
             AMBIENT.base + AMBIENT.wave * Math.sin(x0 * 0.013 + y0 * 0.019 + clock * AMBIENT.speed)
-          let target = (toEnergy[index]! + ambient) * fade
+          let target = toEnergy[index]! + ambient
           if (target > 1) target = 1
 
           const level = energy[index]! + (target - energy[index]!) * catchEnergy
           energy[index] = level
-          dispX[index] = dispX[index]! + (toX[index]! * fade - dispX[index]!) * catchDisplacement
-          dispY[index] = dispY[index]! + (toY[index]! * fade - dispY[index]!) * catchDisplacement
+          dispX[index] = dispX[index]! + (toX[index]! - dispX[index]!) * catchDisplacement
+          dispY[index] = dispY[index]! + (toY[index]! - dispY[index]!) * catchDisplacement
 
-          // Por debajo de esto el nodo no se distingue del fondo: sale del dibujo y se ahorran
-          // un `arc` y un `moveTo`. En la mitad inferior de la pantalla eso es casi la mitad del
-          // campo.
+          // Por debajo de esto el nodo no se distingue del fondo: sale del dibujo y se ahorran un
+          // `arc` y un `moveTo`.
           if (level < 0.014) continue
 
           let bucket = (level * BUCKETS) | 0
@@ -590,7 +576,7 @@ export function HeroField() {
 
       ctx.lineWidth = 0.75
       for (let step = 0; step < links.length; step++) {
-        ctx.strokeStyle = `${linkColor}${(0.05 + step * 0.055).toFixed(3)})`
+        ctx.strokeStyle = `${linkColor}${(0.04 + step * 0.045).toFixed(3)})`
         ctx.stroke(links[step]!)
       }
 
@@ -607,12 +593,10 @@ export function HeroField() {
         const headY = item.axis === 0 ? originY + item.line * spacing : item.pos
         const tailX = item.axis === 0 ? item.pos - item.dir * BEAM.trail : headX
         const tailY = item.axis === 0 ? headY : item.pos - item.dir * BEAM.trail
-        const fade = item.axis === 0 ? rowFade[item.line]! : 1
-        if (fade <= 0.02) continue
 
         const trace = ctx.createLinearGradient(tailX, tailY, headX, headY)
         trace.addColorStop(0, `${linkColor}0)`)
-        trace.addColorStop(1, `${linkColor}${(0.45 * fade).toFixed(3)})`)
+        trace.addColorStop(1, `${linkColor}0.34)`)
         ctx.strokeStyle = trace
         ctx.beginPath()
         ctx.moveTo(tailX, tailY)
@@ -632,7 +616,7 @@ export function HeroField() {
         }
         if (drift > 0.01) {
           const x = width * (0.5 + 0.33 * Math.sin(clock * 0.11))
-          const y = height * (0.36 + 0.26 * Math.sin(clock * 0.157 + 1.1))
+          const y = height * (0.45 + 0.32 * Math.sin(clock * 0.157 + 1.1))
           ctx.globalAlpha = drift * 0.85
           ctx.drawImage(halo, x - size / 2, y - size / 2, size, size)
         }
@@ -666,12 +650,11 @@ export function HeroField() {
         untilBeam = BEAM_EVERY.min + Math.random() * (BEAM_EVERY.max - BEAM_EVERY.min)
         const axis: 0 | 1 = Math.random() < 0.62 ? 0 : 1
         const dir: 1 | -1 = Math.random() < 0.5 ? 1 : -1
-        // En horizontal el carril se sortea sólo en la mitad de arriba: abajo el campo está
-        // apagado y el pulso saldría cruzando el bloque de texto.
-        const line =
-          axis === 0
-            ? Math.floor(Math.random() * Math.max(1, rows * 0.45))
-            : Math.floor(Math.random() * cols)
+        // Cualquier carril, y esto cambió al salir del hero: antes los horizontales se sorteaban
+        // sólo en la mitad de arriba, porque abajo vivía el bloque de texto de la portada. Con la
+        // capa fija por debajo puede haber cualquier sección, así que no hay una mitad «buena»;
+        // lo que mantiene el pulso discreto es su opacidad, no dónde sale.
+        const line = Math.floor(Math.random() * (axis === 0 ? rows : cols))
         const span = axis === 0 ? width : height
         beams.push({ axis, line, pos: dir > 0 ? -BEAM.trail : span + BEAM.trail, dir })
       }
@@ -688,7 +671,7 @@ export function HeroField() {
     }
 
     const start = () => {
-      if (running || !motion || !onScreen || document.hidden) return
+      if (running || !motion || document.hidden) return
       running = true
       previous = 0
       frame = requestAnimationFrame(step)
@@ -702,30 +685,26 @@ export function HeroField() {
     // --- Entradas ----------------------------------------------------------
 
     /**
-     * El puntero se escucha en `window` y no en el hero, y ésa es la única forma de que esto
-     * funcione: el lienzo tiene `pointer-events: none` —no puede robarle un clic a un botón—, así
-     * que nunca recibiría un evento propio. Se traduce a coordenadas del lienzo y se descarta lo
-     * que cae fuera, que es lo mismo que habría hecho el navegador pero sin ponerse en medio.
+     * El puntero se escucha en `window` y no en la capa, y ésa es la única forma de que esto
+     * funcione: el campo tiene `pointer-events: none` —no puede robarle un clic a un botón—, así
+     * que nunca recibiría un evento propio.
+     *
+     * La capa es fija y ocupa la ventana, así que `clientX`/`clientY` **ya son** las coordenadas
+     * del lienzo: no hay nada que restar ni que volver a leer al hacer scroll, que es lo que hacía
+     * falta cuando el campo vivía dentro del hero.
      */
     const onMove = (event: PointerEvent) => {
-      const x = event.clientX - originLeft
-      const y = event.clientY - originTop
-      if (x < 0 || y < 0 || x > width || y > height) {
-        pointer.want = 0
-        return
-      }
-
       // La primera vez se coloca sin inercia. Si no, la luz sale del rincón donde se quedó y
       // cruza la pantalla hasta el cursor: un efecto llamativo que nadie ha pedido y que apunta
       // a que el fondo tiene estado.
       if (!pointer.seen) {
         pointer.seen = true
-        pointer.x = x
-        pointer.y = y
+        pointer.x = event.clientX
+        pointer.y = event.clientY
       }
 
-      pointer.x = x
-      pointer.y = y
+      pointer.x = event.clientX
+      pointer.y = event.clientY
       pointer.want = 1
       pointer.still = 0
     }
@@ -735,27 +714,17 @@ export function HeroField() {
     }
 
     const onPress = (event: PointerEvent) => {
-      const x = event.clientX - originLeft
-      const y = event.clientY - originTop
-      if (x < 0 || y < 0 || x > width || y > height) return
-
       // Tres ondas a la vez ya no se distinguen y multiplican el trabajo por fotograma.
       if (pulses.length >= 3) pulses.shift()
-      pulses.push({ x, y, age: 0 })
+      pulses.push({ x: event.clientX, y: event.clientY, age: 0 })
 
       // En una pantalla táctil no hay `pointermove` previo: el toque es también lo que enciende
       // la luz. Sin esto, la onda sale de un sitio a oscuras.
-      pointer.x = x
-      pointer.y = y
+      pointer.x = event.clientX
+      pointer.y = event.clientY
       pointer.want = 1
       pointer.still = 0
       pointer.seen = true
-    }
-
-    const onScroll = () => {
-      const box = host.getBoundingClientRect()
-      originLeft = box.left
-      originTop = box.top
     }
 
     const onVisibility = () => {
@@ -782,19 +751,9 @@ export function HeroField() {
       else paintStill()
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0]
-        if (!entry) return
-        onScreen = entry.isIntersecting
-        if (onScreen) start()
-        else stop()
-      },
-      // Un margen generoso: reanudar el bucle justo en el píxel en el que el hero reaparece deja
-      // ver el primer fotograma sin inercia al volver arriba.
-      { rootMargin: '120px' },
-    )
-
+    // Observa la propia capa, que mide lo que mide la ventana. Es lo que recoge el giro del
+    // teléfono y —esto importa más de lo que parece— el repliegue de la barra de direcciones
+    // móvil, que cambia el alto sin que haya un `resize` de ventana en algunos navegadores.
     const resize = new ResizeObserver(() => {
       measure()
       if (!motion) paintStill()
@@ -806,9 +765,7 @@ export function HeroField() {
       window.addEventListener('pointermove', onMove, { passive: true })
       window.addEventListener('pointerdown', onPress, { passive: true })
       window.addEventListener('pointerleave', onLeave)
-      window.addEventListener('scroll', onScroll, { passive: true })
       document.addEventListener('visibilitychange', onVisibility)
-      observer.observe(host)
       resize.observe(host)
       start()
     } else {
@@ -820,36 +777,34 @@ export function HeroField() {
 
     return () => {
       stop()
-      observer.disconnect()
       resize.disconnect()
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerdown', onPress)
       window.removeEventListener('pointerleave', onLeave)
-      window.removeEventListener('scroll', onScroll)
       document.removeEventListener('visibilitychange', onVisibility)
       reduced.removeEventListener('change', onMotionChange)
     }
   }, [])
 
   return (
-    <div ref={hostRef} className="hero-field" aria-hidden="true">
+    <div ref={hostRef} className="site-field" aria-hidden="true">
       {/* La atmósfera, en CSS y debajo del lienzo: dos manchas de cobre desenfocadas que respiran.
           Van aquí y no en el canvas porque un desenfoque de este tamaño lo hace el compositor
           gratis y en el lienzo costaría un degradado enorme por fotograma. */}
-      <div className="hero-field__aurora" />
+      <div className="site-field__aurora" />
 
       {/* La retícula de planos, estática: dos juegos de líneas de un píxel a opacidad casi nula,
-          con una máscara que las desvanece antes de llegar al texto. Es lo que le da al campo un
-          suelo sobre el que apoyarse — sin ella los nodos flotan en negro y el conjunto se lee
+          con una máscara que las desvanece antes de llegar a los bordes. Es lo que le da al campo
+          un suelo sobre el que apoyarse — sin ella los nodos flotan en negro y el conjunto se lee
           como un salvapantallas. */}
-      <div className="hero-field__grid" />
+      <div className="site-field__grid" />
 
-      <canvas ref={canvasRef} className="hero-field__canvas" />
+      <canvas ref={canvasRef} className="site-field__canvas" />
 
-      {/* El velo. Mucho más ligero que el del mosaico de fotografías: aquí el campo ya se apaga
-          solo hacia abajo, así que esto sólo tiene dos trabajos — proteger la franja de la
-          cabecera fija, que es translúcida, y coser el borde de abajo con la sección siguiente. */}
-      <div className="hero-field__scrim" />
+      {/* El velo. Protege las dos franjas donde el campo estorbaría —la de la cabecera fija, que
+          es translúcida, y la de abajo, donde en móvil vive la barra de iconos— y de paso baja un
+          punto el conjunto para que ningún párrafo del sitio compita con los nodos. */}
+      <div className="site-field__scrim" />
     </div>
   )
 }

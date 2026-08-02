@@ -73,16 +73,24 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D dirigido por el scroll, sin
   JavaScript salvo los dos botones. Fallback sin soporte o con `prefers-reduced-motion`: carrusel
   horizontal plano. En papel se deshace en retícula de dos columnas. Ver [[cover-flow]].
-- **La primera pantalla ES el campo interactivo.** El hero ocupa `min-h-svh` con el texto apoyado
-  abajo y, detrás, una retícula de mil a tres mil nodos dibujada en un `<canvas>` que **reacciona
-  al puntero**: pozo de luz que aparta y enciende los nodos, constelación que sólo existe donde hay
-  luz, onda al hacer clic y pulsos que viajan por filas y columnas.
-  `components/sections/HeroField.tsx` + bloque «Campo interactivo» de `globals.css`. Cero
-  dependencias, `aria-hidden`, `pointer-events: none` en toda la capa, el bucle se para al salir de
-  pantalla, con `prefers-reduced-motion` se dibuja un solo fotograma y no se imprime. Es el único
-  componente de cliente de la portada. El texto del hero es corto a propósito —puesto, nombre, una
-  línea, ubicación y las cuatro cifras—: la entradilla larga se quitó porque sobre un fondo que se
-  mueve no se lee. Ver [[campo-interactivo]].
+- **El campo interactivo es el fondo de TODA la web, no sólo del hero.** Una retícula de mil a tres
+  mil nodos dibujada en un `<canvas>` que **reacciona al puntero**: pozo de luz que aparta y
+  enciende los nodos, constelación que sólo existe donde hay luz, onda al hacer clic y pulsos que
+  viajan por filas y columnas. Se monta **una sola vez en el layout**
+  (`components/layout/SiteField.tsx` + bloque «Campo interactivo del sitio» de `globals.css`), en
+  una capa **fija** del tamaño de la ventana por la que pasan por encima todas las secciones y
+  todas las páginas. Cero dependencias, `aria-hidden`, `pointer-events: none` en toda la capa, el
+  bucle se para al cambiar de pestaña, con `prefers-reduced-motion` se dibuja un solo fotograma y
+  no se imprime. El hero sigue midiendo `min-h-svh` porque su aportación al conjunto ya no es el
+  fondo sino **el hueco**: una pantalla entera donde el campo se ve sin nada delante. El texto del
+  hero es corto a propósito —puesto, nombre, una línea, ubicación y las cuatro cifras—: la
+  entradilla larga se quitó porque sobre un fondo que se mueve no se lee. Ver
+  [[campo-interactivo]].
+- **El orden de capas lo fija una regla explícita**, no el orden del documento: la capa del campo
+  es un elemento posicionado con `z-index: 0`, y en CSS eso gana al contenido de los elementos
+  estáticos aunque venga antes. Por eso `globals.css` sube `body > main` y `body > footer` a
+  `position: relative` con `z-index: 1`. **Si añades un hermano directo del `<body>` que tenga que
+  verse, súbelo también.**
 - **El contraste del hero lo da un velo anclado al TEXTO** (`.hero-copy::before`), no un
   porcentaje del alto del hero, y el rótulo del puesto lleva pastilla propia (`.hero-chip`). Las
   dos cosas son la corrección de un fallo real. Regla corta: **si tocas el velo, vuelve a mirar el
@@ -114,12 +122,15 @@ Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.
    geometría en un sitio y, de paso, convierte el carrusel en una ventana centrada en vez de una
    banda a sangre con medio metro de vacío a la izquierda en un monitor ancho. Ver
    [[cover-flow]].
-8. **El campo de la portada nunca compite con el texto, y tiene que verse sin tocarlo.** Son dos
-   condiciones a la vez y las dos salen de fallos reales. Si al tocar el velo o los nodos hay que
-   esforzarse para leer **cualquier** línea del hero a 390 px, el cambio está mal —y el listón es
-   el rótulo del puesto y la ubicación, no el nombre—; lo que garantiza el contraste va anclado al
-   texto y con los topes en `rem`, nunca en porcentajes del alto del hero. Y al revés: si el campo
-   sólo aparece bajo el puntero, en móvil no aparece nunca. Ver [[campo-interactivo]].
+8. **El campo nunca compite con el texto, y tiene que verse sin tocarlo.** Son dos condiciones a
+   la vez, las dos salen de fallos reales y ahora aplican a **todas** las secciones, no sólo al
+   hero. Si al tocar el velo o los nodos hay que esforzarse para leer **cualquier** línea del hero
+   a 390 px, el cambio está mal —y el listón es el rótulo del puesto y la ubicación, no el
+   nombre—; lo que garantiza el contraste va anclado al texto y con los topes en `rem`, nunca en
+   porcentajes del alto del hero. Y al revés: si el campo sólo aparece bajo el puntero, en móvil no
+   aparece nunca. **Ojo con la tentación de resolverlo subiendo el velo global**: se probó al 30 %
+   y dejó el fondo prácticamente negro en toda la web, porque los nodos en reposo pintan a poco más
+   de 0,2 de opacidad. Está en el 12 %. Ver [[campo-interactivo]].
 9. **Sólo entran imágenes CC0 o dominio público**, y cada una queda documentada donde vive. Nada
    de CC-BY: obligaría a mostrar el crédito en la propia página. La regla nació con las dieciséis
    fotografías del escenario cinético, que ya no se usan pero siguen en `public/hero/` con su
@@ -178,6 +189,23 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-02 (rama `feature/hero-interactivo`): **el campo deja de ser el fondo de la portada y pasa
+a ser el fondo de toda la web.** `HeroField.tsx` se convierte en `components/layout/SiteField.tsx`
+y se monta una sola vez en el layout, en una capa **fija** del tamaño de la ventana: está en las
+páginas interiores, no se reinicia al navegar entre ellas y no se arrastra con el scroll. Fija y no
+del alto del documento porque lo contrario serían decenas de miles de nodos. Se cayeron por el
+camino dos piezas que sólo tenían sentido dentro del hero: el degradado por filas que apagaba la
+mitad inferior del lienzo —en una capa fija sería una franja oscura permanente al pie de todas las
+pantallas— y el `IntersectionObserver`, que en algo siempre visible no se dispara nunca; el bucle
+lo para ahora la pestaña. El contraste del hero vuelve a darlo entero `.hero-copy::before`, con los
+topes subidos. **El fallo de la sesión, encontrado en la primera captura**: el velo global se puso
+al 30 % y dejó el sitio prácticamente negro —los nodos en reposo pintan a poco más de 0,2 de
+opacidad, así que taparlos con un 30 % de grafito los borra—; está en el 12 %. Y una regla nueva en
+`globals.css` que conviene no perder de vista: `body > main, body > footer { z-index: 1 }`, porque
+un elemento posicionado con `z-index: 0` gana al contenido de los estáticos aunque venga antes en
+el documento. `npm run check` limpio y `check:mobile` 21/21 en los dos idiomas sobre el build de
+producción._
 
 _2026-08-02 (rama `feature/hero-interactivo`): **el fondo de la portada se rehace con código y
 pasa a ser interactivo.** Se retira el escenario cinético entero —`HeroStage.tsx`, los cuatro

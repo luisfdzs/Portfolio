@@ -138,6 +138,22 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* EL CONTENIDO, POR ENCIMA DEL CAMPO.
+     El fondo interactivo (`.site-field`) es una capa fija con `z-index: 0`, y
+     ése es el detalle que obliga a estas dos líneas: en el orden de pintado de
+     CSS, un elemento POSICIONADO con `z-index: 0` va por encima del contenido
+     de los elementos estáticos, aunque esté antes en el documento. Sin esto el
+     campo se dibujaría delante del texto de las secciones y no detrás.
+     La cabecera y la barra de móvil no aparecen aquí porque ya tienen su propio
+     `z-40`/`z-50`, y el pie tampoco lo necesitaría —su fondo es opaco— pero se
+     incluye para que la regla sea «todo lo que cuelga del body, encima» y no una
+     lista de excepciones que hay que recordar al añadir la siguiente. */
+  body > main,
+  body > footer {
+    position: relative;
+    z-index: 1;
+  }
+
   @media (width >= 64rem) {
     body {
       padding-block-end: 0;
@@ -491,11 +507,11 @@
 }
 
 /* ============================================================================
-   CAMPO INTERACTIVO DE LA PORTADA
+   CAMPO INTERACTIVO DEL SITIO
 
-   La mecánica del fondo del hero. El razonamiento de diseño —y todo lo que
-   ocurre dentro del lienzo— está en `components/sections/HeroField.tsx`; aquí
-   sólo están las capas que lo rodean.
+   El fondo de toda la web, no sólo del hero. El razonamiento de diseño —y todo
+   lo que ocurre dentro del lienzo— está en `components/layout/SiteField.tsx`;
+   aquí sólo están las capas que lo rodean.
 
    El reparto entre CSS y lienzo no es arbitrario, y es la regla de este bloque:
    **el CSS pone lo que no cambia y el lienzo lo que responde.** La atmósfera
@@ -528,7 +544,7 @@
    sistema que arranca y no como algo que tardó en cargar. Empieza en 0 y sube:
    el primer fotograma del lienzo se pinta con el retículo ya colocado, así que
    sin esto la retícula aparecería entera y seca. */
-@keyframes hero-field-enter {
+@keyframes site-field-enter {
   from {
     opacity: 0;
     transform: scale(1.04);
@@ -566,18 +582,29 @@
 
 @layer components {
   /* --- La caja del campo -----------------------------------------------------
+     `fixed` y no `absolute`, y es LA decisión de este bloque. El campo es el
+     fondo de todo el sitio: si se estirase a lo alto del documento serían
+     decenas de miles de nodos y un mapa de bits de varios megapíxeles. Fijo a la
+     ventana son siempre los mismos dos mil, el coste no depende de lo que mida
+     el contenido, y el texto viaja sobre una superficie quieta en vez de
+     arrastrar la retícula consigo.
+
      `overflow: hidden` no es cosmético: el retículo del lienzo sangra por los
-     cuatro bordes a propósito y la atmósfera se sale de la caja por arriba.
-     `check:mobile` comprueba que la portada no desborde ni un píxel a 390 px, y
-     un fondo a sangre es el sospechoso número uno de ese fallo.
+     cuatro bordes a propósito y la atmósfera se sale de la caja. `check:mobile`
+     comprueba que no haya ni un píxel de desbordamiento a 390 px.
 
      `pointer-events: none` en toda la capa, no sólo en el lienzo: el campo
      reacciona al puntero **sin recibirlo**. Los eventos se escuchan en `window`
-     y se descartan los que caen fuera (ver `HeroField.tsx`), así que un clic
-     destinado a un botón llega siempre al botón. Un fondo decorativo que se come
-     una pulsación es un fallo de accesibilidad, no un detalle. */
-  .hero-field {
-    position: absolute;
+     (ver `SiteField.tsx`), así que un clic destinado a un botón llega siempre al
+     botón. Un fondo decorativo que se come una pulsación es un fallo de
+     accesibilidad, no un detalle.
+
+     `z-index: 0` y no `-1`: con negativo dependería de que el fondo del `body`
+     se propague al lienzo de la raíz para no taparlo, que funciona pero se rompe
+     el día que alguien le ponga un fondo al `html`. Con cero, el orden lo fija
+     una regla explícita en la capa base (`body > main, body > footer`). */
+  .site-field {
+    position: fixed;
     inset: 0;
     overflow: hidden;
     pointer-events: none;
@@ -585,22 +612,27 @@
   }
 
   /* --- La atmósfera ---------------------------------------------------------
-     Dos manchas de cobre desenfocadas, centradas en la franja donde el campo se
-     ve de verdad: la mitad de arriba. Es lo que le da temperatura al grafito y
+     Dos manchas de cobre desenfocadas. Es lo que le da temperatura al grafito y
      lo que evita que un campo de puntos cobrizos sobre negro se lea como una
-     terminal. Abajo no llega porque abajo está el texto. */
-  .hero-field__aurora {
+     terminal.
+
+     Cuando el campo era del hero se apoyaban arriba, porque abajo estaba el
+     texto de la portada. Ahora la capa es fija y por debajo puede haber
+     cualquier sección: se reparten por la ventana, se abren un poco más y bajan
+     de intensidad. Una mancha de cobre al 30 % detrás de un titular de seis rem
+     es atmósfera; detrás de un párrafo de la experiencia es niebla. */
+  .site-field__aurora {
     position: absolute;
-    inset: -20% -12% 22%;
+    inset: -18% -12%;
     background:
       radial-gradient(
-        ellipse 55% 60% at 32% 38%,
-        color-mix(in srgb, var(--color-signal) 30%, transparent) 0%,
+        ellipse 55% 55% at 28% 30%,
+        color-mix(in srgb, var(--color-signal) 22%, transparent) 0%,
         transparent 68%
       ),
       radial-gradient(
-        ellipse 48% 52% at 72% 24%,
-        color-mix(in srgb, var(--color-signal) 19%, transparent) 0%,
+        ellipse 50% 50% at 76% 68%,
+        color-mix(in srgb, var(--color-signal) 14%, transparent) 0%,
         transparent 70%
       );
     filter: blur(3.5rem);
@@ -614,10 +646,12 @@
      negro y el conjunto se lee como un salvapantallas de partículas; con ellas
      se lee como una superficie medida, que es de lo que va un CV de ingeniero.
 
-     La máscara las desvanece antes de llegar al bloque de texto y en los bordes
-     laterales, así que no hay ninguna línea que muera en un borde recto —que es
-     lo que delata un fondo de retícula puesto encima. */
-  .hero-field__grid {
+     La máscara es ahora una viñeta centrada en vez de un óvalo apoyado arriba:
+     desvanece las líneas antes de que lleguen a cualquiera de los cuatro bordes,
+     que es lo que evita que se vea dónde empieza y acaba el fondo. Ninguna línea
+     muere en un canto recto — eso es exactamente lo que delata un fondo de
+     retícula pegado encima. */
+  .site-field__grid {
     position: absolute;
     inset: 0;
     background-image:
@@ -625,7 +659,7 @@
       linear-gradient(to bottom, var(--color-line-strong) 1px, transparent 1px);
     background-size: 5rem 5rem;
     opacity: 0.6;
-    mask-image: radial-gradient(ellipse 85% 55% at 50% 24%, #000 0%, transparent 74%);
+    mask-image: radial-gradient(ellipse 82% 72% at 50% 42%, #000 0%, transparent 78%);
   }
 
   /* --- El lienzo ------------------------------------------------------------
@@ -633,35 +667,44 @@
      elemento son la resolución del mapa de bits —los pone el componente, con el
      ratio de píxel dentro— y no el tamaño en pantalla. Sin estas dos líneas el
      lienzo se dibujaría al doble en una pantalla retina. */
-  .hero-field__canvas {
+  .site-field__canvas {
     position: absolute;
     inset: 0;
     display: block;
     width: 100%;
     height: 100%;
-    animation: hero-field-enter 1.3s var(--ease-out-soft) 0.1s both;
+    animation: site-field-enter 1.3s var(--ease-out-soft) 0.1s both;
   }
 
   /* --- El velo del campo ----------------------------------------------------
-     Mucho más ligero que el que hacía falta con el mosaico de fotografías,
-     porque el campo ya se apaga solo hacia abajo (`rowFade` en `HeroField.tsx`:
-     los nodos de la mitad inferior directamente no se dibujan). Le quedan dos
-     trabajos, y los dos son de borde:
+     Tres trabajos, y los tres cambiaron al pasar el campo a fondo del sitio:
 
      1. Grafito casi opaco en los primeros 4 rem: ahí vive la cabecera fija, que
-        es translúcida (`bg-ink/80`), y un pulso pasando por debajo de ella se
-        leería como un parpadeo en la navegación.
-     2. Una vuelta suave al final, para que la costura con la sección siguiente
-        no se note. */
-  .hero-field__scrim {
+        es translúcida (`bg-ink/80`), y un pulso pasando por debajo se leería
+        como un parpadeo en la navegación.
+     2. Lo mismo en los últimos 4 rem, que antes no hacía falta porque abajo del
+        hero no había nada fijo. Ahora ahí está la barra de iconos de móvil.
+     3. Y un velo BASE por toda la ventana que antes tampoco existía, porque el
+        campo pasa ahora por debajo de todo el texto de la web y no sólo de un
+        titular.
+
+     **El 3 está en el 12 %, y llegar ahí costó una captura.** El primer intento
+     lo puso al 30 %, que sobre el papel era «bajar el conjunto un punto» y en
+     pantalla dejaba el fondo prácticamente negro: los nodos en reposo pintan a
+     una opacidad de 0,2 largos, así que taparlos con un 30 % de grafito los
+     borra. Un fondo que hay que buscar no es un fondo. El 12 % quita el filo sin
+     apagar la retícula, y la protección de verdad la dan las tres piezas que
+     estaban pensadas para eso: el velo del texto de la portada, la pastilla del
+     rótulo y el propio techo de brillo del lienzo. */
+  .site-field__scrim {
     position: absolute;
     inset: 0;
     background: linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--color-ink) 88%, transparent) 0%,
-      color-mix(in srgb, var(--color-ink) 28%, transparent) 4rem,
-      transparent 42%,
-      color-mix(in srgb, var(--color-ink) 45%, transparent) 100%
+      color-mix(in srgb, var(--color-ink) 85%, transparent) 0%,
+      color-mix(in srgb, var(--color-ink) 12%, transparent) 4rem,
+      color-mix(in srgb, var(--color-ink) 12%, transparent) calc(100% - 4rem),
+      color-mix(in srgb, var(--color-ink) 72%, transparent) 100%
     );
   }
 
@@ -678,14 +721,19 @@
      aguantan un fondo detrás. Con el nombre no pasaba —es enorme y casi blanco—,
      y por eso una revisión rápida lo deja pasar.
 
-     **Con el campo interactivo hace la mitad de trabajo que con el mosaico, y por
-     eso los topes han bajado.** El fondo de aquí no es una fotografía que pueda
-     salir clara: es un retículo que se apaga hacia abajo por diseño. Mantener los
-     topes de entonces sería tapar con grafito una zona que ya está oscura, y de
-     paso borrar los pocos nodos que llegan a la altura de los botones.
+     **Al pasar el campo a fondo de todo el sitio, este velo recuperó trabajo.**
+     Mientras el campo era del hero, sus nodos se apagaban solos hacia abajo (un
+     degradado por filas dentro del lienzo) y aquí bastaba con muy poco. Ese
+     degradado ya no existe: apagar la mitad inferior de una capa FIJA sería una
+     franja oscura permanente al pie de todas las pantallas del sitio. Así que el
+     campo llega ahora entero hasta abajo y quien protege el bloque de la portada
+     es otra vez este velo, con los topes subidos en consecuencia.
 
-     Se queda porque cubre dos casos que el campo no cubre solo: una onda de clic
-     lanzada muy abajo, y el propio contraste del texto sobre la atmósfera cobriza.
+     No cierra en grafito puro, y eso también cambió: con el campo detrás sólo de
+     la portada, el fondo por debajo del hero era negro liso y no se notaba. Ahora
+     hay retícula en la sección siguiente, y un rectángulo opaco al final del hero
+     se leería como un corte. Cierra al 90 %.
+
      Los topes van en `rem` a propósito: se miden contra las líneas que tienen que
      proteger, no contra una ventana que no sabemos cuánto mide.
 
@@ -715,10 +763,10 @@
     background: linear-gradient(
       to bottom,
       transparent 0,
-      color-mix(in srgb, var(--color-ink) 18%, transparent) 4rem,
-      color-mix(in srgb, var(--color-ink) 42%, transparent) 12rem,
-      color-mix(in srgb, var(--color-ink) 72%, transparent) 20rem,
-      var(--color-ink) 27rem
+      color-mix(in srgb, var(--color-ink) 26%, transparent) 4rem,
+      color-mix(in srgb, var(--color-ink) 52%, transparent) 12rem,
+      color-mix(in srgb, var(--color-ink) 78%, transparent) 20rem,
+      color-mix(in srgb, var(--color-ink) 90%, transparent) 27rem
     );
   }
 
@@ -790,7 +838,7 @@
 
 /* Movimiento reducido: el campo se CONGELA, no se esconde.
 
-   El lienzo se para en `HeroField.tsx`, que es donde puede pararse de verdad:
+   El lienzo se para en `SiteField.tsx`, que es donde puede pararse de verdad:
    con `prefers-reduced-motion` no se registra ni un escuchador y se dibuja un
    único fotograma. Lo que hace falta aquí es lo otro: apagar las animaciones CSS
    que rodean al lienzo, y dejarlo VISIBLE — su animación de entrada arranca en
@@ -801,14 +849,14 @@
    deja el fotograma inicial, que es el correcto, pero sigue ejecutando el ciclo
    miles de veces por segundo. `animation: none` lo apaga de verdad. */
 @media (prefers-reduced-motion: reduce) {
-  .hero-field__canvas,
-  .hero-field__aurora,
+  .site-field__canvas,
+  .site-field__aurora,
   .hero-portrait,
   .hero-hint__arrow {
     animation: none !important;
   }
 
-  .hero-field__canvas {
+  .site-field__canvas {
     opacity: 1;
   }
 
@@ -816,7 +864,7 @@
      así que dejarla en el 100 % —que es lo que valdría sin animación— sería MÁS
      cobre del que se ve nunca con el movimiento activado: quien pide menos
      movimiento acabaría con un fondo más intenso. */
-  .hero-field__aurora {
+  .site-field__aurora {
     opacity: 0.6;
   }
 }
@@ -928,11 +976,11 @@
     animation: none !important;
   }
 
-  /* El campo de la portada no existe en papel. Es lo primero de la página, así que sin esto un
-     CV impreso empezaría por media hoja de retícula en gris —y con `print-color-adjust` de por
-     medio, puede que en negro sólido—. Basta con esconder la capa: el componente para el bucle
-     solo en cuanto deja de verse. */
-  .hero-field {
+  /* El campo no existe en papel, y ahora importa el doble: es una capa FIJA, y una capa fija se
+     imprime **en todas las hojas**. Sin esto, un CV de cinco páginas saldría con la retícula en
+     gris —o en negro sólido, según cómo resuelva el navegador `print-color-adjust`— repetida
+     cinco veces. Basta con esconder la capa. */
+  .site-field {
     display: none !important;
   }
 

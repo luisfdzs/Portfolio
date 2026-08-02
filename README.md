@@ -174,50 +174,59 @@ movimiento, queda **un carrusel horizontal normal** con las tarjetas separadas y
 Y en papel se deshace en la retícula de dos columnas que había antes: sin eso, un `overflow-x`
 imprimiría el primer proyecto y recortaría los otros tres.
 
-### El campo interactivo de la portada
+### El campo interactivo: el fondo de toda la web
 
-**La primera pantalla completa es el campo.** Al abrir la web se ve una retícula de nodos —de mil
-a tres mil, según el tamaño de la ventana— dibujada en un `<canvas>`, con el bloque de texto
-apoyado abajo, encima de ella. **Reacciona a quien la mira:** el puntero abre un pozo de luz, los
-nodos se apartan y se encienden en cobre y tejen entre ellos una constelación que sólo existe
-donde hay luz; un clic lanza una onda que recorre la pantalla entera; y cada dos o cuatro segundos
-un pulso viaja por una fila o una columna dejando estela, como un dato por un bus.
+**No es el fondo del hero: es la superficie del sitio.** Detrás de todas las secciones y de todas
+las páginas hay una retícula de nodos —de mil a tres mil, según el tamaño de la ventana— dibujada
+en un `<canvas>`. **Reacciona a quien la mira:** el puntero abre un pozo de luz, los nodos se
+apartan y se encienden en cobre y tejen entre ellos una constelación que sólo existe donde hay luz;
+un clic lanza una onda que recorre la pantalla entera; y cada dos o cinco segundos un pulso viaja
+por una fila o una columna dejando estela, como un dato por un bus.
 
-Vive en `components/sections/HeroField.tsx` —que es todo el motor— y su parte estática (la
-atmósfera de cobre desenfocada, la retícula de planos y el velo) en el bloque «Campo interactivo de
-la portada» de `app/globals.css`. El razonamiento largo está en los comentarios de los dos.
+Vive en `components/layout/SiteField.tsx` —que es todo el motor, y se monta una sola vez en el
+layout— y su parte estática (la atmósfera de cobre desenfocada, la retícula de planos y el velo) en
+el bloque «Campo interactivo del sitio» de `app/globals.css`. El razonamiento largo está en los
+comentarios de los dos.
 
-**Sustituye al escenario cinético**, el mosaico de dieciséis fotografías CC0 que ocupaba esta
+**Sustituye al escenario cinético**, el mosaico de dieciséis fotografías CC0 que ocupaba la primera
 pantalla hasta el 2026-08-02. El cambio no es de estilo: aquello era material grabado en bucle,
 indiferente a quien estuviera delante, y esto es un sistema que responde. En un portfolio de
 desarrollo, un fondo generado con código dice en tres segundos lo que el CV tarda dos pantallas en
 argumentar.
 
 - **Un solo lienzo y cero dependencias.** Ni Three, ni una librería de animación: contexto 2D,
-  `Float32Array` y un bucle. Es el único componente de cliente de la portada; el resto sigue siendo
-  HTML estático.
+  `Float32Array` y un bucle. Es el único componente de cliente del sitio junto a la navegación; el
+  resto sigue siendo HTML estático.
+- **Fijo a la ventana, nunca del alto del documento.** Un lienzo tan alto como la página serían
+  decenas de miles de nodos y un mapa de bits de varios megapíxeles; así son siempre los mismos dos
+  mil y el coste no depende de lo que mida el contenido. De paso, el texto viaja sobre una
+  superficie quieta en vez de arrastrar la retícula consigo, y al navegar entre páginas del mismo
+  idioma el lienzo **no se reinicia**: el layout no se vuelve a montar.
 - **Es decoración declarada.** `aria-hidden` en la raíz y `pointer-events: none` en toda la capa: el
-  campo reacciona al puntero **sin recibirlo** —los eventos se escuchan en `window` y se descartan
-  los que caen fuera—, así que un clic destinado a un botón llega siempre al botón. No sale en la
-  impresión, y con `prefers-reduced-motion: reduce` no se registra ni un escuchador: se dibuja un
-  único fotograma.
-- **Trabaja sólo cuando se le ve.** El bucle se para al salir el hero de la pantalla y al cambiar
-  de pestaña.
-- **La legibilidad se resuelve en el origen.** Los nodos de la mitad inferior —donde vive el
-  texto— se dibujan cada vez más apagados hasta un suelo del 10 %, en vez de dibujarse enteros y
-  taparse después con un velo. El velo del texto (`.hero-copy::before`) sigue existiendo, con los
-  topes rebajados, y sigue **anclado AL TEXTO** y no a un porcentaje del alto del hero: esto es la
-  corrección de un fallo real, y lo que se cae primero es el rótulo del puesto y la línea de la
-  ubicación, no el nombre.
-- **El rótulo del puesto lleva pastilla propia** (`.hero-chip`): fondo casi opaco y desenfoque
-  detrás. Es lo que permite que el velo empiece tarde y flojo, y por tanto que se siga viendo el
-  campo en el centro de la pantalla.
+  campo reacciona al puntero **sin recibirlo** —los eventos se escuchan en `window`—, así que un
+  clic destinado a un botón llega siempre al botón. No sale en la impresión —y ahí importa el
+  doble, porque una capa fija se imprimiría en **todas** las hojas—, y con
+  `prefers-reduced-motion: reduce` no se registra ni un escuchador: se dibuja un único fotograma.
+- **El orden de capas es explícito.** El campo es un elemento posicionado con `z-index: 0`, y en el
+  orden de pintado de CSS eso va por encima del contenido de los elementos estáticos aunque esté
+  antes en el documento. Por eso `globals.css` lleva
+  `body > main, body > footer { position: relative; z-index: 1 }`. **Si añades un hermano directo
+  del `<body>` que tenga que verse, súbelo también.**
+- **La legibilidad se reparte entre tres piezas, y ninguna es un velo global fuerte.** El velo del
+  texto de la portada (`.hero-copy::before`), la pastilla del rótulo del puesto (`.hero-chip`) y el
+  techo de brillo del propio lienzo. El velo sigue **anclado AL TEXTO** y no a un porcentaje del
+  alto del hero: es la corrección de un fallo real, y lo que se cae primero es el rótulo del puesto
+  y la línea de la ubicación, no el nombre.
+- **El velo global está en el 12 %, y hay una razón para no subirlo.** Se probó al 30 % al pasar el
+  campo a fondo del sitio y la web se quedó prácticamente negra: los nodos en reposo pintan a poco
+  más de 0,2 de opacidad, así que un 30 % de grafito encima los borra. Si el problema es que algo
+  no se lee, lo que hay que tocar es la pieza que protege ese texto, no la manta.
 - **El campo tiene que verse sin tocar nada.** Un fondo que sólo aparece bajo el puntero es
   invisible en un móvil, donde no hay puntero — pasó en la primera captura, y por eso el nodo en
   reposo tiene un tamaño y una opacidad mínimos que se ven solos. Lo que la interacción añade es
   el relieve, no la existencia.
-- **Verificar a 390 px antes de cerrar.** `overflow-hidden` en la sección es lo único que impide
-  que el campo ensanche el documento, y es el fallo nº 1 de `check:mobile`.
+- **Verificar a 390 px antes de cerrar.** `overflow: hidden` en la capa es lo único que impide que
+  el campo ensanche el documento, y es el fallo nº 1 de `check:mobile`.
 
 Las dieciséis fotografías CC0 del escenario anterior siguen en `public/hero/` con su
 `CREDITS.md` y su `scripts/build-hero-tiles.mjs`, **pero ya no las usa nadie**. Se dejaron ahí a

@@ -1,7 +1,7 @@
 # Tejas de la portada — procedencia y licencia
 
 > **Ya no se usan (desde el 2026-08-02).** El escenario cinético de fotografías lo sustituyó el
-> campo interactivo dibujado en `<canvas>` (`components/sections/HeroField.tsx`), y estas dieciséis
+> campo interactivo dibujado en `<canvas>` (`components/layout/SiteField.tsx`), y estas dieciséis
 > imágenes quedaron huérfanas. No se borraron: están documentadas, son reconstruibles con
 > `node scripts/build-hero-tiles.mjs` y quitarlas es una decisión aparte. Todo lo que sigue
 > describe cómo se eligieron y de dónde salieron, y sigue siendo cierto.
