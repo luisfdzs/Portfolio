@@ -58,7 +58,7 @@ export async function generateMetadata({
  * leído y ahora sí quiere el código.
  *
  * El bloque de anterior/siguiente cierra el bucle de la lista, para que se puedan recorrer
- * los seis proyectos sin volver al índice entre cada dos.
+ * la lista entera sin volver al índice entre cada dos fichas.
  */
 export default async function ProjectPage({
   params,

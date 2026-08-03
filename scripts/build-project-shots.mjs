@@ -1,76 +1,127 @@
+#!/usr/bin/env node
 /**
- * RECORTA Y CONVIERTE LAS CAPTURAS DE LOS PROYECTOS
+ * CAPTURAS DE PORTADA DE LOS PROYECTOS · `npm run shots`
  *
- * Las capturas se toman de las webs en vivo con el navegador, a 1568×698 (la proporción del
- * viewport que devuelve la herramienta), y llegan como JPEG sueltos en una carpeta temporal.
- * Este script las deja como las quiere la web: **2:1 exacto y WebP**.
+ * Lo que se ve en la tarjeta de cada proyecto es **la sección principal de su página
+ * principal**: la primera pantalla de la web en vivo, tal y como la ve quien entra. No un
+ * recorte de una captura larga ni un montaje.
  *
- * Por qué 2:1 y no 16:10, que es la proporción típica de una captura: 698 px de alto sólo dan
- * para 1117 px de ancho a 16:10, así que habría que recortar 225 px por lado — y ahí se va la
- * tercera columna de la cuadrícula de producto de Bonsái y media navegación de Manfisa. A 2:1
- * el recorte es de 86 px por lado, que en una captura de web no se echa en falta.
+ * Cómo lo consigue: abre cada `liveUrl` en un Chrome real con la ventana **a 1400×700**, que
+ * es exactamente el 2:1 del hueco de la tarjeta (`Figure`, `ratio="wide"`), y guarda el
+ * viewport. Al medir la ventana con la proporción de destino no hay que recortar nada, y eso
+ * es la diferencia con la versión anterior de este script: recortaba una captura de 1568×698 a
+ * 2:1 y se comía 86 px por lado, es decir el borde izquierdo del titular y de la navegación.
+ *
+ * Se captura al doble de densidad (`deviceScaleFactor: 2`) y se reduce a 1400×700 con sharp:
+ * el texto de una interfaz reducido desde el doble se lee, y capturado a 1:1 se ve sucio.
  *
  * Uso:
- *   node scripts/build-project-shots.mjs <carpeta-con-los-jpg>
+ *   npm run shots                       todos los proyectos publicados
+ *   npm run shots -- cedece mila-barber   sólo esos slugs
  *
- * El mapa de abajo dice qué fichero es de qué proyecto, y hay que actualizarlo si se vuelven
- * a tomar las capturas: los nombres que genera el navegador llevan una marca de tiempo y no
- * dicen nada. No es bonito, pero es honesto — la alternativa sería adivinar por orden.
+ * La lista de proyectos y sus URLs salen de `content/`, así que este script no tiene ningún
+ * mapa que mantener: un proyecto nuevo en `content/projects.config.ts` ya está aquí. Node
+ * despoja los tipos por su cuenta y todos los `import` de `content/` son `import type`, así
+ * que se importa el TypeScript directamente (igual que en `build-sanity-import.mjs`).
+ *
+ * Usa `playwright-core` con el Chrome YA instalado: no descarga navegadores.
  */
-import { readdir } from 'node:fs/promises'
-import { basename, join } from 'node:path'
-import sharp from 'sharp'
 
-/** Ancho final. 1400 cubre la ficha a pantalla completa sin pasarse de peso. */
+import { join } from 'node:path'
+import process from 'node:process'
+import { chromium } from 'playwright-core'
+import sharp from 'sharp'
+import { projects } from '../content/projects.ts'
+
+/** El hueco de la tarjeta: 2:1. Ver `components/ui/Figure.tsx`. */
 const WIDTH = 1400
 const HEIGHT = WIDTH / 2
 
-/** Sufijo del fichero de origen → slug del proyecto. */
-const MAP = {
-  '-0': 'swiftmet',
-  '-1': 'manfisa',
-  '-3': 'almuerziko-san-fermin',
-  '-5': 'blablatour',
-  '-7': 'sangil-studio',
-  '-8': 'bonsai-artesania',
-}
+/**
+ * Cuánto se espera con la página ya cargada antes de disparar.
+ *
+ * No es un margen de seguridad caprichoso: casi todas estas webs tienen una animación de
+ * entrada —el texto aparece desde abajo, el vídeo de portada arranca, el mosaico se pone en
+ * marcha—. Capturar antes de que termine deja la tarjeta con el titular a medio opacidad, que
+ * se lee como una captura mal hecha y no como un efecto.
+ */
+const SETTLE_MS = 4500
 
-const source = process.argv[2]
-if (!source) {
-  console.error('Falta la carpeta de origen.\n  node scripts/build-project-shots.mjs <carpeta>')
+/** Chrome instalado en el sistema. Se puede sobreescribir con CHROME_PATH. */
+const CHROME =
+  process.env.CHROME_PATH ??
+  (process.platform === 'win32'
+    ? 'C:/Program Files/Google/Chrome/Application/chrome.exe'
+    : process.platform === 'darwin'
+      ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+      : '/usr/bin/google-chrome')
+
+const only = process.argv.slice(2)
+const targets = projects.filter(
+  (project) => project.liveUrl && (only.length === 0 || only.includes(project.slug)),
+)
+
+if (targets.length === 0) {
+  console.error(
+    only.length > 0
+      ? `Ningún proyecto publicado con esos slugs: ${only.join(', ')}`
+      : 'Ningún proyecto publicado tiene `liveUrl`.',
+  )
   process.exit(1)
 }
 
-const files = (await readdir(source)).filter((name) => name.endsWith('.jpg'))
 const out = join(process.cwd(), 'public', 'projects')
 
+const browser = await chromium.launch({ executablePath: CHROME })
+const context = await browser.newContext({
+  viewport: { width: WIDTH, height: HEIGHT },
+  deviceScaleFactor: 2,
+  // El castellano primero: estas webs negocian el idioma por cabecera, y una captura en
+  // inglés en la versión castellana de la tarjeta canta.
+  locale: 'es-ES',
+})
+
 let written = 0
+const failed = []
 
-for (const [suffix, slug] of Object.entries(MAP)) {
-  const match = files.find((name) => basename(name, '.jpg').endsWith(suffix))
-  if (!match) {
-    console.warn(`[capturas] Sin fichero para «${slug}» (sufijo ${suffix}): se omite.`)
-    continue
+for (const project of targets) {
+  const page = await context.newPage()
+
+  try {
+    await page.goto(project.liveUrl, { waitUntil: 'load', timeout: 60000 })
+    // `networkidle` es lo que espera a las fuentes y a las imágenes de la primera pantalla,
+    // pero un vídeo en bucle o una conexión abierta lo dejan sin cumplirse nunca: se le da un
+    // tope y se sigue. Esperar de menos se ve en la captura; esperar para siempre, no.
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {})
+    await page.evaluate(() => document.fonts.ready)
+    // Arriba del todo: si la web restaura la posición del scroll, la «sección principal» que
+    // se captura sería la mitad de otra.
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await page.waitForTimeout(SETTLE_MS)
+
+    const shot = await page.screenshot({ type: 'png' })
+
+    await sharp(shot)
+      .resize(WIDTH, Math.round(HEIGHT))
+      .webp({ quality: 82 })
+      .toFile(join(out, `${project.slug}.webp`))
+
+    written += 1
+    console.log(`[capturas] ${project.name} → public/projects/${project.slug}.webp`)
+  } catch (error) {
+    failed.push(project.slug)
+    console.error(`[capturas] ✗ ${project.name} (${project.liveUrl}): ${error.message}`)
+  } finally {
+    await page.close()
   }
-
-  const target = join(out, `${slug}.webp`)
-
-  await sharp(join(source, match))
-    // `cover` anclado ARRIBA e IZQUIERDA, no centrado. Las dos anclas son deliberadas:
-    //
-    // - Arriba, porque ahí están la cabecera y el titular, que es lo que hace que la captura
-    //   se reconozca como una web y no como una fotografía cualquiera.
-    // - A la izquierda, porque una web se maqueta de izquierda a derecha: el logotipo y el
-    //   titular arrancan en el margen izquierdo. Con el recorte centrado —que es lo primero
-    //   que probé— se comían 86 px por lado y salía «NGIL STUDIO» en vez de «SANGIL STUDIO»
-    //   y un titular de Manfisa empezado por la mitad de la primera letra. Lo que sobra por
-    //   la derecha de una captura suele ser margen; lo que sobra por la izquierda, nunca.
-    .resize(WIDTH, Math.round(HEIGHT), { fit: 'cover', position: 'left top' })
-    .webp({ quality: 82 })
-    .toFile(target)
-
-  written += 1
-  console.log(`[capturas] ${match} → public/projects/${slug}.webp`)
 }
 
-console.log(`\n[capturas] ${written} de ${Object.keys(MAP).length} escritas en public/projects/.`)
+await context.close()
+await browser.close()
+
+console.log(`\n[capturas] ${written} de ${targets.length} escritas en public/projects/.`)
+
+if (failed.length > 0) {
+  console.error(`[capturas] Sin captura: ${failed.join(', ')}`)
+  process.exit(1)
+}
