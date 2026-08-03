@@ -326,13 +326,21 @@ export function getProjects(): Promise<ProjectEntry[]> {
 }
 
 /**
- * Los destacados de la portada. Si nadie ha marcado ninguno, se cogen los primeros: una
- * portada sin proyectos sería peor que una portada con los proyectos en orden de lista.
+ * Los proyectos del carrusel de la portada: **todos**, con los destacados delante.
+ *
+ * Antes eran sólo los cuatro destacados, con el argumento de que la portada tenía que
+ * enseñar una muestra y dejar paso a la siguiente sección. Se cambió a propósito: quien lee
+ * un CV en dos minutos no siempre entra en el índice de `/projects`, y en un carrusel las
+ * tarjetas se pasan de lado y no hacia abajo, así que las ocho cuestan el mismo scroll que
+ * cuatro. Esconder la mitad del trabajo no compraba nada.
+ *
+ * `featured` sigue significando algo, y es esto: **por dónde abre el carrusel**. Primero los
+ * marcados y después el resto, cada grupo en el orden de la lista —`Array.prototype.sort` es
+ * estable, así que dentro de cada grupo no se mueve nada—.
  */
-export async function getFeaturedProjects(limit = 4): Promise<ProjectEntry[]> {
+export async function getCarouselProjects(): Promise<ProjectEntry[]> {
   const projects = await getProjects()
-  const featured = projects.filter((project) => project.featured)
-  return (featured.length > 0 ? featured : projects).slice(0, limit)
+  return [...projects].sort((a, b) => Number(b.featured) - Number(a.featured))
 }
 
 export async function getProject(slug: string): Promise<ProjectEntry | undefined> {

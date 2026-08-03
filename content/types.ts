@@ -85,7 +85,10 @@ export type ProjectEntry = {
   /** Matiz honesto sobre el estado (dominio pendiente, datos de ejemplo…). */
   note?: Localized | null
   image?: DescribedImage | null
-  /** Los destacados de la portada, en orden. El resto vive sólo en `/projects`. */
+  /**
+   * Por dónde abre el carrusel de la portada: los destacados van delante y el resto detrás.
+   * **No decide quién sale** —en la portada salen todos—, sólo el orden.
+   */
   featured?: boolean
 }
 

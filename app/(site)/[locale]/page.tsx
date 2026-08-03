@@ -2,11 +2,10 @@ import { cacheLife } from 'next/cache'
 import { notFound } from 'next/navigation'
 import { site } from '@/content/site'
 import {
+  getCarouselProjects,
   getEducation,
   getExperience,
-  getFeaturedProjects,
   getProfile,
-  getProjects,
   getSkills,
 } from '@/lib/content'
 import { totalYearsOfExperience } from '@/lib/format'
@@ -28,9 +27,9 @@ import { Stack } from '@/components/sections/Stack'
  * tocar la capa de datos, y lo que hace que en este fichero se vea de un golpe **de qué
  * está hecha la página**.
  *
- * Las seis consultas van en paralelo con `Promise.all`. En la práctica son lecturas de
+ * Las cinco consultas van en paralelo con `Promise.all`. En la práctica son lecturas de
  * memoria (el contenido vive en `content/`) o consultas cacheadas a Sanity, así que la
- * diferencia es pequeña; se hace igual porque encadenarlas con seis `await` seguidos sería
+ * diferencia es pequeña; se hace igual porque encadenarlas con cinco `await` seguidos sería
  * una cascada gratuita en cuanto el panel esté conectado.
  */
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -57,13 +56,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   const t = getDictionary(locale)
 
-  const [profile, experience, education, skills, projects, featured] = await Promise.all([
+  // `getCarouselProjects` y no `getProjects`: son los mismos proyectos —todos— y sólo cambia
+  // el orden, con los destacados delante. La cifra de webs en producción del hero se cuenta
+  // de esta misma lista, que para contar da igual cómo esté ordenada.
+  const [profile, experience, education, skills, projects] = await Promise.all([
     getProfile(),
     getExperience(),
     getEducation(),
     getSkills(),
-    getProjects(),
-    getFeaturedProjects(4),
+    getCarouselProjects(),
   ])
 
   /**
@@ -131,7 +132,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <Hero locale={locale} profile={profile} stats={stats} />
       <About locale={locale} profile={profile} />
       <Experience locale={locale} entries={experience} />
-      <Projects locale={locale} featured={featured} total={projects.length} />
+      <Projects locale={locale} projects={projects} />
       <Education locale={locale} entries={education} />
       <Stack locale={locale} groups={skills} />
       <Contact locale={locale} profile={profile} />

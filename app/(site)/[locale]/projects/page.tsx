@@ -34,8 +34,9 @@ export async function generateMetadata({
  * ancla a mitad de una página de CV que obliga a pasar por encima de la experiencia
  * laboral. Lo mismo, a más precisión, con la ficha de cada proyecto.
  *
- * A tres columnas en pantalla grande y no a dos como en la portada: aquí el objetivo es
- * ver el catálogo entero de una vez, no dar aire a cuatro piezas destacadas.
+ * En la portada están los mismos proyectos —todos—, pero en un carrusel que se hojea de uno en
+ * uno. Aquí se ven a la vez, a tres columnas en pantalla grande: eso es lo que distingue a esta
+ * página de aquella sección, no un catálogo más largo.
  */
 export default async function ProjectsPage({ params }: { params: Promise<{ locale: string }> }) {
   // Estática completa, por lo mismo que la portada: ver el comentario en `[locale]/page.tsx`.

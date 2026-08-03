@@ -234,12 +234,19 @@ En escritorio la navegación es la cabecera fija; en móvil (`< lg`), una **barr
 iconos** al alcance del pulgar. Nunca las dos: tenerlas sería robar 4 rem arriba y abajo en el
 dispositivo que menos tiene.
 
-### Los proyectos destacados van en un «cover flow»
+### Los proyectos de la portada van en un «cover flow»
 
-Los cuatro proyectos de la portada no están en una retícula, sino en un **carrusel 3D**: la
+Los proyectos de la portada no están en una retícula, sino en un **carrusel 3D**: la
 tarjeta centrada se mira de frente y las de los lados se giran sobre su eje vertical, se alejan y
-se apagan. Es la única sección cuyo contenido es visual, y cuatro capturas de web puestas una al
+se apagan. Es la única sección cuyo contenido es visual, y varias capturas de web puestas una al
 lado de otra no se miran: se hojean.
+
+**Salen todos los proyectos, no una selección.** Antes eran sólo los cuatro `featured` y el resto
+quedaba en el índice de `/projects`; el argumento era ahorrar scroll y no se sostiene aquí, porque
+en un carrusel las tarjetas se pasan de lado y ocho ocupan lo mismo que cuatro. El coste sí era
+real: la mitad del trabajo sólo se veía entrando en una segunda página. `featured` sigue sirviendo
+para algo —decide **por dónde abre** el carrusel, ver `getCarouselProjects` en `lib/content.ts`— y
+el índice sigue enlazado debajo, porque hace otra cosa: es una URL que se manda suelta.
 
 Lo mueve **el scroll y nada más**. Las animaciones son `view-timeline` + `animation-timeline`, la
 misma técnica que las apariciones al hacer scroll, así que no hay JavaScript calculando
@@ -370,7 +377,8 @@ la sección, y «atrás» sale de la página en vez de recorrer las secciones vi
 
 **Para añadir, quitar o reordenar un proyecto se toca un fichero y basta con el título.**
 `content/projects.config.ts` es la lista de lo que se publica y en qué orden, y marca con
-`featured` los cuatro que salen en el carrusel de la portada. El contenido de cada uno —resumen,
+`featured` los cuatro por los que abre el carrusel de la portada —donde salen **todos**—. El
+contenido de cada uno —resumen,
 decisiones, stack, captura— vive en su ficha, en `content/projects.ts`, unida a la lista por el
 `name`.
 
@@ -462,9 +470,19 @@ Cosas que están así a propósito y con quién se resuelven:
   densidad. **Hace falta el original a 800×800**; las medidas declaradas en `content/profile.ts`
   son las reales, no las deseadas, porque `next/image` reserva el hueco con ellas y mentir ahí
   provoca salto de maquetación.
-- **Sangil Studio apunta al entorno de test.** Es donde está la web terminada:
-  `sangilstudio.com` sirve todavía una página de «en proceso». Cuando el estudio dé el visto
-  bueno, cambiar `liveUrl` y borrar el campo `note` en `content/projects.ts`.
+- **Hay que cambiar el enlace de Sangil Studio EN EL PANEL.** El `liveUrl` y el `note` de esa ficha
+  están también en Sanity, que es quien manda en lo desplegado, así que la web pública sigue
+  enlazando a `sangilstudiotest.vercel.app` hasta editarlo a mano: `/admin` → **Proyectos** →
+  _Sangil Studio_ → poner `https://sangilstudio.com` en «Web en vivo», vaciar «Nota» → _Publish_.
+  **No** con `npm run migrate:import`: corre con `--replace` y machacaría el retrato vacío del
+  perfil y el orden de los documentos arrastrables.
+- **Sangil Studio apunta ya a `sangilstudio.com`,** por decisión de Luis el 2026-08-03: se cambió
+  el `liveUrl` —antes `sangilstudiotest.vercel.app`— y se borró el `note` que explicaba el desvío.
+  **Lo que hay que vigilar:** el día del cambio el dominio seguía sirviendo la página de «Web en
+  construcción», así que el botón «Web en vivo» de esa tarjeta lleva a un cartel de en proceso
+  mientras el estudio no lance. La captura de la tarjeta sí es la web terminada (se hizo contra
+  test), y **no** hay que regenerarla con `npm run shots -- sangil-studio` hasta que el dominio
+  sirva la web de verdad: hoy capturaría el cartel. Volver a test es cambiar una línea.
 - **No hay badge de «disponible para nuevos proyectos».** La portada dice el puesto actual
   —«Analista programador senior en Mobile Smart City»—, que es un dato verificable en LinkedIn y
   no una señal de búsqueda activa. Añadirlo es decisión de Luis, no del código.

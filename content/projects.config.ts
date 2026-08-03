@@ -3,7 +3,7 @@
  *
  * **Este es el único fichero que hay que tocar para añadir, quitar o reordenar un
  * proyecto.** Con poner el título basta: el orden de esta lista es el orden en que se
- * publican, y `featured` marca los que salen en el carrusel de la portada. Todo lo demás
+ * publican, y `featured` marca por cuáles abre el carrusel de la portada. Todo lo demás
  * —el resumen, el stack, la captura— vive en la ficha del proyecto, en `content/projects.ts`.
  *
  * ## Cómo se añade uno
@@ -33,10 +33,12 @@
 export type ProjectListing = string | { title: string; featured?: boolean }
 
 /**
- * Los cuatro `featured` son los del carrusel de la portada (ver `getFeaturedProjects`), y
- * están elegidos para que se vea el alcance del trabajo y no cuatro veces lo mismo: un
- * catálogo industrial B2B, una aplicación con cuentas y agenda, la web de un artista y un
- * portfolio de arquitectura. Cambiar cuáles son es mover la bandera, nada más.
+ * **En el carrusel de la portada salen todos**, así que `featured` ya no decide quién sale
+ * sino **por dónde se abre**: primero los marcados y detrás el resto, cada grupo en el orden
+ * de esta lista (ver `getCarouselProjects`). Los cuatro de ahora están elegidos para que la
+ * primera vuelta enseñe el alcance del trabajo y no cuatro veces lo mismo: un catálogo
+ * industrial B2B, una aplicación con cuentas y agenda, la web de un artista y un portfolio de
+ * arquitectura. Cambiar cuáles son es mover la bandera, nada más.
  */
 export const projectList: ProjectListing[] = [
   { title: 'Swiftmet', featured: true },
