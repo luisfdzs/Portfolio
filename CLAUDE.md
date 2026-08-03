@@ -217,7 +217,10 @@ que ganar son utilidades de Tailwind y entre capas manda el orden de las capas, 
 especificidad. De paso se vio que el `rounded-full` del avatar nunca se había aplicado. `npm run
 check` limpio y `check:mobile` 21/21 en los dos idiomas sobre el build de producción.
 **Pendiente:** lo desplegado lee la foto de Sanity, así que el recorte no llega a producción hasta
-subirlo al panel. Ver [[hero-sanity]]._
+subirlo al panel — `/admin` → Perfil → «Retrato de Luis Fernández Sangil» → *Publish*, **nunca con
+`migrate:import`**, que corre con `--replace`. Es el caso general de la regla del contenido y el
+síntoma engaña: **cambiar una imagen en `content/` no cambia la web mientras Sanity tenga la suya**,
+y ni el `check` ni el build se quejan. Ver [[hero-sanity]]._
 
 _2026-08-03 (rama `feature/integrar-sanity`): **el panel deja de ser opcional y pasa a mandar.**
 Proyecto `Portfolio` (`3pdexisd`) con dataset `production` público, los dieciséis documentos y las
