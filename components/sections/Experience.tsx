@@ -69,7 +69,18 @@ export function Experience({
               }
             />
 
-            <div className="lg:grid lg:grid-cols-[13rem_1fr] lg:gap-10">
+            {/* TRES columnas en escritorio y la tercera va vacía, a propósito.
+                Con dos, el texto quedaba centrado en su columna pero la columna no
+                estaba centrada en la sección: la de fechas (13rem), su hueco (2,5rem)
+                y el sangrado de la línea temporal (2,5rem) empujan el contenido
+                18rem a la derecha, así que su centro caía 9rem por delante del centro
+                del rótulo. Se veía como un desfase entre la cabecera y las entradas.
+                La columna vacía mide lo que hay que devolver: 13rem + 2,5rem del
+                sangrado = 15,5rem, y con ella el centro del contenido coincide con el
+                del rótulo. Sin elemento de más: la pista existe por la plantilla.
+                Quien toque `lg:pl-10`, la columna de fechas o el `gap` tiene que
+                recalcular este valor. */}
+            <div className="lg:grid lg:grid-cols-[13rem_1fr_15.5rem] lg:gap-10">
               <div className="lg:pt-0.5">
                 <p className="figure-num text-small text-signal">
                   {formatRange(entry.range, locale, t.experience.present)}

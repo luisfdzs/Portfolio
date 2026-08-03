@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import { getProject, getProjectNeighbours, getProjectSlugs } from '@/lib/content'
 import { isLocale, type Locale, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { href } from '@/lib/i18n/routes'
+import { href, projectHref } from '@/lib/i18n/routes'
 import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
 import { ArrowLeft, ArrowRight } from '@/components/ui/Icons'
@@ -37,8 +37,8 @@ export async function generateMetadata({
     title: project.name,
     description: project.tagline[raw],
     alternates: {
-      canonical: `${href(raw, 'projects', slug)}`,
-      languages: Object.fromEntries(locales.map((entry) => [entry, href(entry, 'projects', slug)])),
+      canonical: projectHref(raw, slug),
+      languages: Object.fromEntries(locales.map((entry) => [entry, projectHref(entry, slug)])),
     },
     openGraph: {
       type: 'article',
@@ -204,7 +204,7 @@ export default async function ProjectPage({
           className="mt-20 grid gap-6 border-t border-line pt-10 sm:grid-cols-2"
         >
           <Link
-            href={href(locale, 'projects', neighbours.previous.slug)}
+            href={projectHref(locale, neighbours.previous.slug)}
             className="group flex flex-col items-center gap-1"
           >
             <span className="eyebrow inline-flex items-center gap-2">
@@ -217,7 +217,7 @@ export default async function ProjectPage({
           </Link>
 
           <Link
-            href={href(locale, 'projects', neighbours.next.slug)}
+            href={projectHref(locale, neighbours.next.slug)}
             className="group flex flex-col items-center gap-1"
           >
             <span className="eyebrow inline-flex items-center gap-2">

@@ -6,8 +6,9 @@ import { cn } from '@/lib/cn'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href, mobileNavigation, navigation } from '@/lib/i18n/routes'
-import { Briefcase, Close, Code, Home, Mail, Menu } from '@/components/ui/Icons'
+import { Briefcase, Close, Code, Mail, Menu, User } from '@/components/ui/Icons'
 import { LocaleSwitch } from './LocaleSwitch'
+import { useActiveSection } from './useActiveSection'
 
 /**
  * Navegación de móvil: barra inferior fija de cinco destinos.
@@ -26,11 +27,18 @@ import { LocaleSwitch } from './LocaleSwitch'
  * Los dos idiomas van al final, **detrás de un filete horizontal**: son lo único del panel
  * que no es un destino, y sin la línea se leen como una séptima y una octava sección.
  *
- * Es el único componente de cliente con estado del sitio, y sólo por el panel: la barra en
- * sí no necesitaría JavaScript.
+ * **La sección que se está leyendo va resaltada en amarillo**, en la barra y en el panel, y
+ * es lo que convierte cinco atajos en una posición: sin eso, la barra dice a dónde se puede
+ * ir en una página de siete pantallas y no dice dónde estás. Lo mide `useActiveSection`.
+ *
+ * Es el único componente de cliente con estado del sitio, y ya no sólo por el panel: la
+ * barra necesita el scroll para saber qué icono encender.
+ *
+ * El icono de «Perfil» es una **persona** y no la casa que había: junto a ese rótulo, un
+ * icono de inicio promete volver arriba y lleva a la mitad de la página.
  */
 const icons = {
-  about: Home,
+  about: User,
   experience: Briefcase,
   projects: Code,
   contact: Mail,
@@ -49,6 +57,7 @@ const PANEL_ID = 'mobile-menu'
 export function MobileNav({ locale }: { locale: Locale }) {
   const t = getDictionary(locale)
   const [open, setOpen] = useState(false)
+  const active = useActiveSection()
 
   /**
    * Cerrar con Escape y bloquear el scroll del fondo mientras el panel está abierto.
@@ -106,7 +115,11 @@ export function MobileNav({ locale }: { locale: Locale }) {
                 <Link
                   href={href(locale, key)}
                   onClick={() => setOpen(false)}
-                  className="block px-4 py-2 text-center font-display text-title text-paper transition-colors hover:text-signal"
+                  aria-current={key === active ? 'location' : undefined}
+                  className={cn(
+                    'block px-4 py-2 text-center font-display text-title transition-colors hover:text-signal',
+                    key === active ? 'text-signal' : 'text-paper',
+                  )}
                 >
                   {t.nav[key]}
                 </Link>
@@ -132,15 +145,30 @@ export function MobileNav({ locale }: { locale: Locale }) {
         <ul className="flex h-16 items-stretch">
           {mobileNavigation.map((key) => {
             const Icon = icons[key]
+            const current = key === active
             return (
               <li key={key} className="flex-1">
                 <Link
                   href={href(locale, key)}
                   onClick={() => setOpen(false)}
-                  className="flex size-full flex-col items-center justify-center gap-1 text-paper-faint transition-colors hover:text-signal"
+                  aria-current={current ? 'location' : undefined}
+                  className={cn(
+                    'relative flex size-full flex-col items-center justify-center gap-1 transition-colors',
+                    current ? 'text-signal' : 'text-paper-faint hover:text-signal',
+                  )}
                 >
                   <Icon className="size-5" />
                   <span className="text-[0.625rem] leading-none">{t.nav[key]}</span>
+                  {/* El filete superior, sólo en la activa: el amarillo es la señal
+                      principal y ésta es la que la acompaña, porque un icono a 20 px
+                      teñido de un color no es una diferencia que todo el mundo vea. */}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'absolute inset-x-3 top-0 h-0.5 rounded-full bg-signal transition-opacity',
+                      current ? 'opacity-100' : 'opacity-0',
+                    )}
+                  />
                 </Link>
               </li>
             )

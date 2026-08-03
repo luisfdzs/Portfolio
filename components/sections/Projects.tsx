@@ -1,8 +1,7 @@
 import type { ProjectEntry } from '@/content/types'
 import type { Locale } from '@/lib/i18n/config'
-import { getDictionary, interpolate } from '@/lib/i18n/dictionaries'
-import { href } from '@/lib/i18n/routes'
-import { Action } from '@/components/ui/Action'
+import { getDictionary } from '@/lib/i18n/dictionaries'
+import { sections } from '@/lib/i18n/routes'
 import { CoverFlow } from '@/components/ui/CoverFlow'
 import { Code } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
@@ -10,17 +9,21 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
 import { ProjectCard } from './ProjectCard'
 
 /**
- * Proyectos en la portada: **todos**, en un carrusel «cover flow».
+ * Proyectos en la portada: **todos**, en un carrusel «cover flow». Y desde el 2026-08-03,
+ * **el único sitio donde está la lista**: el índice de `/projects` se retiró.
  *
  * Están todos a propósito, y antes no lo estaban: la portada enseñaba los cuatro destacados
- * y remitía al índice de `/projects` para el resto. El argumento era el scroll, y no se
- * sostiene en un carrusel —las tarjetas se pasan de lado, así que ocho ocupan exactamente lo
- * mismo que cuatro—, mientras el coste sí era real: la mitad del trabajo sólo se veía si a
- * alguien le apetecía entrar en una segunda página. El orden lo pone `getCarouselProjects`,
- * con los destacados delante.
+ * y remitía al índice para el resto. El argumento era el scroll, y no se sostiene en un
+ * carrusel —las tarjetas se pasan de lado, así que ocho ocupan exactamente lo mismo que
+ * cuatro—, mientras el coste sí era real: la mitad del trabajo sólo se veía si a alguien le
+ * apetecía entrar en una segunda página. El orden lo pone `getCarouselProjects`, con los
+ * destacados delante.
  *
- * El índice sigue existiendo y sigue enlazado desde aquí, porque hace otra cosa: es una URL
- * que se puede mandar suelta por LinkedIn sin obligar a nadie a pasar por el CV entero.
+ * **Y con los ocho aquí, el índice dejó de tener trabajo.** Era una segunda lista de lo
+ * mismo, dos URLs con las mismas ocho tarjetas compitiendo por «Luis Fernández Sangil», y
+ * una entrada del menú que en vez de moverse por el CV se iba de página. Lo que sí sigue
+ * siendo una página es **cada proyecto**: eso es lo que se manda suelto en una candidatura,
+ * y es lo que un ancla no da.
  *
  * **Por qué un carrusel y no la retícula de dos columnas que había antes.** Es la única
  * sección de la página cuyo contenido es visual, y una captura de web a 45 vw compitiendo
@@ -31,17 +34,13 @@ import { ProjectCard } from './ProjectCard'
  *
  * Lo que **cuesta** es honesto y conviene tenerlo escrito: en una retícula se verían todas de
  * un golpe y aquí hay una de frente y dos asomando. Se compensa con el solape —que hace
- * evidente que hay más a los lados—, con los botones y con el enlace al índice justo debajo.
- * Si alguna vez se mide que la gente no pasa de la primera tarjeta, la retícula sigue viva en
- * `/projects` y volver es cambiar este fichero.
+ * evidente que hay más a los lados— y con los botones. Ahora que el índice no existe, esto es
+ * lo único que hay: si alguna vez se mide que la gente no pasa de la primera tarjeta, la
+ * alternativa es volver a la retícula **aquí**, no reabrir una segunda página.
  *
  * El efecto es CSS puro dirigido por el scroll (bloque «COVER FLOW» de `globals.css`); el
- * carrusel va a ancho completo y sólo el titular y el pie se quedan dentro de la retícula
- * de la página, porque centrar la tarjeta contra el viewport es lo que hace el efecto.
- *
- * El id de la sección es `projects` igual que la ruta `/projects`. No colisionan —uno es
- * un ancla y el otro un segmento de URL— y compartir nombre es lo que permite que el menú
- * apunte a la página y la barra de móvil a esta sección sin dos claves distintas.
+ * carrusel va a ancho completo y sólo el titular se queda dentro de la retícula de la página,
+ * porque centrar la tarjeta contra el viewport es lo que hace el efecto.
  */
 export function Projects({
   locale,
@@ -53,13 +52,12 @@ export function Projects({
   const t = getDictionary(locale)
 
   return (
-    // El id es una cadena literal y no una clave de `sections`: «proyectos» no es un
-    // ancla del sistema de navegación —el menú y la barra de móvil llevan a la página
-    // `/projects`— pero conviene poder enlazar el bloque de la portada directamente.
-    // El `section-block` va aquí y el `page-gutter` en cada bloque de dentro: el carrusel
-    // tiene que llegar a los dos bordes de la pantalla y el margen lateral de la página se
-    // lo comería.
-    <section id="projects" className="section-block text-center">
+    // El id sale de `sections`, como el de las demás: desde que no hay índice, «proyectos»
+    // es un destino del menú igual que experiencia o formación, y el ancla la construye
+    // `href()` de ese mismo mapa. El `section-block` va aquí y el `page-gutter` en el bloque
+    // de dentro: el carrusel tiene que llegar a los dos bordes de la pantalla y el margen
+    // lateral de la página se lo comería.
+    <section id={sections.projects} className="section-block text-center">
       <div className="page-gutter mx-auto max-w-7xl">
         <SectionHeading index="01" title={t.projects.title} kicker={t.projects.kicker} icon={Code}>
           <p>{t.projects.intro}</p>
@@ -78,21 +76,10 @@ export function Projects({
           nextLabel={t.projects.carouselNext}
         >
           {projects.map((project) => (
-            <ProjectCard key={project.slug} locale={locale} project={project} framed />
+            <ProjectCard key={project.slug} locale={locale} project={project} />
           ))}
         </CoverFlow>
       </Reveal>
-
-      {/* El enlace al índice ya no depende de que queden proyectos por enseñar —aquí están
-          todos—, sino de que el índice siga siendo un sitio útil al que ir: una página con
-          las fichas en retícula, enlazable de una en una. */}
-      <div className="page-gutter mx-auto max-w-7xl">
-        <Reveal className="mt-12 border-t border-line pt-8">
-          <Action href={href(locale, 'projects')} variant="secondary">
-            {interpolate(t.projects.viewAll, { count: projects.length })}
-          </Action>
-        </Reveal>
-      </div>
     </section>
   )
 }
