@@ -78,11 +78,11 @@ export function Education({
                       rel="noopener noreferrer"
                       className="link-underline transition-colors hover:text-signal"
                     >
-                      {entry.institution}
+                      {entry.institution[locale]}
                       <span className="sr-only"> ({t.a11y.externalLink})</span>
                     </Link>
                   ) : (
-                    entry.institution
+                    entry.institution[locale]
                   )}
                 </p>
 

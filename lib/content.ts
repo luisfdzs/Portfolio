@@ -154,7 +154,7 @@ const experienceSchema = z
 const educationSchema = z.object({
   slug: z.string().min(1),
   title: localizedString,
-  institution: z.string().min(1),
+  institution: localizedString,
   range: dateRange,
   location: localizedString.nullish(),
   note: localizedString.nullish(),

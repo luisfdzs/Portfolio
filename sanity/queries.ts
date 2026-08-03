@@ -61,7 +61,7 @@ export const EDUCATION_QUERY = defineQuery(`
   *[_type == "education"] | order(orderRank asc) {
     "slug": slug.current,
     title ${localized},
-    institution,
+    institution ${localized},
     "range": { "start": startDate, "end": endDate },
     location ${localized},
     note ${localized},

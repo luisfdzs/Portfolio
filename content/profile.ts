@@ -208,7 +208,10 @@ export const education: EducationEntry[] = [
       es: 'Grado en Ingeniería Industrial',
       en: "Bachelor's degree in Industrial Engineering",
     },
-    institution: 'Universidade de Vigo',
+    // El castellano es el que ya estaba editado en el panel («Universidad», no
+    // «Universidade»), para que el respaldo y el panel digan lo mismo. El inglés es el
+    // nombre oficial que usa la propia uvigo.gal en su versión inglesa.
+    institution: { es: 'Universidad de Vigo', en: 'University of Vigo' },
     range: { start: '2020-09', end: '2025-06' },
     location: { es: 'Vigo, Galicia', en: 'Vigo, Spain' },
     note: {
