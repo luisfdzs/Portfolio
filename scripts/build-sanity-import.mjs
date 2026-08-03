@@ -24,6 +24,11 @@
  *    coger un fichero del disco y crear el asset: sin esto, los documentos entrarían sin
  *    captura y las tarjetas de proyecto perderían justo lo que las hace convincentes. La ruta
  *    va como `file://` **relativa al fichero NDJSON**, así que se calcula desde él.
+ * 3. **Los `_id` llevan guion y NUNCA un punto**: `experience-swiftmet`, no
+ *    `experience.swiftmet`. Para Sanity un `_id` es una ruta separada por puntos, y **sólo la
+ *    raíz es pública**; todo lo que tenga un punto exige token de lectura, que es el mecanismo
+ *    con el que `drafts.` esconde los borradores. Ver `idFor` más abajo: es un fallo real y
+ *    silencioso, no una preferencia de estilo.
  */
 
 import { mkdir, writeFile } from 'node:fs/promises'
@@ -43,6 +48,26 @@ const OUT = join(process.cwd(), 'scripts', 'migration', 'import.ndjson')
  */
 function orderRank(index) {
   return `0|${String((index + 1) * 100000).padStart(6, '0')}:`
+}
+
+/**
+ * El `_id` de un documento importado: tipo y slug unidos **por un guion**.
+ *
+ * El punto está prohibido y no es una cuestión de gusto. Sanity trata el `_id` como una ruta
+ * separada por puntos y **publica sólo la raíz**: un documento con `_id` de la forma
+ * `experience.swiftmet` queda en un subcamino y **exige token de lectura**, igual que los
+ * borradores en `drafts.`. Ese es el mecanismo, no un efecto secundario
+ * (https://www.sanity.io/docs/content-lake/ids).
+ *
+ * Cómo se manifiesta si alguien lo vuelve a poner: la importación dice «Done!», el panel
+ * enseña los dieciséis documentos, y **la web sigue sirviendo `content/`** —porque
+ * `lib/content.ts` recibe un array vacío del cliente anónimo del build y cae al respaldo,
+ * exactamente como está diseñado para hacer—. Ni un error, ni un aviso raro: sólo un panel
+ * que no manda nada. Pasó al enchufar Sanity el 2026-08-03 y costó encontrarlo porque
+ * `profile`, que no lleva punto, sí se leía.
+ */
+function idFor(type, slug) {
+  return `${type}-${slug}`
 }
 
 /** Un texto traducible tal y como lo espera el esquema: `{ es, en }`. */
@@ -96,7 +121,7 @@ documents.push(
 for (const [index, entry] of experience.entries()) {
   documents.push(
     clean({
-      _id: `experience.${entry.slug}`,
+      _id: idFor('experience', entry.slug),
       _type: 'experience',
       orderRank: orderRank(index),
       role: localized(entry.role),
@@ -117,7 +142,7 @@ for (const [index, entry] of experience.entries()) {
 for (const [index, entry] of education.entries()) {
   documents.push(
     clean({
-      _id: `education.${entry.slug}`,
+      _id: idFor('education', entry.slug),
       _type: 'education',
       orderRank: orderRank(index),
       title: localized(entry.title),
@@ -135,7 +160,7 @@ for (const [index, entry] of education.entries()) {
 for (const [index, group] of skills.entries()) {
   documents.push(
     clean({
-      _id: `skillGroup.${group.key}`,
+      _id: idFor('skillGroup', group.key),
       _type: 'skillGroup',
       orderRank: orderRank(index),
       title: localized(group.title),
@@ -148,7 +173,7 @@ for (const [index, group] of skills.entries()) {
 for (const [index, project] of projects.entries()) {
   documents.push(
     clean({
-      _id: `project.${project.slug}`,
+      _id: idFor('project', project.slug),
       _type: 'project',
       orderRank: orderRank(index),
       name: project.name,

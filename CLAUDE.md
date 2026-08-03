@@ -32,9 +32,11 @@ test y en producción**, en los dos idiomas. El flujo `develop` → `test` → `
 `develop` no despliega nada y cada push a `test` y a `main` despliega en su entorno. IDs y detalles
 en la memoria [[despliegue]].
 
-**Todavía no hay proyecto de Sanity**, y la web funciona igual sirviendo `content/` — es
-exactamente lo que la arquitectura contempla (ver [[contenido-dos-fuentes]]). Enchufarlo es el
-siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del panel».
+**El panel está enchufado (2026-08-03).** Proyecto de Sanity `Portfolio`, id `3pdexisd`, dataset
+`production` público, con los dieciséis documentos del CV y las siete imágenes importados; la web
+se construye ya leyendo del panel y `content/` queda como respaldo, que es su papel (ver
+[[contenido-dos-fuentes]]). Detalles y las dos trampas que costaron la sesión —el `_id` con punto
+y el host del endpoint de webhooks— en [[sanity-enchufado]].
 
 ## 2. Stack técnico
 
@@ -50,7 +52,9 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   credenciales de nada.
 - **Panel:** Sanity dentro de la propia web, en `/admin`. Cinco tipos de documento: el singleton
   `profile` y `experience`, `education`, `skillGroup` y `project`, los cuatro ordenables
-  arrastrando.
+  arrastrando. Proyecto `3pdexisd`, dataset `production` **público** (la web lee sin token al
+  construir; un dataset privado obligaría a repartir una credencial de lectura para servir un CV
+  que es público igual). Dos webhooks de revalidación, uno por entorno. Ver [[sanity-enchufado]].
 - **Despliegue: Vercel**, dos entornos (`main` → producción, `test` → test con `noindex`).
   Framework declarado en `vercel.json`.
 - **Calidad:** `npm run check` (typecheck + ESLint + Prettier) y `npm run check:mobile` (21
@@ -201,6 +205,19 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-03 (rama `feature/integrar-sanity`): **el panel deja de ser opcional y pasa a mandar.**
+Proyecto `Portfolio` (`3pdexisd`) con dataset `production` público, los dieciséis documentos y las
+siete imágenes importados, tres orígenes CORS y dos webhooks de revalidación, uno por entorno. En
+código sólo cambian dos cosas, y las dos son arreglos: los `_id` que genera
+`scripts/build-sanity-import.mjs` pasan de `experience.altia` a `experience-altia` —**un `_id` con
+punto es un subcamino privado en Sanity y no se lee sin token**, y ese fue el fallo de la sesión:
+importación correcta, panel lleno y la web sirviendo `content/` sin un solo error, porque la regla
+del contenido cae al respaldo cuando la consulta vuelve vacía— y `migrate:import` deja de usar el
+argumento posicional de dataset, que está deprecado. De paso se corrige una advertencia del README
+que era falsa: el `PATCH` con `rule` no hace falta si se llama al endpoint del host del proyecto en
+vez de al global. `npm run check` limpio y `check:mobile` 21/21 en los dos idiomas sobre el build
+de producción leyendo de Sanity. Ver [[sanity-enchufado]]._
 
 _2026-08-03 (rama `feature/hero-interactivo`): **vuelve el escenario cinético, y ahora hay DOS
 fondos con el sitio repartido entre ellos.** El encargo: mosaico de fotografías en la primera

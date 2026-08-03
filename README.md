@@ -99,29 +99,61 @@ en `next.config.ts`). Es deliberado: con `cacheComponents` activo, leer el reloj
 render volvería dinámica una ruta que debe ser estática. Cualquier despliegue recalcula las
 cifras, así que el desfase real es de meses.
 
-## Puesta en marcha del panel (opcional)
+## El panel (ya enchufado)
 
-1. Crea un proyecto en [sanity.io/manage](https://www.sanity.io/manage) (plan gratuito).
-2. `cp .env.example .env.local` y pega el **Project ID** en `NEXT_PUBLIC_SANITY_PROJECT_ID`.
-3. Añade la misma variable a los **dos** proyectos de Vercel (producción y test).
-4. Importa el contenido actual:
-   ```bash
-   npm run migrate:build      # content/ → scripts/migration/import.ndjson
-   npx sanity login
-   npm run migrate:import     # sube también el retrato y las seis capturas
-   ```
-5. Crea el webhook de revalidación en sanity.io/manage › API › Webhooks:
-   - URL `https://luisfernandezsangil.vercel.app/api/revalidate` (y la de test)
-   - Dataset `production` · **Trigger on: create, update, delete**
-   - Secret: el mismo valor que `SANITY_REVALIDATE_SECRET` en Vercel
+El proyecto de Sanity existe desde el **2026-08-03**: `Portfolio`, id **`3pdexisd`**, dataset
+`production` **público**, con los dieciséis documentos del CV importados y las siete imágenes
+(retrato y seis capturas) subidas. La web ya se construye leyendo del panel; `content/` sigue en
+su sitio como respaldo y como suelo de la regla de arriba.
 
-> ⚠️ Si el webhook se crea **por API** en vez de por el panel, hay que hacer después un `PATCH`
-> con `rule: {on: ["create","update","delete"]}`. El `POST` no acepta `rule`, y sin ese `PATCH`
-> el webhook queda `isDisabled: false` —parece correcto— pero **no se dispara jamás** y el
-> registro de entregas sale vacío. Pasó en Swiftmet y sólo se detectó comparando con uno que sí
-> funcionaba.
+Público a propósito: la web lee **sin token** al construir, así que un dataset privado obligaría
+a meter una credencial de lectura en los dos proyectos de Vercel para servir un CV que es
+público de todas formas.
 
-Mientras no haya panel, `/admin` no falla: explica qué variable falta y recuerda que la web
+Lo que hay montado, y con qué comando se reproduce en un proyecto nuevo:
+
+```bash
+npx sanity projects create "Portfolio" --dataset production --dataset-visibility public
+# → devuelve el projectId; va a .env.local y a los dos proyectos de Vercel
+
+npm run migrate:build      # content/ → scripts/migration/import.ndjson
+npm run migrate:import     # sube también el retrato y las seis capturas
+
+# Orígenes CORS: sin esto /admin carga pero no puede hablar con Sanity
+npx sanity cors add http://localhost:3000 --credentials
+npx sanity cors add https://luisfernandezsangil.vercel.app --credentials
+npx sanity cors add https://luisfernandezsangiltest.vercel.app --credentials
+```
+
+Variables (las tres, en `.env.local` y en **los dos** proyectos de Vercel):
+`NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` y `SANITY_REVALIDATE_SECRET`.
+Las dos primeras no son secretas —van en el HTML de cualquier web con Sanity—; la tercera sí.
+
+### Los dos webhooks de revalidación
+
+Uno por entorno, los dos sobre el dataset `production`, apuntando a `/api/revalidate` de
+producción y de test, con `rule.on = ["create","update","delete"]` y un filtro que los limita a
+los cinco tipos del CV (así una subida de imagen no regenera el sitio). El secreto es el mismo
+`SANITY_REVALIDATE_SECRET`.
+
+> ⚠️ **El endpoint de webhooks es el del host del proyecto, no el global.** Es
+> `https://<projectId>.api.sanity.io/v2025-02-19/hooks/projects/<projectId>`, y el cuerpo lleva
+> `type` con el valor `document` obligatoriamente. Contra `api.sanity.io` responde un endpoint más
+> viejo que va rechazando campo por campo (`"rule" is not allowed`, luego `apiVersion`, luego
+> `httpMethod`…) y de ahí salió la creencia —anotada aquí durante meses— de que había que crear
+> el webhook y **parchearlo después** con `rule`. No hace falta: contra el host correcto el
+> `POST` acepta `rule` a la primera. `npx sanity openapi get webhooks` da el contrato exacto.
+
+> ⚠️ **Ningún `_id` importado puede llevar un punto.** Para Sanity el `_id` es una ruta separada
+> por puntos y **sólo la raíz es pública**: `experience.altia` exige token de lectura igual que
+> `drafts.algo`. El script genera `experience-altia`, con guion, y el comentario de `idFor` en
+> `scripts/build-sanity-import.mjs` explica por qué. Cómo se manifiesta si se rompe: la
+> importación dice «Done!», el panel enseña los dieciséis documentos y **la web sigue sirviendo
+> `content/`** sin un solo error, porque el cliente anónimo del build recibe listas vacías y la
+> regla del contenido cae al respaldo, que es justo lo que debe hacer. Se tardó en encontrar
+> porque `profile` —el único `_id` sin punto— sí se leía.
+
+Si algún día faltaran las variables, `/admin` no falla: explica cuál falta y recuerda que la web
 pública funciona igual (`app/(studio)/admin/ConnectionNotice.tsx`).
 
 ---
