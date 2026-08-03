@@ -12,6 +12,7 @@
     "check": "npm run typecheck && npm run lint && prettier --check .",
     "format": "prettier --write .",
     "check:mobile": "node scripts/check-mobile.mjs",
+    "shots": "node scripts/build-project-shots.mjs",
     "migrate:build": "node scripts/build-sanity-import.mjs",
     "migrate:import": "sanity dataset import scripts/migration/import.ndjson --dataset production --replace"
   },

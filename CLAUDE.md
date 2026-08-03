@@ -32,6 +32,14 @@ test y en producción**, en los dos idiomas. El flujo `develop` → `test` → `
 `develop` no despliega nada y cada push a `test` y a `main` despliega en su entorno. IDs y detalles
 en la memoria [[despliegue]].
 
+**La web publica ocho proyectos y la lista se decide en un fichero (2026-08-03).**
+`content/projects.config.ts` dice qué proyectos salen, en qué orden y cuáles son los cuatro del
+carrusel; las fichas viven en `content/projects.ts` unidas por el `name`. Están todos los
+repositorios de github.com/luisfdzs **menos Manfisa**, retirada a propósito, y las portadas de las
+tarjetas son **la primera pantalla de cada web en vivo**, capturadas por `npm run shots`. **Ojo:
+el panel manda en lo desplegado, así que la lista no cambia la web pública hasta reflejarla en
+`/admin`.** Ver [[lista-de-proyectos]].
+
 **El panel está enchufado (2026-08-03).** Proyecto de Sanity `Portfolio`, id `3pdexisd`, dataset
 `production` público, con los dieciséis documentos del CV y las siete imágenes importados; la web
 se construye ya leyendo del panel y `content/` queda como respaldo, que es su papel (ver
@@ -62,6 +70,12 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   Framework declarado en `vercel.json`.
 - **Calidad:** `npm run check` (typecheck + ESLint + Prettier) y `npm run check:mobile` (21
   comprobaciones en Chrome real a 390×844, por idioma).
+- **Los proyectos: la lista en un sitio y las fichas en otro.** `content/projects.config.ts` es
+  qué se publica, en qué orden y cuáles son los cuatro `featured`; `content/projects.ts` es el
+  contenido de cada uno. Se unen por el `name` exacto, y **un título sin ficha no se publica**:
+  avisa en el log del build en vez de sacar media tarjeta. Las portadas de las tarjetas son la
+  primera pantalla de cada web en vivo y las genera `npm run shots` con el viewport a 1400×700 —el
+  2:1 del hueco—, sin recortar nada. Ver [[lista-de-proyectos]].
 - **Imágenes locales: lo que hay en `public/` es lo que viaja.** El cargador
   (`sanity/imageLoader.ts`) sólo transforma URLs de la CDN de Sanity y devuelve las rutas locales
   intactas, así que en las capturas de proyecto **`sizes` y `quality` no ahorran ni un byte**: el
@@ -208,6 +222,26 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-03 (en `develop`, por encargo de trabajar ahí directamente): **el retrato pierde el halo
+dorado y los proyectos pasan a decidirse en un fichero de configuración.** Tres cosas en una
+sesión. (1) `.hero-portrait::before` era un aro de cobre alrededor de la cara y ahora es el mismo
+degradado en grafito: **el resplandor se quitó, el degradado no**, porque el retrato vive fuera de
+`.hero-copy` —sobre las tejas del mosaico y sin el velo del texto— y sin nada detrás la cara se
+pierde cuando pasa una teja clara. (2) `content/projects.config.ts`: la lista de qué se publica, en
+qué orden y cuáles son los cuatro del carrusel, con las fichas en `content/projects.ts` unidas por
+el `name`; `featured` sale de la ficha y se va a la lista. Entran **todos los repositorios de
+github.com/luisfdzs menos Manfisa** —se añaden Mila Barber, Cedecé y esta misma web—, y un título
+sin ficha no se publica pero avisa con su nombre. El único detalle técnico feo es que el import
+lleva la extensión escrita y hace falta `allowImportingTsExtensions`: los scripts de `scripts/`
+importan `content/projects.ts` con el despojado de tipos de Node, que no resuelve especificadores
+sin extensión. (3) `npm run shots` reescrito: la portada de cada tarjeta es **la primera pantalla de
+su web en vivo**, capturada con la ventana a 1400×700 —el 2:1 exacto del hueco— en vez de recortada
+de una captura de otra proporción; adiós al mapa de sufijos que había que mantener a mano. `npm run
+check` limpio y `check:mobile` 21/21 en los dos idiomas sobre el build de producción.
+**Pendiente:** el panel sigue con los seis proyectos de la importación inicial, Manfisa incluida, y
+mientras no se refleje ahí la web pública no cambia — mismo síntoma engañoso que con el retrato.
+Ver [[lista-de-proyectos]]._
 
 _2026-08-03 (en `develop`): **el retrato del hero gana respaldo por campo.** El campo «Retrato» del
 panel sigue mandando cuando tiene una imagen elegida, pero **si está vacío la web sirve
