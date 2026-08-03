@@ -206,6 +206,22 @@ proyecto.**
 
 ---
 
+_2026-08-03 (en `develop`, sin commitear): **el retrato del hero pasa a ser un recorte con
+transparencia.** `public/luis.webp` era una fotografía de Luis de traje con la calle detrás —y,
+pese al nombre, un JPEG—; ahora es el busto recortado con canal alfa (WebP RGBA 200×200, 7,9 KB,
+hecho con `rembg`/`birefnet-portrait`). El trabajo no está en el recorte sino en el marco: `Figure`
+pone fondo, filete y esquinas a todas las imágenes, y eso era invisible mientras la foto era opaca
+y lo tapaba entero — con transparencia el busto se leía como una tarjeta oscura. Lo apaga
+`.hero-portrait__frame`, **una regla sin `@layer` al final de `globals.css`**, porque lo que hay
+que ganar son utilidades de Tailwind y entre capas manda el orden de las capas, no la
+especificidad. De paso se vio que el `rounded-full` del avatar nunca se había aplicado. `npm run
+check` limpio y `check:mobile` 21/21 en los dos idiomas sobre el build de producción.
+**Pendiente:** lo desplegado lee la foto de Sanity, así que el recorte no llega a producción hasta
+subirlo al panel — `/admin` → Perfil → «Retrato de Luis Fernández Sangil» → *Publish*, **nunca con
+`migrate:import`**, que corre con `--replace`. Es el caso general de la regla del contenido y el
+síntoma engaña: **cambiar una imagen en `content/` no cambia la web mientras Sanity tenga la suya**,
+y ni el `check` ni el build se quejan. Ver [[hero-sanity]]._
+
 _2026-08-03 (rama `feature/integrar-sanity`): **el panel deja de ser opcional y pasa a mandar.**
 Proyecto `Portfolio` (`3pdexisd`) con dataset `production` público, los dieciséis documentos y las
 siete imágenes importados, tres orígenes CORS y dos webhooks de revalidación, uno por entorno. En
