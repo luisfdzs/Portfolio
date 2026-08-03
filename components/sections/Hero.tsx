@@ -104,6 +104,13 @@ export function Hero({ locale, profile, stats }: Props) {
          * arriba: el velo del texto empieza justo debajo del avatar, así que el avatar flota
          * sobre las tejas en vez de sobre grafito. Es una imagen con su propio halo — no
          * necesita el contraste que necesitan las líneas de texto.
+         *
+         * `hero-portrait__frame` en vez de `rounded-full`: la foto es un RECORTE con
+         * transparencia, así que el marco de `Figure` —fondo, filete y esquinas— dejaría de
+         * ser invisible y el busto se leería como una tarjeta oscura. La clase apaga las
+         * tres cosas en `globals.css`; no se hace con utilidades porque `cn()` no resuelve
+         * conflictos de Tailwind y `bg-transparent` contra `bg-ink-raised` se decidiría por
+         * el orden de la hoja generada. Ver «El retrato, flotando sobre el campo».
          */}
         <div className="hero-portrait mx-auto w-20 lg:w-24">
           <Figure
@@ -112,7 +119,7 @@ export function Hero({ locale, profile, stats }: Props) {
             ratio="square"
             priority
             sizes="6rem"
-            className="rounded-full"
+            className="hero-portrait__frame"
           />
         </div>
 
