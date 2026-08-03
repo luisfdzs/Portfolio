@@ -95,11 +95,15 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   en la sección + `mx-auto` en las cajas con ancho máximo + `justify-center` en las filas flex; las
   tres cosas juntas, porque ninguna hace el trabajo de las otras. **En papel no**: `@media print` lo
   deshace. Qué quedó sin centrar y por qué, en [[decisiones-de-diseno]].
-- **Los proyectos de la portada van en un carrusel «cover flow», y van TODOS** (bloque «COVER
-  FLOW» de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D dirigido por el scroll, sin
-  JavaScript salvo los dos botones. Fallback sin soporte o con `prefers-reduced-motion`: carrusel
-  horizontal plano. En papel se deshace en retícula de dos columnas — y con ocho tarjetas eso son
-  **dos hojas de proyectos**, no una. Ver [[cover-flow]].
+- **Los proyectos de la portada van en un carrusel «cover flow», van TODOS y el carrusel es
+  INFINITO** (bloque «COVER FLOW» de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D
+  dirigido por el scroll, y de JavaScript sólo los dos botones y el salto del bucle. El bucle es
+  una **cinta de correr**: la lista se pinta tres veces, quien mira vive en la copia del medio y el
+  scroll se recoloca una lista entera **con el gesto ya parado** —recolocar en marcha mata la
+  inercia—; las copias van `inert` y **no se imprimen** (`[data-clone]`). Fallback sin soporte o
+  con `prefers-reduced-motion`: carrusel horizontal plano, con el bucle igualmente. En papel se
+  deshace en retícula de dos columnas — y con ocho tarjetas eso son **dos hojas de proyectos**, no
+  una. Ver [[cover-flow]].
 - **HAY DOS FONDOS Y CADA UNO TIENE SU SITIO.** En la **primera sección** manda el **escenario
   cinético**: el mosaico a pantalla completa de dieciséis fotografías CC0 y cuatro paneles de
   interfaz dibujados, en cinco columnas que se desplazan despacio y en direcciones alternas
@@ -228,6 +232,33 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-03 (en `develop`, por encargo de trabajar ahí directamente): **el carrusel de proyectos ya
+no tiene extremos.** Después de la última tarjeta vuelve la primera, en los dos sentidos. La
+técnica es una **cinta de correr**: `CoverFlow.tsx` pinta la lista **tres veces**, coloca a quien
+mira en la copia del medio y, cuando el scroll se ha ido una lista entera hacia un lado, le resta o
+le suma esa lista de golpe. La tarjeta centrada antes y después del salto son la misma tarjeta en el
+mismo sitio de la pantalla, así que el salto no se ve. **Las tres decisiones que lo hacen funcionar,
+y ninguna es evidente:** (1) **tres copias y no dos**, porque para dar la vuelta en los dos sentidos
+hace falta una de sobra a cada lado —con dos, tirar hacia la izquierda desde la primera tarjeta se
+come el borde del contenedor antes de tener sitio donde recolocarse—; (2) **el salto se hace con el
+scroll quieto** (140 ms sin eventos), porque tocar `scrollLeft` en marcha aborta el desplazamiento
+suave del navegador y mata la inercia del dedo, que es la sensación exacta de carrusel roto — y
+esperar sale gratis porque hay una lista entera de margen; (3) **la cuenta se hace con el resto de la
+división** y no con un `if` por sentido, así que un arrastre de varias listas de una pasada se
+recoloca igual de bien (comprobado saltando a `scrollWidth`: vuelve a la banda del medio, sin
+callejón). El CSS no se enteró de nada, y eso era el buen presagio: cada tarjeta se anima por su
+propia posición (`view-timeline` es de cada `li`), así que las copias giran solas. Sí hubo que
+tocarlo en dos sitios: **las copias no se imprimen** (`.cover-flow-item[data-clone] { display:
+none }`, o serían seis hojas con los ocho proyectos tres veces) y **los botones pierden el estado
+apagado**, porque en un bucle no hay principio ni final. Las copias van **`inert`** y no
+`aria-hidden`: lo segundo dejaría veinticuatro enlaces alcanzables con el tabulador para ocho
+proyectos (comprobado con Playwright: `focus()` sobre los dieciséis enlaces clonados no mueve
+`document.activeElement`). Comprobado además el bucle en las dos direcciones y con `arrastre largo` a
+1440 y a 390 px y con `prefers-reduced-motion: reduce`. `npm run check` limpio y `check:mobile` 21/21
+en los dos idiomas sobre el build de producción. De paso, el `highlight` de la ficha de este
+portfolio deja de decir «sin JavaScript salvo los dos botones» — **queda pendiente en el panel**, que
+es quien manda en lo desplegado. Ver [[cover-flow]]._
 
 _2026-08-03 (rama `feature/portada-todos-los-proyectos`, en worktree propio): **la portada enseña
 los ocho proyectos, y Sangil Studio apunta a su dominio.** Dos cosas. (1) El carrusel de la portada
