@@ -11,6 +11,7 @@ import { HashCleaner } from '@/components/layout/HashCleaner'
 import { Header } from '@/components/layout/Header'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { SiteField } from '@/components/layout/SiteField'
+import { BackToTop } from '@/components/ui/BackToTop'
 import '@/app/globals.css'
 
 /**
@@ -165,6 +166,11 @@ export default async function SiteLayout({
         <main id="main">{children}</main>
         <Footer locale={locale} profile={profile} />
         <MobileNav locale={locale} />
+
+        {/* Volver arriba. Va en el layout, no en la portada: hace falta también en el índice
+            de proyectos y en cada ficha, que son páginas largas. Se esconde solo mientras se
+            está en la primera pantalla. */}
+        <BackToTop locale={locale} />
 
         {/* No pinta nada: borra el `#seccion` de la barra de direcciones una vez el
             navegador lo ha usado, para que el menú deje siempre una URL con la misma

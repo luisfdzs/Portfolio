@@ -62,11 +62,11 @@ export function href(locale: Locale, key: LinkKey, ...segments: string[]): strin
  * indexarse sin comprobaciones extra.
  */
 export const navigation = [
-  'about',
-  'experience',
   'projects',
+  'experience',
   'education',
   'stack',
+  'about',
   'contact',
 ] as const satisfies readonly LinkKey[]
 
@@ -75,12 +75,17 @@ export type NavKey = (typeof navigation)[number]
 /**
  * Barra inferior de móvil: **cinco** destinos y no seis. Con el pulgar, cinco iconos es
  * el máximo que cabe a 390 px sin que el área táctil baje de los 24 px que pide
- * WCAG 2.2. Se cae `education` y `stack`, que son las dos secciones que nadie busca
- * directamente —se leen de paso al bajar—, y el sexto hueco lo ocupa el menú completo.
+ * WCAG 2.2. En la barra van los cuatro atajos que alguien busca a propósito —se caen
+ * `education` y `stack`, que se leen de paso al bajar— y el quinto hueco abre el menú
+ * completo, que repite **todas** las entradas: la barra es el atajo y el menú es el
+ * índice, así que quien lo abre no tiene que reconstruir el sitio a partir de lo que
+ * *no* está en la barra.
+ *
+ * El orden es el de `navigation`, que es el orden en que se leen las secciones.
  */
 export const mobileNavigation = [
-  'about',
-  'experience',
   'projects',
+  'experience',
+  'about',
   'contact',
 ] as const satisfies readonly NavKey[]
