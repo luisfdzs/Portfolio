@@ -46,7 +46,15 @@ export type ExperienceEntry = {
 export type EducationEntry = {
   slug: string
   title: Localized
-  institution: string
+  /**
+   * Traducido, al contrario que `company` en la experiencia.
+   *
+   * La diferencia no es un descuido: «Altia» o «ABB» son marcas y se escriben igual en
+   * cualquier idioma, pero una universidad tiene nombre oficial en cada uno —«Universidade
+   * de Vigo» y «University of Vigo», los dos de uvigo.gal—, y dejar el gallego en la
+   * versión inglesa era exactamente el hueco sin traducir que se ve al leerla.
+   */
+  institution: Localized
   range: DateRange
   location?: Localized | null
   note?: Localized | null

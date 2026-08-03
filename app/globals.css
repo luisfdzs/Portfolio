@@ -271,8 +271,14 @@
     transition: transform 0.45s var(--ease-out-soft);
   }
 
+  /* `[aria-current]` es la entrada del menú de la sección que se está leyendo: se queda
+     con el subrayado puesto. El color amarillo ya la distingue, pero el color no puede ser
+     la única señal —es la regla de contraste del proyecto—, y el filete la marca también
+     para quien no lo vea. Sólo entra por el atributo cuando está, nunca puesto a `false`:
+     el selector mira la presencia, no el valor. */
   &:hover::after,
-  &:focus-visible::after {
+  &:focus-visible::after,
+  &[aria-current]::after {
     transform: scaleX(1);
   }
 }

@@ -4,7 +4,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
-import { Home } from '@/components/ui/Icons'
+import { User } from '@/components/ui/Icons'
 
 /**
  * Perfil: los tres párrafos que explican de dónde sales y cómo trabajas.
@@ -43,7 +43,7 @@ export function About({ locale, profile }: { locale: Locale; profile: Profile })
       id={sections.about}
       className="page-gutter mx-auto max-w-7xl section-block text-center"
     >
-      <SectionHeading index="05" title={t.about.title} kicker={t.about.kicker} icon={Home} />
+      <SectionHeading index="05" title={t.about.title} kicker={t.about.kicker} icon={User} />
 
       {lead ? (
         <Reveal>

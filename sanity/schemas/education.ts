@@ -26,7 +26,9 @@ export const education = defineType({
     defineField({
       name: 'institution',
       title: 'Centro',
-      type: 'string',
+      // Traducido: una universidad tiene nombre oficial en cada idioma («Universidade de
+      // Vigo» / «University of Vigo»). Sin el inglés se cae al castellano, como el resto.
+      type: 'localizedString',
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -69,7 +71,12 @@ export const education = defineType({
     }),
   ],
   preview: {
-    select: { title: 'title.es', institution: 'institution', start: 'startDate', end: 'endDate' },
+    select: {
+      title: 'title.es',
+      institution: 'institution.es',
+      start: 'startDate',
+      end: 'endDate',
+    },
     prepare({ title, institution, start, end }) {
       return {
         title: title ?? '(sin titulación)',

@@ -114,7 +114,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     ...(currentJob ? { worksFor: { '@type': 'Organization', name: currentJob.company } } : {}),
     alumniOf: education.map((entry) => ({
       '@type': 'EducationalOrganization',
-      name: entry.institution,
+      name: entry.institution[locale],
       ...(entry.url ? { url: entry.url } : {}),
     })),
     knowsAbout: skills.flatMap((group) => group.items),

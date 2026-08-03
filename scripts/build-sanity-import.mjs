@@ -154,7 +154,7 @@ for (const [index, entry] of education.entries()) {
       orderRank: orderRank(index),
       title: localized(entry.title),
       slug: { _type: 'slug', current: entry.slug },
-      institution: entry.institution,
+      institution: localized(entry.institution),
       startDate: entry.range.start,
       endDate: entry.range.end ?? undefined,
       location: localized(entry.location),

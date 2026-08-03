@@ -3,7 +3,7 @@ import type { ProjectEntry } from '@/content/types'
 import { cn } from '@/lib/cn'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { href } from '@/lib/i18n/routes'
+import { projectHref } from '@/lib/i18n/routes'
 import { Figure } from '@/components/ui/Figure'
 import { ArrowRight } from '@/components/ui/Icons'
 import { Tag } from '@/components/ui/Tag'
@@ -18,7 +18,13 @@ const statusStyles: Record<ProjectEntry['status'], string> = {
 }
 
 /**
- * Tarjeta de proyecto, la misma en la portada y en el índice de `/projects`.
+ * Tarjeta de proyecto: el resumen de un proyecto y la puerta a su ficha.
+ *
+ * Sólo la usa el carrusel de la portada. Tuvo dos usos —también la retícula del índice de
+ * `/projects`— y con el índice retirado se le cayeron las dos banderas que servían para
+ * distinguirlos, `framed` y `priority`: una bandera sin quien la ponga es una trampa, porque
+ * el día que alguien la lea creerá que hay un segundo sitio donde esto se pinta distinto.
+ * Ahora la tarjeta es siempre un panel con borde, que es lo que el carrusel necesita.
  *
  * **Toda la tarjeta es el enlace**, no un «Ver más» al final: en móvil el área pulsable es
  * el dedo entero y obligar a acertar en un enlace de texto de 13 px es hostil. El truco es
@@ -34,42 +40,24 @@ const statusStyles: Record<ProjectEntry['status'], string> = {
  * están anclados a los bordes de la imagen a propósito y centrarlos los juntaría en un
  * amontonamiento sin significado.
  *
- * `framed` la convierte en un panel con borde y fondo propios. Lo pide el carrusel de la
- * portada: una tarjeta girada en el espacio tiene que parecer un objeto con cantos, y sin
- * fondo el giro se lee como un texto torcido. En la retícula del índice el panel sobraría —
- * ahí las tarjetas ya están separadas por el hueco de la cuadrícula.
+ * El panel —borde, fondo y esquinas— lo pide el carrusel: una tarjeta girada en el espacio
+ * tiene que parecer un objeto con cantos, y sin fondo el giro se lee como un texto torcido.
  */
-export function ProjectCard({
-  locale,
-  project,
-  priority = false,
-  framed = false,
-}: {
-  locale: Locale
-  project: ProjectEntry
-  priority?: boolean
-  framed?: boolean
-}) {
+export function ProjectCard({ locale, project }: { locale: Locale; project: ProjectEntry }) {
   const t = getDictionary(locale)
   const stack = project.stack ?? []
   const visible = stack.slice(0, STACK_LIMIT)
   const hidden = stack.length - visible.length
 
   return (
-    <article
-      className={cn(
-        'group relative flex flex-col text-center',
-        framed && 'h-full rounded-xl border border-line-strong bg-ink-raised p-4 sm:p-5',
-      )}
-    >
+    <article className="group relative flex h-full flex-col rounded-xl border border-line-strong bg-ink-raised p-4 text-center sm:p-5">
       <Figure
         image={project.image}
         locale={locale}
-        priority={priority}
         // En el carrusel la tarjeta nunca pasa de 28rem, que es el tope de
-        // `--cover-flow-card`: pedir 45vw ahí descargaría una captura del doble de lo
+        // `--cover-flow-card`: pedir 45vw aquí descargaría una captura del doble de lo
         // que se va a ver.
-        sizes={framed ? '(min-width: 34rem) 28rem, 70vw' : '(min-width: 1024px) 45vw, 100vw'}
+        sizes="(min-width: 34rem) 28rem, 70vw"
         className="transition-opacity duration-500 group-hover:opacity-85"
       />
 
@@ -83,7 +71,7 @@ export function ProjectCard({
 
       <h3 className="mt-3 text-title text-paper">
         <Link
-          href={href(locale, 'projects', project.slug)}
+          href={projectHref(locale, project.slug)}
           className="transition-colors group-hover:text-signal"
         >
           {/* La capa que hace pulsable la tarjeta entera. `z-10` para quedar por encima
@@ -108,15 +96,10 @@ export function ProjectCard({
         </ul>
       ) : null}
 
-      {/* Con `framed` las tarjetas están todas al mismo alto y los textos no miden lo
-          mismo: `mt-auto` baja esta línea al pie de cada una para que las cuatro flechas
-          queden en la misma altura y la fila no parezca descuadrada. */}
-      <p
-        className={cn(
-          'flex items-center justify-center gap-2 text-small text-signal',
-          framed ? 'mt-auto pt-5' : 'mt-5',
-        )}
-      >
+      {/* Las tarjetas del carrusel están todas al mismo alto y los textos no miden lo
+          mismo: `mt-auto` baja esta línea al pie de cada una para que las flechas queden a
+          la misma altura y la fila no parezca descuadrada. */}
+      <p className="mt-auto flex items-center justify-center gap-2 pt-5 text-small text-signal">
         {t.projects.viewProject}
         <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
       </p>
