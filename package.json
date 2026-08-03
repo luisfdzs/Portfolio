@@ -13,7 +13,7 @@
     "format": "prettier --write .",
     "check:mobile": "node scripts/check-mobile.mjs",
     "migrate:build": "node scripts/build-sanity-import.mjs",
-    "migrate:import": "sanity dataset import scripts/migration/import.ndjson production --replace"
+    "migrate:import": "sanity dataset import scripts/migration/import.ndjson --dataset production --replace"
   },
   "dependencies": {
     "@sanity/client": "^7.25.0",
