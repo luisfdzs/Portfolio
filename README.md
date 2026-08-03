@@ -234,6 +234,31 @@ En escritorio la navegación es la cabecera fija; en móvil (`< lg`), una **barr
 iconos** al alcance del pulgar. Nunca las dos: tenerlas sería robar 4 rem arriba y abajo en el
 dispositivo que menos tiene.
 
+El quinto icono de la barra abre el **menú a pantalla completa**, y ahí están **todas** las
+secciones —no sólo las dos que no caben en la barra— con los dos idiomas al final, detrás de un
+filete horizontal. Es el menú de `Swiftmet`: un panel que sólo lista el sobrante obliga a mirar la
+barra para deducir qué falta.
+
+### El orden de las secciones
+
+`hero → proyectos → experiencia → formación → stack → perfil → contacto`.
+
+Los proyectos van primero porque son la única sección con prueba visual, y quien dedica treinta
+segundos a un CV los gasta mirando. El perfil —tres párrafos de prosa— va al final, para quien ya
+ha decidido seguir leyendo.
+
+**Cambiar este orden toca tres sitios**, y no hay nada que avise si se olvida uno:
+`app/(site)/[locale]/page.tsx`, el `index` de cada `SectionHeading` (la numeración `01`…`06`, que es
+el índice implícito de la página) y `navigation` en `lib/i18n/routes.ts`, que es el menú.
+
+### Volver arriba
+
+Botón flotante (`components/ui/BackToTop.tsx`), en escritorio y en móvil, que **aparece pasada la
+primera pantalla**: encima del hero sería una flecha para subir a donde ya estás. Sustituye a la que
+había en el pie, que era un enlace a la ruta actual y por tanto no movía el scroll. Llama a
+`window.scrollTo({ top: 0 })` **sin `behavior`** a propósito: así se aplica el `scroll-behavior` de
+la hoja de estilos, que ya es suave e instantáneo bajo `prefers-reduced-motion`.
+
 ### Los proyectos de la portada van en un «cover flow» infinito
 
 Los proyectos de la portada no están en una retícula, sino en un **carrusel 3D**: la
