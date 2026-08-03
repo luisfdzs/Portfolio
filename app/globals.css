@@ -319,14 +319,22 @@
 }
 
 /* ============================================================================
-   COVER FLOW — los proyectos de la portada (todos)
+   COVER FLOW — los proyectos de la portada (todos, y en bucle infinito)
 
    Un carrusel 3D: la tarjeta centrada se mira de frente y las demás se giran
    sobre su eje vertical, se alejan y se apagan. Lo mueve el scroll y nada más
    —`view-timeline` + `animation-timeline`, la misma técnica que `reveal`—, así
    que no hay JavaScript calculando posiciones ni un bucle de animación
-   corriendo detrás. Los dos botones de `CoverFlow.tsx` son lo único con JS, y
-   sólo porque una rueda de ratón no hace scroll horizontal.
+   corriendo detrás. De `CoverFlow.tsx` vienen sólo los dos botones —una rueda de
+   ratón no hace scroll horizontal— y el salto del bucle.
+
+   **El carrusel no tiene extremos.** La lista se pinta tres veces y el scroll se
+   recoloca una lista entera cuando se ha ido de largo, con lo que después de la
+   última tarjeta vuelve la primera. Aquí eso no se nota: cada tarjeta se anima
+   por su propia posición (`view-timeline` es de cada `li`), así que las copias
+   giran igual que los originales sin una línea más de CSS. Lo único que las
+   distingue es `[data-clone]`, y sólo lo usa la hoja de impresión. El cómo y el
+   por qué están en `CoverFlow.tsx`.
 
    La geometría es lo único delicado:
 
@@ -1443,6 +1451,14 @@
     width: auto;
     margin-inline: 0;
     view-timeline-name: none;
+  }
+
+  /* Las copias del bucle infinito NO se imprimen. En pantalla la lista se pinta
+     tres veces para que el carrusel no tenga extremos (ver `CoverFlow.tsx`); en
+     papel, donde no hay scroll ni bucle, eso serían veinticuatro tarjetas y seis
+     hojas de proyectos repitiendo los ocho tres veces. */
+  .cover-flow-item[data-clone] {
+    display: none;
   }
 
   .cover-flow-stage,

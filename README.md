@@ -234,7 +234,7 @@ En escritorio la navegación es la cabecera fija; en móvil (`< lg`), una **barr
 iconos** al alcance del pulgar. Nunca las dos: tenerlas sería robar 4 rem arriba y abajo en el
 dispositivo que menos tiene.
 
-### Los proyectos de la portada van en un «cover flow»
+### Los proyectos de la portada van en un «cover flow» infinito
 
 Los proyectos de la portada no están en una retícula, sino en un **carrusel 3D**: la
 tarjeta centrada se mira de frente y las de los lados se giran sobre su eje vertical, se alejan y
@@ -256,14 +256,31 @@ posiciones. La geometría —lo único delicado— está razonada en el bloque �
 solape), y **el ancho del carrusel es lo que decide cuánto dura el giro**, porque con
 `animation-range: contain` el giro ocupa `ancho − tarjeta`.
 
-Lo único con JavaScript son los **dos botones** de `components/ui/CoverFlow.tsx`: con el dedo se
+De JavaScript hay dos cosas en `components/ui/CoverFlow.tsx`. Los **dos botones**: con el dedo se
 arrastra y con el tabulador el navegador trae al foco cada tarjeta, pero una rueda de ratón no
-hace scroll horizontal y la barra está oculta a propósito.
+hace scroll horizontal y la barra está oculta a propósito. Y **el bucle**, que es lo que sigue.
+
+**El carrusel no tiene extremos: después de la última tarjeta vuelve la primera.** La lista se
+pinta **tres veces** y quien mira vive en la copia del medio; cuando el scroll se ha ido una lista
+entera hacia un lado, se le resta o se le suma esa lista **de golpe**. La tarjeta centrada antes
+del salto y la de después son la misma tarjeta en el mismo sitio de la pantalla, así que el salto
+no se ve: es una cinta de correr, no una animación. Tres copias y no dos porque hace falta una de
+sobra **a cada lado** para poder dar la vuelta en los dos sentidos. Dos detalles que hacen que no
+se note:
+
+- **El salto se hace con el scroll quieto** (140 ms sin eventos). Recolocar en marcha aborta el
+  desplazamiento suave del navegador y mata la inercia del dedo, que es la sensación exacta de
+  carrusel roto. Esperar sale gratis porque hay una lista entera de margen a cada lado.
+- **Las copias van `inert`**: fuera del tabulador y fuera del árbol de accesibilidad. Con
+  `aria-hidden` a secas quedarían veinticuatro enlaces alcanzables con el teclado para ocho
+  proyectos.
 
 Si el navegador no soporta animaciones dirigidas por scroll, o si el sistema pide menos
-movimiento, queda **un carrusel horizontal normal** con las tarjetas separadas y ninguna girada.
-Y en papel se deshace en la retícula de dos columnas que había antes: sin eso, un `overflow-x`
-imprimiría el primer proyecto y recortaría los otros tres.
+movimiento, queda **un carrusel horizontal normal** con las tarjetas separadas y ninguna girada —y
+el bucle sigue funcionando, porque no depende del CSS—. Y en papel se deshace en la retícula de dos
+columnas que había antes: sin eso, un `overflow-x` imprimiría el primer proyecto y recortaría todos
+los demás. **En papel las copias no se imprimen** (`.cover-flow-item[data-clone]`): serían seis
+hojas con los ocho proyectos tres veces.
 
 ### Los dos fondos: el mosaico en la portada, el campo en todo lo demás
 
@@ -476,6 +493,11 @@ Cosas que están así a propósito y con quién se resuelven:
   _Sangil Studio_ → poner `https://sangilstudio.com` en «Web en vivo», vaciar «Nota» → _Publish_.
   **No** con `npm run migrate:import`: corre con `--replace` y machacaría el retrato vacío del
   perfil y el orden de los documentos arrastrables.
+- **Y de paso, un `highlight` de la ficha de este portfolio.** Con el carrusel infinito
+  (2026-08-03) la frase «sin JavaScript salvo los dos botones» dejó de ser exacta y en `content/`
+  ya dice «los dos botones y el salto del bucle». En el panel sigue la vieja: `/admin` →
+  **Proyectos** → _Portfolio_ → «Lo que tiene dentro» → el punto del cover flow. Es cosmético y no
+  urge, pero es una afirmación técnica en una web que se vende por que se pueden comprobar.
 - **Sangil Studio apunta ya a `sangilstudio.com`,** por decisión de Luis el 2026-08-03: se cambió
   el `liveUrl` —antes `sangilstudiotest.vercel.app`— y se borró el `note` que explicaba el desvío.
   **Lo que hay que vigilar:** el día del cambio el dominio seguía sirviendo la página de «Web en
