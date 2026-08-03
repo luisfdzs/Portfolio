@@ -10,25 +10,30 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
 import { ProjectCard } from './ProjectCard'
 
 /**
- * Proyectos en la portada: sólo los destacados, en un carrusel «cover flow».
+ * Proyectos en la portada: **todos**, en un carrusel «cover flow».
  *
- * No están todos a propósito. El índice de `/projects` existe para quien quiera el
- * catálogo completo; la portada tiene que enseñar los cuatro que mejor representan el
- * trabajo y dejar paso a la siguiente sección. Seis tarjetas aquí serían dos pantallas de
- * scroll antes de llegar a la formación.
+ * Están todos a propósito, y antes no lo estaban: la portada enseñaba los cuatro destacados
+ * y remitía al índice de `/projects` para el resto. El argumento era el scroll, y no se
+ * sostiene en un carrusel —las tarjetas se pasan de lado, así que ocho ocupan exactamente lo
+ * mismo que cuatro—, mientras el coste sí era real: la mitad del trabajo sólo se veía si a
+ * alguien le apetecía entrar en una segunda página. El orden lo pone `getCarouselProjects`,
+ * con los destacados delante.
+ *
+ * El índice sigue existiendo y sigue enlazado desde aquí, porque hace otra cosa: es una URL
+ * que se puede mandar suelta por LinkedIn sin obligar a nadie a pasar por el CV entero.
  *
  * **Por qué un carrusel y no la retícula de dos columnas que había antes.** Es la única
  * sección de la página cuyo contenido es visual, y una captura de web a 45 vw compitiendo
  * con otra al lado no se mira: se hojea. El cover flow pone una tarjeta de frente y deja
- * las otras giradas al lado, que es exactamente cómo alguien elige entre cuatro cosas
- * parecidas. Y de paso ahorra media pantalla de scroll en la mitad de la página donde se
- * decide si se sigue leyendo.
+ * las otras giradas al lado, que es exactamente cómo alguien elige entre varias cosas
+ * parecidas. Y de paso ahorra pantallas de scroll en la mitad de la página donde se decide si
+ * se sigue leyendo — con ocho tarjetas, más que antes.
  *
- * Lo que **cuesta** es honesto y conviene tenerlo escrito: en la retícula se veían los
- * cuatro proyectos de un golpe y aquí hay uno de frente y dos asomando. Se compensa con el
- * solape —que hace evidente que hay más a los lados—, con los botones y con el enlace al
- * índice completo justo debajo. Si alguna vez se mide que la gente no pasa de la primera
- * tarjeta, la retícula sigue viva en `/projects` y volver es cambiar este fichero.
+ * Lo que **cuesta** es honesto y conviene tenerlo escrito: en una retícula se verían todas de
+ * un golpe y aquí hay una de frente y dos asomando. Se compensa con el solape —que hace
+ * evidente que hay más a los lados—, con los botones y con el enlace al índice justo debajo.
+ * Si alguna vez se mide que la gente no pasa de la primera tarjeta, la retícula sigue viva en
+ * `/projects` y volver es cambiar este fichero.
  *
  * El efecto es CSS puro dirigido por el scroll (bloque «COVER FLOW» de `globals.css`); el
  * carrusel va a ancho completo y sólo el titular y el pie se quedan dentro de la retícula
@@ -40,12 +45,10 @@ import { ProjectCard } from './ProjectCard'
  */
 export function Projects({
   locale,
-  featured,
-  total,
+  projects,
 }: {
   locale: Locale
-  featured: readonly ProjectEntry[]
-  total: number
+  projects: readonly ProjectEntry[]
 }) {
   const t = getDictionary(locale)
 
@@ -74,22 +77,22 @@ export function Projects({
           previousLabel={t.projects.carouselPrevious}
           nextLabel={t.projects.carouselNext}
         >
-          {featured.map((project) => (
+          {projects.map((project) => (
             <ProjectCard key={project.slug} locale={locale} project={project} framed />
           ))}
         </CoverFlow>
       </Reveal>
 
-      {/* El enlace al índice sólo aparece si de verdad hay más que enseñar. */}
-      {total > featured.length ? (
-        <div className="page-gutter mx-auto max-w-7xl">
-          <Reveal className="mt-12 border-t border-line pt-8">
-            <Action href={href(locale, 'projects')} variant="secondary">
-              {interpolate(t.projects.viewAll, { count: total })}
-            </Action>
-          </Reveal>
-        </div>
-      ) : null}
+      {/* El enlace al índice ya no depende de que queden proyectos por enseñar —aquí están
+          todos—, sino de que el índice siga siendo un sitio útil al que ir: una página con
+          las fichas en retícula, enlazable de una en una. */}
+      <div className="page-gutter mx-auto max-w-7xl">
+        <Reveal className="mt-12 border-t border-line pt-8">
+          <Action href={href(locale, 'projects')} variant="secondary">
+            {interpolate(t.projects.viewAll, { count: projects.length })}
+          </Action>
+        </Reveal>
+      </div>
     </section>
   )
 }

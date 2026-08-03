@@ -252,7 +252,7 @@ const sheets: ProjectSheet[] = [
       },
     ],
     stack: ['Next.js 16', 'TypeScript', 'Tailwind CSS 4', 'Sanity', 'lexorank', 'Vercel'],
-    liveUrl: 'https://sangilstudiotest.vercel.app',
+    liveUrl: 'https://sangilstudio.com',
     repoUrl: 'https://github.com/luisfdzs/sangilstudio',
     image: {
       src: '/projects/sangil-studio.webp',
@@ -262,10 +262,6 @@ const sheets: ProjectSheet[] = [
         es: 'Primera pantalla de Sangil Studio: fotografía a sangre del pórtico de hormigón de una promoción de vivienda social en Pamplona, con el titular en serif «Arquitectura con una razón detrás de cada decisión» y el pie de obra debajo.',
         en: 'Sangil Studio first screen: a full-bleed photograph of the concrete portico of a social housing development in Pamplona, with the serif headline «Architecture with a reason behind every decision» and the project caption below.',
       },
-    },
-    note: {
-      es: 'El enlace apunta al entorno de test, que es donde está la web terminada: sangilstudio.com sirve todavía la página de «en proceso» hasta que el estudio dé el visto bueno para lanzar.',
-      en: 'The link points to the test environment, which is where the finished site lives: sangilstudio.com still serves a holding page until the studio approves the launch.',
     },
   },
   {
@@ -472,8 +468,8 @@ const sheets: ProjectSheet[] = [
         en: 'Both backgrounds are drawn in code: a kinetic mosaic on the first screen and, everywhere else, a grid of up to three thousand nodes on a canvas that parts and lights up under the pointer. Without a single added dependency.',
       },
       {
-        es: 'Los proyectos destacados giran en un carrusel «cover flow» dirigido por el scroll con CSS (`animation-timeline`), sin JavaScript salvo los dos botones, y en papel se deshace en una retícula de dos columnas.',
-        en: 'Featured projects turn in a «cover flow» carousel driven by scroll in pure CSS (`animation-timeline`), with no JavaScript beyond the two buttons, and it unfolds into a two-column grid in print.',
+        es: 'Los proyectos giran en un carrusel «cover flow» dirigido por el scroll con CSS (`animation-timeline`), sin JavaScript salvo los dos botones, y en papel se deshace en una retícula de dos columnas.',
+        en: 'The projects turn in a «cover flow» carousel driven by scroll in pure CSS (`animation-timeline`), with no JavaScript beyond the two buttons, and it unfolds into a two-column grid in print.',
       },
       {
         es: 'La verificación en móvil es parte del trabajo, no una revisión a ojo: 21 comprobaciones en un Chrome real a 390×844 y por idioma, incluidos desbordamiento horizontal, áreas pulsables de 24 px y que las dos navegaciones no compartan nombre accesible.',
