@@ -40,6 +40,10 @@ export const profile: Profile = {
     ],
   },
   photo: {
+    // **Es un RECORTE con canal alfa**: el busto sin la calle de detrás. Si alguna vez se
+    // repone el original a 800×800, hay que volver a recortarlo — una foto con fondo aquí
+    // deja el hero con una tarjeta oscura alrededor de la cara (ver `.hero-portrait__frame`
+    // en `globals.css`).
     // 200×200 es el original que había: es justo el mínimo para el retrato circular de
     // móvil (160 px) pero se queda corto para los 320 px de escritorio, donde se ve blando
     // en pantallas de alta densidad. Está apuntado en el README como pendiente: hace falta

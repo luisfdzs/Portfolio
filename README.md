@@ -362,6 +362,14 @@ Falla del lado seguro: si mañana falta la variable, no se indexa.
 
 Cosas que están así a propósito y con quién se resuelven:
 
+- **El recorte del retrato hay que subirlo al panel.** `public/luis.webp` es ya el busto con canal
+  alfa, y `content/profile.ts` lo apunta, pero **la web no lo enseña hasta que esté en Sanity**: por
+  la regla del contenido, el panel manda cuando tiene documentos, y el documento `profile` sigue
+  referenciando el JPEG original con la calle detrás. Se arregla en `/admin` → **Perfil** → campo
+  «Retrato de Luis Fernández Sangil» → reemplazar la imagen por `public/luis.webp` → _Publish_. **No
+  con `npm run migrate:import`**: corre con `--replace` y machacaría las ediciones hechas a mano en
+  el panel y el orden de los documentos arrastrables. Es el caso general y conviene tenerlo
+  presente: **cambiar una imagen en `content/` no cambia la web mientras Sanity tenga la suya.**
 - **El retrato es de 200×200.** Es el original que había en el portfolio anterior. Da justo para
   el círculo de móvil (160 px) pero se ve blando en los 320 px de escritorio con pantalla de alta
   densidad. **Hace falta el original a 800×800**; las medidas declaradas en `content/profile.ts`

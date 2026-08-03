@@ -74,3 +74,4 @@ scripts/migration/import.ndjson
 # `vercel link` añade aquí `.vercel` y `.env*` por su cuenta. Ya están declarados
 # arriba, así que si vuelven a aparecer duplicados tras un `vercel link` se pueden
 # borrar sin pensar.
+heros/

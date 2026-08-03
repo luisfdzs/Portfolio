@@ -1257,6 +1257,31 @@
   }
 }
 
+/* El marco del retrato, apagado. La foto del hero es un RECORTE con canal alfa —sólo
+   el busto, sin la calle de detrás—, y el marco que `Figure` pone a todas las imágenes
+   (`bg-ink-raised`, `border` y `rounded-lg`) era invisible mientras la foto era opaca y
+   lo tapaba entero. Con transparencia se convierte en una tarjeta oscura alrededor del
+   busto, que es justo lo contrario de recortarlo.
+
+   `overflow: visible` porque el recorte llega al borde inferior del cuadro: con el
+   recorte del contenedor, los hombros se cortarían en arco.
+
+   **Va SIN `@layer`, y ése es el motivo de que esté aquí abajo y no junto a
+   `.hero-portrait`.** Lo que hay que ganar son utilidades de Tailwind, que viven en
+   `@layer utilities`; una regla en `@layer components` pierde contra ellas por muy
+   específica que sea, porque entre capas manda el orden de las capas. El CSS sin capa
+   gana a todas. Tampoco se resuelve pasando `bg-transparent` desde `Hero.tsx`: `cn()`
+   concatena y no desempata utilidades en conflicto (ver `lib/cn.ts`).
+
+   Quien vuelva a poner una foto CON fondo tiene que deshacer este bloque, no sólo
+   cambiar el archivo. */
+.hero-portrait__frame {
+  overflow: visible;
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+}
+
 /* Movimiento reducido: los dos fondos se CONGELAN, no se esconden.
 
    Son dos, y la lista de abajo tiene que nombrarlos a los dos: el escenario
