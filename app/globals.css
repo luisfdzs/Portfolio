@@ -319,7 +319,7 @@
 }
 
 /* ============================================================================
-   COVER FLOW — los cuatro proyectos destacados de la portada
+   COVER FLOW — los proyectos de la portada (todos)
 
    Un carrusel 3D: la tarjeta centrada se mira de frente y las demás se giran
    sobre su eje vertical, se alejan y se apagan. Lo mueve el scroll y nada más
@@ -392,7 +392,7 @@
 
 .cover-flow-track {
   display: flex;
-  align-items: stretch; /* las cuatro tarjetas, del mismo alto */
+  align-items: stretch; /* todas las tarjetas, del mismo alto */
   /* La pista mide lo que miden sus tarjetas, no lo que mide la ventana. Un
      `<ul>` es de bloque y con el ancho automático se quedaría clavado al ancho
      del contenedor: el recorrido del scroll se calcularía contra esa caja y las
@@ -1418,12 +1418,13 @@
   }
 
   /* El carrusel, deshecho: en papel no hay scroll, así que un `overflow-x`
-     imprimiría el primer proyecto y recortaría los otros tres. Se convierte en
+     imprimiría el primer proyecto y recortaría todos los demás. Se convierte en
      la retícula de dos columnas que tenía la sección antes del carrusel, sin
      giro, sin solape y sin opacidad.
      Dos columnas y no una lista en vertical: a lo ancho de una hoja, una tarjeta
      por fila deja la captura a 19 cm y su hueco de 2:1 mide 9,5 cm de alto, así
-     que los cuatro proyectos se comían dos páginas de papel. */
+     que ya con cuatro proyectos se comía dos páginas de papel — y desde que en la
+     portada salen los ocho, el doble. */
   .cover-flow {
     overflow: visible;
     max-width: none;

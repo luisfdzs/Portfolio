@@ -132,7 +132,7 @@ export const project = defineType({
       title: 'Destacado en la portada',
       type: 'boolean',
       description:
-        'La portada muestra los cuatro primeros destacados. El resto viven en /projects.',
+        'En la portada salen todos los proyectos: esto decide por cuáles abre el carrusel. Los destacados van delante y el resto detrás, cada grupo en el orden de la lista.',
       initialValue: false,
     }),
   ],

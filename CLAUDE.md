@@ -33,10 +33,12 @@ test y en producción**, en los dos idiomas. El flujo `develop` → `test` → `
 en la memoria [[despliegue]].
 
 **La web publica ocho proyectos y la lista se decide en un fichero (2026-08-03).**
-`content/projects.config.ts` dice qué proyectos salen, en qué orden y cuáles son los cuatro del
-carrusel; las fichas viven en `content/projects.ts` unidas por el `name`. Están todos los
-repositorios de github.com/luisfdzs **menos Manfisa**, retirada a propósito, y las portadas de las
-tarjetas son **la primera pantalla de cada web en vivo**, capturadas por `npm run shots`. **Ojo:
+`content/projects.config.ts` dice qué proyectos salen y en qué orden; las fichas viven en
+`content/projects.ts` unidas por el `name`. **Los ocho salen en la portada y los ocho en el índice
+de `/projects`** (2026-08-03): `featured` ya no decide quién sale, sólo por dónde abre el carrusel.
+Están todos los repositorios de github.com/luisfdzs **menos Manfisa**, retirada a propósito, y las
+portadas de las tarjetas son **la primera pantalla de cada web en vivo**, capturadas por
+`npm run shots`. **Ojo:
 el panel manda en lo desplegado, así que la lista no cambia la web pública hasta reflejarla en el
 panel** — hecho ya por CLI el 2026-08-03, con el documento de Manfisa borrado aparte porque
 `--replace` no borra. Y **retirar un proyecto necesita además un despliegue**: el webhook no se
@@ -73,9 +75,10 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
 - **Calidad:** `npm run check` (typecheck + ESLint + Prettier) y `npm run check:mobile` (21
   comprobaciones en Chrome real a 390×844, por idioma).
 - **Los proyectos: la lista en un sitio y las fichas en otro.** `content/projects.config.ts` es
-  qué se publica, en qué orden y cuáles son los cuatro `featured`; `content/projects.ts` es el
-  contenido de cada uno. Se unen por el `name` exacto, y **un título sin ficha no se publica**:
-  avisa en el log del build en vez de sacar media tarjeta. Las portadas de las tarjetas son la
+  qué se publica y en qué orden; `content/projects.ts` es el contenido de cada uno. `featured`
+  **no** decide quién sale —en la portada salen todos—, sino por cuáles abre el carrusel. Se unen
+  por el `name` exacto, y **un título sin ficha no se publica**: avisa en el log del build en vez
+  de sacar media tarjeta. Las portadas de las tarjetas son la
   primera pantalla de cada web en vivo y las genera `npm run shots` con el viewport a 1400×700 —el
   2:1 del hueco—, sin recortar nada. Ver [[lista-de-proyectos]].
 - **Imágenes locales: lo que hay en `public/` es lo que viaja.** El cargador
@@ -92,10 +95,11 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   en la sección + `mx-auto` en las cajas con ancho máximo + `justify-center` en las filas flex; las
   tres cosas juntas, porque ninguna hace el trabajo de las otras. **En papel no**: `@media print` lo
   deshace. Qué quedó sin centrar y por qué, en [[decisiones-de-diseno]].
-- **Los proyectos destacados de la portada van en un carrusel «cover flow»** (bloque «COVER FLOW»
-  de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D dirigido por el scroll, sin
+- **Los proyectos de la portada van en un carrusel «cover flow», y van TODOS** (bloque «COVER
+  FLOW» de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D dirigido por el scroll, sin
   JavaScript salvo los dos botones. Fallback sin soporte o con `prefers-reduced-motion`: carrusel
-  horizontal plano. En papel se deshace en retícula de dos columnas. Ver [[cover-flow]].
+  horizontal plano. En papel se deshace en retícula de dos columnas — y con ocho tarjetas eso son
+  **dos hojas de proyectos**, no una. Ver [[cover-flow]].
 - **HAY DOS FONDOS Y CADA UNO TIENE SU SITIO.** En la **primera sección** manda el **escenario
   cinético**: el mosaico a pantalla completa de dieciséis fotografías CC0 y cuatro paneles de
   interfaz dibujados, en cinco columnas que se desplazan despacio y en direcciones alternas
@@ -224,6 +228,29 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-03 (rama `feature/portada-todos-los-proyectos`, en worktree propio): **la portada enseña
+los ocho proyectos, y Sangil Studio apunta a su dominio.** Dos cosas. (1) El carrusel de la portada
+pasa de los cuatro `featured` a **todos**: `getFeaturedProjects(4)` se convierte en
+`getCarouselProjects()`, que devuelve la lista entera con los destacados delante —`sort` estable, así
+que dentro de cada grupo no se mueve nada—. El argumento viejo era ahorrar scroll y no se sostiene en
+un carrusel, donde las tarjetas se pasan de lado: ocho ocupan lo mismo que cuatro, y el coste sí era
+real, porque la mitad del trabajo sólo se veía entrando en `/projects`. **`featured` no se retira: se
+le cambia el trabajo**, y ahora decide por dónde abre el carrusel —una bandera que no hace nada es
+una trampa, y borrarla habría tocado la lista, el tipo, la consulta y el esquema del panel—. El
+enlace al índice deja de ser condicional (`total > featured.length` ya nunca es cierto) y pasa a
+decir «Ver el índice de los 8 proyectos»: el índice sigue teniendo sentido porque es una URL que se
+manda suelta, no un catálogo más largo. (2) `liveUrl` de Sangil Studio pasa de
+`sangilstudiotest.vercel.app` a `https://sangilstudio.com` y se borra su `note`. **Ojo con esto: el
+dominio servía todavía la página de «Web en construcción» el día del cambio**, así que el botón «Web
+en vivo» de esa tarjeta lleva a un cartel hasta que el estudio lance; volver a test es una línea. Y
+**la captura de la tarjeta no hay que regenerarla** (`npm run shots -- sangil-studio`) hasta
+entonces, porque hoy capturaría el cartel en vez de la web. `npm run check` limpio y `check:mobile`
+21/21 en los dos idiomas sobre el build de producción, con las ocho tarjetas en la portada y cero
+desbordamiento a 390. **Lo que este cambio NO arregla solo:** el `liveUrl` y el `note` viven también
+en el panel, que es quien manda en lo desplegado, así que la web pública sigue enlazando a test hasta
+editar `/admin` → Proyectos → Sangil Studio (poner el dominio, borrar la nota) → *Publish* — **nunca
+con `migrate:import`**, que corre con `--replace`. Es el caso general de [[contenido-dos-fuentes]]._
 
 _2026-08-03 (en `develop`, por encargo de trabajar ahí directamente): **el retrato pierde el halo
 dorado y los proyectos pasan a decidirse en un fichero de configuración.** Tres cosas en una
