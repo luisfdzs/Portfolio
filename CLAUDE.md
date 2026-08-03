@@ -32,6 +32,12 @@ test y en producción**, en los dos idiomas. El flujo `develop` → `test` → `
 `develop` no despliega nada y cada push a `test` y a `main` despliega en su entorno. IDs y detalles
 en la memoria [[despliegue]].
 
+**El orden de la portada es `hero → proyectos → experiencia → formación → stack → perfil →
+contacto` (2026-08-03).** Los proyectos van delante porque son la única sección con prueba visual;
+el perfil, que es prosa, cierra antes de contacto. **Cambiarlo obliga a tocar tres sitios**: la
+página, el `index` de cada `SectionHeading` —la numeración `01…06` está escrita a mano— y
+`navigation` en `lib/i18n/routes.ts`. Ver [[navegacion-y-orden]].
+
 **La web publica ocho proyectos y la lista se decide en un fichero (2026-08-03).**
 `content/projects.config.ts` dice qué proyectos salen y en qué orden; las fichas viven en
 `content/projects.ts` unidas por el `name`. **Los ocho salen en la portada y los ocho en el índice
@@ -87,8 +93,12 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   peso se decide al generar el archivo.
 - **Tipografía:** Instrument Serif (titulares), Inter (cuerpo) y JetBrains Mono (datos), las tres
   autoalojadas por `next/font` — ninguna petición a Google en tiempo de ejecución.
-- **Navegación:** cabecera fija en escritorio; en móvil (`< lg`), barra inferior de cinco iconos.
-  Nunca las dos a la vez. **La URL nunca enseña `#seccion`**: los `href` siguen llevando el
+- **Navegación:** cabecera fija en escritorio; en móvil (`< lg`), barra inferior de cinco iconos,
+  y su quinto icono abre un **menú a pantalla completa con TODAS las secciones** y los dos idiomas
+  detrás de un filete horizontal (el menú de `Swiftmet`). Nunca la cabecera y la barra a la vez.
+  **Volver arriba es un botón flotante** (`components/ui/BackToTop.tsx`) que aparece pasada la
+  primera pantalla, en los dos anchos y en todas las páginas; la flecha que había en el pie era un
+  enlace a la ruta actual y no movía el scroll. **La URL nunca enseña `#seccion`**: los `href` siguen llevando el
   ancla, pero `components/layout/HashCleaner.tsx` la borra en cuanto ha hecho su trabajo, y en
   las navegaciones entre páginas no llega ni a escribirse. Ver [[urls-sin-anclas]].
 - **Alineación: el texto va centrado** en el espacio que ocupa, como en `sangilstudio`. `text-center`
@@ -232,6 +242,29 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-03 (en `develop`, por encargo de trabajar ahí directamente): **seis cambios de navegación y
+lectura de la portada, pedidos de una vez.** (1) **El menú de móvil es el de Swiftmet**: el panel
+pasa a ocupar la pantalla entera hasta el borde de la barra y enseña **todas** las secciones —no
+sólo las dos que no caben— con los dos idiomas al final detrás de un filete horizontal. Se cae la
+cortina, que sólo tenía sentido cuando el panel era una tira sobre la barra. (2) **El orden de la
+portada** pasa a `hero → proyectos → experiencia → formación → stack → perfil → contacto`: la
+sección con prueba visual delante y la prosa al final. **Toca tres sitios y ninguno avisa si se
+olvida**: la página, la numeración `01…06` de las cabeceras y `navigation`. (3) **Las cuatro cifras
+del hero van en una sola fila también en móvil**; lo que no cabía no eran las cifras sino los
+rótulos —«PRODUCCIÓN» a 11 px con 0,14 em desborda una columna de 82 px—, así que el `<dt>` deja de
+usar `eyebrow` y baja a 9 px con la entreletra a la mitad, recuperando el sistema en `lg`. (4) **El
+rótulo de sección cabe en una línea en escritorio**: el ancho máximo pasa a ser dos valores, 24ch en
+móvil y 52ch en `lg`, y no `max-w-none`, que en 1920 px lo estiraría a los 80rem del contenedor. (5)
+**Formación deja de enseñar las fechas de la carrera** — el `range` sigue en el contenido y en el
+panel porque es verdad; lo que cambia es que la sección no lo pinta. (6) **Volver arriba pasa a ser
+un botón flotante que aparece pasada la primera pantalla**, en los dos anchos y en todas las
+páginas: **la flecha del pie no funcionaba** y por eso no lo notaba nadie —era un `<Link>` a `/es`,
+la ruta en la que ya estás, que no navega y no mueve el scroll—. Lleva `window.scrollTo({ top: 0 })`
+**sin `behavior`**, que es lo que conserva el `scroll-behavior` de la hoja de estilos y con él
+`prefers-reduced-motion`. `npm run check` limpio y `check:mobile` **21/21 en los dos idiomas** sobre
+el build de producción, sin tocar el script, con cero desbordamiento a 390 y la hoja de impresión
+comprobada. Ver [[navegacion-y-orden]]._
 
 _2026-08-03 (en `develop`, por encargo de trabajar ahí directamente): **el carrusel de proyectos ya
 no tiene extremos.** Después de la última tarjeta vuelve la primera, en los dos sentidos. La

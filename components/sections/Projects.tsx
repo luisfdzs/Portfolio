@@ -61,7 +61,7 @@ export function Projects({
     // lo comería.
     <section id="projects" className="section-block text-center">
       <div className="page-gutter mx-auto max-w-7xl">
-        <SectionHeading index="03" title={t.projects.title} kicker={t.projects.kicker} icon={Code}>
+        <SectionHeading index="01" title={t.projects.title} kicker={t.projects.kicker} icon={Code}>
           <p>{t.projects.intro}</p>
         </SectionHeading>
       </div>

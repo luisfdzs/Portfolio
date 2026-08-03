@@ -14,8 +14,17 @@ import { LocaleSwitch } from './LocaleSwitch'
  *
  * Abajo y no arriba porque se maneja con el pulgar, que es lo que sujeta el teléfono. Los
  * cuatro primeros son las secciones que alguien busca a propósito; el quinto abre el menú
- * completo con las dos que no caben (`education` y `stack`) y el selector de idioma. Ver
- * `mobileNavigation` en `lib/i18n/routes.ts` para el criterio.
+ * completo. Ver `mobileNavigation` en `lib/i18n/routes.ts` para el criterio.
+ *
+ * **El panel enseña TODAS las entradas, no sólo las que no caben en la barra**, y ocupa la
+ * pantalla entera hasta el borde de la barra. Es el menú de `Swiftmet`, adoptado por
+ * encargo, y el argumento es que un menú que sólo lista el sobrante obliga a mirar la barra
+ * para deducir qué falta: se abre buscando el índice del sitio y aparece media lista. A
+ * pantalla completa las seis entradas caben centradas y al tamaño de titular, que a 390 px
+ * es la diferencia entre leerlas y buscarlas.
+ *
+ * Los dos idiomas van al final, **detrás de un filete horizontal**: son lo único del panel
+ * que no es un destino, y sin la línea se leen como una séptima y una octava sección.
  *
  * Es el único componente de cliente con estado del sitio, y sólo por el panel: la barra en
  * sí no necesitaría JavaScript.
@@ -65,49 +74,52 @@ export function MobileNav({ locale }: { locale: Locale }) {
     }
   }, [open])
 
-  /** Las secciones que no caben en la barra: el menú completo menos lo que ya está. */
-  const overflowKeys = navigation.filter(
-    (key) => !(mobileNavigation as readonly string[]).includes(key),
-  )
-
   return (
     <>
-      {/* Cortina. Cierra al pulsar fuera; es un `<button>` y no un `<div>` con onClick
-          para que se pueda cerrar también con el teclado. */}
-      {open ? (
-        <button
-          type="button"
-          aria-label={t.a11y.closeMenu}
-          onClick={() => setOpen(false)}
-          className="fixed inset-0 z-40 bg-ink/70 backdrop-blur-sm lg:hidden"
-        />
-      ) : null}
-
-      {/* Panel del menú completo, justo encima de la barra. */}
+      {/*
+       * Panel del menú: de arriba de la pantalla al borde de la barra.
+       *
+       * Sin cortina, y no por descuido: la que había aquí sólo tenía sentido cuando el panel
+       * era una tira sobre la barra y quedaba página a la vista alrededor. Ocupando la
+       * pantalla entera no hay «fuera» donde pulsar, así que cerrar es el mismo botón con el
+       * que se abrió —que la barra deja siempre encima— o Escape.
+       *
+       * Fondo OPACO (`bg-ink-raised`): con uno translúcido se leerían las secciones por
+       * debajo de las entradas del menú, que es el fallo clásico de un panel a pantalla
+       * completa. `overflow-y-auto` para que, si algún día hay más entradas o alguien usa el
+       * tipo del sistema muy grande, se puedan alcanzar en vez de quedar cortadas.
+       */}
       <div
         id={PANEL_ID}
         hidden={!open}
-        className="page-gutter fixed inset-x-0 bottom-nav-mobile z-50 border-t border-line bg-ink-raised pt-6 pb-6 lg:hidden"
+        className="page-gutter fixed inset-x-0 top-0 bottom-nav-mobile z-50 overflow-y-auto bg-ink-raised lg:hidden"
       >
-        <nav aria-label={t.a11y.menu}>
-          <ul className="flex flex-col gap-1">
-            {overflowKeys.map((key) => (
+        {/* `min-h-full` y no `h-full`: el menú se centra en la pantalla, pero si no cabe
+            crece y el `overflow-y-auto` de arriba lo deja alcanzable. */}
+        <nav
+          aria-label={t.a11y.menu}
+          className="flex min-h-full flex-col items-center justify-center py-14"
+        >
+          <ul className="flex w-full flex-col items-center gap-2">
+            {navigation.map((key) => (
               <li key={key}>
                 <Link
                   href={href(locale, key)}
                   onClick={() => setOpen(false)}
-                  className="block rounded-md px-3 py-3 text-center text-paper transition-colors hover:bg-ink hover:text-signal"
+                  className="block px-4 py-2 text-center font-display text-title text-paper transition-colors hover:text-signal"
                 >
                   {t.nav[key]}
                 </Link>
               </li>
             ))}
           </ul>
+
+          {/* El filete es el que separa los destinos de los idiomas. */}
+          <div className="mt-10 flex items-center gap-4 border-t border-line pt-8">
+            <span className="eyebrow">{t.a11y.changeLanguage}</span>
+            <LocaleSwitch current={locale} />
+          </div>
         </nav>
-        <div className="mt-5 flex items-center justify-between border-t border-line pt-5">
-          <span className="eyebrow">{t.a11y.changeLanguage}</span>
-          <LocaleSwitch current={locale} />
-        </div>
       </div>
 
       {/* La barra. */}

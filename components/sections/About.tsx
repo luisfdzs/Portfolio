@@ -9,10 +9,13 @@ import { Home } from '@/components/ui/Icons'
 /**
  * Perfil: los tres párrafos que explican de dónde sales y cómo trabajas.
  *
- * Es la única sección de prosa larga del sitio, y va **antes** de la experiencia a
- * propósito: la lista de puestos dice qué has hecho, pero no por qué un ingeniero
- * industrial acabó escribiendo software, que es justo la pregunta que se hace quien lee tu
- * CV y la que decide si sigue leyendo.
+ * Es la única sección de prosa larga del sitio, y por eso va **al final**, justo antes de
+ * contacto. Estuvo primera, con el argumento de que explica por qué un ingeniero industrial
+ * acabó escribiendo software antes de que nadie lea la lista de puestos. El orden nuevo lo
+ * invierte a propósito: tres párrafos de prosa en la segunda pantalla son un peaje para
+ * quien todavía no sabe si le interesas, y las capturas de los proyectos y las fechas de la
+ * experiencia contestan la misma pregunta enseñando en vez de contando. Quien llega hasta
+ * aquí ya ha decidido seguir leyendo, y es exactamente a quien va dirigido este texto.
  *
  * El primer párrafo lleva un tamaño mayor —de entradilla— porque en una sección de tres
  * párrafos que nadie va a leer entera, el primero es el que tiene que aguantar solo.
@@ -40,7 +43,7 @@ export function About({ locale, profile }: { locale: Locale; profile: Profile })
       id={sections.about}
       className="page-gutter mx-auto max-w-7xl section-block text-center"
     >
-      <SectionHeading index="01" title={t.about.title} kicker={t.about.kicker} icon={Home} />
+      <SectionHeading index="05" title={t.about.title} kicker={t.about.kicker} icon={Home} />
 
       {lead ? (
         <Reveal>

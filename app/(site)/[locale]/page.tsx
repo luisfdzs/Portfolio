@@ -129,12 +129,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      {/*
+       * EL ORDEN DE LAS SECCIONES, y por qué éste.
+       *
+       * Los proyectos van primero, justo detrás del hero: es la única sección con prueba
+       * visual —capturas de webs en producción— y quien dedica treinta segundos al CV los
+       * gasta mirando, no leyendo. Después la trayectoria comprobable (experiencia,
+       * formación, stack), y el perfil —tres párrafos de prosa, la sección más lenta— al
+       * final, ya para quien ha decidido seguir leyendo. Contacto cierra siempre.
+       *
+       * Cambiar este orden obliga a tocar dos cosas más: la numeración de las cabeceras
+       * (`index` de `SectionHeading`, que es el índice implícito de la página) y el orden
+       * de `navigation` en `lib/i18n/routes.ts`, que es el del menú.
+       */}
       <Hero locale={locale} profile={profile} stats={stats} />
-      <About locale={locale} profile={profile} />
-      <Experience locale={locale} entries={experience} />
       <Projects locale={locale} projects={projects} />
+      <Experience locale={locale} entries={experience} />
       <Education locale={locale} entries={education} />
       <Stack locale={locale} groups={skills} />
+      <About locale={locale} profile={profile} />
       <Contact locale={locale} profile={profile} />
     </>
   )

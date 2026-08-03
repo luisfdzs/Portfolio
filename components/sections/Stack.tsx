@@ -26,7 +26,7 @@ export function Stack({ locale, groups }: { locale: Locale; groups: readonly Ski
       id={sections.stack}
       className="page-gutter mx-auto max-w-7xl section-block text-center"
     >
-      <SectionHeading index="05" title={t.stack.title} kicker={t.stack.kicker} icon={Layers} />
+      <SectionHeading index="04" title={t.stack.title} kicker={t.stack.kicker} icon={Layers} />
 
       <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
         {groups.map((group, index) => (

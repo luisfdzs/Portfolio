@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import type { EducationEntry } from '@/content/types'
-import { formatRange } from '@/lib/format'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
@@ -35,7 +34,7 @@ export function Education({
       className="page-gutter mx-auto max-w-7xl section-block text-center"
     >
       <SectionHeading
-        index="04"
+        index="03"
         title={t.education.title}
         kicker={t.education.kicker}
         icon={GraduationCap}
@@ -45,16 +44,28 @@ export function Education({
         {entries.map((entry, index) => (
           <Reveal as="li" key={entry.slug} step={index}>
             <div className="lg:grid lg:grid-cols-[13rem_1fr] lg:gap-10">
-              <div>
-                <p className="figure-num text-small text-signal">
-                  {formatRange(entry.range, locale, t.education.ongoing)}
-                </p>
-                {entry.location ? (
-                  <p className="figure-num mt-1 text-small text-paper-faint">
-                    {entry.location[locale]}
-                  </p>
-                ) : null}
-              </div>
+              {/*
+               * SIN FECHAS, y es una decisión, no un olvido.
+               *
+               * La columna enseñaba «sept. 2020 — jun. 2025» y se ha quitado por encargo. El
+               * argumento es que en formación las fechas sólo pueden restar: con cinco años de
+               * experiencia encima, un título acabado hace poco invita a la cuenta de la edad y
+               * a la de cuánto se tardó, y ninguna de las dos dice nada sobre cómo trabaja
+               * alguien. Lo que sí lo dice está en la nota de abajo —la carrera cursada en
+               * paralelo a jornada completa—, y ahí sigue.
+               *
+               * `entry.range` **no se borra del contenido**: es un dato verdadero del CV y el
+               * modelo lo mantiene (el panel lo sigue pidiendo). Lo que cambia es que esta
+               * sección no lo pinta. En experiencia las fechas siguen estando, y ahí sí son el
+               * argumento: lo que un recruiter comprueba primero es que no haya huecos.
+               */}
+              {entry.location ? (
+                <div>
+                  <p className="figure-num text-small text-paper-faint">{entry.location[locale]}</p>
+                </div>
+              ) : (
+                <div />
+              )}
 
               <div className="mt-3 lg:mt-0">
                 <h3 className="text-title text-paper">{entry.title[locale]}</h3>

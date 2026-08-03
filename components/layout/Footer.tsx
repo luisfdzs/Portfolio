@@ -4,8 +4,7 @@ import type { Profile } from '@/content/types'
 import { buildYear } from '@/lib/format'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { href } from '@/lib/i18n/routes'
-import { ArrowUp, GitHub, LinkedIn, Mail } from '@/components/ui/Icons'
+import { GitHub, LinkedIn, Mail } from '@/components/ui/Icons'
 
 /**
  * Pie.
@@ -73,22 +72,15 @@ export function Footer({ locale, profile }: { locale: Locale; profile: Profile }
           </div>
         </div>
 
-        {/* En columna y centrado, no `justify-between`: con el copyright a la izquierda y la
-            flecha a la derecha, la última línea del sitio sería la única que rompe el eje
-            central. La flecha debajo y centrada cierra la página en el mismo eje. */}
-        <div className="mt-12 flex flex-col items-center gap-4 border-t border-line pt-6">
+        {/* Aquí había una flecha de «volver arriba» y se ha quitado: era un `<Link>` al
+            idioma actual —o sea, a la ruta en la que ya estás—, que no navega y no mueve el
+            scroll. Ahora es un botón flotante que aparece pasada la primera pantalla y en
+            todas las páginas (`components/ui/BackToTop.tsx`), que además es donde se necesita:
+            quien ha llegado al pie ya ha terminado de leer. */}
+        <div className="mt-12 border-t border-line pt-6">
           <p className="figure-num text-small text-paper-faint">
             © {year} {profile.name}. {t.footer.rights}
           </p>
-          {/* Ancla y no `window.scrollTo`: funciona sin JavaScript y respeta el
-              `scroll-behavior` del sistema para quien pide movimiento reducido. */}
-          <Link
-            href={href(locale, 'home')}
-            aria-label={t.a11y.backToTop}
-            className="tap text-paper-faint transition-colors hover:text-signal"
-          >
-            <ArrowUp className="size-5" />
-          </Link>
         </div>
       </div>
     </footer>

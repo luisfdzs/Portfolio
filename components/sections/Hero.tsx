@@ -192,12 +192,29 @@ export function Hero({ locale, profile, stats }: Props) {
           {/* Cifras. Al final del bloque y con un filete encima: son el resumen del CV, así
               que se leen después del titular, nunca antes. `w-full` porque el contenedor es
               una columna flex centrada: sin él la retícula se encoge a lo que miden las
-              cifras y el filete deja de sostener el bloque de lado a lado. */}
-          <dl className="mt-10 grid w-full grid-cols-2 gap-x-8 gap-y-7 border-t border-line pt-8 text-center lg:mt-12 lg:grid-cols-4">
+              cifras y el filete deja de sostener el bloque de lado a lado.
+
+              **Las cuatro en una sola fila también en móvil.** Estaban en dos columnas de dos,
+              y a media pantalla del hero eso las convertía en dos parejas que se leen por
+              separado: son un mismo dato de cuatro cifras —el resumen del CV en una línea— y
+              hay que poder abarcarlas de un golpe. A 390 px cada hueco mide unos 82 px, así
+              que el reparto es justo y lo que hay que cuidar es el rótulo. */}
+          <dl className="mt-10 grid w-full grid-cols-4 gap-x-2 gap-y-7 border-t border-line pt-8 text-center lg:mt-12 lg:gap-x-8">
             {stats.map((stat) => (
               <div key={stat.label}>
                 <dd className="figure-num text-figure text-paper">{stat.value}</dd>
-                <dt className="eyebrow mt-2">{stat.label}</dt>
+                {/*
+                 * El rótulo no usa `eyebrow` y ésa es toda la diferencia: en cuatro columnas
+                 * a 390 px, «PRODUCCIÓN» a 11 px con 0,14 em de entreletra mide más que la
+                 * columna y desborda la página —`check:mobile` no tolera un píxel—. Aquí baja
+                 * a 9 px con la entreletra a la mitad y en `lg` recupera los valores del
+                 * sistema. Va con utilidades y no con la utilidad `eyebrow` más un tamaño
+                 * encima porque las dos viven en la misma capa de CSS y quién gana lo
+                 * decidiría el orden de la hoja generada, no lo que está escrito aquí.
+                 */}
+                <dt className="mt-2 font-mono text-[0.5625rem] leading-[1.4] tracking-[0.07em] text-paper-faint uppercase lg:text-[0.6875rem] lg:tracking-[0.14em]">
+                  {stat.label}
+                </dt>
               </div>
             ))}
           </dl>
