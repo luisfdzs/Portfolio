@@ -24,7 +24,10 @@
  *    coger un fichero del disco y crear el asset: sin esto, los documentos entrarían sin
  *    captura y las tarjetas de proyecto perderían justo lo que las hace convincentes. La ruta
  *    va como `file://` **relativa al fichero NDJSON**, así que se calcula desde él.
- * 3. **Los `_id` llevan guion y NUNCA un punto**: `experience-swiftmet`, no
+ * 3. **El retrato del perfil NO se sube.** Es la única pieza de `content/` que no viaja al
+ *    panel: el campo existe, pero vacío la web sirve `public/luis.webp`. Ver el comentario en
+ *    el documento del perfil, más abajo.
+ * 4. **Los `_id` llevan guion y NUNCA un punto**: `experience-swiftmet`, no
  *    `experience.swiftmet`. Para Sanity un `_id` es una ruta separada por puntos, y **sólo la
  *    raíz es pública**; todo lo que tenga un punto exige token de lectura, que es el mecanismo
  *    con el que `drafts.` esconde los borradores. Ver `idFor` más abajo: es un fallo real y
@@ -114,7 +117,11 @@ documents.push(
     linkedin: profile.linkedin,
     github: profile.github,
     bio: localized(profile.bio),
-    photo: asset(profile.photo),
+    // **El retrato se deja SIN subir a propósito**, aunque el campo exista en el panel: con
+    // el campo vacío la web sirve `public/luis.webp` (ver `getProfile`), y así el fichero del
+    // repositorio es lo que se ve mientras nadie elija otro. Subirlo aquí dejaría dos copias
+    // de la misma foto con la del panel ganando, que es exactamente el fallo que se arregló:
+    // cambiar el recorte en `public/` no cambiaba nada en producción, sin un solo error.
   }),
 )
 

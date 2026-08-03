@@ -7,6 +7,11 @@ import { defineField, defineType } from 'sanity'
  * Es el documento que afecta a todas las páginas —cabecera, pie, metadatos, apertura
  * social—, así que sus campos son los únicos con validación estricta: un correo mal escrito
  * aquí rompe el único botón de la web que importa.
+ *
+ * **El retrato es el único campo con respaldo propio**: si se deja vacío, la web sirve el
+ * `public/luis.webp` del repositorio en vez de dejar el hueco (ver `getProfile` en
+ * `lib/content.ts`). De ahí que no lleve `required()` — obligarlo aquí quitaría justo la
+ * salida que hace que vaciarlo sea una opción legítima y no un documento a medias.
  */
 export const profile = defineType({
   name: 'profile',
@@ -63,6 +68,8 @@ export const profile = defineType({
       name: 'photo',
       title: 'Retrato',
       type: 'image',
+      description:
+        'Opcional. Si lo dejas vacío se usa el retrato que viene con la web (public/luis.webp), que es un recorte con transparencia preparado para el marco de la portada. Si subes uno propio, súbelo también recortado: una foto con fondo se ve como una tarjeta oscura alrededor de la cara.',
       // El recorte importa aquí más que en ninguna otra imagen: se sirve en círculo en
       // móvil, y sin `hotspot` un retrato descentrado sale sin media cara.
       options: { hotspot: true },

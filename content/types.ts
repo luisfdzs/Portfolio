@@ -98,5 +98,11 @@ export type Profile = {
   github: string
   /** Párrafos de la sección «Perfil». */
   bio: Localized<string[]>
-  photo?: DescribedImage | null
+  /**
+   * **Obligatorio, y no por casualidad.** El panel lo puede dejar vacío, pero
+   * `getProfile` pone entonces el retrato de `content/profile.ts` (ver `portrait`), así que
+   * ninguna vista recibe un perfil sin foto y el hero no puede quedarse con el hueco de
+   * trama. Si esto vuelve a ser opcional, el hueco vuelve con él.
+   */
+  photo: DescribedImage
 }

@@ -49,7 +49,10 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   documentos. Es la decisión de arquitectura central y está explicada en el README y en
   [[contenido-dos-fuentes]]. **Diferencia importante con los proyectos de cliente**: ahí Sanity es
   la única fuente y su ausencia es un error; aquí la web se construye y se despliega sin
-  credenciales de nada.
+  credenciales de nada. **La regla cae por documento, con UNA excepción: el retrato del hero cae
+  por campo.** Si el campo «Retrato» del panel está vacío se sirve `public/luis.webp`, porque un
+  perfil sin foto es un documento válido y no dispararía el respaldo — el hero se quedaría con el
+  hueco de trama. Ver [[hero-sanity]].
 - **Panel:** Sanity dentro de la propia web, en `/admin`. Cinco tipos de documento: el singleton
   `profile` y `experience`, `education`, `skillGroup` y `project`, los cuatro ordenables
   arrastrando. Proyecto `3pdexisd`, dataset `production` **público** (la web lee sin token al
@@ -206,7 +209,25 @@ proyecto.**
 
 ---
 
-_2026-08-03 (en `develop`, sin commitear): **el retrato del hero pasa a ser un recorte con
+_2026-08-03 (en `develop`): **el retrato del hero gana respaldo por campo.** El campo «Retrato» del
+panel sigue mandando cuando tiene una imagen elegida, pero **si está vacío la web sirve
+`public/luis.webp`** en vez de dejar el hueco de trama de `Figure`. Es la única excepción a la regla
+del contenido, que cae por documento: un «Perfil» sin foto es un documento **válido** y por eso no
+disparaba ningún respaldo. La imagen se exporta como `portrait` en `content/profile.ts` —declarada
+**antes** de `profile`, que la referencia—, la pone `getProfile`, y `Profile.photo` pasa a ser
+obligatorio en el tipo. **La trampa está en la consulta**: `select(defined(photo.asset) => photo
+{…})` y no `photo {…}` a secas, porque proyectar un campo vacío devuelve un objeto con las claves a
+`null` en vez de `null`, y eso tumbaría la validación del perfil **entero** y se caería al respaldo
+con él, perdiendo lo que sí esté editado en el panel. De paso, `migrate:import` deja de subir el
+retrato: subirlo dejaría de fábrica dos copias de la misma foto con la del panel ganando, que es el
+fallo que esto arregla. `npm run check` limpio y `check:mobile` 21/21 en los dos idiomas sobre el
+build de producción, con las dos ramas comprobadas —con foto en el panel y sin ella—.
+**Pendiente:** el panel de producción sigue teniendo el JPEG con la calle detrás, así que para que
+se vea el recorte hay que **vaciar el campo** en `/admin` → Perfil → *Publish* (o reemplazar ahí la
+imagen por `public/luis.webp`); **nunca con `migrate:import`**, que corre con `--replace`. Ver
+[[hero-sanity]]._
+
+_2026-08-03 (en `develop`): **el retrato del hero pasa a ser un recorte con
 transparencia.** `public/luis.webp` era una fotografía de Luis de traje con la calle detrás —y,
 pese al nombre, un JPEG—; ahora es el busto recortado con canal alfa (WebP RGBA 200×200, 7,9 KB,
 hecho con `rembg`/`birefnet-portrait`). El trabajo no está en el recorte sino en el marco: `Figure`
