@@ -3,6 +3,7 @@ import { z } from 'zod'
 import {
   education as localEducation,
   experience as localExperience,
+  portrait,
   profile as localProfile,
   skills as localSkills,
 } from '@/content/profile'
@@ -49,6 +50,14 @@ import type { Localized } from '@/lib/i18n/config'
  * El punto 2 es el que evita el fallo más probable: crear el proyecto de Sanity, no
  * haber importado todavía el contenido, y que la web se quede en blanco justo el día que
  * alguien la mira. Un dataset vacío no es una instrucción de borrar el CV.
+ *
+ * ## La excepción: el retrato
+ *
+ * Los tres puntos de arriba funcionan **por documento**, y hay un caso en el que eso no
+ * alcanza: el campo del retrato en el «Perfil». Un perfil sin foto elegida es un documento
+ * válido —no dispara ningún respaldo— y dejaría el hero con el hueco de trama de `Figure`.
+ * Así que el retrato tiene respaldo **por campo**: si el panel no trae ninguno, se sirve el de
+ * `content/profile.ts`. Es la única excepción; ver `getProfile`.
  *
  * ## Documentos a medias
  *
@@ -193,6 +202,9 @@ const profileSchema = z.object({
   linkedin: z.url(),
   github: z.url(),
   bio: localizedParagraphs,
+  // Opcional aquí y obligatorio en el tipo `Profile`: el hueco lo rellena `getProfile` con
+  // el retrato del repositorio. Es la única normalización de esta frontera que trae un valor
+  // de `content/` en vez de limitarse a poner un array vacío.
   photo: imageSchema.nullish(),
 })
 
@@ -288,7 +300,13 @@ export async function getProfile(): Promise<Profile> {
     return localProfile
   }
 
-  return result.data
+  // **El retrato tiene respaldo propio, por campo.** Todo lo demás en este módulo cae al
+  // repositorio por documento entero, y con la foto no vale: un «Perfil» del panel sin
+  // imagen elegida es un documento válido, así que no dispara el respaldo de arriba y el
+  // hero se quedaría con el hueco de trama de `Figure` —una portada con un rectángulo
+  // rayado donde va la cara—. El panel manda cuando ha elegido una; si no, se sirve la del
+  // repositorio, que es el recorte calibrado para el marco del hero.
+  return { ...result.data, photo: result.data.photo ?? portrait }
 }
 
 export function getExperience(): Promise<ExperienceEntry[]> {
