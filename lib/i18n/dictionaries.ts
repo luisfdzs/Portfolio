@@ -89,12 +89,14 @@ const es = {
     // Aparece bajo el título de la sección en la portada.
     intro:
       'No son ejercicios de curso: son webs de clientes reales en producción, con panel de administración para que el cliente edite su propio contenido sin pasar por mí.',
-    viewAll: 'Ver los {count} proyectos',
+    // «El índice» y no «los proyectos»: en el carrusel de la portada están ya todos, así que
+    // el enlace no promete más trabajo del que se ha visto, sino otra forma de mirarlo.
+    viewAll: 'Ver el índice de los {count} proyectos',
     viewProject: 'Ver el proyecto',
     // El carrusel de la portada. Los rótulos de los dos botones son de lector de
     // pantalla: en pantalla sólo hay una flecha, porque «Siguiente» al lado de una flecha
     // que apunta a la derecha es la misma información dos veces.
-    carousel: 'Proyectos destacados',
+    carousel: 'Proyectos',
     carouselPrevious: 'Proyecto anterior',
     carouselNext: 'Proyecto siguiente',
     liveSite: 'Web en vivo',
@@ -232,9 +234,9 @@ const en: Dictionary = {
     kicker: 'My own websites, end to end',
     intro:
       'Not course exercises: real client websites in production, each with an admin panel so the client edits their own content without going through me.',
-    viewAll: 'See all {count} projects',
+    viewAll: 'See the index of all {count} projects',
     viewProject: 'View project',
-    carousel: 'Featured projects',
+    carousel: 'Projects',
     carouselPrevious: 'Previous project',
     carouselNext: 'Next project',
     liveSite: 'Live site',
