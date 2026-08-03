@@ -258,21 +258,61 @@ async function main() {
   if (tooSmall.length > 0) console.log('    ', tooSmall.join('\n     '))
   check(tooSmall.length === 0, 'todo lo pulsable llega a 24×24 px')
 
+  // --- La sección que se está leyendo, resaltada -------------------------------------------
+  /**
+   * El menú tiene que decir **dónde estás**, no sólo a dónde se puede ir. Se comprueba en la
+   * barra de móvil porque es la navegación que se ve a 390 px, y con los dos casos que
+   * importan: sobre el hero no hay sección que resaltar, y dentro de una sí — exactamente una.
+   * Dos entradas marcadas a la vez es el fallo típico de medir «la más visible» en vez de una
+   * línea de lectura (ver `useActiveSection`).
+   */
+  console.log('\nSección activa')
+  await page.goto(`${BASE}/${LOCALE}`, { waitUntil: 'networkidle' })
+  check(
+    (await bar.locator('a[aria-current]').count()) === 0,
+    'sobre el hero no hay ninguna entrada resaltada',
+  )
+
+  await page.evaluate(() => {
+    const target = document.getElementById('experience')
+    if (target) {
+      window.scrollTo({
+        top: target.getBoundingClientRect().top + window.scrollY + 10,
+        behavior: 'instant',
+      })
+    }
+  })
+  await page.waitForTimeout(400)
+  const marked = await bar.locator('a[aria-current]').allInnerTexts()
+  check(
+    marked.length === 1 && /experien/i.test(marked[0] ?? ''),
+    `en experiencia se resalta sólo esa entrada (${JSON.stringify(marked)})`,
+  )
+
   // --- Ficha de proyecto: el sitio donde las rutas relativas explotan ---------------------
   console.log('\nFicha de proyecto')
+  /**
+   * El índice de proyectos se retiró: `/es/projects` ya no es una página y la redirección de
+   * `next.config.ts` tiene que llevar a la sección de la portada. Es la comprobación de que
+   * una URL que estuvo en el `sitemap.xml` no devuelve un 404 — y el 404 lo cazaría igual el
+   * escuchador de respuestas, pero diciendo sólo «HTTP 404» sin explicar qué se esperaba.
+   */
   await page.goto(`${BASE}/${LOCALE}/projects`, { waitUntil: 'networkidle' })
-  const indexOverflow = await horizontalOverflow(page)
-  if (indexOverflow > 1) console.log('    culpable:', await overflowCulprit(page))
-  check(indexOverflow <= 1, 'el índice de proyectos no desborda')
+  check(
+    new URL(page.url()).pathname === `/${LOCALE}`,
+    `/${LOCALE}/projects redirige a la portada (${new URL(page.url()).pathname})`,
+  )
 
-  const firstCard = page.locator('article h3 a').first()
+  // La primera tarjeta de la copia CENTRAL del carrusel: las otras dos son clones `inert` y
+  // un clic sobre ellas no llega a ningún sitio (ver `CoverFlow`).
+  const firstCard = page.locator('li:not([data-clone]) article h3 a').first()
   const cardHref = await firstCard.getAttribute('href')
   check(Boolean(cardHref?.startsWith('/')), `los enlaces de tarjeta son absolutos (${cardHref})`)
 
   await firstCard.click()
   // `waitForURL` y no `waitForLoadState('networkidle')`: la navegación de Next es de cliente,
   // así que la red se queda quieta enseguida y `networkidle` resolvía **antes** de que la
-  // ruta hubiera cambiado. La comprobación fallaba con la URL del índice, dando a entender
+  // ruta hubiera cambiado. La comprobación fallaba con la URL de partida, dando a entender
   // que el enlace estaba roto cuando lo que estaba mal era la espera.
   const navigated = await page
     .waitForURL(new RegExp(`/${LOCALE}/projects/.+`), { timeout: 8000 })

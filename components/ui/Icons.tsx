@@ -77,11 +77,20 @@ export function ArrowDown(props: IconProps) {
   )
 }
 
-export function Home(props: IconProps) {
+/**
+ * Perfil.
+ *
+ * Aquí había una casa, y la usaban las dos cosas que representan la sección «Perfil»: su
+ * cabecera y el icono de la barra de móvil. Un icono de inicio junto al rótulo «Perfil»
+ * promete volver arriba y lleva a la mitad de la página — que es la clase de desajuste que
+ * hace desconfiar de una barra de navegación entera. La casa se fue con ella porque no
+ * quedaba nada que la usara.
+ */
+export function User(props: IconProps) {
   return (
     <Icon {...props}>
-      <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" />
-      <path d="M9.5 21v-6h5v6" />
+      <circle cx="12" cy="8" r="3.75" />
+      <path d="M4.5 20.5c0-3.6 3.4-5.5 7.5-5.5s7.5 1.9 7.5 5.5" />
     </Icon>
   )
 }

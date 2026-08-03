@@ -30,7 +30,7 @@ principal del proyecto y está explicada abajo, en «El contenido: dos fuentes y
 | `npm run build`          | Build de producción                                               |
 | `npm start`              | Sirve el build de producción                                      |
 | `npm run check`          | **Puerta de calidad**: typecheck + ESLint + formato               |
-| `npm run check:mobile`   | 21 comprobaciones en un Chrome real a 390×844 (requiere servidor) |
+| `npm run check:mobile`   | 23 comprobaciones en un Chrome real a 390×844 (requiere servidor) |
 | `npm run shots`          | Recaptura la portada de cada proyecto de su web en vivo           |
 | `npm run format`         | Aplica Prettier                                                   |
 | `npm run migrate:build`  | Convierte `content/` en el NDJSON de importación a Sanity         |
@@ -191,7 +191,7 @@ Publicar y **editar** se ve en segundos por el webhook. Quitar, no del todo, y c
 antes de retirar algo: comprobado el 2026-08-03 al borrar Manfisa del dataset, con los dos
 entornos ya desplegados.
 
-Lo que el webhook arregla solo: la portada, `/es/projects` y las fichas que siguen existiendo.
+Lo que el webhook arregla solo: la portada y las fichas que siguen existiendo.
 Sirven una vez la copia vieja —regeneran en segundo plano, así que la **primera** petición después
 de publicar todavía enseña lo anterior; la segunda ya no— y luego quedan al día.
 
@@ -239,6 +239,16 @@ secciones —no sólo las dos que no caben en la barra— con los dos idiomas al
 filete horizontal. Es el menú de `Swiftmet`: un panel que sólo lista el sobrante obliga a mirar la
 barra para deducir qué falta.
 
+**Las seis entradas llevan a las seis secciones de la portada, y la que se está leyendo va
+resaltada en cobre** —con su subrayado puesto, porque el color no puede ser la única señal—. Lo
+mide `components/layout/useActiveSection.ts`: una **línea horizontal** trazada un cuarto de pantalla
+por debajo de la cabecera, y gana la sección que la cruza. El camino evidente sería un
+`IntersectionObserver` que se quede con «la más visible», y en una página cuyas secciones miden de
+media pantalla a cuatro eso resalta la más alta casi todo el rato y parpadea en los solapes. La
+línea da una sola respuesta y cambia exactamente al pasar de una sección a la siguiente. En una
+ficha de proyecto no hay secciones que medir, así que ahí manda la ruta y se marca «Proyectos», que
+es de donde se ha entrado.
+
 ### El orden de las secciones
 
 `hero → proyectos → experiencia → formación → stack → perfil → contacto`.
@@ -270,8 +280,13 @@ lado de otra no se miran: se hojean.
 quedaba en el índice de `/projects`; el argumento era ahorrar scroll y no se sostiene aquí, porque
 en un carrusel las tarjetas se pasan de lado y ocho ocupan lo mismo que cuatro. El coste sí era
 real: la mitad del trabajo sólo se veía entrando en una segunda página. `featured` sigue sirviendo
-para algo —decide **por dónde abre** el carrusel, ver `getCarouselProjects` en `lib/content.ts`— y
-el índice sigue enlazado debajo, porque hace otra cosa: es una URL que se manda suelta.
+para algo —decide **por dónde abre** el carrusel, ver `getCarouselProjects` en `lib/content.ts`—.
+
+Y con los ocho aquí, **el índice se retiró** (2026-08-03): era una segunda URL con las mismas ocho
+tarjetas, compitiendo con la portada por «Luis Fernández Sangil», y una entrada del menú que en vez
+de moverse por el CV se iba de página. Lo que sí sigue siendo una página es **cada proyecto**
+(`/es/projects/swiftmet`), que es lo que se manda suelto en una candidatura. La URL vieja no da 404:
+`next.config.ts` redirige `/es/projects` y `/en/projects` al ancla de esta sección.
 
 Lo mueve **el scroll y nada más**. Las animaciones son `view-timeline` + `animation-timeline`, la
 misma técnica que las apariciones al hacer scroll, así que no hay JavaScript calculando
@@ -390,9 +405,10 @@ máscaras, mira el filete de cifras antes de cerrar.
 
 ### En la barra de direcciones nunca se ve una almohadilla
 
-Las secciones de la portada son anclas y `/es/projects` es una página. Es una diferencia real —el
-fragmento es la única parte de una URL que no llega al servidor—, pero al visitante le llega como
-una incoherencia: unas entradas del mismo menú dejan `/es/projects` y otras `/es#experience`.
+Las seis secciones de la portada son anclas y las fichas de proyecto son páginas. Es una diferencia
+real —el fragmento es la única parte de una URL que no llega al servidor—, pero al visitante le
+llega como una incoherencia: pulsar en el menú dejaría `/es#experience` y pulsar una tarjeta,
+`/es/projects/swiftmet`.
 
 `components/layout/HashCleaner.tsx` quita esa diferencia, y **sin tocar los `href`**: siguen
 llevando el ancla, así que la navegación funciona sin JavaScript, se puede abrir en otra pestaña,

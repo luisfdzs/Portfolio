@@ -53,7 +53,20 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/proyectos',
-        destination: '/es/projects',
+        destination: '/es#projects',
+        permanent: true,
+      },
+      {
+        // El índice de proyectos se retiró el 2026-08-03 —los ocho están en el carrusel de
+        // la portada—, pero la URL estuvo publicada: la enseñaba el menú, la enlazaba la
+        // propia sección y **estuvo en el `sitemap.xml`**, así que Google la conoce. Sin
+        // esto, quien vuelva por ella o por un enlace ya enviado se come un 404.
+        //
+        // El patrón no lleva comodín a propósito: casa `/es/projects` exacto y **no**
+        // `/es/projects/swiftmet`, que sigue siendo una página de verdad. Un `/:path*`
+        // aquí se llevaría por delante las ocho fichas.
+        source: '/:locale(es|en)/projects',
+        destination: '/:locale#projects',
         permanent: true,
       },
       {

@@ -89,9 +89,6 @@ const es = {
     // Aparece bajo el título de la sección en la portada.
     intro:
       'No son ejercicios de curso: son webs de clientes reales en producción, con panel de administración para que el cliente edite su propio contenido sin pasar por mí.',
-    // «El índice» y no «los proyectos»: en el carrusel de la portada están ya todos, así que
-    // el enlace no promete más trabajo del que se ha visto, sino otra forma de mirarlo.
-    viewAll: 'Ver el índice de los {count} proyectos',
     viewProject: 'Ver el proyecto',
     // El carrusel de la portada. Los rótulos de los dos botones son de lector de
     // pantalla: en pantalla sólo hay una flecha, porque «Siguiente» al lado de una flecha
@@ -111,13 +108,11 @@ const es = {
       prototype: 'Prototipo navegable',
       archived: 'Archivado',
     },
-    index: {
-      title: 'Proyectos',
-      lead: 'Todo lo que he construido por mi cuenta, con el detalle técnico de cada pieza.',
-    },
     previous: 'Anterior',
     next: 'Siguiente',
-    backToProjects: 'Todos los proyectos',
+    // Lleva al carrusel de la portada, no a un índice: se dice «volver» porque es de ahí
+    // de donde se entra a una ficha.
+    backToProjects: 'Volver a los proyectos',
   },
 
   education: {
@@ -234,7 +229,6 @@ const en: Dictionary = {
     kicker: 'My own websites, end to end',
     intro:
       'Not course exercises: real client websites in production, each with an admin panel so the client edits their own content without going through me.',
-    viewAll: 'See the index of all {count} projects',
     viewProject: 'View project',
     carousel: 'Projects',
     carouselPrevious: 'Previous project',
@@ -251,13 +245,9 @@ const en: Dictionary = {
       prototype: 'Working prototype',
       archived: 'Archived',
     },
-    index: {
-      title: 'Projects',
-      lead: 'Everything I have built on my own, with the technical detail of each piece.',
-    },
     previous: 'Previous',
     next: 'Next',
-    backToProjects: 'All projects',
+    backToProjects: 'Back to projects',
   },
 
   education: {
