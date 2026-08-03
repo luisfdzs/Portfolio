@@ -37,8 +37,10 @@ en la memoria [[despliegue]].
 carrusel; las fichas viven en `content/projects.ts` unidas por el `name`. Están todos los
 repositorios de github.com/luisfdzs **menos Manfisa**, retirada a propósito, y las portadas de las
 tarjetas son **la primera pantalla de cada web en vivo**, capturadas por `npm run shots`. **Ojo:
-el panel manda en lo desplegado, así que la lista no cambia la web pública hasta reflejarla en
-`/admin`.** Ver [[lista-de-proyectos]].
+el panel manda en lo desplegado, así que la lista no cambia la web pública hasta reflejarla en el
+panel** — hecho ya por CLI el 2026-08-03, con el documento de Manfisa borrado aparte porque
+`--replace` no borra. Y **retirar un proyecto necesita además un despliegue**: el webhook no se
+lleva ni su ficha prerrenderizada ni el `sitemap.xml`. Ver [[lista-de-proyectos]].
 
 **El panel está enchufado (2026-08-03).** Proyecto de Sanity `Portfolio`, id `3pdexisd`, dataset
 `production` público, con los dieciséis documentos del CV y las siete imágenes importados; la web
@@ -239,9 +241,15 @@ sin extensión. (3) `npm run shots` reescrito: la portada de cada tarjeta es **l
 su web en vivo**, capturada con la ventana a 1400×700 —el 2:1 exacto del hueco— en vez de recortada
 de una captura de otra proporción; adiós al mapa de sufijos que había que mantener a mano. `npm run
 check` limpio y `check:mobile` 21/21 en los dos idiomas sobre el build de producción.
-**Pendiente:** el panel sigue con los seis proyectos de la importación inicial, Manfisa incluida, y
-mientras no se refleje ahí la web pública no cambia — mismo síntoma engañoso que con el retrato.
-Ver [[lista-de-proyectos]]._
+Promocionado a `test` y a `main`, y **el panel sincronizado por CLI** a continuación
+(`migrate:build` + `migrate:import` + borrado de `project-manfisa`, que `--replace` no borra): el
+dataset tiene los ocho proyectos en el orden de la lista y el campo del retrato quedó vacío, con lo
+que producción pasa a servir el recorte de `public/luis.webp` y se cierra de rebote el pendiente
+del retrato. **El hallazgo de la sesión llegó al comprobar el resultado:** el webhook pone al día
+la portada, el índice y las fichas vivas —sirviendo una vez la copia vieja antes de regenerar—,
+pero **no** se lleva la ficha prerrenderizada del proyecto retirado ni el `sitemap.xml`, que es
+estático del build. Los dos se van con un despliegue, así que la regla es **borrar el documento y
+desplegar después**. Ver [[lista-de-proyectos]]._
 
 _2026-08-03 (en `develop`): **el retrato del hero gana respaldo por campo.** El campo «Retrato» del
 panel sigue mandando cuando tiene una imagen elegida, pero **si está vacío la web sirve

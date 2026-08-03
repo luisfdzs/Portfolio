@@ -185,6 +185,28 @@ los cinco tipos del CV (así una subida de imagen no regenera el sitio). El secr
 Si algún día faltaran las variables, `/admin` no falla: explica cuál falta y recuerda que la web
 pública funciona igual (`app/(studio)/admin/ConnectionNotice.tsx`).
 
+### QUITAR un proyecto del panel necesita además un build
+
+Publicar y **editar** se ve en segundos por el webhook. Quitar, no del todo, y conviene saberlo
+antes de retirar algo: comprobado el 2026-08-03 al borrar Manfisa del dataset, con los dos
+entornos ya desplegados.
+
+Lo que el webhook arregla solo: la portada, `/es/projects` y las fichas que siguen existiendo.
+Sirven una vez la copia vieja —regeneran en segundo plano, así que la **primera** petición después
+de publicar todavía enseña lo anterior; la segunda ya no— y luego quedan al día.
+
+Lo que **no** arregla:
+
+- **La ficha del proyecto retirado.** `/es/projects/manfisa` se prerrenderizó en el build y sigue
+  respondiendo 200 con su copia, aunque el documento ya no exista. Nada la enlaza, pero la URL
+  funciona y Google la tiene.
+- **`sitemap.xml`**, que es estático del build entero: sigue anunciando los slugs viejos.
+
+Los dos se arreglan **desplegando** —cualquier push a `test` o `main`—: el build nuevo genera
+`generateStaticParams` sin ese slug, la ruta pasa a resolverse en el momento, no encuentra el
+proyecto y devuelve 404. Así que el orden correcto para retirar un proyecto es **borrar el
+documento y desplegar después**, no sólo borrarlo.
+
 ---
 
 ## Diseño
@@ -422,18 +444,12 @@ Falla del lado seguro: si mañana falta la variable, no se indexa.
 
 Cosas que están así a propósito y con quién se resuelven:
 
-- **El panel sigue con la lista de proyectos vieja.** Desde el 2026-08-03 el repositorio publica
-  ocho proyectos y **no** Manfisa, pero lo desplegado lee de Sanity y allí siguen los seis de la
-  importación inicial, Manfisa incluida. Hasta reflejarlo en el panel, la web pública no cambia y
-  ni el `check` ni el build se quejan — es la regla del contenido funcionando, no un fallo. Dos
-  formas de arreglarlo:
-  - **A mano en `/admin`** (recomendada si ya se ha editado algo ahí): borrar el documento de
-    Manfisa y crear «Mila Barber», «Cedecé» y «Portfolio» con su captura de `public/projects/`.
-  - **Reimportando**: `npm run migrate:build && npm run migrate:import`. Deja el dataset con
-    exactamente lo que hay en `content/`, **pero corre con `--replace`**: machaca las ediciones
-    hechas a mano y el orden de los documentos arrastrables, y **no borra** el documento de
-    Manfisa, que hay que eliminar aparte
-    (`npx sanity documents delete project-manfisa --dataset production`).
+- ~~**El panel sigue con la lista de proyectos vieja.**~~ Resuelto el 2026-08-03: reimportado
+  (`npm run migrate:build && npm run migrate:import`) y borrado el documento de Manfisa
+  (`npx sanity documents delete project-manfisa --dataset production`), que `--replace` **no**
+  borra por su cuenta. El dataset tiene ya los ocho proyectos en el orden de la lista, sin
+  borradores, y el retrato del perfil quedó vacío — que es justo lo que hacía falta para que la
+  web sirva el recorte de `public/luis.webp` (ver el punto de abajo).
 - **Hay que VACIAR el retrato del panel para que se vea el recorte.** El campo «Retrato» del
   documento `profile` sigue teniendo el JPEG original con la calle detrás, y el panel manda cuando
   tiene una imagen elegida. Desde el 2026-08-03 basta con quitarla —`/admin` → **Perfil** → campo
