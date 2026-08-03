@@ -104,7 +104,12 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
 - **Alineación: el texto va centrado** en el espacio que ocupa, como en `sangilstudio`. `text-center`
   en la sección + `mx-auto` en las cajas con ancho máximo + `justify-center` en las filas flex; las
   tres cosas juntas, porque ninguna hace el trabajo de las otras. **En papel no**: `@media print` lo
-  deshace. Qué quedó sin centrar y por qué, en [[decisiones-de-diseno]].
+  deshace. Y **centrar el texto en una columna no lo centra en la sección**: experiencia y formación
+  maquetan cada entrada en una retícula con un carril de `13rem` a la izquierda, así que llevan una
+  **tercera columna vacía** (`13rem` en formación, `15,5rem` en experiencia, que suma el sangrado de
+  la línea temporal) para que el contenido caiga en el mismo eje que el rótulo. Quien toque el
+  carril, el `gap` o el sangrado tiene que recalcular ese valor. Qué quedó sin centrar y por qué, en
+  [[decisiones-de-diseno]].
 - **Los proyectos de la portada van en un carrusel «cover flow», van TODOS y el carrusel es
   INFINITO** (bloque «COVER FLOW» de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D
   dirigido por el scroll, y de JavaScript sólo los dos botones y el salto del bucle. El bucle es
@@ -242,6 +247,35 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-03 (en `develop`): **experiencia y formación vuelven a cuadrar con su rótulo en
+escritorio.** El contenido de cada entrada se veía descolocado a la derecha respecto a la cabecera de
+la sección, y la causa no era un margen sino la retícula: el `text-center` centra el texto **en su
+columna**, y esa columna arranca a la derecha del carril de fechas (`13rem` + `2,5rem` de hueco, más
+el `lg:pl-10` de la línea temporal en experiencia). Medido en Chrome a 1440 px, el titular de cada
+puesto caía **145 px** a la derecha del centro del rótulo y el de formación **124 px**. Se arregla con
+una **tercera columna vacía** que devuelve exactamente lo que el carril empuja —`15,5rem` en
+experiencia y `13rem` en formación—, sin añadir ningún elemento: la pista existe porque la declara
+`grid-template-columns`. Comprobado a 1024, 1440 y 1920 px, y con el desfase medido antes y después
+sobre el build de producción: pasa de 145/124 px a **0–1 px**. Móvil intacto (la retícula es `lg:`) y
+la hoja de impresión también, que a la anchura de una hoja no llega al `lg`. `npm run check` limpio y
+`check:mobile` 21/21 en los dos idiomas. **Lo que no avisa si se rompe**: el valor de la columna
+vacía es aritmética a mano, así que cambiar el ancho del carril, el `gap` o el sangrado vuelve a
+descuadrarlo en silencio. Ver [[decisiones-de-diseno]]._
+
+_2026-08-03 (en `develop`): **el centro de formación pasa a traducirse.** La versión inglesa enseñaba
+«Universidad de Vigo» porque `institution` era una `string` suelta; ahora es `Localized` (`es:
+'Universidad de Vigo'`, `en: 'University of Vigo'`, el nombre oficial de uvigo.gal en inglés). El
+castellano se toma del panel —«Universidad», no la forma gallega que consta en LinkedIn y tenía el
+respaldo— para que las dos fuentes digan lo mismo. **`company` en la experiencia sigue siendo una
+`string` a propósito**: «Altia» o «ABB» son marcas y no se traducen; una universidad pública tiene
+nombre oficial en cada idioma. El cambio toca siete sitios —tipo, respaldo, validación, esquema del
+panel (con el `select` del `preview` a `institution.es`), consulta, vista y el `alumniOf` del
+JSON-LD— más el generador del NDJSON. **Y el panel se queda desalineado**: su valor es una cadena, la
+consulta lo proyecta a `null`, la validación tumba el documento y la formación cae al respaldo, que
+dice lo correcto —la web se ve bien— pero con dos avisos en el log del build; se cierra en `/admin` →
+Formación → Centro rellenando los dos idiomas. `npm run check` limpio y el prerenderizado comprobado:
+`en.html` dice «University of Vigo» y `es.html` «Universidad de Vigo». Ver [[perfil-cv]]._
 
 _2026-08-03 (en `develop`, por encargo de trabajar ahí directamente): **seis cambios de navegación y
 lectura de la portada, pedidos de una vez.** (1) **El menú de móvil es el de Swiftmet**: el panel

@@ -43,7 +43,14 @@ export function Education({
       <ol className="space-y-10">
         {entries.map((entry, index) => (
           <Reveal as="li" key={entry.slug} step={index}>
-            <div className="lg:grid lg:grid-cols-[13rem_1fr] lg:gap-10">
+            {/* TRES columnas en escritorio y la tercera va vacía, a propósito: es lo
+                mismo que en experiencia y por la misma razón. El texto estaba centrado
+                en su columna, pero la columna arrancaba 15,5rem a la derecha (la de la
+                ubicación más el hueco), así que el bloque caía descentrado respecto al
+                rótulo de la sección. Aquí la columna vacía mide 13rem —lo que ocupa la
+                de la ubicación— porque esta sección no lleva el sangrado de la línea
+                temporal, y con eso las dos vuelven a ser simétricas. */}
+            <div className="lg:grid lg:grid-cols-[13rem_1fr_13rem] lg:gap-10">
               {/*
                * SIN FECHAS, y es una decisión, no un olvido.
                *
