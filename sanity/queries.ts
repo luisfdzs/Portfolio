@@ -19,7 +19,16 @@ const image = `{
   alt ${localized}
 }`
 
-/** El perfil es un singleton: si hubiera más de uno, gana el primero por antigüedad. */
+/**
+ * El perfil es un singleton: si hubiera más de uno, gana el primero por antigüedad.
+ *
+ * **El retrato se proyecta con `select(defined(photo.asset) => …)` y no con `photo {…}` a
+ * secas**, que es la forma evidente y la equivocada: proyectar un campo vacío devuelve un
+ * objeto con las cuatro claves a `null` en vez de `null`, y entonces la validación del perfil
+ * **entero** falla y se cae al respaldo de `content/` con él, perdiendo de paso lo que sí esté
+ * editado en el panel. Con el `select`, «no hay retrato elegido» llega como `null`, que es lo
+ * que `getProfile` sabe rellenar con el retrato del repositorio.
+ */
 export const PROFILE_QUERY = defineQuery(`
   *[_type == "profile"] | order(_createdAt asc)[0] {
     name,
@@ -29,7 +38,7 @@ export const PROFILE_QUERY = defineQuery(`
     linkedin,
     github,
     bio ${localized},
-    photo ${image}
+    "photo": select(defined(photo.asset) => photo ${image})
   }
 `)
 

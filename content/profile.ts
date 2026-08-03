@@ -1,4 +1,4 @@
-import type { EducationEntry, ExperienceEntry, Profile, SkillGroup } from './types'
+import type { DescribedImage, EducationEntry, ExperienceEntry, Profile, SkillGroup } from './types'
 
 /**
  * EL CV, COMO DATOS
@@ -13,6 +13,42 @@ import type { EducationEntry, ExperienceEntry, Profile, SkillGroup } from './typ
  * hechos. Si algún día hace falta un dato que no consta, se deja fuera: un CV con un
  * dato dudoso vale menos que uno con un hueco.
  */
+
+/**
+ * EL RETRATO DE RESPALDO, y **el único respaldo que se usa por campo y no por documento**.
+ *
+ * El panel sigue teniendo su campo «Retrato» y sigue mandando cuando hay una imagen elegida;
+ * lo que cambia es qué pasa cuando no la hay. La regla general del contenido cae al respaldo
+ * **por documento entero** —perfil, puesto, proyecto—, y con el retrato eso no basta: el
+ * documento «Perfil» del panel es perfectamente válido con el campo de la foto vacío, así que
+ * no se cae a `content/` y el hero se quedaba con el hueco de trama de `Figure`. Por eso el
+ * respaldo del retrato es por campo y lo pone `getProfile` (ver `lib/content.ts`).
+ *
+ * Va suelto y no sólo dentro de `profile` porque el respaldo de campo tiene que poder usarse
+ * cuando el resto del perfil viene de Sanity, que es el caso normal. Se declara **antes** de
+ * `profile`, que lo referencia: al revés sería un `const` usado antes de inicializarse y el
+ * módulo rompería al cargar.
+ *
+ * **Es un RECORTE con canal alfa**: el busto sin la calle de detrás, calibrado contra
+ * `.hero-portrait__frame` — una foto con fondo subida al panel deja el busto como una tarjeta
+ * oscura en el hero. Si alguna vez se repone el original a 800×800, hay que volver a
+ * recortarlo.
+ *
+ * 200×200 es el original que había: es justo el mínimo para el retrato circular de móvil
+ * (160 px) pero se queda corto para los 320 px de escritorio, donde se ve blando en pantallas
+ * de alta densidad. Está apuntado en el README como pendiente: hace falta el original a
+ * 800×800. Se declaran las medidas reales y no las deseadas, porque `next/image` reserva el
+ * hueco con ellas y mentir aquí provoca salto de maquetación.
+ */
+export const portrait: DescribedImage = {
+  src: '/luis.webp',
+  width: 200,
+  height: 200,
+  alt: {
+    es: 'Retrato de Luis Fernández Sangil',
+    en: 'Portrait of Luis Fernández Sangil',
+  },
+}
 
 export const profile: Profile = {
   name: 'Luis Fernández Sangil',
@@ -39,24 +75,7 @@ export const profile: Profile = {
       'Alongside that I build complete websites on my own, and there I choose the stack: Next.js, Sanity and Vercel. Not just the interface: the content model, the panel so the client edits their own copy, the deployment with separate environments, and the maintenance. The projects below are exactly that, and all of them are in production.',
     ],
   },
-  photo: {
-    // **Es un RECORTE con canal alfa**: el busto sin la calle de detrás. Si alguna vez se
-    // repone el original a 800×800, hay que volver a recortarlo — una foto con fondo aquí
-    // deja el hero con una tarjeta oscura alrededor de la cara (ver `.hero-portrait__frame`
-    // en `globals.css`).
-    // 200×200 es el original que había: es justo el mínimo para el retrato circular de
-    // móvil (160 px) pero se queda corto para los 320 px de escritorio, donde se ve blando
-    // en pantallas de alta densidad. Está apuntado en el README como pendiente: hace falta
-    // el original a 800×800. Se declaran las medidas reales y no las deseadas, porque
-    // `next/image` reserva el hueco con ellas y mentir aquí provoca salto de maquetación.
-    src: '/luis.webp',
-    width: 200,
-    height: 200,
-    alt: {
-      es: 'Retrato de Luis Fernández Sangil',
-      en: 'Portrait of Luis Fernández Sangil',
-    },
-  },
+  photo: portrait,
 }
 
 /**

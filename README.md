@@ -84,6 +84,32 @@ Cada documento se valida con **zod** por separado. Uno que no cumple se descarta
 el log del build; nunca se tumba la web entera. Un puesto sin descripción no puede hacer
 desaparecer los otros tres.
 
+### La excepción: el retrato tiene respaldo por campo
+
+Los tres puntos funcionan **por documento**, y hay un caso en el que eso no alcanza. El campo
+«Retrato» del «Perfil» es opcional en el panel, y un perfil sin foto elegida es un documento
+perfectamente válido: no dispara ningún respaldo, así que el hero se quedaría con el hueco de
+trama de `Figure` —un rectángulo rayado donde va la cara—. Por eso el retrato se resuelve **por
+campo**:
+
+> **Si el panel trae un retrato, manda el del panel. Si el campo está vacío, se sirve
+> `public/luis.webp`.**
+
+Lo pone `getProfile` en `lib/content.ts`, con la imagen exportada como `portrait` en
+`content/profile.ts`. Dos consecuencias prácticas:
+
+- **Vaciar el campo en el panel es una acción legítima**, no un documento a medias: es la forma
+  de decir «usa la foto que viene con la web». De ahí que el campo no lleve `required()`.
+- **`migrate:import` no sube el retrato** aunque el campo exista, precisamente para que un
+  proyecto recién importado sirva el fichero del repositorio y no una segunda copia de la misma
+  foto que además ganaría. Es el fallo que esto arregla: cambiar el recorte en `public/` no
+  cambiaba nada en producción, y ni el `check` ni el build se quejaban.
+
+En la consulta, el retrato se proyecta con `select(defined(photo.asset) => …)` y **no** con
+`photo {…}` a secas, que es la forma evidente y la equivocada: proyectar un campo vacío devuelve
+un objeto con las claves a `null` en vez de `null`, y entonces falla la validación del perfil
+entero y se cae al respaldo con él, perdiendo lo que sí esté editado en el panel.
+
 ### Nada de cifras escritas a mano
 
 Los cuatro números del titular —años de experiencia, proyectos en producción, empresas y
@@ -117,7 +143,7 @@ npx sanity projects create "Portfolio" --dataset production --dataset-visibility
 # → devuelve el projectId; va a .env.local y a los dos proyectos de Vercel
 
 npm run migrate:build      # content/ → scripts/migration/import.ndjson
-npm run migrate:import     # sube también el retrato y las seis capturas
+npm run migrate:import     # sube también las seis capturas (el retrato NO: ver más abajo)
 
 # Orígenes CORS: sin esto /admin carga pero no puede hablar con Sanity
 npx sanity cors add http://localhost:3000 --credentials
@@ -362,14 +388,13 @@ Falla del lado seguro: si mañana falta la variable, no se indexa.
 
 Cosas que están así a propósito y con quién se resuelven:
 
-- **El recorte del retrato hay que subirlo al panel.** `public/luis.webp` es ya el busto con canal
-  alfa, y `content/profile.ts` lo apunta, pero **la web no lo enseña hasta que esté en Sanity**: por
-  la regla del contenido, el panel manda cuando tiene documentos, y el documento `profile` sigue
-  referenciando el JPEG original con la calle detrás. Se arregla en `/admin` → **Perfil** → campo
-  «Retrato de Luis Fernández Sangil» → reemplazar la imagen por `public/luis.webp` → _Publish_. **No
-  con `npm run migrate:import`**: corre con `--replace` y machacaría las ediciones hechas a mano en
-  el panel y el orden de los documentos arrastrables. Es el caso general y conviene tenerlo
-  presente: **cambiar una imagen en `content/` no cambia la web mientras Sanity tenga la suya.**
+- **Hay que VACIAR el retrato del panel para que se vea el recorte.** El campo «Retrato» del
+  documento `profile` sigue teniendo el JPEG original con la calle detrás, y el panel manda cuando
+  tiene una imagen elegida. Desde el 2026-08-03 basta con quitarla —`/admin` → **Perfil** → campo
+  «Retrato» → borrar la imagen → _Publish_— y la web sirve `public/luis.webp`, que es el busto con
+  canal alfa. La otra opción, si se prefiere tener la foto en el panel, es reemplazarla ahí por
+  `public/luis.webp`; las dos valen. Lo que **no** sirve es `npm run migrate:import`: corre con
+  `--replace` y machacaría las ediciones hechas a mano y el orden de los documentos arrastrables.
 - **El retrato es de 200×200.** Es el original que había en el portfolio anterior. Da justo para
   el círculo de móvil (160 px) pero se ve blando en los 320 px de escritorio con pantalla de alta
   densidad. **Hace falta el original a 800×800**; las medidas declaradas en `content/profile.ts`

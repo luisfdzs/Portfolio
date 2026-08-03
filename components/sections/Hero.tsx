@@ -111,6 +111,11 @@ export function Hero({ locale, profile, stats }: Props) {
          * tres cosas en `globals.css`; no se hace con utilidades porque `cn()` no resuelve
          * conflictos de Tailwind y `bg-transparent` contra `bg-ink-raised` se decidiría por
          * el orden de la hoja generada. Ver «El retrato, flotando sobre el campo».
+         *
+         * `profile.photo` **nunca es nulo**, y no porque el panel obligue a rellenarlo: si
+         * está vacío, `getProfile` pone el retrato del repositorio (ver `portrait` en
+         * `content/profile.ts`). Por eso aquí no hay ninguna comprobación ni el hero puede
+         * enseñar el hueco de trama de `Figure` donde va la cara.
          */}
         <div className="hero-portrait mx-auto w-20 lg:w-24">
           <Figure
