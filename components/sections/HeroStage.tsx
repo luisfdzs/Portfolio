@@ -9,6 +9,15 @@ import { cn } from '@/lib/cn'
  * ocupando el alto completo de la ventana, en cinco columnas que se desplazan despacio y en
  * direcciones alternas sobre un resplandor de cobre que respira.
  *
+ * **Es el fondo de la PRIMERA SECCIÓN, y sólo de ella.** El resto de la web lo cubre el campo
+ * interactivo (`components/layout/SiteField.tsx`), una capa fija montada en el layout con una
+ * retícula de nodos que reacciona al puntero. Los dos conviven porque el escenario es una capa
+ * **opaca** dentro del hero: tapa el campo mientras dura la primera pantalla y se disuelve en
+ * los últimos 9 rem, que es donde el campo emerge. Esa disolución es una máscara en
+ * `.hero-stage` (ver `globals.css`) y es la única costura entre los dos fondos: **quien toque
+ * uno tiene que mirarla.** Sin ella el borde inferior del hero sería una raya horizontal a media
+ * pantalla, entre grafito liso y retícula.
+ *
  * **Antes era una banda en la mitad derecha del hero; ahora es la primera pantalla.** El cambio
  * no es de tamaño, es de quién manda: el texto pasó a apoyarse abajo, sobre el mosaico, en vez de
  * convivir con él a media altura. Eso permitió tirar tres piezas frágiles —el «el carril empieza

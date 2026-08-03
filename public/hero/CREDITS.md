@@ -1,5 +1,11 @@
 # Tejas de la portada — procedencia y licencia
 
+> **Vuelven a usarse (desde el 2026-08-03), y sólo en la primera sección.** Entre el 2026-08-02 y
+> esa fecha estuvieron huérfanas: el campo interactivo dibujado en `<canvas>`
+> (`components/layout/SiteField.tsx`) había sustituido al escenario. Ahora los dos fondos
+> conviven — el mosaico en la portada, la retícula de nodos en el resto de la web—, así que
+> `HeroStage.tsx` volvió y estas dieciséis imágenes con él.
+
 Las dieciséis fotografías de `public/hero/` son el material del **escenario cinético** de la
 portada (`components/sections/HeroStage.tsx`). Este archivo existe para que dentro de dos años se
 pueda responder sin dudar de dónde salió cada una, porque una foto sin procedencia documentada es

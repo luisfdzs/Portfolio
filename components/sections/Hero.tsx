@@ -28,6 +28,13 @@ type Props = {
  * fondo dinámico se vea desde el primer segundo, con la referencia de la portada de
  * `swiftmet.vercel.app` y del collage de sanity.io.
  *
+ * **HAY DOS FONDOS EN ESTA WEB, Y ÉSTE ES EL DE LA PRIMERA PANTALLA.** El otro es el campo
+ * interactivo (`components/layout/SiteField.tsx`), una capa fija montada en el layout que pasa
+ * por debajo de todas las secciones de todas las páginas. El escenario es una capa OPACA dentro
+ * de esta sección: se pone delante del campo mientras dura el hero y se disuelve en sus últimos
+ * 9 rem, que es donde el campo emerge y se queda ya para el resto de la web. Si se toca uno de
+ * los dos, hay que mirar la costura entre ambos — está en la máscara de `.hero-stage`.
+ *
  * Las cuatro decisiones que responden a eso:
  *
  * - **El nombre es el titular**, en la serif y al tamaño más grande del sitio. En un
@@ -71,10 +78,12 @@ export function Hero({ locale, profile, stats }: Props) {
       aria-labelledby="hero-name"
       // A sangre y recortando: el escenario tiene que llegar al borde de la ventana por los
       // cuatro lados. `overflow-hidden` es lo que impide que las columnas —que salen del
-      // encuadre por arriba y por abajo— alarguen el documento; `check:mobile` no tolera ni un
-      // píxel de desbordamiento.
-      // `isolate` crea el contexto de apilamiento donde el `z-0` del escenario y el `z-10` del
-      // contenido se ordenan sin poder afectar a las secciones de al lado.
+      // encuadre por arriba y por abajo— alarguen el documento, y de paso recorta el velo del
+      // texto, que se saca a sangre con `inset-inline: calc(50% - 50vw)` y con él la barra de
+      // desplazamiento; `check:mobile` no tolera ni un píxel de desbordamiento.
+      // `isolate` crea el contexto de apilamiento donde el `z-0` del escenario, el `z-10` del
+      // contenido y el `z-index: -1` del velo se ordenan sin poder afectar a las secciones de al
+      // lado ni colarse por detrás de la capa fija del campo.
       // `justify-end`: el texto se apoya en el borde de abajo y el mosaico se queda con la
       // mitad de arriba de la pantalla, que es el reparto que pedía el encargo.
       // `hero-section` y `hero-shell` sólo existen para la hoja de impresión: en papel el

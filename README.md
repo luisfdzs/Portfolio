@@ -99,29 +99,61 @@ en `next.config.ts`). Es deliberado: con `cacheComponents` activo, leer el reloj
 render volvería dinámica una ruta que debe ser estática. Cualquier despliegue recalcula las
 cifras, así que el desfase real es de meses.
 
-## Puesta en marcha del panel (opcional)
+## El panel (ya enchufado)
 
-1. Crea un proyecto en [sanity.io/manage](https://www.sanity.io/manage) (plan gratuito).
-2. `cp .env.example .env.local` y pega el **Project ID** en `NEXT_PUBLIC_SANITY_PROJECT_ID`.
-3. Añade la misma variable a los **dos** proyectos de Vercel (producción y test).
-4. Importa el contenido actual:
-   ```bash
-   npm run migrate:build      # content/ → scripts/migration/import.ndjson
-   npx sanity login
-   npm run migrate:import     # sube también el retrato y las seis capturas
-   ```
-5. Crea el webhook de revalidación en sanity.io/manage › API › Webhooks:
-   - URL `https://luisfernandezsangil.vercel.app/api/revalidate` (y la de test)
-   - Dataset `production` · **Trigger on: create, update, delete**
-   - Secret: el mismo valor que `SANITY_REVALIDATE_SECRET` en Vercel
+El proyecto de Sanity existe desde el **2026-08-03**: `Portfolio`, id **`3pdexisd`**, dataset
+`production` **público**, con los dieciséis documentos del CV importados y las siete imágenes
+(retrato y seis capturas) subidas. La web ya se construye leyendo del panel; `content/` sigue en
+su sitio como respaldo y como suelo de la regla de arriba.
 
-> ⚠️ Si el webhook se crea **por API** en vez de por el panel, hay que hacer después un `PATCH`
-> con `rule: {on: ["create","update","delete"]}`. El `POST` no acepta `rule`, y sin ese `PATCH`
-> el webhook queda `isDisabled: false` —parece correcto— pero **no se dispara jamás** y el
-> registro de entregas sale vacío. Pasó en Swiftmet y sólo se detectó comparando con uno que sí
-> funcionaba.
+Público a propósito: la web lee **sin token** al construir, así que un dataset privado obligaría
+a meter una credencial de lectura en los dos proyectos de Vercel para servir un CV que es
+público de todas formas.
 
-Mientras no haya panel, `/admin` no falla: explica qué variable falta y recuerda que la web
+Lo que hay montado, y con qué comando se reproduce en un proyecto nuevo:
+
+```bash
+npx sanity projects create "Portfolio" --dataset production --dataset-visibility public
+# → devuelve el projectId; va a .env.local y a los dos proyectos de Vercel
+
+npm run migrate:build      # content/ → scripts/migration/import.ndjson
+npm run migrate:import     # sube también el retrato y las seis capturas
+
+# Orígenes CORS: sin esto /admin carga pero no puede hablar con Sanity
+npx sanity cors add http://localhost:3000 --credentials
+npx sanity cors add https://luisfernandezsangil.vercel.app --credentials
+npx sanity cors add https://luisfernandezsangiltest.vercel.app --credentials
+```
+
+Variables (las tres, en `.env.local` y en **los dos** proyectos de Vercel):
+`NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` y `SANITY_REVALIDATE_SECRET`.
+Las dos primeras no son secretas —van en el HTML de cualquier web con Sanity—; la tercera sí.
+
+### Los dos webhooks de revalidación
+
+Uno por entorno, los dos sobre el dataset `production`, apuntando a `/api/revalidate` de
+producción y de test, con `rule.on = ["create","update","delete"]` y un filtro que los limita a
+los cinco tipos del CV (así una subida de imagen no regenera el sitio). El secreto es el mismo
+`SANITY_REVALIDATE_SECRET`.
+
+> ⚠️ **El endpoint de webhooks es el del host del proyecto, no el global.** Es
+> `https://<projectId>.api.sanity.io/v2025-02-19/hooks/projects/<projectId>`, y el cuerpo lleva
+> `type` con el valor `document` obligatoriamente. Contra `api.sanity.io` responde un endpoint más
+> viejo que va rechazando campo por campo (`"rule" is not allowed`, luego `apiVersion`, luego
+> `httpMethod`…) y de ahí salió la creencia —anotada aquí durante meses— de que había que crear
+> el webhook y **parchearlo después** con `rule`. No hace falta: contra el host correcto el
+> `POST` acepta `rule` a la primera. `npx sanity openapi get webhooks` da el contrato exacto.
+
+> ⚠️ **Ningún `_id` importado puede llevar un punto.** Para Sanity el `_id` es una ruta separada
+> por puntos y **sólo la raíz es pública**: `experience.altia` exige token de lectura igual que
+> `drafts.algo`. El script genera `experience-altia`, con guion, y el comentario de `idFor` en
+> `scripts/build-sanity-import.mjs` explica por qué. Cómo se manifiesta si se rompe: la
+> importación dice «Done!», el panel enseña los dieciséis documentos y **la web sigue sirviendo
+> `content/`** sin un solo error, porque el cliente anónimo del build recibe listas vacías y la
+> regla del contenido cae al respaldo, que es justo lo que debe hacer. Se tardó en encontrar
+> porque `profile` —el único `_id` sin punto— sí se leía.
+
+Si algún día faltaran las variables, `/admin` no falla: explica cuál falta y recuerda que la web
 pública funciona igual (`app/(studio)/admin/ConnectionNotice.tsx`).
 
 ---
@@ -141,8 +173,9 @@ sistema.
   números dentro.
 - **Un único acento, cobre.** Marca lo accionable y el dato destacado. Nunca decora.
 - **Las apariciones al hacer scroll son CSS puro** (`animation-timeline: view()`), sin
-  JavaScript, y respetan `prefers-reduced-motion`. El escenario animado de la portada también:
-  ver «El escenario cinético de la portada» más abajo.
+  JavaScript, y respetan `prefers-reduced-motion`. De los dos fondos del sitio, el mosaico de la
+  portada tampoco lleva JavaScript; el campo sí, porque reacciona al puntero. Ver «Los dos fondos»
+  más abajo.
 - **Hay hoja de impresión.** Un recruiter que quiere guardar el CV pulsa Ctrl+P: sale en papel
   blanco, sin la navegación y con las URLs de los enlaces escritas al lado.
 
@@ -174,54 +207,86 @@ movimiento, queda **un carrusel horizontal normal** con las tarjetas separadas y
 Y en papel se deshace en la retícula de dos columnas que había antes: sin eso, un `overflow-x`
 imprimiría el primer proyecto y recortaría los otros tres.
 
-### El escenario cinético de la portada
+### Los dos fondos: el mosaico en la portada, el campo en todo lo demás
 
-**La primera pantalla completa es el escenario.** Al abrir la web se ve una pared de pantallas,
-servidores, red y cacharrería en movimiento —hasta cinco columnas de tejas desplazándose despacio
-en direcciones alternas sobre un resplandor de cobre, con cuatro paneles de interfaz dibujados en
-CSS repartidos entre ellas: un editor, una salida de `build`, una terminal y una topología—, y el
-bloque de texto se apoya abajo, encima del mosaico. Vive en `components/sections/HeroStage.tsx` y
-su mecánica en el bloque «Escenario cinético» de `app/globals.css`; el razonamiento largo está en
-los comentarios de los dos.
+**La web tiene dos fondos y cada uno tiene su sitio.** La primera pantalla es el **escenario
+cinético**: un mosaico a sangre de dieciséis fotografías CC0 y cuatro paneles de interfaz dibujados
+en CSS, en cinco columnas que se desplazan despacio y en direcciones alternas sobre un resplandor de
+cobre que respira, con el texto del hero apoyado abajo encima de él. En cuanto se baja de ahí
+—y en todas las páginas interiores— manda el **campo interactivo**.
 
-El texto del hero es deliberadamente corto: el puesto actual, el nombre, una línea de qué haces,
-dónde estás y las cuatro cifras. La entradilla de tres líneas que había antes se quitó —sobre un
-fondo en movimiento no se lee—, y los clientes que enumeraba están en la sección de experiencia,
-que es donde se pueden comprobar con las fechas al lado.
+El escenario vive en `components/sections/HeroStage.tsx` y en el bloque «Escenario cinético de la
+portada» de `app/globals.css`. **No lleva una línea de JavaScript**: son animaciones CSS infinitas
+sobre `transform` y `opacity`, las dos propiedades que el navegador anima en el compositor sin
+volver a medir. Es decoración declarada (`aria-hidden`, `alt=""`, `pointer-events: none`), se
+congela con `prefers-reduced-motion` y no se imprime. La procedencia y la licencia de las dieciséis
+fotografías están en `public/hero/CREDITS.md`; se reconstruyen con
+`node scripts/build-hero-tiles.mjs`.
 
-Lo que hay que saber para no romperlo:
+#### El campo interactivo
 
-- **Cero JavaScript.** Son animaciones CSS sobre `transform` y `opacity`, las dos propiedades que
-  el navegador anima en el compositor. Es un componente de servidor: la portada sigue siendo HTML
-  estático.
-- **Es decoración declarada.** `aria-hidden` en la raíz, `alt=""` en las fotos y
-  `pointer-events: none` en todo el escenario. No sale en la impresión, y con
-  `prefers-reduced-motion: reduce` **se congela** (no se esconde).
-- **El contraste del texto lo da un velo anclado AL TEXTO**, `.hero-copy::before`, no un
-  porcentaje del alto del hero. Esto es la corrección de un fallo real: con el velo medido en
-  porcentajes, el rótulo del puesto y la línea de la ubicación —los dos textos más pequeños y
-  apagados de la portada— caían sobre la parte abierta y no se leían. Anclado al texto y con los
-  topes en `rem`, el reparto no depende del alto de la ventana ni del idioma. El velo del
-  escenario (`__scrim`) se queda sólo como atmósfera.
-- **El rótulo del puesto lleva pastilla propia** (`.hero-chip`): fondo casi opaco y desenfoque
-  detrás. Es lo que permite que el velo empiece tarde y flojo, y por tanto que se siga viendo el
-  mosaico en el centro de la pantalla.
-- **El alto de teja va en `vh`, y no es un detalle estético.** El bucle repite la lista de tejas
-  dos veces y se desplaza un 50 %: para que no se vea la costura, una copia tiene que ser más
-  alta que la ventana. Con el alto derivado del ancho de columna eso dependía de la forma de la
-  pantalla; en `vh`, siete tejas × 16 vh cubren cualquier ventana. **Si cambias el número de
-  tejas por columna, rehaz esa cuenta.**
-- **Verificar a 390 px antes de cerrar.** `overflow-hidden` en la sección es lo único que impide
-  que el mosaico ensanche el documento, y es el fallo nº 1 de `check:mobile`.
+Detrás de todas las secciones que no son la portada, y de todas las páginas, hay una retícula de
+nodos —de mil a tres mil, según el tamaño de la ventana— dibujada en un `<canvas>`. **Reacciona a
+quien la mira:** el puntero abre un pozo de luz, los nodos se apartan y se encienden en cobre y
+tejen entre ellos una constelación que sólo existe donde hay luz; un clic lanza una onda que recorre
+la pantalla entera; y cada dos o cinco segundos un pulso viaja por una fila o una columna dejando
+estela, como un dato por un bus.
 
-Las dieciséis fotografías son **CC0 1.0** (dominio público, uso comercial, sin atribución
-exigida), localizadas con la API de Openverse. La procedencia de cada una está en
-`public/hero/CREDITS.md`, y se reconstruyen con `node scripts/build-hero-tiles.mjs`, que además
-imprime la tabla de procedencia lista para pegar. Pesan **281 KB** entre las dieciséis, y ese
-número es literal: el cargador de imágenes del proyecto devuelve las rutas locales sin
-transformar, así que el archivo que hay en `public/hero/` es exactamente el que se descarga —
-`sizes` y `quality` no recortan nada aquí. Si hay que aligerar el escenario, se aligera en el
-script.
+Vive en `components/layout/SiteField.tsx` —que es todo el motor, y se monta una sola vez en el
+layout— y su parte estática (la atmósfera de cobre desenfocada, la retícula de planos y el velo) en
+el bloque «Campo interactivo del sitio» de `app/globals.css`. El razonamiento largo está en los
+comentarios de los dos.
+
+- **Un solo lienzo y cero dependencias.** Ni Three, ni una librería de animación: contexto 2D,
+  `Float32Array` y un bucle. Es el único componente de cliente del sitio junto a la navegación; el
+  resto sigue siendo HTML estático.
+- **Fijo a la ventana, nunca del alto del documento.** Un lienzo tan alto como la página serían
+  decenas de miles de nodos y un mapa de bits de varios megapíxeles; así son siempre los mismos dos
+  mil y el coste no depende de lo que mida el contenido. De paso, el texto viaja sobre una
+  superficie quieta en vez de arrastrar la retícula consigo, y al navegar entre páginas del mismo
+  idioma el lienzo **no se reinicia**: el layout no se vuelve a montar.
+- **Es decoración declarada.** `aria-hidden` en la raíz y `pointer-events: none` en toda la capa: el
+  campo reacciona al puntero **sin recibirlo** —los eventos se escuchan en `window`—, así que un
+  clic destinado a un botón llega siempre al botón. No sale en la impresión —y ahí importa el
+  doble, porque una capa fija se imprimiría en **todas** las hojas—, y con
+  `prefers-reduced-motion: reduce` no se registra ni un escuchador: se dibuja un único fotograma.
+- **El orden de capas es explícito.** El campo es un elemento posicionado con `z-index: 0`, y en el
+  orden de pintado de CSS eso va por encima del contenido de los elementos estáticos aunque esté
+  antes en el documento. Por eso `globals.css` lleva
+  `body > main, body > footer { position: relative; z-index: 1 }`. **Si añades un hermano directo
+  del `<body>` que tenga que verse, súbelo también.**
+- **La legibilidad se reparte entre tres piezas, y ninguna es un velo global fuerte.** El velo del
+  texto de la portada (`.hero-copy::before`), la pastilla del rótulo del puesto (`.hero-chip`) y el
+  techo de brillo del propio lienzo. El velo sigue **anclado AL TEXTO** y no a un porcentaje del
+  alto del hero: es la corrección de un fallo real, y lo que se cae primero es el rótulo del puesto
+  y la línea de la ubicación, no el nombre. Sus intensidades se calibran contra el **mosaico**, que
+  es el fondo más duro de los dos: una fotografía clara detrás de un texto pequeño es mucho peor que
+  la retícula, y calibrar contra el fondo benévolo es cómo se cuela un rótulo ilegible.
+- **El velo global está en el 12 %, y hay una razón para no subirlo.** Se probó al 30 % al pasar el
+  campo a fondo del sitio y la web se quedó prácticamente negra: los nodos en reposo pintan a poco
+  más de 0,2 de opacidad, así que un 30 % de grafito encima los borra. Si el problema es que algo
+  no se lee, lo que hay que tocar es la pieza que protege ese texto, no la manta.
+- **El campo tiene que verse sin tocar nada.** Un fondo que sólo aparece bajo el puntero es
+  invisible en un móvil, donde no hay puntero — pasó en la primera captura, y por eso el nodo en
+  reposo tiene un tamaño y una opacidad mínimos que se ven solos. Lo que la interacción añade es
+  el relieve, no la existencia.
+- **Verificar a 390 px antes de cerrar.** `overflow: hidden` en la capa es lo único que impide que
+  el campo ensanche el documento, y es el fallo nº 1 de `check:mobile`.
+
+#### La costura entre los dos, que es lo único delicado
+
+El escenario es una capa **opaca** dentro del hero (`.hero-stage` lleva
+`background: var(--color-ink)`): sin eso se verían los dos fondos a la vez, con la retícula asomando
+por los huecos entre tejas. Y por ser opaco hay que apagarlo **antes** del borde inferior del hero,
+o el canto se lee como una raya horizontal de lado a lado. Lo hace un `mask-image` que lo disuelve
+entre los 16 y los 8 rem finales; el velo del texto hace lo simétrico con su propia máscara de
+6 rem.
+
+Los números salen de dos capturas, y la regla que dejan es corta: **el escenario tiene que estar
+apagado del todo antes de que empiecen las cifras.** Con la disolución en 9 rem la costura
+desaparecía, pero «5 AÑOS DE EXPERIENCIA» —versalitas pequeñas y apagadas— quedaba sobre la
+fotografía de un armario de servidores todavía a tres cuartos de opacidad. Si tocas una de las dos
+máscaras, mira el filete de cifras antes de cerrar.
 
 ### En la barra de direcciones nunca se ve una almohadilla
 
