@@ -73,19 +73,27 @@ siguiente paso opcional, con los cuatro pasos del README, «Puesta en marcha del
   de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D dirigido por el scroll, sin
   JavaScript salvo los dos botones. Fallback sin soporte o con `prefers-reduced-motion`: carrusel
   horizontal plano. En papel se deshace en retícula de dos columnas. Ver [[cover-flow]].
-- **El campo interactivo es el fondo de TODA la web, no sólo del hero.** Una retícula de mil a tres
-  mil nodos dibujada en un `<canvas>` que **reacciona al puntero**: pozo de luz que aparta y
-  enciende los nodos, constelación que sólo existe donde hay luz, onda al hacer clic y pulsos que
-  viajan por filas y columnas. Se monta **una sola vez en el layout**
-  (`components/layout/SiteField.tsx` + bloque «Campo interactivo del sitio» de `globals.css`), en
+- **HAY DOS FONDOS Y CADA UNO TIENE SU SITIO.** En la **primera sección** manda el **escenario
+  cinético**: el mosaico a pantalla completa de dieciséis fotografías CC0 y cuatro paneles de
+  interfaz dibujados, en cinco columnas que se desplazan despacio y en direcciones alternas
+  (`components/sections/HeroStage.tsx` + bloque «Escenario cinético de la portada» de
+  `globals.css`, sin una línea de JavaScript). En **todo lo demás** manda el **campo interactivo**:
+  una retícula de mil a tres mil nodos dibujada en un `<canvas>` que **reacciona al puntero** —pozo
+  de luz que aparta y enciende los nodos, constelación que sólo existe donde hay luz, onda al hacer
+  clic y pulsos que viajan por filas y columnas—, montada **una sola vez en el layout**
+  (`components/layout/SiteField.tsx` + bloque «Campo interactivo del sitio» de `globals.css`) en
   una capa **fija** del tamaño de la ventana por la que pasan por encima todas las secciones y
   todas las páginas. Cero dependencias, `aria-hidden`, `pointer-events: none` en toda la capa, el
   bucle se para al cambiar de pestaña, con `prefers-reduced-motion` se dibuja un solo fotograma y
-  no se imprime. El hero sigue midiendo `min-h-svh` porque su aportación al conjunto ya no es el
-  fondo sino **el hueco**: una pantalla entera donde el campo se ve sin nada delante. El texto del
-  hero es corto a propósito —puesto, nombre, una línea, ubicación y las cuatro cifras—: la
-  entradilla larga se quitó porque sobre un fondo que se mueve no se lee. Ver
-  [[campo-interactivo]].
+  ninguno de los dos se imprime. El texto del hero es corto a propósito —puesto, nombre, una línea,
+  ubicación y las cuatro cifras—: la entradilla larga se quitó porque sobre un fondo que se mueve no
+  se lee. Ver [[campo-interactivo]].
+- **Conviven porque el escenario es OPACO y se disuelve antes del borde del hero.** `.hero-stage`
+  lleva `background: var(--color-ink)` —si no, se verían los dos a la vez, la retícula asomando por
+  los huecos entre tejas— y un `mask-image` que lo apaga entre los 16 y los 8 rem finales del hero;
+  el velo del texto hace lo simétrico con su propia máscara de 6 rem. Ésa es la única costura entre
+  los dos fondos: **quien toque uno tiene que mirarla**, y calibrarla contra el filete de cifras,
+  que es el texto que se cae primero. Ver [[campo-interactivo]].
 - **El orden de capas lo fija una regla explícita**, no el orden del documento: la capa del campo
   es un elemento posicionado con `z-index: 0`, y en CSS eso gana al contenido de los elementos
   estáticos aunque venga antes. Por eso `globals.css` sube `body > main` y `body > footer` a
@@ -122,19 +130,23 @@ Detalle y razonamiento en el **README.md**, que es extenso a propósito, y en `.
    geometría en un sitio y, de paso, convierte el carrusel en una ventana centrada en vez de una
    banda a sangre con medio metro de vacío a la izquierda en un monitor ancho. Ver
    [[cover-flow]].
-8. **El campo nunca compite con el texto, y tiene que verse sin tocarlo.** Son dos condiciones a
-   la vez, las dos salen de fallos reales y ahora aplican a **todas** las secciones, no sólo al
-   hero. Si al tocar el velo o los nodos hay que esforzarse para leer **cualquier** línea del hero
-   a 390 px, el cambio está mal —y el listón es el rótulo del puesto y la ubicación, no el
-   nombre—; lo que garantiza el contraste va anclado al texto y con los topes en `rem`, nunca en
-   porcentajes del alto del hero. Y al revés: si el campo sólo aparece bajo el puntero, en móvil no
-   aparece nunca. **Ojo con la tentación de resolverlo subiendo el velo global**: se probó al 30 %
-   y dejó el fondo prácticamente negro en toda la web, porque los nodos en reposo pintan a poco más
-   de 0,2 de opacidad. Está en el 12 %. Ver [[campo-interactivo]].
+8. **Ningún fondo compite con el texto, y los dos tienen que verse sin tocarlos.** Son dos
+   condiciones a la vez, las dos salen de fallos reales y aplican a **todas** las secciones. Si al
+   tocar el velo, los nodos o las máscaras hay que esforzarse para leer **cualquier** línea del hero
+   a 390 px, el cambio está mal —y el listón son el rótulo del puesto, la ubicación y **los rótulos
+   de las cifras**, no el nombre—; lo que garantiza el contraste va anclado al texto y con los topes
+   en `rem`, nunca en porcentajes del alto del hero. Y al revés: si el campo sólo aparece bajo el
+   puntero, en móvil no aparece nunca. **Ojo con la tentación de resolverlo subiendo el velo
+   global**: se probó al 30 % y dejó el fondo prácticamente negro en toda la web, porque los nodos
+   en reposo pintan a poco más de 0,2 de opacidad. Está en el 12 %. Y **la calibración se hace
+   siempre contra el fondo más duro de los dos**, que es el mosaico: los topes del velo del texto
+   son los del escenario (28 / 58 / 88 %) y no los más flojos que bastaban con la retícula detrás.
+   Ver [[campo-interactivo]].
 9. **Sólo entran imágenes CC0 o dominio público**, y cada una queda documentada donde vive. Nada
    de CC-BY: obligaría a mostrar el crédito en la propia página. La regla nació con las dieciséis
-   fotografías del escenario cinético, que ya no se usan pero siguen en `public/hero/` con su
-   `CREDITS.md`; sigue valiendo para cualquier imagen que entre al proyecto.
+   fotografías del escenario cinético (`public/hero/` + su `CREDITS.md`) y vale para cualquier
+   imagen que entre al proyecto. **Esas dieciséis estuvieron un día sin uso y no se borraron; al día
+   siguiente volvieron.** Es el argumento a favor de documentar en vez de barrer.
 10. **Las secciones de la portada no se convierten en rutas** para quitar la almohadilla de la
     URL. Serían cinco páginas por idioma con el mismo CV compitiendo con la portada por «Luis
     Fernández Sangil». La almohadilla se quita en cliente; ver [[urls-sin-anclas]].
@@ -189,6 +201,24 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-03 (rama `feature/hero-interactivo`): **vuelve el escenario cinético, y ahora hay DOS
+fondos con el sitio repartido entre ellos.** El encargo: mosaico de fotografías en la primera
+sección, campo de nodos en el resto. `HeroStage.tsx` se recupera de `develop` tal cual y se vuelve
+a montar en `Hero.tsx`; `SiteField.tsx` no se toca. Lo que sí es nuevo es **la costura**, que es
+donde está todo el trabajo: `.hero-stage` pasa a ser una capa opaca (`background: var(--color-ink)`,
+o la retícula asomaría por los huecos entre tejas) y se disuelve con un `mask-image` entre los 16 y
+los 8 rem finales del hero, mientras el velo del texto hace lo simétrico con su propia máscara de
+6 rem y el sobrante de abajo baja de `-10rem` a `-1.5rem`. **Los dos fallos de la sesión salieron de
+capturas y son el mismo fallo dos veces: calibrar la costura mirando la costura.** Primero, sin
+máscara, una raya horizontal de lado a lado en el borde del hero, entre grafito liso y retícula.
+Después, con la disolución en 9 rem, el filete de cifras —«5 AÑOS DE EXPERIENCIA», versalitas
+pequeñas y apagadas— sobre una fotografía de un armario de servidores a tres cuartos de opacidad.
+La regla que queda: **el escenario tiene que estar apagado del todo antes de que empiecen las
+cifras**, y los desvanecidos se miden contra ese filete. De paso, los topes del velo del texto
+vuelven a los del escenario (28 / 58 / 88 %), porque detrás del texto ya no hay nodos sino fotos.
+Las dieciséis imágenes de `public/hero/` dejan de estar huérfanas. `npm run check` limpio y
+`check:mobile` 21/21 en los dos idiomas sobre el build de producción._
 
 _2026-08-02 (rama `feature/hero-interactivo`): **el campo deja de ser el fondo de la portada y pasa
 a ser el fondo de toda la web.** `HeroField.tsx` se convierte en `components/layout/SiteField.tsx`

@@ -1,13 +1,13 @@
 # Tejas de la portada — procedencia y licencia
 
-> **Ya no se usan (desde el 2026-08-02).** El escenario cinético de fotografías lo sustituyó el
-> campo interactivo dibujado en `<canvas>` (`components/layout/SiteField.tsx`), y estas dieciséis
-> imágenes quedaron huérfanas. No se borraron: están documentadas, son reconstruibles con
-> `node scripts/build-hero-tiles.mjs` y quitarlas es una decisión aparte. Todo lo que sigue
-> describe cómo se eligieron y de dónde salieron, y sigue siendo cierto.
+> **Vuelven a usarse (desde el 2026-08-03), y sólo en la primera sección.** Entre el 2026-08-02 y
+> esa fecha estuvieron huérfanas: el campo interactivo dibujado en `<canvas>`
+> (`components/layout/SiteField.tsx`) había sustituido al escenario. Ahora los dos fondos
+> conviven — el mosaico en la portada, la retícula de nodos en el resto de la web—, así que
+> `HeroStage.tsx` volvió y estas dieciséis imágenes con él.
 
-Las dieciséis fotografías de `public/hero/` fueron el material del **escenario cinético** de la
-portada. Este archivo existe para que dentro de dos años se
+Las dieciséis fotografías de `public/hero/` son el material del **escenario cinético** de la
+portada (`components/sections/HeroStage.tsx`). Este archivo existe para que dentro de dos años se
 pueda responder sin dudar de dónde salió cada una, porque una foto sin procedencia documentada es
 una foto que hay que quitar.
 
