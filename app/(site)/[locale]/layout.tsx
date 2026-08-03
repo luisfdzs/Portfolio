@@ -10,6 +10,7 @@ import { Footer } from '@/components/layout/Footer'
 import { HashCleaner } from '@/components/layout/HashCleaner'
 import { Header } from '@/components/layout/Header'
 import { MobileNav } from '@/components/layout/MobileNav'
+import { SiteField } from '@/components/layout/SiteField'
 import '@/app/globals.css'
 
 /**
@@ -128,6 +129,27 @@ export default async function SiteLayout({
       className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
     >
       <body>
+        {/*
+         * EL FONDO DE TODO EL SITIO, montado una sola vez y aquí.
+         *
+         * Es una capa fija que ocupa la ventana y pasa por debajo de la cabecera, del contenido
+         * y del pie. Va en el layout y no en la portada por dos razones que no son de comodidad:
+         *
+         * 1. **Para que exista en las páginas interiores.** La lista de proyectos y la ficha de
+         *    cada proyecto son páginas propias; si el campo viviera en el hero, entrar en un
+         *    proyecto significaría salir a un fondo negro liso y la web parecería otra.
+         * 2. **Para que no se reinicie al navegar.** El layout no se vuelve a montar al cambiar
+         *    de página dentro del mismo idioma, así que el lienzo sobrevive a la navegación: ni
+         *    se rearma la retícula, ni se repite la animación de entrada, ni la luz vuelve al
+         *    rincón. La superficie es la misma; lo que cambia es lo que hay encima.
+         *
+         * Va antes que todo lo demás en el documento porque es lo que está detrás de todo lo
+         * demás. Que quede efectivamente detrás no lo decide este orden sino una regla explícita
+         * en `globals.css` (`body > main, body > footer`): un elemento posicionado con
+         * `z-index: 0` gana al contenido de los estáticos aunque venga antes.
+         */}
+        <SiteField />
+
         {/* Primer elemento enfocable de la página: quien navega con teclado no debería
             tener que tabular por los seis enlaces del menú en cada carga. Sólo se ve
             cuando tiene el foco. */}
