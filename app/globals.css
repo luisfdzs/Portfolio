@@ -138,6 +138,22 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* EL CONTENIDO, POR ENCIMA DEL CAMPO.
+     El fondo interactivo (`.site-field`) es una capa fija con `z-index: 0`, y
+     ése es el detalle que obliga a estas dos líneas: en el orden de pintado de
+     CSS, un elemento POSICIONADO con `z-index: 0` va por encima del contenido
+     de los elementos estáticos, aunque esté antes en el documento. Sin esto el
+     campo se dibujaría delante del texto de las secciones y no detrás.
+     La cabecera y la barra de móvil no aparecen aquí porque ya tienen su propio
+     `z-40`/`z-50`, y el pie tampoco lo necesitaría —su fondo es opaco— pero se
+     incluye para que la regla sea «todo lo que cuelga del body, encima» y no una
+     lista de excepciones que hay que recordar al añadir la siguiente. */
+  body > main,
+  body > footer {
+    position: relative;
+    z-index: 1;
+  }
+
   @media (width >= 64rem) {
     body {
       padding-block-end: 0;
@@ -493,10 +509,18 @@
 /* ============================================================================
    ESCENARIO CINÉTICO DE LA PORTADA
 
-   El fondo animado del hero, que aquí **es la primera pantalla completa**: un
-   mosaico de código, servidores, red y cacharrería que ocupa el alto de la
-   ventana, con el texto apoyado abajo sobre él. El razonamiento de diseño está
-   en `components/sections/HeroStage.tsx`; aquí está la mecánica.
+   El fondo animado de la PRIMERA SECCIÓN, y sólo de ella: un mosaico de código,
+   servidores, red y cacharrería que ocupa el alto de la ventana, con el texto
+   apoyado abajo sobre él. El razonamiento de diseño está en
+   `components/sections/HeroStage.tsx`; aquí está la mecánica.
+
+   **Convive con el campo interactivo, no lo sustituye.** El campo
+   (`.site-field`, bloque siguiente) es una capa fija que pasa por debajo de toda
+   la web; el escenario es una capa OPACA dentro del hero que se pone delante de
+   él durante la primera pantalla. El reparto lo pide el encargo: fotografías en
+   la portada, retícula de nodos en el resto. Quien toque una de las dos capas
+   tiene que mirar la costura entre ambas — ver el degradado de disolución de
+   `.hero-stage`.
 
    Dos reglas gobiernan este bloque:
 
@@ -549,31 +573,6 @@
   }
 }
 
-/* La flotación del retrato. Amplitud mínima (6 px en catorce segundos): lo justo
-   para que el avatar no parezca pegado al fondo. */
-@keyframes hero-float {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -0.375rem, 0);
-  }
-}
-
-/* El aviso de que hay más abajo. Recorrido corto y pausa larga: una flecha que
-   bota sin parar es un elemento parpadeante más, y esto sólo tiene que insinuar. */
-@keyframes hero-hint {
-  0%,
-  55%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  75% {
-    transform: translate3d(0, 0.3rem, 0);
-  }
-}
-
 @layer components {
   /* --- La caja del escenario -------------------------------------------------
      `overflow: hidden` no es cosmético: es lo que impide que las columnas —que
@@ -581,20 +580,49 @@
      documento. `check:mobile` comprueba que la portada no desborde ni un píxel a
      390 px, y un mosaico de fondo es el sospechoso número uno de ese fallo.
 
-     No lleva máscara. En la versión anterior el escenario era una banda en la
-     mitad derecha y hacían falta dos máscaras y un velo coordinados en la misma
-     unidad para que el texto se leyera. Ahora el escenario es la pantalla
+     **EL FONDO OPACO Y LA MÁSCARA SON LO QUE HACE QUE ESTO CONVIVA CON EL
+     CAMPO**, y no se pueden quitar por separado:
+
+     - `background: var(--color-ink)` tapa la capa fija del campo mientras dura
+       la primera pantalla. Sin él, la retícula de nodos se vería por los huecos
+       entre tejas y por debajo del mosaico: dos fondos distintos superpuestos,
+       que es exactamente lo que no se quiere.
+     - `mask-image` disuelve el escenario ENTERO —tejas, resplandor, velo y
+       fondo opaco— entre los 16 y los 8 rem finales del hero. Sin ella, el borde
+       inferior del hero sería un canto recto entre grafito liso y la retícula
+       del campo, o sea una raya horizontal a media pantalla. Con ella, el
+       mosaico se apaga y el campo emerge por debajo.
+
+     **LOS DOS NÚMEROS SE MIDEN CONTRA LAS CIFRAS DEL CV, Y ÉSA ES LA TRAMPA DE
+     ESTE BLOQUE.** El primer intento disolvía sólo los últimos 9 rem, que sobre
+     el papel bastaba para matar la costura y en la captura dejaba el filete de
+     cifras —«5 AÑOS DE EXPERIENCIA», en versalitas pequeñas y apagadas— justo
+     encima de una fotografía de un armario de servidores todavía a tres cuartos
+     de opacidad. Ilegible. El escenario tiene que estar **del todo apagado antes
+     de que empiecen las cifras**, no a mitad de camino: por eso acaba a 8 rem
+     del borde y no a 0. Lo que queda por debajo es campo, que es un fondo mucho
+     más benévolo, y encima de él el velo del texto llega entero.
+
+     El tramo va en `rem` y no en porcentaje por lo mismo que los topes del velo
+     del texto: se mide contra el bloque de cifras que tiene delante, no contra
+     una ventana de alto desconocido.
+
+     No lleva máscara lateral. En la versión anterior el escenario era una banda
+     en la mitad derecha y hacían falta dos máscaras y un velo coordinados en la
+     misma unidad para que el texto se leyera. Ahora el escenario es la pantalla
      entera y el contraste lo resuelve un único degradado vertical, el velo, que
-     además es el mismo en móvil y en escritorio. Una pieza menos que
-     desincronizar. */
+     además es el mismo en móvil y en escritorio. */
   .hero-stage {
     position: absolute;
     inset: 0;
     overflow: hidden;
     /* Nunca se come un clic destinado a un botón que esté encima. */
     pointer-events: none;
-    /* Detrás de todo el contenido del hero, y por encima del lienzo. */
+    /* Detrás de todo el contenido del hero, y por delante de la capa del campo:
+       el hero está en `main`, que va en `z-index: 1`, y el campo en 0. */
     z-index: 0;
+    background: var(--color-ink);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 16rem), transparent calc(100% - 8rem));
 
     /* La separación entre tejas, en un solo sitio: la usan el carril (entre
        columnas) y la pista (entre tejas), y tienen que ser la misma o el mosaico
@@ -608,7 +636,11 @@
      `transform: none`, y una animación gana siempre a una declaración normal.
      Puesta en el carril machacaría cualquier `transform` estático que se le
      ponga en el futuro; ya pasó una vez con la inclinación de la versión
-     anterior y costó de diagnosticar, porque el CSS «se ve bien». */
+     anterior y costó de diagnosticar, porque el CSS «se ve bien».
+
+     **La entrada va aquí y no en `.hero-stage`**, y ahora importa más que antes:
+     `.hero-stage` es lo que tapa el campo, y animarle la opacidad desde cero
+     dejaría ver la retícula debajo durante el segundo y medio del arranque. */
   .hero-stage__area {
     position: absolute;
     inset: 0;
@@ -869,40 +901,254 @@
         color-mix(in srgb, var(--color-ink) 14%, transparent)
       );
   }
+}
+
+/* ============================================================================
+   CAMPO INTERACTIVO DEL SITIO
+
+   El fondo de toda la web MENOS la primera pantalla, donde manda el escenario
+   cinético del bloque anterior. El razonamiento de diseño —y todo
+   lo que ocurre dentro del lienzo— está en `components/layout/SiteField.tsx`;
+   aquí sólo están las capas que lo rodean.
+
+   El reparto entre CSS y lienzo no es arbitrario, y es la regla de este bloque:
+   **el CSS pone lo que no cambia y el lienzo lo que responde.** La atmósfera
+   desenfocada y la retícula de planos son degradados enormes que el compositor
+   dibuja una vez y no vuelve a tocar; pedírselos al contexto 2D sesenta veces
+   por segundo costaría más que los dos mil nodos juntos. Y al revés: nada de lo
+   que reacciona al puntero está aquí, porque haría falta escribir una variable
+   CSS por fotograma y con ella un recálculo de estilo por fotograma.
+   ========================================================================= */
+
+/* La atmósfera, respirando. Lenta (41 s) y sin relación con ninguna otra
+   duración del sitio, para que no se le vea el ciclo. Sólo `transform` y
+   `opacity`: son las dos propiedades que el navegador anima en el compositor
+   sin volver a medir ni repintar. El desenfoque es estático — `filter` no se
+   anima; lo que se anima es la escala de algo ya desenfocado. */
+@keyframes hero-aurora {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translate3d(-3%, 1%, 0) scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate3d(3%, -2%, 0) scale(1.12);
+  }
+}
+
+/* La entrada, una sola vez. El campo no aparece de golpe con la página: se
+   enciende en algo más de un segundo, que es lo que hace que se lea como un
+   sistema que arranca y no como algo que tardó en cargar. Empieza en 0 y sube:
+   el primer fotograma del lienzo se pinta con el retículo ya colocado, así que
+   sin esto la retícula aparecería entera y seca. */
+@keyframes site-field-enter {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* La flotación del retrato. Amplitud mínima (6 px en catorce segundos): lo justo
+   para que el avatar no parezca pegado al fondo. */
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -0.375rem, 0);
+  }
+}
+
+/* El aviso de que hay más abajo. Recorrido corto y pausa larga: una flecha que
+   bota sin parar es un elemento parpadeante más, y esto sólo tiene que insinuar. */
+@keyframes hero-hint {
+  0%,
+  55%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  75% {
+    transform: translate3d(0, 0.3rem, 0);
+  }
+}
+
+@layer components {
+  /* --- La caja del campo -----------------------------------------------------
+     `fixed` y no `absolute`, y es LA decisión de este bloque. El campo es el
+     fondo de todo el sitio: si se estirase a lo alto del documento serían
+     decenas de miles de nodos y un mapa de bits de varios megapíxeles. Fijo a la
+     ventana son siempre los mismos dos mil, el coste no depende de lo que mida
+     el contenido, y el texto viaja sobre una superficie quieta en vez de
+     arrastrar la retícula consigo.
+
+     `overflow: hidden` no es cosmético: el retículo del lienzo sangra por los
+     cuatro bordes a propósito y la atmósfera se sale de la caja. `check:mobile`
+     comprueba que no haya ni un píxel de desbordamiento a 390 px.
+
+     `pointer-events: none` en toda la capa, no sólo en el lienzo: el campo
+     reacciona al puntero **sin recibirlo**. Los eventos se escuchan en `window`
+     (ver `SiteField.tsx`), así que un clic destinado a un botón llega siempre al
+     botón. Un fondo decorativo que se come una pulsación es un fallo de
+     accesibilidad, no un detalle.
+
+     `z-index: 0` y no `-1`: con negativo dependería de que el fondo del `body`
+     se propague al lienzo de la raíz para no taparlo, que funciona pero se rompe
+     el día que alguien le ponga un fondo al `html`. Con cero, el orden lo fija
+     una regla explícita en la capa base (`body > main, body > footer`). */
+  .site-field {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* --- La atmósfera ---------------------------------------------------------
+     Dos manchas de cobre desenfocadas. Es lo que le da temperatura al grafito y
+     lo que evita que un campo de puntos cobrizos sobre negro se lea como una
+     terminal.
+
+     Cuando el campo era del hero se apoyaban arriba, porque abajo estaba el
+     texto de la portada. Ahora la capa es fija y por debajo puede haber
+     cualquier sección: se reparten por la ventana, se abren un poco más y bajan
+     de intensidad. Una mancha de cobre al 30 % detrás de un titular de seis rem
+     es atmósfera; detrás de un párrafo de la experiencia es niebla. */
+  .site-field__aurora {
+    position: absolute;
+    inset: -18% -12%;
+    background:
+      radial-gradient(
+        ellipse 55% 55% at 28% 30%,
+        color-mix(in srgb, var(--color-signal) 22%, transparent) 0%,
+        transparent 68%
+      ),
+      radial-gradient(
+        ellipse 50% 50% at 76% 68%,
+        color-mix(in srgb, var(--color-signal) 14%, transparent) 0%,
+        transparent 70%
+      );
+    filter: blur(3.5rem);
+    animation: hero-aurora 41s ease-in-out infinite;
+    will-change: opacity, transform;
+  }
+
+  /* --- La retícula de planos ------------------------------------------------
+     Dos juegos de líneas de un píxel, estáticos y casi invisibles. No es
+     decoración repetida: es el SUELO del campo. Sin ellas los nodos flotan en
+     negro y el conjunto se lee como un salvapantallas de partículas; con ellas
+     se lee como una superficie medida, que es de lo que va un CV de ingeniero.
+
+     La máscara es ahora una viñeta centrada en vez de un óvalo apoyado arriba:
+     desvanece las líneas antes de que lleguen a cualquiera de los cuatro bordes,
+     que es lo que evita que se vea dónde empieza y acaba el fondo. Ninguna línea
+     muere en un canto recto — eso es exactamente lo que delata un fondo de
+     retícula pegado encima. */
+  .site-field__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--color-line-strong) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-line-strong) 1px, transparent 1px);
+    background-size: 5rem 5rem;
+    opacity: 0.6;
+    mask-image: radial-gradient(ellipse 82% 72% at 50% 42%, #000 0%, transparent 78%);
+  }
+
+  /* --- El lienzo ------------------------------------------------------------
+     `display: block` y las medidas al 100 %: los atributos `width`/`height` del
+     elemento son la resolución del mapa de bits —los pone el componente, con el
+     ratio de píxel dentro— y no el tamaño en pantalla. Sin estas dos líneas el
+     lienzo se dibujaría al doble en una pantalla retina. */
+  .site-field__canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    animation: site-field-enter 1.3s var(--ease-out-soft) 0.1s both;
+  }
+
+  /* --- El velo del campo ----------------------------------------------------
+     Tres trabajos, y los tres cambiaron al pasar el campo a fondo del sitio:
+
+     1. Grafito casi opaco en los primeros 4 rem: ahí vive la cabecera fija, que
+        es translúcida (`bg-ink/80`), y un pulso pasando por debajo se leería
+        como un parpadeo en la navegación.
+     2. Lo mismo en los últimos 4 rem, que antes no hacía falta porque abajo del
+        hero no había nada fijo. Ahora ahí está la barra de iconos de móvil.
+     3. Y un velo BASE por toda la ventana que antes tampoco existía, porque el
+        campo pasa ahora por debajo de todo el texto de la web y no sólo de un
+        titular.
+
+     **El 3 está en el 12 %, y llegar ahí costó una captura.** El primer intento
+     lo puso al 30 %, que sobre el papel era «bajar el conjunto un punto» y en
+     pantalla dejaba el fondo prácticamente negro: los nodos en reposo pintan a
+     una opacidad de 0,2 largos, así que taparlos con un 30 % de grafito los
+     borra. Un fondo que hay que buscar no es un fondo. El 12 % quita el filo sin
+     apagar la retícula, y la protección de verdad la dan las tres piezas que
+     estaban pensadas para eso: el velo del texto de la portada, la pastilla del
+     rótulo y el propio techo de brillo del lienzo. */
+  .site-field__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-ink) 85%, transparent) 0%,
+      color-mix(in srgb, var(--color-ink) 12%, transparent) 4rem,
+      color-mix(in srgb, var(--color-ink) 12%, transparent) calc(100% - 4rem),
+      color-mix(in srgb, var(--color-ink) 72%, transparent) 100%
+    );
+  }
 
   /* --- El velo del texto ---------------------------------------------------
      LA PIEZA QUE HACE LEGIBLE EL BLOQUE DE TEXTO, Y VA ANCLADA AL TEXTO.
 
      Se mide **desde el propio bloque de texto, no desde un porcentaje del hero**,
-     y la diferencia no es de estilo. La primera versión cerraba el degradado del
-     escenario en el 62 % del alto del hero, un número sacado a ojo de una
-     captura. Fallaba, y se vio en la primera captura: el bloque de texto mide lo
-     que miden sus líneas —unos 40 rem con las cifras dentro—, así que en una
-     ventana de 900 px empieza bastante más arriba de ese 62 %, y el rótulo del
-     puesto y la línea de «Vigo, Galicia» caían sobre la parte abierta del velo.
-     Son los dos textos más pequeños y más apagados de la portada, justo los que
-     menos aguantan una fotografía detrás. Con el nombre no pasaba —es enorme y
-     casi blanco—, y por eso una revisión rápida lo deja pasar.
+     y la diferencia no es de estilo. Una versión anterior cerraba el degradado en
+     el 62 % del alto del hero, un número sacado a ojo de una captura. Fallaba: el
+     bloque de texto mide lo que miden sus líneas —unos 40 rem con las cifras
+     dentro—, así que en una ventana de 900 px empieza bastante más arriba de ese
+     62 %, y el rótulo del puesto y la línea de «Vigo, Galicia» caían fuera. Son
+     los dos textos más pequeños y más apagados de la portada, justo los que menos
+     aguantan un fondo detrás. Con el nombre no pasaba —es enorme y casi blanco—,
+     y por eso una revisión rápida lo deja pasar.
 
-     Anclado al texto, el degradado empieza 3,5 rem por encima del rótulo pase lo
-     que pase: da igual el alto de la ventana, el idioma (el rótulo en inglés
-     ocupa una línea menos) o que alguien tenga el tipo del sistema a 24 px. Y los
-     topes van en `rem` por la misma razón: se miden contra las líneas que tienen
-     que proteger, no contra una ventana que no sabemos cuánto mide.
+     **Los topes están calibrados contra el MOSAICO, que es el fondo más duro de
+     los dos que puede haber detrás.** En la primera pantalla lo que pasa por
+     debajo del texto es el escenario cinético, y una fotografía clara detrás de
+     un texto pequeño y apagado es mucho peor que la retícula de nodos del campo.
+     Así que valen los topes del escenario (28 / 58 / 88 %), no los más flojos que
+     bastaban cuando el fondo de la portada era el campo: calibrar contra el más
+     benévolo de los dos fondos es cómo se cuela un rótulo ilegible.
+
+     No cierra en grafito puro, y esa parte sí la manda el campo: el escenario se
+     disuelve en los últimos 9 rem del hero (ver la máscara de `.hero-stage`), así
+     que las cifras y la sección siguiente van sobre la retícula. Un rectángulo
+     opaco ahí se leería como un corte. Cierra al 90 %.
+
+     Los topes van en `rem` a propósito: se miden contra las líneas que tienen que
+     proteger, no contra una ventana que no sabemos cuánto mide.
 
      **El avatar queda fuera a propósito**, por encima de este bloque: es una
-     imagen con su propio halo y su propia sombra, no necesita contraste de texto,
-     y dejarlo en la zona abierta es lo que mantiene una franja de mosaico visible
-     arriba incluso a 390 px, donde el texto ocupa todo el ancho.
+     imagen con su propio halo y su propia sombra, y dejarlo en la zona abierta es
+     lo que mantiene el campo visible arriba incluso a 390 px.
 
      `inset-inline: calc(50% - 50vw)` lo saca a sangre desde un contenedor
      centrado de 80 rem, y el sobrante lo recorta el `overflow-hidden` de la
-     sección. El `-10rem` de abajo cubre el hueco que el contenedor reserva para
-     la barra de iconos de móvil: sin él se veían tejas por debajo de las cifras.
+     sección. Y **dónde ACABA lo decide la máscara, no el sobrante**: ver la nota
+     de `mask-image` ahí abajo, que es la pieza que evita la raya horizontal
+     entre el hero y la primera sección.
 
      `z-index: -1` y `pointer-events: none`: se pinta detrás del texto de su
-     propio contenedor —que ya está en `z-10`, o sea por encima del escenario— y
-     no puede interceptar el clic de un botón. */
+     propio contenedor —que ya está en `z-10`, o sea por encima de los dos
+     fondos— y no
+     puede interceptar el clic de un botón. */
   .hero-copy {
     position: relative;
   }
@@ -910,52 +1156,53 @@
   .hero-copy::before {
     content: '';
     position: absolute;
-    inset-block: -3.5rem -10rem;
+    inset-block: -3.5rem -1.5rem;
     inset-inline: calc(50% - 50vw);
     z-index: -1;
     pointer-events: none;
-    /*
-     * LOS TOPES SON EL EQUILIBRIO ENTRE «SE LEE» Y «SE VE EL FONDO», y están puestos
-     * línea por línea, no a ojo:
-     *
-     * - 0–4 rem, transparente: aquí está el rótulo del puesto, y no depende de este
-     *   degradado — lleva su propia pastilla (`.hero-chip`). Es lo que permite que el
-     *   velo empiece tarde y flojo en vez de tener que tapar el mosaico desde arriba.
-     * - 4–12 rem, del 28 % al 58 %: el saludo y el NOMBRE. El nombre mide 4,5 rem y es
-     *   casi blanco, así que se lee sobre una teja con muy poca ayuda — y es justo la
-     *   franja donde interesa que el mosaico siga viéndose, porque es el centro de la
-     *   pantalla.
-     * - 12–20 rem, hasta el 88 %: la línea de la ubicación y los botones. Texto pequeño
-     *   y apagado: aquí sí hace falta el velo.
-     * - 26 rem en adelante, grafito puro: las cifras y su filete. Son el resumen del CV
-     *   y se comparan de un vistazo; una foto por detrás las convierte en decoración.
-     *
-     * La primera versión llegaba al 88 % en 9 rem y a grafito puro en 16 rem: se leía
-     * todo perfectamente y el mosaico desaparecía de la mitad inferior de la pantalla,
-     * que es medio encargo tirado a la basura. Se vio comparando dos capturas.
-     */
     background: linear-gradient(
       to bottom,
       transparent 0,
       color-mix(in srgb, var(--color-ink) 28%, transparent) 4rem,
       color-mix(in srgb, var(--color-ink) 58%, transparent) 12rem,
       color-mix(in srgb, var(--color-ink) 88%, transparent) 20rem,
-      var(--color-ink) 26rem
+      color-mix(in srgb, var(--color-ink) 90%, transparent) 27rem
     );
+    /* Y SE APAGA ANTES DE LLEGAR AL BORDE DEL HERO, medido desde abajo.
+       Sin esto el velo llega al canto inferior de la sección valiendo un 90 %
+       de grafito, y justo debajo empieza la retícula del campo a plena vista:
+       una raya horizontal de lado a lado a la altura de las cifras. Se vio en
+       la captura. El degradado de fondo no puede resolverlo solo porque se mide
+       desde ARRIBA, y lo que hay que fijar es dónde acaba.
+
+       El desvanecido es CORTO —6 rem— y no puede alargarse sin mirar antes las
+       cifras: el filete del CV vive unos 7 rem por encima del borde del hero, o
+       sea justo al principio de este tramo. Con 12 rem el velo llegaba allí a
+       menos de la mitad de su valor y las versalitas se quedaban sin fondo. Con
+       6 rem las cifras cogen el velo entero y lo que se desvanece es el hueco de
+       debajo, donde no hay texto.
+
+       El `-1.5rem` de sobrante hace que el velo termine **por encima** del borde
+       de la sección en los dos casos: el hueco que el contenedor reserva abajo
+       son 3,5 rem en escritorio y algo más de 5 en móvil, donde va la barra de
+       iconos. El antiguo sobrante de 10 rem existía para tapar las tejas que
+       asomaban por debajo de las cifras, y ya no hace falta: allí el escenario
+       está disuelto por su propia máscara. */
+    mask-image: linear-gradient(to top, transparent 0, #000 6rem);
   }
 
   /* --- La pastilla del rótulo de estado ------------------------------------
      El puesto actual va en un texto pequeño, en versalitas y apagado: es el texto
      menos legible de la portada y está en la parte ALTA del hero, que es
-     precisamente donde el velo tiene que estar abierto para que se vea el
-     mosaico. Las dos cosas no caben.
+     precisamente donde el fondo tiene que verse. Las dos cosas no caben.
 
      La pastilla lo resuelve donde está el problema en vez de a manotazos: un
      fondo propio, casi opaco, con desenfoque detrás y un filete. Así el rótulo se
-     lee sobre cualquier teja, y el velo puede empezar cuatro rem más abajo y con
-     la mitad de intensidad. De paso, un chip de estado con su punto es como se
-     enseña «lo que estoy haciendo ahora» en cualquier interfaz reciente, así que
-     el arreglo técnico coincide con lo que pedía el encargo. */
+     lee pase lo que pase por detrás —incluida la cabeza de un pulso, que es lo
+     más brillante que dibuja el campo—, y el velo del texto puede empezar cuatro
+     rem más abajo y con la mitad de intensidad. De paso, un chip de estado con su
+     punto es como se enseña «lo que estoy haciendo ahora» en cualquier interfaz
+     reciente, así que el arreglo técnico coincide con lo que pedía el encargo. */
   .hero-chip {
     display: inline-flex;
     align-items: center;
@@ -964,32 +1211,29 @@
     border: 1px solid var(--color-line-strong);
     background: color-mix(in srgb, var(--color-ink-raised) 78%, transparent);
     padding: 0.4rem 0.9rem;
-    /* El desenfoque es lo que evita que se lea el borde de una teja a través de la
+    /* El desenfoque es lo que evita que se lea la retícula a través de la
        pastilla, que es lo que la haría parecer un recuadro sucio en vez de una
        superficie. */
     backdrop-filter: blur(0.5rem);
   }
 
-  /* --- El retrato, flotando sobre el escenario -----------------------------
-     Ahora es un avatar pequeño: el protagonista de la primera pantalla es el
-     escenario, y una foto de 20 rem en el centro lo partía en dos. El tamaño lo
-     pone `Hero.tsx`; aquí sólo está lo que lo despega del fondo. */
+  /* --- El retrato, flotando sobre el campo ---------------------------------
+     Es un avatar pequeño: el protagonista de la primera pantalla es el campo, y
+     una foto de 20 rem en el centro lo partía en dos. El tamaño lo pone
+     `Hero.tsx`; aquí sólo está lo que lo despega del fondo. */
   .hero-portrait {
     position: relative;
     animation: hero-float 14s ease-in-out infinite;
     /* `drop-shadow` y no `box-shadow`: sigue el contorno real del contenido, así
        que vale igual para el círculo del avatar sin repetir el radio en dos
-       sitios que luego se desincronizan.
-
-       Es la sombra la que hace el trabajo de despegar la cara del mosaico. Sin
-       ella, con una teja clara pasando justo por detrás, el retrato se lee como
-       una foto más del escenario. */
+       sitios que luego se desincronizan. Es la sombra la que separa la cara del
+       fondo cuando le toca pasar por detrás la parte encendida del campo. */
     filter: drop-shadow(0 1rem 1.75rem rgb(0 0 0 / 0.7));
   }
 
   /* El halo de cobre detrás del retrato. Cumple una función además de la
-     estética: separa la silueta de las tejas que pasan por detrás, que es lo que
-     evita que la cara se confunda con una foto más del escenario. */
+     estética: apaga los nodos justo alrededor de la silueta, que es lo que evita
+     que la cara se lea como un punto más del retículo. */
   .hero-portrait::before {
     content: '';
     position: absolute;
@@ -1013,38 +1257,61 @@
   }
 }
 
-/* Movimiento reducido: el escenario se CONGELA, no se esconde.
-   Se repite aquí, con `!important`, aunque el bloque general de `prefers-
-   reduced-motion` ya lleve la duración a 0,01 ms: ese atajo aplicado a una
-   animación infinita deja las tejas en el fotograma inicial, que es el correcto,
-   pero sigue ejecutando el ciclo miles de veces por segundo. `animation: none`
-   lo apaga de verdad. */
+/* Movimiento reducido: los dos fondos se CONGELAN, no se esconden.
+
+   Son dos, y la lista de abajo tiene que nombrarlos a los dos: el escenario
+   cinético de la portada (`.hero-stage__*`) y el campo del resto del sitio
+   (`.site-field__*`). Olvidar uno no se ve en una revisión rápida, porque el
+   atajo general de 0,01 ms deja el fotograma inicial, que es el correcto — lo
+   que no hace es dejar de ejecutar el ciclo miles de veces por segundo.
+
+   El lienzo se para en `SiteField.tsx`, que es donde puede pararse de verdad:
+   con `prefers-reduced-motion` no se registra ni un escuchador y se dibuja un
+   único fotograma. Lo que hace falta aquí es lo otro: apagar las animaciones CSS
+   que rodean al lienzo, y dejarlo VISIBLE — su animación de entrada arranca en
+   `opacity: 0`, así que sin esto el campo congelado sería un campo invisible.
+
+   Se repite con `!important` aunque el bloque general de `prefers-reduced-motion`
+   ya lleve la duración a 0,01 ms: ese atajo aplicado a una animación infinita
+   deja el fotograma inicial, que es el correcto, pero sigue ejecutando el ciclo
+   miles de veces por segundo. `animation: none` lo apaga de verdad. */
 @media (prefers-reduced-motion: reduce) {
-  /* `__area` y no `__rail`: la animación de entrada está en la zona. Apuntar al
-     elemento equivocado aquí no se vería —el atajo general de 0,01 ms deja el
-     resultado correcto igual—, y por eso conviene que la lista nombre
-     exactamente lo que está animado. */
+  /* `.hero-stage__area` y no `.hero-stage__rail`: la animación de entrada del
+     escenario está en la zona. Apuntar al elemento equivocado aquí no se vería
+     —el atajo general de 0,01 ms deja el resultado correcto igual—, y por eso
+     conviene que la lista nombre exactamente lo que está animado. */
   .hero-stage__area,
   .hero-stage__track,
   .hero-stage__glow,
+  .site-field__canvas,
+  .site-field__aurora,
   .hero-portrait,
   .hero-hint__arrow {
     animation: none !important;
   }
 
-  /* `opacity: 1` sólo donde la animación podía dejarlo a cero: la zona arranca su
-     entrada desde `opacity: 0`, y sin esto un escenario congelado se quedaría
-     invisible en vez de quieto. */
-  .hero-stage__area {
+  /* `opacity: 1` sólo donde la animación podía dejarlo a cero: las dos entradas
+     arrancan desde `opacity: 0`, y sin esto un fondo congelado sería un fondo
+     invisible en vez de un fondo quieto. */
+  .hero-stage__area,
+  .site-field__canvas {
     opacity: 1;
   }
 
-  /* El resplandor, en cambio, se congela a media respiración. Su ciclo va del 40 %
-     al 75 %, así que dejarlo en el 100 % —que es lo que valdría sin animación—
-     sería MÁS cobre del que se ve nunca con el movimiento activado: quien pide
-     menos movimiento acabaría con un fondo más intenso. */
+  /* El resplandor del escenario se congela a media respiración. Su ciclo va del
+     40 % al 75 %, así que dejarlo en el 100 % —que es lo que valdría sin
+     animación— sería MÁS cobre del que se ve nunca con el movimiento activado:
+     quien pide menos movimiento acabaría con un fondo más intenso. */
   .hero-stage__glow {
     opacity: 0.55;
+  }
+
+  /* La atmósfera se congela a media respiración. Su ciclo va del 45 % al 70 %,
+     así que dejarla en el 100 % —que es lo que valdría sin animación— sería MÁS
+     cobre del que se ve nunca con el movimiento activado: quien pide menos
+     movimiento acabaría con un fondo más intenso. */
+  .site-field__aurora {
+    opacity: 0.6;
   }
 }
 
@@ -1155,9 +1422,16 @@
     animation: none !important;
   }
 
-  /* El escenario de la portada no existe en papel. Es lo primero de la página, así que sin
-     esto un CV impreso empezaría por media hoja de fotos de servidores en escala de grises
-     —y con `print-color-adjust` de por medio, puede que en negro sólido—. */
+  /* El campo no existe en papel, y ahora importa el doble: es una capa FIJA, y una capa fija se
+     imprime **en todas las hojas**. Sin esto, un CV de cinco páginas saldría con la retícula en
+     gris —o en negro sólido, según cómo resuelva el navegador `print-color-adjust`— repetida
+     cinco veces. Basta con esconder la capa.
+
+     Y con la capa se va el escenario cinético de la portada, por su propio motivo: es lo
+     primero de la página, así que sin esto un CV impreso empezaría por media hoja de
+     fotografías de servidores en escala de grises —y con `print-color-adjust` de por medio,
+     puede que en negro sólido—. */
+  .site-field,
   .hero-stage {
     display: none !important;
   }
@@ -1170,10 +1444,10 @@
   }
 
   /* EL HALO DEL RETRATO, FUERA. En pantalla es un resplandor de cobre que separa la
-     silueta de las tejas; en papel, con el escenario ya quitado, es un nubarrón
-     negro de cuatro centímetros alrededor de la cara — se vio en la captura de
-     impresión. Van los dos: el degradado radial del `::before` y el `drop-shadow`
-     del contenedor, porque cada uno pinta la mitad de la nube. */
+     silueta del campo; en papel, con el campo ya quitado, es un nubarrón gris de cuatro
+     centímetros alrededor de la cara — se vio en la captura de impresión, y se volvió a ver
+     al reescribir este bloque. Van los dos: el degradado radial del `::before` y el
+     `drop-shadow` del contenedor, porque cada uno pinta la mitad de la nube. */
   .hero-portrait {
     filter: none !important;
   }
@@ -1184,7 +1458,7 @@
 
   /* La pastilla del rótulo, deshecha. Su fondo es grafito translúcido y su texto es
      claro: impresa, sale una píldora gris oscuro con el puesto ilegible dentro.
-     En papel no hay teja de la que defenderse, así que se queda el texto solo. */
+     En papel no hay fondo del que defenderse, así que se queda el texto solo. */
   .hero-chip {
     border: 0;
     background: none;
@@ -1201,7 +1475,7 @@
   }
 
   /* EL HERO DEJA DE MEDIR UNA PANTALLA. En la web ocupa `min-h-svh` con el texto
-     apoyado abajo, que es lo que deja sitio al escenario. En papel el escenario no
+     apoyado abajo, que es lo que deja sitio al campo. En papel el campo no
      se imprime, así que ese alto se convierte en una hoja casi en blanco con el
      nombre al final — la primera página del CV, precisamente. Se vio en la captura
      de impresión: el titular caía a dos tercios de la hoja.
