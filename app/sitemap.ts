@@ -3,15 +3,16 @@ import { site } from '@/content/site'
 import { getProjectSlugs } from '@/lib/content'
 import { buildDate } from '@/lib/format'
 import { locales } from '@/lib/i18n/config'
-import { href } from '@/lib/i18n/routes'
+import { projectHref } from '@/lib/i18n/routes'
 
 /**
  * Sitemap generado del contenido real: no hay lista de URLs que mantener a mano y por tanto
  * no puede quedar desactualizada.
  *
  * **Las anclas de la portada no entran.** `/es#experience` no es una URL distinta de `/es`
- * para un rastreador, y declararla lo único que consigue es diluir la portada en cinco
- * entradas que apuntan al mismo documento.
+ * para un rastreador, y declararla lo único que consigue es diluir la portada en seis
+ * entradas que apuntan al mismo documento. Con el índice de proyectos retirado, eso deja
+ * dos clases de URL: las dos portadas y una ficha por proyecto e idioma.
  *
  * `changeFrequency` refleja lo que de verdad cambia: la portada lleva el CV y se toca al
  * cambiar de puesto o al terminar un proyecto (`monthly`); una ficha de proyecto, casi
@@ -33,16 +34,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     })
 
-    entries.push({
-      url: `${site.url}${href(locale, 'projects')}`,
-      lastModified,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    })
-
     for (const slug of slugs) {
       entries.push({
-        url: `${site.url}${href(locale, 'projects', slug)}`,
+        url: `${site.url}${projectHref(locale, slug)}`,
         lastModified,
         changeFrequency: 'yearly',
         priority: 0.6,

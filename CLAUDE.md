@@ -27,8 +27,9 @@ heredó de `C:\Proyectos\sangilstudio`.
 **Estado (2026-08-01): DESPLEGADO.**
 [luisfernandezsangil.vercel.app](https://luisfernandezsangil.vercel.app) (producción, rama `main`)
 y [luisfernandezsangiltest.vercel.app](https://luisfernandezsangiltest.vercel.app) (test, rama
-`test`, con `Disallow: /`). `npm run check` limpio y `npm run check:mobile` **21/21 en local, en
-test y en producción**, en los dos idiomas. El flujo `develop` → `test` → `main` está verificado:
+`test`, con `Disallow: /`). `npm run check` limpio y `npm run check:mobile` **23/23 en local**, en
+los dos idiomas (fueron 21/21 en local, test y producción hasta que el script ganó las dos
+comprobaciones de la sección activa el 2026-08-03). El flujo `develop` → `test` → `main` está verificado:
 `develop` no despliega nada y cada push a `test` y a `main` despliega en su entorno. IDs y detalles
 en la memoria [[despliegue]].
 
@@ -40,8 +41,11 @@ página, el `index` de cada `SectionHeading` —la numeración `01…06` está e
 
 **La web publica ocho proyectos y la lista se decide en un fichero (2026-08-03).**
 `content/projects.config.ts` dice qué proyectos salen y en qué orden; las fichas viven en
-`content/projects.ts` unidas por el `name`. **Los ocho salen en la portada y los ocho en el índice
-de `/projects`** (2026-08-03): `featured` ya no decide quién sale, sólo por dónde abre el carrusel.
+`content/projects.ts` unidas por el `name`. **Los ocho salen en el carrusel de la portada, que es
+el único sitio donde está la lista: el índice de `/projects` se retiró** (2026-08-03; la URL vieja
+redirige al ancla de la sección). `featured` no decide quién sale, sólo por dónde abre el carrusel.
+**Cada proyecto sí sigue teniendo página propia** (`/es/projects/swiftmet`), que es lo que se manda
+suelto en una candidatura, y su URL se construye con `projectHref` y no con `href`.
 Están todos los repositorios de github.com/luisfdzs **menos Manfisa**, retirada a propósito, y las
 portadas de las tarjetas son **la primera pantalla de cada web en vivo**, capturadas por
 `npm run shots`. **Ojo:
@@ -78,7 +82,7 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   que es público igual). Dos webhooks de revalidación, uno por entorno. Ver [[sanity-enchufado]].
 - **Despliegue: Vercel**, dos entornos (`main` → producción, `test` → test con `noindex`).
   Framework declarado en `vercel.json`.
-- **Calidad:** `npm run check` (typecheck + ESLint + Prettier) y `npm run check:mobile` (21
+- **Calidad:** `npm run check` (typecheck + ESLint + Prettier) y `npm run check:mobile` (23
   comprobaciones en Chrome real a 390×844, por idioma).
 - **Los proyectos: la lista en un sitio y las fichas en otro.** `content/projects.config.ts` es
   qué se publica y en qué orden; `content/projects.ts` es el contenido de cada uno. `featured`
@@ -96,6 +100,13 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
 - **Navegación:** cabecera fija en escritorio; en móvil (`< lg`), barra inferior de cinco iconos,
   y su quinto icono abre un **menú a pantalla completa con TODAS las secciones** y los dos idiomas
   detrás de un filete horizontal (el menú de `Swiftmet`). Nunca la cabecera y la barra a la vez.
+  **Las seis entradas llevan a las seis secciones de la portada** —desde que no hay índice de
+  proyectos, ninguna se va de página— **y la que se está leyendo va resaltada en amarillo**, con su
+  filete puesto porque el color no puede ser la única señal. Lo mide
+  `components/layout/useActiveSection.ts` con **una línea de lectura** a un cuarto de pantalla por
+  debajo de la cabecera, no con un `IntersectionObserver` que se quede con «la más visible»: en una
+  página cuyas secciones miden de media pantalla a cuatro, eso resalta la más alta casi todo el rato.
+  En una ficha de proyecto manda la ruta y se marca «Proyectos».
   **Volver arriba es un botón flotante** (`components/ui/BackToTop.tsx`) que aparece pasada la
   primera pantalla, en los dos anchos y en todas las páginas; la flecha que había en el pie era un
   enlace a la ruta actual y no movía el scroll. **La URL nunca enseña `#seccion`**: los `href` siguen llevando el
@@ -242,6 +253,36 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-03 (rama `feature/proyectos-sin-indice`, en worktree propio): **se retira el índice de
+proyectos y el menú pasa a decir dónde estás.** Encargo de Luis: «quita la pantalla `/es/projects`,
+que con la sección de la portada me llega; lo que sí tiene sentido es `/projects/swiftmet` y el resto
+de proyectos igual». Y de paso: la sección en la que estamos no se resaltaba y no todos los botones
+de la barra llevaban a lo que prometían. (1) **Fuera una página, `app/(site)/[locale]/projects/page.tsx`.**
+Es la consecuencia de lo de esa misma mañana: desde que el carrusel enseña los ocho, el índice era
+una segunda URL con las mismas ocho tarjetas compitiendo con la portada por «Luis Fernández Sangil».
+Las fichas no se tocan. **Lo que arrastra es más que borrar el fichero**: `projects` sale de `routes`
+y entra en `sections`, las fichas se enlazan con la función nueva `projectHref(locale, slug)` —
+`href(locale, 'projects', slug)` ahora devolvería `/es#projects`, porque `href` mira primero si la
+clave es sección—, `next.config.ts` redirige `/:locale(es|en)/projects` al ancla **sin comodín**
+(un `/:path*` se llevaría las ocho fichas), y se caen del `sitemap.xml`, de los diccionarios
+(`viewAll`, `index`) y de `ProjectCard` las dos banderas `framed` y `priority`, que sólo servían para
+distinguir el carrusel de la retícula del índice. (2) **La sección que se lee va resaltada en
+amarillo**, en la cabecera, en la barra de móvil y en el panel, con `aria-current="location"` y el
+filete puesto —el color no puede ser la única señal—. Lo mide `useActiveSection` con **una línea de
+lectura** y no con un `IntersectionObserver`: quedarse con «la más visible» resalta la sección más
+alta casi todo el scroll y parpadea en los solapes. En el hero no hay nada marcado y en una ficha
+manda la ruta, que se decide **durante el render** (el `setState` en el efecto es error de ESLint
+aquí, y con razón). (3) **El icono de «Perfil» era una casa** en la barra y en la cabecera de la
+sección: junto a ese rótulo promete volver arriba y lleva a la mitad de la página. Ahora es una
+persona, y `Home` se fue con ella porque no quedaba nada que la usara. `check:mobile` gana dos
+comprobaciones —**23/23** en los dos idiomas sobre el build de producción— y el recorrido de la
+ficha empieza ya en la portada, seleccionando `li:not([data-clone])` porque las otras dos copias del
+carrusel son clones `inert`. **La trampa de la sesión no estaba en la web:** el Chrome de la
+extensión **no anima el scroll**, así que al reproducir el fallo parecía que ningún enlace del menú
+funcionaba; comprobado con un iframe sintético que es del navegador. Medido después con Playwright y
+`reducedMotion: 'reduce'`, los seis enlaces aterrizan con el borde de su sección exactamente bajo la
+cabecera. Ver [[lista-de-proyectos]] y [[navegacion-y-orden]]._
 
 _2026-08-03 (en `develop`, por encargo de trabajar ahí directamente): **seis cambios de navegación y
 lectura de la portada, pedidos de una vez.** (1) **El menú de móvil es el de Swiftmet**: el panel

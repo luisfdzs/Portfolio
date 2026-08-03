@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import type { Locale } from '@/lib/i18n/config'
-import { href, navigation } from '@/lib/i18n/routes'
+import { href } from '@/lib/i18n/routes'
 import { LocaleSwitch } from './LocaleSwitch'
+import { NavList } from './NavList'
 
 /**
  * Cabecera de escritorio.
@@ -33,23 +34,11 @@ export function Header({ locale }: { locale: Locale }) {
           Luis Fernández Sangil
         </Link>
 
+        {/* Las entradas van en un componente de cliente porque resaltan la sección que se
+            está leyendo, y para eso hay que medir el scroll. La cabecera en sí sigue
+            siendo de servidor. */}
         <nav aria-label={t.a11y.mainNavigation}>
-          <ul className="flex items-center gap-7">
-            {/* `Link` también para las anclas: Next resuelve `/es#about` haciendo scroll
-                si ya estás en la portada y navegando si vienes de una ficha de proyecto,
-                que es justo lo que hace falta. Y al de `projects`, que sí es una página,
-                le da prefetch gratis. */}
-            {navigation.map((key) => (
-              <li key={key}>
-                <Link
-                  href={href(locale, key)}
-                  className="link-underline text-small text-paper-soft transition-colors hover:text-paper"
-                >
-                  {t.nav[key]}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <NavList locale={locale} />
         </nav>
 
         <LocaleSwitch current={locale} />
