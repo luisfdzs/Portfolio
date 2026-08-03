@@ -468,8 +468,8 @@ const sheets: ProjectSheet[] = [
         en: 'Both backgrounds are drawn in code: a kinetic mosaic on the first screen and, everywhere else, a grid of up to three thousand nodes on a canvas that parts and lights up under the pointer. Without a single added dependency.',
       },
       {
-        es: 'Los proyectos giran en un carrusel «cover flow» dirigido por el scroll con CSS (`animation-timeline`), sin JavaScript salvo los dos botones, y en papel se deshace en una retícula de dos columnas.',
-        en: 'The projects turn in a «cover flow» carousel driven by scroll in pure CSS (`animation-timeline`), with no JavaScript beyond the two buttons, and it unfolds into a two-column grid in print.',
+        es: 'Los proyectos giran en un carrusel «cover flow» infinito dirigido por el scroll con CSS (`animation-timeline`): el giro entero es CSS y de JavaScript sólo hay los dos botones y el salto que devuelve el bucle a su sitio. En papel se deshace en una retícula de dos columnas.',
+        en: 'The projects turn in an endless «cover flow» carousel driven by scroll in CSS (`animation-timeline`): the whole 3D effect is CSS, and the only JavaScript is the two buttons and the jump that keeps the loop seamless. In print it unfolds into a two-column grid.',
       },
       {
         es: 'La verificación en móvil es parte del trabajo, no una revisión a ojo: 21 comprobaciones en un Chrome real a 390×844 y por idioma, incluidos desbordamiento horizontal, áreas pulsables de 24 px y que las dos navegaciones no compartan nombre accesible.',
