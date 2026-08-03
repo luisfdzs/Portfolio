@@ -95,14 +95,15 @@ export function Hero({ locale, profile, stats }: Props) {
       <div className="hero-shell page-gutter relative z-10 mx-auto w-full max-w-7xl pt-28 pb-[calc(var(--spacing-nav-mobile)+1.5rem)] text-center lg:pb-14">
         {/*
          * El retrato, ahora avatar. `hero-portrait` es lo que lo pone POR ENCIMA del
-         * escenario en vez de al lado: flota con una oscilación mínima y lleva un halo de
-         * cobre y una sombra que lo despegan de las tejas que pasan por debajo. Sin esa
-         * sombra, en el momento en que a una teja clara le toca pasar justo detrás, la
-         * silueta se pierde y la cara parece una foto más del fondo.
+         * escenario en vez de al lado: flota con una oscilación mínima y lleva una sombra
+         * de grafito que lo despega de las tejas que pasan por debajo. Sin esa sombra, en el
+         * momento en que a una teja clara le toca pasar justo detrás, la silueta se pierde y
+         * la cara parece una foto más del fondo. **Sin cobre**: el halo dorado que hubo ahí
+         * se quitó por encargo (ver «El retrato, flotando sobre el campo» en `globals.css`).
          *
          * **Va FUERA de `.hero-copy`**, y eso es lo que deja una franja de mosaico visible
          * arriba: el velo del texto empieza justo debajo del avatar, así que el avatar flota
-         * sobre las tejas en vez de sobre grafito. Es una imagen con su propio halo — no
+         * sobre las tejas en vez de sobre grafito. Es una imagen con su propia sombra — no
          * necesita el contraste que necesitan las líneas de texto.
          *
          * `hero-portrait__frame` en vez de `rounded-full`: la foto es un RECORTE con

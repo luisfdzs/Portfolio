@@ -1231,9 +1231,15 @@
     filter: drop-shadow(0 1rem 1.75rem rgb(0 0 0 / 0.7));
   }
 
-  /* El halo de cobre detrás del retrato. Cumple una función además de la
-     estética: apaga los nodos justo alrededor de la silueta, que es lo que evita
-     que la cara se lea como un punto más del retículo. */
+  /* La sombra suave detrás del retrato. **Sin cobre**: hubo un halo dorado ahí y se
+     quitó por encargo — se leía como un aro de luz alrededor de la cara, que es
+     justo lo que una foto de perfil no necesita.
+     Lo que queda es grafito y cumple la función que el cobre sólo acompañaba:
+     apagar el fondo pegado a la silueta —los nodos del campo o una teja clara del
+     mosaico— para que la cara no se lea como un elemento más del fondo. Sobre
+     grafito no se ve; sobre una fotografía clara, sí, y para eso está.
+     Quien vuelva a meter color aquí está deshaciendo el encargo, no afinando un
+     matiz. */
   .hero-portrait::before {
     content: '';
     position: absolute;
@@ -1242,8 +1248,8 @@
     border-radius: 50%;
     background: radial-gradient(
       circle at 50% 45%,
-      color-mix(in srgb, var(--color-signal) 26%, transparent) 0%,
-      color-mix(in srgb, var(--color-ink) 88%, transparent) 55%,
+      color-mix(in srgb, var(--color-ink) 88%, transparent) 0%,
+      color-mix(in srgb, var(--color-ink) 72%, transparent) 55%,
       transparent 78%
     );
     filter: blur(0.6rem);
@@ -1468,8 +1474,8 @@
     display: none !important;
   }
 
-  /* EL HALO DEL RETRATO, FUERA. En pantalla es un resplandor de cobre que separa la
-     silueta del campo; en papel, con el campo ya quitado, es un nubarrón gris de cuatro
+  /* LA SOMBRA DEL RETRATO, FUERA. En pantalla es grafito que separa la silueta del
+     fondo; en papel, con el fondo ya quitado, es un nubarrón gris de cuatro
      centímetros alrededor de la cara — se vio en la captura de impresión, y se volvió a ver
      al reescribir este bloque. Van los dos: el degradado radial del `::before` y el
      `drop-shadow` del contenedor, porque cada uno pinta la mitad de la nube. */

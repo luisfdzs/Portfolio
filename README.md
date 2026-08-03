@@ -31,6 +31,7 @@ principal del proyecto y está explicada abajo, en «El contenido: dos fuentes y
 | `npm start`              | Sirve el build de producción                                      |
 | `npm run check`          | **Puerta de calidad**: typecheck + ESLint + formato               |
 | `npm run check:mobile`   | 21 comprobaciones en un Chrome real a 390×844 (requiere servidor) |
+| `npm run shots`          | Recaptura la portada de cada proyecto de su web en vivo           |
 | `npm run format`         | Aplica Prettier                                                   |
 | `npm run migrate:build`  | Convierte `content/` en el NDJSON de importación a Sanity         |
 | `npm run migrate:import` | Importa ese NDJSON al dataset (sube también las imágenes)         |
@@ -48,7 +49,8 @@ LOCALE=en npm run check:mobile
 | Quiero cambiar…                          | Fichero                             |
 | ---------------------------------------- | ----------------------------------- |
 | Experiencia, formación, stack, perfil    | `content/profile.ts`                |
-| Proyectos (o el panel, en `/admin`)      | `content/projects.ts`               |
+| Qué proyectos salen y en qué orden       | `content/projects.config.ts`        |
+| El contenido de un proyecto              | `content/projects.ts`               |
 | Nombre, dominio canónico, repositorio    | `content/site.ts`                   |
 | Textos de interfaz y traducciones        | `lib/i18n/dictionaries.ts`          |
 | Colores, tipografías, ritmo, animaciones | `app/globals.css` (`@theme`)        |
@@ -128,9 +130,10 @@ cifras, así que el desfase real es de meses.
 ## El panel (ya enchufado)
 
 El proyecto de Sanity existe desde el **2026-08-03**: `Portfolio`, id **`3pdexisd`**, dataset
-`production` **público**, con los dieciséis documentos del CV importados y las siete imágenes
-(retrato y seis capturas) subidas. La web ya se construye leyendo del panel; `content/` sigue en
-su sitio como respaldo y como suelo de la regla de arriba.
+`production` **público**, con los documentos del CV importados y sus capturas subidas. La web ya
+se construye leyendo del panel; `content/` sigue en su sitio como respaldo y como suelo de la
+regla de arriba. La importación inicial subió dieciséis documentos y siete imágenes; **la lista de
+proyectos del panel ya no coincide con la del repositorio** (ver «Pendiente»).
 
 Público a propósito: la web lee **sin token** al construir, así que un dataset privado obligaría
 a meter una credencial de lectura en los dos proyectos de Vercel para servir un CV que es
@@ -143,7 +146,7 @@ npx sanity projects create "Portfolio" --dataset production --dataset-visibility
 # → devuelve el projectId; va a .env.local y a los dos proyectos de Vercel
 
 npm run migrate:build      # content/ → scripts/migration/import.ndjson
-npm run migrate:import     # sube también las seis capturas (el retrato NO: ver más abajo)
+npm run migrate:import     # sube también las capturas (el retrato NO: ver más abajo)
 
 # Orígenes CORS: sin esto /admin carga pero no puede hablar con Sanity
 npx sanity cors add http://localhost:3000 --credentials
@@ -341,12 +344,43 @@ hasta que la sección aparece—.
 A cambio se pierden dos cosas, y conviene saberlo antes de tocarlo: copiar la URL ya no comparte
 la sección, y «atrás» sale de la página en vez de recorrer las secciones visitadas.
 
+### Qué proyectos salen: `content/projects.config.ts`
+
+**Para añadir, quitar o reordenar un proyecto se toca un fichero y basta con el título.**
+`content/projects.config.ts` es la lista de lo que se publica y en qué orden, y marca con
+`featured` los cuatro que salen en el carrusel de la portada. El contenido de cada uno —resumen,
+decisiones, stack, captura— vive en su ficha, en `content/projects.ts`, unida a la lista por el
+`name`.
+
+Un título de la lista sin ficha **no se publica** y deja un aviso con su nombre en el log del
+build. Es deliberado: media tarjeta —sin frase, sin año y con el hueco tramado donde va la
+captura— se lee como un descuido. Al revés no pasa nada: una ficha que no está en la lista
+simplemente no sale, así que retirar un proyecto no obliga a borrar lo escrito.
+
+Están todos los repositorios de github.com/luisfdzs **menos Manfisa**, retirada a propósito.
+
+> ⚠️ **Con el panel enchufado, esta lista no manda en lo desplegado.** La regla del contenido
+> dice que Sanity gana cuando tiene documentos, así que un cambio aquí sólo se ve en la web
+> después de reflejarlo en el panel (ver «Pendiente»).
+
 ### Las capturas de los proyectos
 
-Las seis capturas de `public/projects/` se toman de las webs en vivo y se procesan con
-`scripts/build-project-shots.mjs`, que las recorta a **2:1 anclado arriba e izquierda**. Las dos
-anclas están razonadas en el propio script; el resumen es que una web se maqueta de izquierda a
-derecha, y con el recorte centrado salía «NGIL STUDIO» en vez de «SANGIL STUDIO».
+Lo que se ve en la tarjeta es **la sección principal de la página principal de cada proyecto**: la
+primera pantalla de la web en vivo. Las genera `npm run shots` (`scripts/build-project-shots.mjs`)
+abriendo cada `liveUrl` en un Chrome real con la ventana **a 1400×700**, que es el 2:1 exacto del
+hueco de la tarjeta, y guardando el viewport al doble de densidad. Medir la ventana con la
+proporción de destino es lo que evita recortar: la versión anterior de este script recortaba una
+captura de 1568×698 y se comía 86 px por lado, es decir el borde izquierdo del titular y de la
+navegación.
+
+```bash
+npm run shots                        # todos los proyectos publicados
+npm run shots -- cedece mila-barber  # sólo esos slugs
+```
+
+Las URLs salen de `content/`, así que el script no tiene ningún mapa que mantener: un proyecto
+nuevo en la lista ya está aquí. Lo que **sí** hay que hacer a mano es escribir el `alt` de la
+captura en la ficha, mirándola.
 
 Si un proyecto no tiene captura, la tarjeta enseña **la trama** de `placeholder-grid`, no un gris
 que la disimule: un hueco declarado es información y un hueco camuflado es un descuido que
@@ -388,6 +422,18 @@ Falla del lado seguro: si mañana falta la variable, no se indexa.
 
 Cosas que están así a propósito y con quién se resuelven:
 
+- **El panel sigue con la lista de proyectos vieja.** Desde el 2026-08-03 el repositorio publica
+  ocho proyectos y **no** Manfisa, pero lo desplegado lee de Sanity y allí siguen los seis de la
+  importación inicial, Manfisa incluida. Hasta reflejarlo en el panel, la web pública no cambia y
+  ni el `check` ni el build se quejan — es la regla del contenido funcionando, no un fallo. Dos
+  formas de arreglarlo:
+  - **A mano en `/admin`** (recomendada si ya se ha editado algo ahí): borrar el documento de
+    Manfisa y crear «Mila Barber», «Cedecé» y «Portfolio» con su captura de `public/projects/`.
+  - **Reimportando**: `npm run migrate:build && npm run migrate:import`. Deja el dataset con
+    exactamente lo que hay en `content/`, **pero corre con `--replace`**: machaca las ediciones
+    hechas a mano y el orden de los documentos arrastrables, y **no borra** el documento de
+    Manfisa, que hay que eliminar aparte
+    (`npx sanity documents delete project-manfisa --dataset production`).
 - **Hay que VACIAR el retrato del panel para que se vea el recorte.** El campo «Retrato» del
   documento `profile` sigue teniendo el JPEG original con la calle detrás, y el panel manda cuando
   tiene una imagen elegida. Desde el 2026-08-03 basta con quitarla —`/admin` → **Perfil** → campo
