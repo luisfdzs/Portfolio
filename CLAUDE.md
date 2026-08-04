@@ -132,6 +132,18 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   carril, el `gap` o el sangrado tiene que recalcular los 18rem** — ahora es un número y no dos, pero
   nada avisa igual. Formación ya no tiene carril: al quitarse la ubicación se fue la retícula. Qué
   quedó sin centrar y por qué, en [[decisiones-de-diseno]].
+- **La experiencia se lee de ANTIGUO A RECIENTE y su filete es una barra de progreso** (2026-08-04).
+  Las dos cosas son la misma decisión y no se pueden separar: el filete vertical pasa a ser cobre
+  —la única línea de la página que representa algo— y se enciende con el scroll hasta donde has
+  leído (bloque «La línea temporal de experiencia» de `globals.css`, `animation-timeline: view()`,
+  cero JavaScript), y para que **avance** al bajar la lista tiene que ir del primer puesto al
+  actual. `Experience.tsx` invierte `entries` **sólo para la vista** —el contenido, el panel y el
+  JSON-LD siguen en orden de CV— y por eso **el punto relleno es el último y no el primero**. El
+  filete son dos pseudoelementos y no el borde (un borde no se degrada ni se anima); el `border-l`
+  se queda **transparente desde el JSX**, porque `border-line` es una utilidad y una regla de
+  `@layer components` pierde contra ella. **En papel se deshace la inversión** con
+  `column-reverse`: un CV impreso que acaba en el puesto de hoy obliga a llegar al final para saber
+  dónde trabajas, y eso es lo primero que se mira. Ver [[decisiones-de-diseno]].
 - **Los proyectos de la portada van en un carrusel «cover flow», van TODOS y el carrusel es
   INFINITO** (bloque «COVER FLOW» de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D
   dirigido por el scroll, y de JavaScript sólo los dos botones y el salto del bucle. El bucle es
@@ -290,6 +302,28 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-04 (en `develop`): **la línea temporal es cobre, mide lo leído, y la sección se lee al
+revés.** Encargo de Luis en dos tiempos: primero el color, y con él cinco efectos montados en un
+conmutador de desarrollo —hermano del del hero, con los atajos en Mayúsculas para no pisarse— del
+que eligió el **progreso de lectura**; el andamiaje (`timelineVariants.ts` y su conmutador) se borró
+al elegir, como estaba previsto. Lo que queda: el filete apagado al 16 % y encima uno encendido que
+crece con `animation-timeline: view()`, **sin una línea de JavaScript**. Tres cosas que no se ven
+venir. (1) **El filete no puede ser el `border-left`**: un borde no se degrada ni se anima por
+tramos, así que son dos pseudoelementos en `left: -1px` y el borde se queda de relleno, transparente,
+porque es él quien reserva el píxel del que cuelgan el sangrado de los `li` y los puntos.
+**`border-transparent` va en el JSX**, no en la hoja: `border-line` es una utilidad de Tailwind y una
+regla de `@layer components` pierde contra ella —lo pintaba al lado y la línea salía de dos píxeles—.
+Es la trampa de `.hero-portrait__frame` otra vez. (2) **La lista se invierte**, porque una barra que
+avanza mientras el CV retrocede cuenta la historia al revés; se invierte **sólo en la vista**
+(`[...entries].reverse()`), el contenido y el panel no se tocan, y el punto relleno pasa a ser el
+último. (3) **El movimiento reducido necesita regla propia y no por el motivo de siempre**: con
+`animation-timeline`, antes de entrar en el rango manda el relleno hacia atrás —`scaleY(0)`—, así que
+el atajo general de 0,01 ms dejaría la línea invisible hasta que apareciera la sección. En papel se
+deshacen las dos cosas: el borde vuelve a ser gris (un pseudoelemento con `background` no se imprime)
+y `column-reverse` devuelve el orden de CV. `npm run check` limpio y `check:mobile` 23/23, con el
+progreso medido a lo largo de la sección (0,05 → 0,98), el orden comprobado en pantalla y en papel y
+el movimiento reducido verificado. Ver [[decisiones-de-diseno]]._
 
 _2026-08-04 (en `develop`): **experiencia se centra moviendo la cabecera, y las dos vueltas
 anteriores se desmontan.** El diagnóstico es de Luis y es la solución entera: la cabecera y el `<ol>`
