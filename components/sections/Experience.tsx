@@ -24,9 +24,10 @@ import { TagList } from '@/components/ui/Tag'
  * - **El filete vertical y el punto** dan continuidad visual sin bordes de tarjeta: cuatro
  *   tarjetas serían cuatro bloques sueltos, y esto es una trayectoria.
  *
- * **Y en escritorio la lista entera va corrida a la derecha**, que es lo que hace que el
- * conjunto —filete, fechas y puesto— quede centrado en la sección en vez de pegado al margen
- * izquierdo con un hueco de 18rem a la derecha. La cuenta está donde se aplica, en el `ol`.
+ * **Y en escritorio es la CABECERA la que se corre**, no la lista: el carril de fechas empuja
+ * el texto 18rem a la derecha, así que un rótulo centrado en la sección nunca coincide con el
+ * titular del puesto que encabeza. Se le pasa el mismo sangrado (`textIndent`) y los dos
+ * quedan en el mismo eje. La lista, en consecuencia, ocupa el ancho entero y no compensa nada.
  *
  * El texto va centrado en cada una de las dos columnas —fechas y puesto—, y el filete y los
  * puntos siguen a la izquierda: son la línea del tiempo, no texto, y moverlos al centro
@@ -42,71 +43,94 @@ export function Experience({
 }) {
   const t = getDictionary(locale)
 
+  /*
+   * DE ANTIGUO A RECIENTE, AL REVÉS QUE EL CONTENIDO, y sólo aquí: `entries` llega en el
+   * orden del CV —lo último primero— y así se queda en el contenido, en el panel y en el
+   * JSON-LD. Lo que se invierte es la lectura de esta sección, porque desde que la línea
+   * temporal marca el progreso de scroll tiene que **avanzar** al bajar: con el puesto de hoy
+   * arriba, la barra iba encendiéndose hacia atrás en el tiempo, que es lo contrario de lo
+   * que dibuja.
+   *
+   * `[...entries]` porque `reverse()` muta, y `entries` es un `readonly` que viene del
+   * contenido: invertirlo en el sitio afectaría a quien lo lea después en el mismo render.
+   *
+   * Consecuencia que hay que llevar de la mano: **el puesto actual ya no es el índice 0**,
+   * es el último. Es lo que decide qué punto va relleno.
+   */
+  const timeline = [...entries].reverse()
+
   return (
     <section
       id={sections.experience}
       className="page-gutter mx-auto max-w-7xl section-block text-center"
     >
+      {/*
+       * LA CABECERA SE CENTRA SOBRE LA COLUMNA DEL PUESTO, no sobre la sección, y los 18rem
+       * son la única cuenta que queda en esta sección: el sangrado de la línea temporal
+       * (`lg:pl-10`, 2,5rem) + el carril de fechas (13rem) + el hueco de la retícula (2,5rem).
+       * Eso es lo que separa el borde izquierdo de la sección del borde izquierdo del texto,
+       * así que rellenar la cabecera con lo mismo pone el rótulo y el titular de cada puesto
+       * en el mismo eje. Es relleno y no margen para que el filete siga cruzando la sección
+       * entera; el detalle está en `SectionHeading`.
+       *
+       * Quien toque el carril, el hueco o el sangrado tiene que traer aquí la nueva suma —y
+       * nada avisa si se olvida—, pero ahora es UN número y no dos que se descuadran juntos.
+       */}
       <SectionHeading
         index="02"
         title={t.experience.title}
         kicker={t.experience.kicker}
         icon={Briefcase}
+        textIndent="lg:pl-72"
       />
 
       {/*
-       * EL MARGEN DE 9REM EN ESCRITORIO ES LO QUE CENTRA LA SECCIÓN, y sin él la lista se ve
-       * corrida a la izquierda por mucho que cada texto esté centrado en su columna.
-       *
-       * La cuenta, que es toda la explicación: lo que se ve de cada entrada va desde el filete
-       * de la línea temporal hasta el borde derecho de la columna del puesto, y a la derecha de
-       * eso queda una columna vacía —la que existe para que el titular del puesto caiga en el
-       * mismo eje que el rótulo de la sección—. Con la columna vacía entera a la derecha, ese
-       * bloque visible acababa 18rem antes del borde y no empezaba hasta el borde mismo: el ojo
-       * lee un bloque descentrado, porque lo está. Los 18rem se reparten ahora a medias, 9 y 9,
-       * y el conjunto queda centrado en la sección; el resto lo absorbe la columna del puesto,
-       * que es `1fr`.
-       *
-       * `ml` y no `pl`: el filete es el borde izquierdo de esta lista y los puntos se colocan
-       * respecto a él. Con relleno, el filete se quedaría clavado en el margen de la página y
-       * las fechas se irían solas a la derecha.
-       *
-       * **Quien cambie el margen tiene que cambiar la tercera columna, y al revés**: la suma de
-       * los dos más el hueco de la retícula es constante, y descuadrar uno mueve el bloque
-       * entero sin que nada avise. Es la misma aritmética a mano que ya había en la retícula.
+       * SIN MARGEN NI COLUMNA VACÍA DE COMPENSACIÓN, y las dos cosas se fueron juntas. Existían
+       * para lo contrario de lo que hay ahora: empujaban la lista y recortaban su ancho para
+       * que el bloque visible quedara centrado en la sección, con la cabecera en el eje de la
+       * sección. Pero lo que se lee no es el bloque, es el texto — y el texto seguía escorado
+       * respecto al rótulo. Centrada la cabecera sobre la columna del puesto, la lista puede
+       * ocupar el ancho entero, que es lo que era antes de la aritmética.
        */}
-      <ol className="border-l border-line lg:ml-36">
-        {entries.map((entry, index) => (
+      {/* `exp-timeline`: el filete cobre y la barra de progreso de lectura. El `border-l`
+          sigue puesto y va transparente — es él quien reserva el píxel del que cuelgan el
+          sangrado de los `li` y los puntos; el color lo pintan dos pseudoelementos encima,
+          que es lo único que se puede degradar y animar. Bloque «La línea temporal de
+          experiencia» de `globals.css`.
+
+          **`border-transparent` va aquí y no en la hoja**, aunque el bloque de `globals.css`
+          lo explique: `border-line` es una utilidad de Tailwind y una regla de
+          `@layer components` pierde contra ella por muy específica que sea —entre capas manda
+          el orden de las capas—. Dejarlo en la hoja no quitaba el gris: pintaba el cobre a su
+          lado y la línea salía de dos píxeles. Es la misma trampa que documenta
+          `.hero-portrait__frame`. */}
+      <ol className="exp-timeline border-l border-transparent">
+        {timeline.map((entry, index) => (
           <Reveal
             as="li"
             key={entry.slug}
             step={index}
             className="relative pb-14 pl-6 last:pb-0 lg:pl-10"
           >
-            {/* El punto de la línea temporal. El primero —el puesto actual— va en cobre y
-                relleno; los pasados, huecos. Es la única jerarquía que hace falta. */}
+            {/* El punto de la línea temporal. El del puesto actual va en cobre y relleno;
+                los pasados, huecos. Es la única jerarquía que hace falta.
+                **El actual es el ÚLTIMO**, no el primero, desde que la lista se lee de
+                antiguo a reciente. */}
             <span
               aria-hidden="true"
               className={
-                index === 0
+                index === timeline.length - 1
                   ? 'absolute top-1.5 -left-[5px] size-[9px] rounded-full bg-signal'
                   : 'absolute top-1.5 -left-[5px] size-[9px] rounded-full border border-line-strong bg-ink'
               }
             />
 
-            {/* TRES columnas en escritorio y la tercera va vacía, a propósito.
-                Con dos, el texto quedaba centrado en su columna pero la columna no
-                estaba centrada en la sección: la de fechas (13rem), su hueco (2,5rem)
-                y el sangrado de la línea temporal (2,5rem) empujan el contenido
-                18rem a la derecha, así que su centro caía 9rem por delante del centro
-                del rótulo. Se veía como un desfase entre la cabecera y las entradas.
-                La columna vacía es lo que devuelve eso, y **mide 6,5rem porque los
-                otros 9rem los pone ya el margen de la lista**: 6,5 + 2,5 de hueco
-                son los 9 que faltan hasta los 18. Sin elemento de más: la pista
-                existe por la plantilla. Quien toque `lg:pl-10`, la columna de fechas,
-                el `gap` o el `lg:ml-36` de la lista tiene que recalcular este valor
-                —los dos ajustes son la misma cuenta y se descuadran juntos—. */}
-            <div className="lg:grid lg:grid-cols-[13rem_1fr_6.5rem] lg:gap-10">
+            {/* DOS columnas: el carril de fechas y el puesto, que se queda con el resto.
+                Hubo una tercera vacía a la derecha para centrar la columna del puesto en
+                la sección; sobra desde que es la cabecera la que se centra sobre ella. Los
+                13rem del carril y el hueco de 2,5rem son dos de los tres sumandos del
+                `textIndent` de la cabecera: cambiar uno obliga a recalcularlo. */}
+            <div className="lg:grid lg:grid-cols-[13rem_1fr] lg:gap-10">
               <div className="lg:pt-0.5">
                 <p className="figure-num text-small text-signal">
                   {formatRange(entry.range, locale, t.experience.present)}
