@@ -13,7 +13,7 @@ La memoria curada vive en `.claude/memory/` (índice en `.claude/memory/MEMORY.m
 ## 1. Qué es este proyecto
 
 CV, portfolio y carta de presentación de **Luis Fernández Sangil**, ingeniero industrial y
-desarrollador web en Vigo (Analista programador senior en Mobile Smart City Corp desde marzo de
+desarrollador web en Vigo (Analista programador senior en Mobile Smart City desde marzo de
 2026). Sustituye al portfolio anterior en Astro, que sigue en `C:\Proyectos\Porfolio` y del que
 sólo se ha recuperado el retrato.
 
@@ -281,6 +281,38 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-04 (en `develop`, por encargo de trabajar ahí directamente): **los textos del CV los
+reescribió Luis editando el HTML de la web en producción, y de ahí se han traído al repo y al
+panel.** El método es lo primero que hay que apuntar, porque va a repetirse: Luis edita los textos
+en su Chrome con las herramientas de desarrollo, mete la pestaña en el grupo de la extensión y
+Claude **compara el DOM en vivo contra el HTML que sirve el servidor** (`fetch` de la misma URL con
+`cache: 'reload'`, texto nodo a nodo y alineado con una LCS) para sacar la lista exacta de cambios
+— cincuenta y dos, en esta tanda. **La pestaña tiene que estar en el grupo de la extensión**: fuera
+de él, Claude no ve ni el DOM ni la consola, y una pestaña nueva no serviría de nada porque
+devolvería el HTML desplegado sin las ediciones, que viven sólo en la memoria de esa pestaña. Qué
+cambió: **los cuatro resúmenes de experiencia** (Mobile Smart City explica ahora a qué se dedica con
+una comparación, Altia cuenta el trabajo real de incidencias, Exceltic describe al grupo Ingeteam y
+ASTI cuenta qué es un AGV y la compra por ABB), **la nota de formación** (la forma de pensar de una
+ingeniería, aterrizada en cómo escribe hoy los prompts de IA), **los dos párrafos del perfil** —eran
+tres—, **cuatro rótulos de sección** (`Proyectos`, `Experiencia laboral`, `Quién soy`, `Tecnologías
+que manejo`), **la entradilla de proyectos y la de contacto**, y **el puesto de Altia**, que pasa a
+«Desarrollador full stack». Tres cambios arrastran código y no sólo diccionario: **la nota al pie del
+stack se cae entera** (clave `stack.note` y su párrafo en `Stack.tsx`), **el cliente final se une con
+una flecha** —`forClient` pasa de «para»/«for» a `→`, igual en los dos idiomas porque es un signo y
+no una palabra, y por eso **se quita el « · » de delante** o quedarían dos separadores seguidos—, y
+**Altia pierde dos clientes** (fuera Banco Santander Portugal y GETNET, por decisión de Luis). Las
+ediciones eran sólo en castellano: **el inglés se ha traducido aquí**, y con él las cuatro correcciones
+ortográficas de la versión castellana («Fuí»→«Fui», «fué»→«fue», «ví»→«vi», «vén»→«ven», más «lo
+realmente marca»→«lo que realmente marca»). `npm run check` limpio, el build sin un solo aviso —lo
+que confirma que los seis documentos parcheados validan— y las dos versiones prerrenderizadas
+comprobadas cadena a cadena. **El panel se parcheó a continuación** con la receta de la tanda
+anterior: script de un solo uso, `npx sanity exec … --with-user-token`, `patch().set()` sobre campos
+concretos leyendo los valores de `content/profile.ts`, los seis documentos en una única transacción,
+y el script borrado después — **nunca `migrate:import`**, que corre con `--replace`. Lo que queda
+dicho para la próxima: **un rótulo que repite el rótulo pequeño de encima se ve dos veces**, y es lo
+que le pasa ahora a proyectos («Proyectos» en versalitas y «Proyectos» en titular). Ver
+[[perfil-cv]] y [[navegacion-y-orden]]._
 
 _2026-08-04 (en `develop`, por encargo de trabajar ahí directamente): **la portada se monta sola y
 formación se queda en el hueso.** Tres encargos. (1) **Se escriben también el titular del puesto y la

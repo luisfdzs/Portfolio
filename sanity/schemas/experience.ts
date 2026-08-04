@@ -47,7 +47,7 @@ export const experience = defineType({
       title: 'Cliente final',
       type: 'string',
       description:
-        'Sólo en puestos de consultoría. Separa varios con « · ». La web escribe «Altia · para Banco Santander Portugal».',
+        'Sólo en puestos de consultoría. La web pone una flecha delante: «Altia → INDRA & Kids&Us».',
     }),
     defineField({
       name: 'startDate',

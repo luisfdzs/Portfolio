@@ -133,8 +133,8 @@ El proyecto de Sanity existe desde el **2026-08-03**: `Portfolio`, id **`3pdexis
 `production` **público**, con los documentos del CV importados y sus capturas subidas. La web ya
 se construye leyendo del panel; `content/` sigue en su sitio como respaldo y como suelo de la
 regla de arriba. La importación inicial subió dieciséis documentos y siete imágenes, y desde entonces
-el panel se ha sincronizado dos veces a mano: la lista de proyectos (2026-08-03) y los textos del CV
-(2026-08-04). **Cada cambio en `content/` necesita ese segundo paso**, y la forma de darlo está en
+el panel se ha sincronizado tres veces a mano: la lista de proyectos (2026-08-03) y los textos del CV
+(2026-08-04, dos tandas). **Cada cambio en `content/` necesita ese segundo paso**, y la forma de darlo está en
 «Pendiente»: parcheando campos con `sanity exec`, no con `migrate:import`.
 
 Público a propósito: la web lee **sin token** al construir, así que un dataset privado obligaría
@@ -574,6 +574,10 @@ Cosas que están así a propósito y con quién se resuelven:
   Las dos reglas: parchear campos y nunca reemplazar documentos, y leer los valores del repositorio
   para que las dos fuentes digan literalmente lo mismo. Un cambio de texto en `content/profile.ts`
   siempre necesita este segundo paso.
+  **La receta se repitió el mismo día**, con la segunda tanda de textos —la que Luis escribió
+  editando el HTML de la web en producción con las herramientas de desarrollo del navegador—: los
+  mismos seis documentos, el mismo script de un solo uso, una sola transacción, y borrado después.
+  Que funcione dos veces seguidas es lo que la convierte en el procedimiento y no en una anécdota.
 - ~~**El `institution` del panel es una cadena y tumba el documento de formación.**~~ Resuelto en el
   mismo parche del 2026-08-04: ya es `{es, en}`, el documento valida y la sección deja de caer al
   respaldo. Era el fallo silencioso de la regla del contenido —la web se veía bien porque `content/`

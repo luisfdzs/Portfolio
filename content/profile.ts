@@ -64,30 +64,28 @@ export const profile: Profile = {
   linkedin: 'https://www.linkedin.com/in/luisfernandezsangil',
   github: 'https://github.com/luisfdzs',
   /**
-   * LOS TRES PÁRRAFOS DEL PERFIL, y por qué son cortos.
+   * LOS DOS PÁRRAFOS DEL PERFIL. Eran tres y los reescribió Luis en persona el 2026-08-04.
    *
    * Es la sección más personal del CV y la única de prosa, así que el riesgo no es quedarse
    * corto: es escribir seis párrafos que nadie lea. Cada uno dice una cosa y se aparta.
    *
-   * Lo que dicen, en orden: que lo de programar es afición antes que oficio y que el stack lo
-   * he aprendido solo; que el perfeccionismo va en el trabajo y no en el ego; y que las
-   * habilidades blandas no son el complemento del perfil técnico, sino lo que decide si
-   * merece la pena trabajar con alguien. Ese último párrafo es el que de verdad hay que dejar
-   * al final: es una opinión, y una opinión se defiende cuando ya se ha demostrado lo demás.
+   * Lo que dicen, en orden: que la formación como desarrollador es autodidacta y de dónde
+   * viene —la ingeniería tocaba programación, pero orientada a procesos industriales—; y que
+   * lo que de verdad marca la diferencia son las habilidades blandas. Ese segundo párrafo es
+   * el que hay que dejar al final: es una opinión, y una opinión se defiende cuando ya se ha
+   * demostrado lo demás.
    *
    * No hay una sola cifra ni un solo cliente aquí, a propósito: eso está en las secciones que
    * se pueden comprobar, con las fechas al lado. Aquí no se demuestra nada, se dice quién eres.
    */
   bio: {
     es: [
-      'Soy ingeniero industrial y programo porque me gusta programar. Todo lo que hay detrás de esta web —el stack, el panel de administración, el despliegue— lo he aprendido por mi cuenta, construyendo cosas y rompiéndolas hasta entenderlas.',
-      'Soy perfeccionista con el trabajo y poco con el ego: repaso cada detalle antes de darlo por bueno, y doy por hecho que quien tengo al lado sabe algo que yo no. Preguntar antes de suponer me ha ahorrado más tiempo que cualquier atajo técnico.',
-      'Y lo que de verdad creo: la tecnología se aprende, la persona no. Escuchar, explicarse claro y ser alguien con quien se puede contar vale más que cualquier línea de este CV.',
+      'Como muchos otros desarrolladores, mi formación ha sido 100 % autodidacta, ya que a pesar de haber estudiado ingeniería industrial, me enfoqué en el desarrollo de software y dediqué un tiempo importante a realizar cursos y proyectos personales. En la carrera sí que se tocaba algo de programación, quizá más enfocada a procesos industriales, pero rápidamente vi el potencial que tenía aprender esta habilidad.',
+      'Fuera de la parte técnica, soy muy consciente de que lo que realmente marca la diferencia es la parte humana, lo que llamamos «habilidades blandas». Esto significa ser sincero, humilde para pedir y prestar ayuda, honesto, puntual, agradable, comprometido con la compañía… ser un buen profesional. Ahí es donde se marca la diferencia, y por eso cada día intento mejorar en ese aspecto, en cómo me comporto y me comunico con mis compañeros y con mis superiores.',
     ],
     en: [
-      'I am an industrial engineer and I write software because I enjoy writing software. Everything behind this site — the stack, the admin panel, the deployment — I taught myself, by building things and breaking them until they made sense.',
-      'I am a perfectionist about the work and not about my ego: I go over every detail before calling it done, and I assume the person next to me knows something I do not. Asking before assuming has saved me more time than any technical shortcut.',
-      'And what I actually believe: technology can be learned, character cannot. Listening, explaining yourself clearly and being someone people can count on is worth more than any line of this CV.',
+      'Like many other developers, my training has been entirely self-taught: despite having studied industrial engineering, I focused on software development and put serious time into courses and personal projects. The degree did cover some programming, more oriented towards industrial processes, but I quickly saw the potential of learning this skill.',
+      'Beyond the technical side, I am very aware that what really makes the difference is the human side — what we call “soft skills”. That means being sincere, humble enough to ask for help and to give it, honest, punctual, pleasant, committed to the company… being a good professional. That is where the difference is made, and that is why I try to get better at it every day, at how I behave and how I communicate with my colleagues and with the people I report to.',
     ],
   },
   photo: portrait,
@@ -105,37 +103,40 @@ export const experience: ExperienceEntry[] = [
       es: 'Analista programador senior',
       en: 'Senior developer / analyst',
     },
-    company: 'Mobile Smart City Corp',
+    company: 'Mobile Smart City',
     range: { start: '2026-03', end: null },
     location: { es: 'España · En remoto', en: 'Spain · Remote' },
     remote: true,
     /**
-     * La actividad de la empresa sale de su web oficial (mobilesmart.city): plataforma de
-     * pagos digitales y movilidad urbana —aparcamiento, permisos, denuncias, control y
-     * tráfico— para ayuntamientos, universidades, aeropuertos y recintos privados. Está aquí
-     * porque el nombre no dice a qué se dedica, y un recruiter que no lo sepa no puede valorar
-     * el puesto.
+     * ESTE RESUMEN LO ESCRIBIÓ LUIS EN PRIMERA PERSONA (2026-08-04), y por eso suena distinto
+     * al que había: la actividad de la empresa se explica con una comparación —«el Telpark de
+     * Estados Unidos»— en vez de con la descripción de su web oficial, que no le decía nada a
+     * quien no conoce el sector.
      *
-     * Lo que se cuenta del papel es lo que consta en LinkedIn —análisis e implementación— y
-     * nada más. Ni tecnologías concretas del producto ni logros: eso sería inventar.
+     * El primer párrafo está aquí porque el nombre de la empresa no dice a qué se dedica, y un
+     * recruiter que no lo sepa no puede valorar el puesto. El segundo dice qué hace Luis, y la
+     * frase que no hay que perder es «formando parte de la plantilla interna»: es lo que
+     * distingue este puesto de los tres anteriores, todos de consultoría con cliente final.
      */
     summary: {
       es: [
-        'Plataforma de pagos digitales y movilidad urbana: aparcamiento, permisos, denuncias, control y tráfico para ayuntamientos, universidades, aeropuertos y recintos privados.',
-        'Desarrollo y mantenimiento de sus aplicaciones web, con el análisis y la implementación en la misma mano: entender el problema con quien lo tiene, decidir cómo se resuelve y dejarlo funcionando en producción.',
+        'Mobile Smart City es «el Telpark de Estados Unidos». Es la empresa más grande para gestión de parkings, permisos anuales para zonas de aparcamiento, reservas de plaza en el aeropuerto, etc.',
+        'Dentro de la empresa, formando parte de la plantilla interna y sin la intermediación de consultoras externas, me ocupo del mantenimiento de proyectos legacy, añadir funcionalidades nuevas, realizar migraciones completas, resolver incidencias… un poco de todo.',
       ],
       en: [
-        'A digital payments and urban mobility platform: parking, permits, citations, enforcement and traffic for city councils, universities, airports and private venues.',
-        'Development and maintenance of its web applications, with analysis and implementation in the same pair of hands: understanding the problem with whoever has it, deciding how to solve it, and leaving it running in production.',
+        'Mobile Smart City is “the Telpark of the United States”. It is the largest company for parking management, annual permits for parking zones, airport space reservations, and so on.',
+        'Inside the company, as part of the in-house team and with no external consultancy in between, I maintain legacy projects, add new features, run full migrations, resolve incidents… a bit of everything.',
       ],
     },
     stack: ['C#', '.NET', 'SQL', 'JavaScript', 'TypeScript', 'React'],
   },
   {
     slug: 'altia',
-    role: { es: 'Desarrollador backend', en: 'Backend developer' },
+    role: { es: 'Desarrollador full stack', en: 'Full stack developer' },
     company: 'Altia',
-    client: 'Banco Santander Portugal · INDRA · GETNET · Kids&Us',
+    // Dos clientes y no cuatro: Luis quitó Banco Santander Portugal y GETNET el 2026-08-04.
+    // Es su CV y su decisión; lo que queda sigue constando en LinkedIn.
+    client: 'INDRA & Kids&Us',
     range: { start: '2024-02', end: '2026-01' },
     location: {
       es: 'Madrid, España · En remoto',
@@ -144,12 +145,12 @@ export const experience: ExperienceEntry[] = [
     remote: true,
     summary: {
       es: [
-        'Dos años de consultoría grande: desarrollo y mantenimiento de varias aplicaciones web para Banco Santander Portugal e INDRA, de punta a punta del ciclo —análisis, implementación, pruebas y soporte—.',
-        'Equipo multidisciplinar en metodología ágil, con el cliente final al otro lado del teléfono y todo en remoto. En un entorno así lo que se aprende no es un framework: es escribir código que va a mantener otra persona y explicar una decisión técnica a quien no es técnico.',
+        'Una consultora informática, dos clientes finales.',
+        'Mi trabajo era (la mayor parte del tiempo) resolver incidencias. Fui full-stack porque las incidencias eran a veces un problema de base de datos, otras veces del backend de la aplicación, de un servicio externo, del propio frontend, etc. Quien abría la incidencia no discriminaba el tipo de error, simplemente la reportaba al equipo de incidental.',
       ],
       en: [
-        'Two years in large-scale consultancy: developing and maintaining several web applications for Banco Santander Portugal and INDRA, across the whole lifecycle — analysis, implementation, testing and support.',
-        'A cross-functional team working in agile, with the end client on the other end of the phone and everything remote. What you learn in a place like that is not a framework: it is writing code somebody else will maintain, and explaining a technical decision to someone who is not technical.',
+        'An IT consultancy, two end clients.',
+        'My job was (most of the time) resolving incidents. I was full-stack because an incident could be a database problem, or the application backend, or an external service, or the frontend itself. Whoever opened the incident did not sort it by type of error, they simply reported it to the incident team.',
       ],
     },
     stack: [
@@ -169,7 +170,7 @@ export const experience: ExperienceEntry[] = [
     slug: 'exceltic',
     role: { es: 'Desarrollador full stack', en: 'Full stack developer' },
     company: 'Exceltic',
-    client: 'Grupo Ingeteam',
+    client: 'Ingeteam',
     range: { start: '2023-02', end: '2024-02' },
     location: {
       es: 'Madrid, España · En remoto',
@@ -178,12 +179,12 @@ export const experience: ExperienceEntry[] = [
     remote: true,
     summary: {
       es: [
-        'Los ERPs y las aplicaciones web de todo el grupo Ingeteam a mi cargo: incidencias, desarrollos nuevos y migración de proyectos legacy a tecnologías actuales sin parar lo que ya estaba en marcha.',
-        'Autonomía total sobre los desarrollos y 100 % en remoto. Es el puesto en el que aprendí a leer el código de otro antes de tocarlo, que es la mitad del oficio.',
+        'Grupo de empresas especializado en ingeniería eléctrica, electrónica de potencia, automatización y energías renovables, con presencia internacional en numerosos sectores industriales.',
+        'Formé parte del equipo de desarrollo que mantenía los ERPs y las aplicaciones web de todo el grupo Ingeteam: incidencias, desarrollos nuevos y migraciones de proyectos legacy a tecnologías actuales.',
       ],
       en: [
-        'The ERPs and web applications of the whole Ingeteam group in my hands: incidents, new development, and migrating legacy projects to current technologies without stopping what was already running.',
-        'Full autonomy over the work and fully remote. This is the job where I learned to read somebody else’s code before touching it, which is half the trade.',
+        'A group of companies specialising in electrical engineering, power electronics, automation and renewable energy, with an international presence across many industrial sectors.',
+        'I was part of the development team that maintained the ERPs and web applications of the whole Ingeteam group: incidents, new development, and migrating legacy projects to current technologies.',
       ],
     },
     stack: [
@@ -206,7 +207,10 @@ export const experience: ExperienceEntry[] = [
     slug: 'zemsania-asti-abb',
     role: { es: 'Programador de AGVs', en: 'AGV programmer' },
     company: 'Zemsania Global Group',
-    client: 'ASTI Mobile Robotics · ABB Robotics',
+    // Sólo ASTI: ABB salió del rótulo el 2026-08-04 y pasó al primer párrafo del resumen, que
+    // es donde la compra se puede contar con su contexto («ahora forma parte de…») en vez de
+    // parecer un segundo cliente simultáneo.
+    client: 'ASTI Mobile Robotics',
     range: { start: '2021-08', end: '2022-12' },
     location: {
       es: 'Burgos, España',
@@ -215,12 +219,12 @@ export const experience: ExperienceEntry[] = [
     remote: false,
     summary: {
       es: [
-        'Responsable junior en el departamento de IT, a cargo de la programación de vehículos de guiado automático (AGVs): definir el esquema funcional con el cliente, desarrollar la solución integral de automatización de la planta y hacer la puesta en marcha allí mismo.',
-        'Aquí un error no lanza una excepción en un log: para una línea de producción. Es el trabajo que me enseñó a mirar el sistema entero antes que el código, y sigue siendo la forma en la que programo.',
+        'Ahora forma parte de ABB Robotics, quien ha comprado la compañía. Cuando yo trabajaba en ASTI, la empresa diseñaba y fabricaba robots de transporte autónomos, técnicamente conocidos como AGVs (Automated Guided Vehicles / vehículos de guiado automático). Esto es: carretillas con uñas, elevadores, trenes de basuras… vehículos que se ven en una fábrica, entre las distintas cadenas de montaje, para optimizar la logística y la producción.',
+        'Este fue mi primer empleo como desarrollador de software, y tengo la impresión de que lo que destacaba en mi CV por aquel entonces fue haber ganado el concurso de robots que celebraba la Universidad de Vigo. Fui responsable junior en el departamento de IT, a cargo de la programación de vehículos de guiado automático (AGVs): definir el esquema funcional con el cliente, desarrollar la solución integral de automatización de la planta y hacer la puesta en marcha allí mismo.',
       ],
       en: [
-        'Junior lead in the IT department, in charge of programming automated guided vehicles (AGVs): defining the functional design with the client, building the plant-wide automation solution, and commissioning it on site.',
-        'Here a mistake does not throw an exception into a log — it stops a production line. That is the job that taught me to look at the whole system before the code, and it is still how I write software.',
+        'It is now part of ABB Robotics, which bought the company. When I worked at ASTI, it designed and built autonomous transport robots, technically known as AGVs (Automated Guided Vehicles). That is: fork trucks, lifters, waste trains… the vehicles you see in a factory, moving between assembly lines to optimise logistics and production.',
+        'This was my first job as a software developer, and my impression is that what stood out in my CV back then was having won the robotics contest held by the University of Vigo. I was junior lead in the IT department, in charge of programming automated guided vehicles (AGVs): defining the functional design with the client, building the plant-wide automation solution, and commissioning it on site.',
       ],
     },
     stack: ['C#', '.NET', 'ASP.NET', 'ASP.NET Core', 'Visual Basic', 'SQL', 'JavaScript'],
@@ -242,18 +246,22 @@ export const education: EducationEntry[] = [
     range: { start: '2020-09', end: '2025-06' },
     location: { es: 'Vigo, Galicia', en: 'Vigo, Spain' },
     /**
-     * LA NOTA HABLA DE LA BASE, no del calendario.
+     * LA NOTA HABLA DE LA BASE, no del calendario, y desde el 2026-08-04 la escribe Luis en
+     * primera persona.
      *
-     * Decía que la carrera se cursó en paralelo a los tres primeros puestos, y se ha cambiado
-     * por encargo. El argumento es el mismo por el que esta sección dejó de pintar las fechas:
-     * contar cuánto se solapó invita a la cuenta de los años y a preguntarse cómo se reparte
-     * una jornada, y ninguna de las dos cosas dice nada sobre lo que sabe hacer alguien. Lo que
-     * sí lo dice es qué deja una ingeniería cuando ya no se ejerce de ingeniero, y es de eso de
-     * lo que habla ahora.
+     * Decía que la carrera se cursó en paralelo a los tres primeros puestos, y eso se quitó por
+     * el mismo argumento por el que esta sección dejó de pintar las fechas: contar cuánto se
+     * solapó invita a la cuenta de los años y a preguntarse cómo se reparte una jornada, y
+     * ninguna de las dos cosas dice nada sobre lo que sabe hacer alguien. Lo que sí lo dice es
+     * qué deja una ingeniería cuando ya no se ejerce de ingeniero.
+     *
+     * La versión de Luis aterriza eso en un ejemplo de hoy —cómo escribe los prompts cuando
+     * trabaja con IA— y es a propósito: es el único sitio del CV donde una asignatura de 2020
+     * se conecta con algo que se hace en 2026.
      */
     note: {
-      es: 'Una ingeniería no deja una lista de asignaturas: deja una forma de pensar. Descomponer el problema antes de tocarlo, medir antes de decidir y responder de que lo que sale funciona — la base con la que me siento a programar cada día.',
-      en: 'An engineering degree does not leave you a list of subjects: it leaves you a way of thinking. Break the problem down before touching it, measure before deciding, and stand behind what ships — the foundation I sit down to write software with every day.',
+      es: 'Quizás lo mejor que me ha dado estudiar una carrera como esta es una forma de pensar bien estructurada. Esto me permite hoy en día en mi trabajo hacer muy buenos prompts cuando usamos IA: soy muy específico y concreto escribiendo a agentes de inteligencia artificial y no sólo les pido escribir el código, también métricas concretas de QA y de UAT, test unitarios y de integración, etc. En una carrera como esta se aprende a pensar de forma global y a tener la perspectiva clara de cada tarea antes de comenzar a picar código.',
+      en: 'Perhaps the best thing a degree like this gave me is a well-structured way of thinking. It is what lets me write very good prompts at work today when we use AI: I am specific and concrete when writing to AI agents, and I do not only ask them for the code — I also ask for concrete QA and UAT metrics, unit and integration tests, and so on. A degree like this teaches you to think globally and to have a clear view of each task before you start writing code.',
     },
     url: 'https://www.uvigo.gal/',
   },

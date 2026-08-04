@@ -78,20 +78,28 @@ const es = {
   },
 
   /**
-   * El rótulo nombra las dos mitades de la sección desde que el stack va dentro: cómo trabajo
-   * son los párrafos y con qué es la lista de tecnologías de debajo.
+   * El rótulo es la pregunta desnuda, no el índice de la sección. Decía «Quién soy, cómo
+   * trabajo y con qué» —las dos mitades, párrafos y stack— y se acortó por encargo: enumerar
+   * lo que viene a continuación se lee como un sumario, y a un titular de tres palabras le
+   * sobra el sumario.
    */
   about: {
     title: 'Perfil',
-    kicker: 'Quién soy, cómo trabajo y con qué',
+    kicker: 'Quién soy',
   },
 
   experience: {
     title: 'Experiencia',
-    kicker: 'Cinco años entregando software en producción',
+    kicker: 'Experiencia laboral',
     present: 'actualidad',
-    /** Une la consultora con el cliente final: «Altia · para Banco Santander Portugal». */
-    forClient: 'para',
+    /**
+     * Une la consultora con el cliente final: «Altia → INDRA & Kids&Us».
+     *
+     * **Es una flecha y no la palabra «para»**, y por eso no lleva el « · » delante que tenía
+     * antes: una flecha ya es el separador. Al ser un signo y no una palabra, vale igual en
+     * los dos idiomas.
+     */
+    forClient: '→',
     visitCompany: 'Sobre la empresa',
     stackLabel: 'Tecnologías',
     units: { year: 'año', years: 'años', month: 'mes', months: 'meses' },
@@ -99,10 +107,9 @@ const es = {
 
   projects: {
     title: 'Proyectos',
-    kicker: 'Webs propias, de punta a punta',
+    kicker: 'Proyectos',
     // Aparece bajo el título de la sección en la portada.
-    intro:
-      'No son ejercicios de curso: son webs de clientes reales en producción, con panel de administración para que el cliente edite su propio contenido sin pasar por mí.',
+    intro: 'Webs reales en producción',
     viewProject: 'Ver el proyecto',
     // El carrusel de la portada. Los rótulos de los dos botones son de lector de
     // pantalla: en pantalla sólo hay una flecha, porque «Siguiente» al lado de una flecha
@@ -143,18 +150,20 @@ const es = {
    * `stack` ya no es una sección: es la subsección que cierra el perfil. `title` es su rótulo
    * y `kicker` la línea de debajo — más corta que antes, porque ya no es el titular de una
    * sección sino una aclaración dentro de otra.
+   *
+   * **Y ya no hay `note`.** La nota al pie decía «ordenado por lo que uso a diario, no por lo
+   * que he tocado alguna vez» y se quitó por encargo. Quien la quiera de vuelta tiene que
+   * reponer también el párrafo del final de `Stack.tsx`, que se fue con ella.
    */
   stack: {
     title: 'Stack',
-    kicker: 'Y con lo que lo hago, agrupado por para qué sirve',
-    // Nota honesta al pie: una lista de logos sin matices no dice nada.
-    note: 'Ordenado por lo que uso a diario, no por lo que he tocado alguna vez.',
+    kicker: 'Tecnologías que manejo',
   },
 
   contact: {
     title: 'Contacto',
     kicker: '¿Hablamos?',
-    lead: 'Estoy abierto a escuchar propuestas interesantes. La forma más rápida es el correo; respondo en el día.',
+    lead: 'Siempre estoy abierto a escuchar propuestas interesantes.',
     emailLabel: 'Correo',
     linkedinLabel: 'LinkedIn',
     githubLabel: 'GitHub',
@@ -232,14 +241,15 @@ const en: Dictionary = {
 
   about: {
     title: 'Profile',
-    kicker: 'Who I am, how I work and what with',
+    kicker: 'Who I am',
   },
 
   experience: {
     title: 'Experience',
-    kicker: 'Five years shipping software to production',
+    kicker: 'Work experience',
     present: 'Present',
-    forClient: 'for',
+    // La flecha es la misma en los dos idiomas: es un signo, no una palabra. Ver el castellano.
+    forClient: '→',
     visitCompany: 'About the company',
     stackLabel: 'Technologies',
     units: { year: 'year', years: 'years', month: 'month', months: 'months' },
@@ -247,9 +257,8 @@ const en: Dictionary = {
 
   projects: {
     title: 'Projects',
-    kicker: 'My own websites, end to end',
-    intro:
-      'Not course exercises: real client websites in production, each with an admin panel so the client edits their own content without going through me.',
+    kicker: 'Projects',
+    intro: 'Real websites in production',
     viewProject: 'View project',
     carousel: 'Projects',
     carouselPrevious: 'Previous project',
@@ -278,14 +287,13 @@ const en: Dictionary = {
 
   stack: {
     title: 'Stack',
-    kicker: 'And what I do it with, grouped by what it is for',
-    note: 'Ordered by what I use daily, not by what I have touched once.',
+    kicker: 'Technologies I work with',
   },
 
   contact: {
     title: 'Contact',
     kicker: 'Shall we talk?',
-    lead: 'I am open to hearing interesting proposals. Email is the fastest way; I reply the same day.',
+    lead: 'I am always open to hearing interesting proposals.',
     emailLabel: 'Email',
     linkedinLabel: 'LinkedIn',
     githubLabel: 'GitHub',
