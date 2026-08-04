@@ -14,12 +14,16 @@ import type { NavKey } from './routes'
  * en silencio, que es exactamente lo que le pasa a la mayoría de las webs bilingües.
  */
 const es = {
+  /**
+   * Sin `stack`: dejó de ser una sección el 2026-08-04 —va dentro del perfil— y con ella se
+   * fue su entrada del menú. El rótulo de la subsección no sale de aquí sino de `stack.title`,
+   * que es contenido de sección y no de navegación.
+   */
   nav: {
     about: 'Perfil',
     experience: 'Experiencia',
     projects: 'Proyectos',
     education: 'Formación',
-    stack: 'Stack',
     contact: 'Contacto',
   } satisfies Record<NavKey, string>,
 
@@ -37,7 +41,13 @@ const es = {
     closeMenu: 'Cerrar el menú',
     menu: 'Menú',
     backToTop: 'Volver arriba',
-    changeLanguage: 'Cambiar de idioma',
+    /**
+     * Aquí había un `changeLanguage: 'Cambiar de idioma'` que rotulaba el par de idiomas del
+     * menú de móvil. Se quitó con el rótulo el 2026-08-04: el nombre del idioma sigue
+     * anunciándose, pero lo pone `LocaleSwitch` desde `localeLabels` —«Español», «English»—,
+     * que es el sitio correcto, porque es el mismo dato en los dos usos y no una cadena de
+     * interfaz aparte que haya que mantener traducida dos veces.
+     */
     externalLink: 'se abre en una pestaña nueva',
   },
 
@@ -67,9 +77,13 @@ const es = {
     technologies: 'Tecnologías',
   },
 
+  /**
+   * El rótulo nombra las dos mitades de la sección desde que el stack va dentro: cómo trabajo
+   * son los párrafos y con qué es la lista de tecnologías de debajo.
+   */
   about: {
     title: 'Perfil',
-    kicker: 'Quién soy y cómo trabajo',
+    kicker: 'Quién soy, cómo trabajo y con qué',
   },
 
   experience: {
@@ -121,10 +135,15 @@ const es = {
     ongoing: 'en curso',
   },
 
+  /**
+   * `stack` ya no es una sección: es la subsección que cierra el perfil. `title` es su rótulo
+   * y `kicker` la línea de debajo — más corta que antes, porque ya no es el titular de una
+   * sección sino una aclaración dentro de otra.
+   */
   stack: {
     title: 'Stack',
-    kicker: 'Con lo que trabajo, agrupado por para qué sirve',
-    // Nota honesta al pie de la sección: una lista de logos sin matices no dice nada.
+    kicker: 'Y con lo que lo hago, agrupado por para qué sirve',
+    // Nota honesta al pie: una lista de logos sin matices no dice nada.
     note: 'Ordenado por lo que uso a diario, no por lo que he tocado alguna vez.',
   },
 
@@ -178,7 +197,6 @@ const en: Dictionary = {
     experience: 'Experience',
     projects: 'Projects',
     education: 'Education',
-    stack: 'Stack',
     contact: 'Contact',
   },
 
@@ -190,7 +208,6 @@ const en: Dictionary = {
     closeMenu: 'Close menu',
     menu: 'Menu',
     backToTop: 'Back to top',
-    changeLanguage: 'Change language',
     externalLink: 'opens in a new tab',
   },
 
@@ -211,7 +228,7 @@ const en: Dictionary = {
 
   about: {
     title: 'Profile',
-    kicker: 'Who I am and how I work',
+    kicker: 'Who I am, how I work and what with',
   },
 
   experience: {
@@ -258,7 +275,7 @@ const en: Dictionary = {
 
   stack: {
     title: 'Stack',
-    kicker: 'What I work with, grouped by what it is for',
+    kicker: 'And what I do it with, grouped by what it is for',
     note: 'Ordered by what I use daily, not by what I have touched once.',
   },
 

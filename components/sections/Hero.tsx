@@ -5,6 +5,7 @@ import { href } from '@/lib/i18n/routes'
 import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
 import { ArrowDown, GitHub, LinkedIn, Mail, MapPin } from '@/components/ui/Icons'
+import { Typed, typedLength } from '@/components/ui/Typed'
 import { HeroStage } from '@/components/sections/HeroStage'
 
 type Stat = { value: string; label: string }
@@ -39,7 +40,11 @@ type Props = {
  *
  * - **El nombre es el titular**, en la serif y al tamaño más grande del sitio. En un
  *   portfolio el producto es la persona; poner «Desarrollador Full Stack» de titular y el
- *   nombre en pequeño es esconder lo que se busca en Google.
+ *   nombre en pequeño es esconder lo que se busca en Google. **Y se escribe solo**: el saludo
+ *   y el nombre aparecen letra a letra al abrir la página, como si alguien los estuviera
+ *   tecleando delante. Es lo único que se mueve en el bloque de texto y va donde tiene que ir
+ *   —en la primera línea que se lee—; el resto de la portada aparece puesto. Lo hace CSS sin
+ *   una línea de JavaScript, con el texto completo en el HTML: ver `components/ui/Typed.tsx`.
  * - **Menos texto, y por esto.** La entradilla de tres líneas que había aquí —la que enumeraba
  *   Santander, INDRA, ABB e Ingeteam— se quitó: sobre un fondo en movimiento, un párrafo largo
  *   obliga a elegir entre leerlo o mirar, y quien decide en treinta segundos no hace ni una
@@ -145,7 +150,19 @@ export function Hero({ locale, profile, stats }: Props) {
             {t.hero.availability}
           </p>
 
-          <p className="mt-7 font-display text-lead text-paper-soft">{t.hero.greeting}</p>
+          {/*
+           * EL SALUDO Y EL NOMBRE SE ESCRIBEN, letra a letra, al abrir la página.
+           *
+           * Son dos elementos con tipografía distinta —el saludo es pequeño, el nombre es el
+           * titular— pero **una sola frase**: el `offset` del nombre es lo que ya ha gastado
+           * el saludo más su espacio, así que el nombre empieza a escribirse justo cuando el
+           * saludo termina. Lo hace CSS, sin cursor y sin que el bloque crezca al revelarse,
+           * y el texto va completo en el HTML (ver `components/ui/Typed.tsx`, que es donde
+           * está el razonamiento — incluido el fallo de Chrome que decide cómo se escribe).
+           */}
+          <p className="mt-7 font-display text-lead text-paper-soft">
+            <Typed text={t.hero.greeting} />
+          </p>
           <h1
             id="hero-name"
             className="mt-1 text-display text-paper"
@@ -153,7 +170,8 @@ export function Hero({ locale, profile, stats }: Props) {
             // de pantalla en inglés lee «Sangil» con fonética inglesa.
             lang="es"
           >
-            {profile.name}
+            {/* +1: el espacio que separa el saludo del nombre también se teclea. */}
+            <Typed text={profile.name} offset={typedLength(t.hero.greeting) + 1} />
           </h1>
 
           <p className="mx-auto mt-5 max-w-[30ch] font-display text-title text-signal">

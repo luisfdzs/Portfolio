@@ -224,7 +224,7 @@
 
 /* Aire vertical de una sección: LA MITAD de `--spacing-section` arriba y abajo.
    La mitad, y no el valor entero, porque las secciones son contiguas y sus
-   paddings se suman: con `py-section` en las seis, entre el final del texto de
+   paddings se suman: con `py-section` en las cinco, entre el final del texto de
    una y el rótulo de la siguiente quedaban 18rem de vacío y la página parecía
    partida. Así la suma de los dos paddings adyacentes es exactamente
    `--spacing-section`, que es lo que ese token dice ser: el aire ENTRE bloques. */
@@ -979,6 +979,86 @@
   }
 }
 
+/* ============================================================================
+   TEXTO QUE SE ESCRIBE — el saludo y el nombre de la portada
+
+   «Hola, soy Luis Fernández Sangil» aparece letra a letra al abrir la web, como
+   si alguien lo estuviera tecleando. Lo hace esto y nada más: cada carácter viene
+   del servidor en su propio `<span>` con un `--typed-index`, y aquí se convierte
+   en el momento en que se enciende. Cero JavaScript, y el texto va COMPLETO en el
+   HTML —el nombre es el `<h1>` que alguien busca en Google, así que no puede
+   depender de que un temporizador lo escriba (ver `components/ui/Typed.tsx`).
+
+   **EL ESCALONADO VA EN LA DURACIÓN Y NO EN `animation-delay`, y no es cuestión de
+   gusto: con el retardo, la frase se queda a medias.** Lo evidente es una
+   animación mínima con `animation-delay: índice × paso`, y en Chrome falla. Medido
+   en Chrome 1xx sobre esta misma página: con `1ms` de duración, todo carácter cuyo
+   retardo pase del segundo se queda en `opacity: 0` **para siempre** — «Luis
+   Fernández Sangil» se leía «Luis Fernánde» y ahí se paraba, y ni el `check` ni el
+   build dicen nada porque el HTML está completo. El navegador da por finiquitada
+   una animación de duración despreciable y deja de aplicar su `forwards`; subir la
+   duración a 60 ms sólo mueve la frontera. Así que aquí **no hay ningún retardo**:
+   cada carácter arranca a la vez y **dura hasta su propio momento**, y
+   `steps(1, end)` lo hace saltar a visible justo al terminar. El efecto en
+   pantalla es idéntico, la cuenta es la misma y no hay ninguna frontera que
+   respetar. Comprobado con sesenta caracteres, el doble de los que hay aquí.
+
+   Las otras tres cosas que hay que respetar si se toca:
+
+   - **El revelado es en sitio.** `opacity: 0` y no `display: none`: los
+     caracteres ocultos ocupan su hueco desde el primer fotograma. Si se cambia
+     por algo que haga crecer la caja, el hero —que se apoya en el borde de abajo—
+     se mueve entero mientras se escribe, y eso es un salto de maquetación en la
+     primera pantalla. Es también la razón de que **no haya cursor**: una barra
+     parpadeando al final de una frase que se revela en su sitio se queda a la
+     derecha del hueco todavía vacío, señalando donde no está pasando nada. Hubo
+     uno y se quitó al verlo en la captura.
+   - **El paso es corto a propósito.** 45 ms por carácter dan poco más de un
+     segundo para los veintisiete caracteres de la frase. Es una fracción del
+     tiempo que se le dedica a decidir si esta web merece un scroll: con 80 ms el
+     gesto pasa de simpático a peaje.
+   - **La animación no tiene fase de salida.** Cada carácter va a `opacity: 1` y
+     se queda; nada devuelve el bloque a su estado inicial. Es lo que hace que un
+     navegador que no llegue a ejecutarla —o que la ejecute a 0,01 ms por el atajo
+     de movimiento reducido— acabe con la frase puesta, que es el fallback
+     correcto. El criterio es el de `reveal`: nunca contenido invisible por una
+     animación que no corre.
+   ========================================================================= */
+
+@layer components {
+  .typed {
+    /* El paso, en un solo sitio. */
+    --typed-step: 45ms;
+  }
+
+  /* La palabra: dentro NO se parte. Con un `<span>` por letra el navegador puede
+     meter el salto de línea entre dos cualesquiera, y a 390 px el nombre se
+     rompería en «Fernán / dez». El espacio entre palabras queda fuera, como nodo
+     de texto normal, y es ahí donde el salto tiene que caer. */
+  .typed__word {
+    white-space: nowrap;
+  }
+
+  .typed__char {
+    /* El estado de partida, y el que se ve mientras la animación corre: la
+       animación no cambia nada hasta su último fotograma. */
+    opacity: 0;
+    /* La duración ES el momento en que le toca a este carácter. El `+ 60ms` es
+       para que el primero (índice 0) tenga una duración de verdad y no una de
+       cero, que es el caso que el navegador se salta.
+       `steps(1, end)`: la letra no se desvanece, aparece. Un fundido por carácter
+       con veintisiete solapados se lee como una nube que se aclara, no como
+       alguien escribiendo. */
+    animation: typed-char calc(var(--typed-index) * var(--typed-step) + 60ms) steps(1, end) forwards;
+  }
+}
+
+@keyframes typed-char {
+  to {
+    opacity: 1;
+  }
+}
+
 /* El aviso de que hay más abajo. Recorrido corto y pausa larga: una flecha que
    bota sin parar es un elemento parpadeante más, y esto sólo tiene que insinuar. */
 @keyframes hero-hint {
@@ -1358,6 +1438,17 @@
   .site-field__aurora {
     opacity: 0.6;
   }
+
+  /* La frase del hero, ya escrita. Va explícito aunque el atajo general de 0,01 ms
+     de la capa base **también** la apagaría —aquí el escalonado está en la
+     duración, y llevarla a 0,01 ms enciende los veintisiete caracteres de golpe—,
+     porque depender de eso es depender de una coincidencia: el día que el
+     escalonado vuelva a un `animation-delay`, el atajo dejaría de servir sin que
+     nada avise. `opacity: 1` es lo que garantiza el resultado en los dos casos. */
+  .typed__char {
+    animation: none !important;
+    opacity: 1;
+  }
 }
 
 /* ============================================================================
@@ -1427,6 +1518,14 @@
   }
 
   .reveal {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  /* La frase del hero se imprime entera. En pantalla se escribe letra a letra; en
+     papel no hay tiempo, y un navegador que mande a imprimir antes de que la
+     animación termine dejaría el nombre —el titular del CV— recortado a la mitad. */
+  .typed__char {
     opacity: 1 !important;
     animation: none !important;
   }

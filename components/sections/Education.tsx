@@ -15,9 +15,12 @@ import { SectionHeading } from '@/components/ui/SectionHeading'
  * año—. Sigue estando porque el grado en Ingeniería Industrial es lo que explica el perfil
  * y porque muchas ofertas lo piden como requisito formal.
  *
- * Lo que sí es un argumento es la nota al pie de la entrada: la carrera se cursó en
- * paralelo a jornada completa de desarrollo. Eso dice más sobre cómo trabaja alguien que
- * la titulación en sí, y por eso el campo `note` existe en el modelo.
+ * Lo que sí es un argumento es la nota al pie de la entrada, y por eso el campo `note`
+ * existe en el modelo. **Habla de la base, no del calendario**: qué forma de pensar deja una
+ * ingeniería cuando el trabajo ya no es de ingeniero. Antes contaba que la carrera se cursó
+ * en paralelo a jornada completa de desarrollo, y se cambió por lo mismo que hizo caer las
+ * fechas de aquí: cuánto se tardó y cuánto se solapó son datos que invitan a la cuenta de los
+ * años, no a valorar a quién se está leyendo.
  */
 export function Education({
   locale,
@@ -58,8 +61,8 @@ export function Education({
                * argumento es que en formación las fechas sólo pueden restar: con cinco años de
                * experiencia encima, un título acabado hace poco invita a la cuenta de la edad y
                * a la de cuánto se tardó, y ninguna de las dos dice nada sobre cómo trabaja
-               * alguien. Lo que sí lo dice está en la nota de abajo —la carrera cursada en
-               * paralelo a jornada completa—, y ahí sigue.
+               * alguien. Lo que sí lo dice está en la nota de abajo —qué base deja una
+               * ingeniería—, y ahí sigue.
                *
                * `entry.range` **no se borra del contenido**: es un dato verdadero del CV y el
                * modelo lo mantiene (el panel lo sigue pidiendo). Lo que cambia es que esta

@@ -235,11 +235,13 @@ iconos** al alcance del pulgar. Nunca las dos: tenerlas sería robar 4 rem arrib
 dispositivo que menos tiene.
 
 El quinto icono de la barra abre el **menú a pantalla completa**, y ahí están **todas** las
-secciones —no sólo las dos que no caben en la barra— con los dos idiomas al final, detrás de un
+secciones —no sólo las que no caben en la barra— con los dos idiomas al final, detrás de un
 filete horizontal. Es el menú de `Swiftmet`: un panel que sólo lista el sobrante obliga a mirar la
-barra para deducir qué falta.
+barra para deducir qué falta. Los idiomas van **sin rótulo**, sólo «ES / EN»: el nombre completo se lo
+sigue anunciando `LocaleSwitch` a quien use un lector de pantalla, y en pantalla un rótulo pequeño
+entre destinos a tamaño de titular se leía como la única instrucción del menú.
 
-**Las seis entradas llevan a las seis secciones de la portada, y la que se está leyendo va
+**Las cinco entradas llevan a las cinco secciones de la portada, y la que se está leyendo va
 resaltada en cobre** —con su subrayado puesto, porque el color no puede ser la única señal—. Lo
 mide `components/layout/useActiveSection.ts`: una **línea horizontal** trazada un cuarto de pantalla
 por debajo de la cabecera, y gana la sección que la cruza. El camino evidente sería un
@@ -249,16 +251,48 @@ línea da una sola respuesta y cambia exactamente al pasar de una sección a la 
 ficha de proyecto no hay secciones que medir, así que ahí manda la ruta y se marca «Proyectos», que
 es de donde se ha entrado.
 
+### El saludo y el nombre se escriben letra a letra
+
+Al abrir la web, «Hola, soy Luis Fernández Sangil» aparece **carácter a carácter**, como si alguien lo
+estuviera tecleando. Lo hacen `components/ui/Typed.tsx` (componente de **servidor**) y el bloque «Texto
+que se escribe» de `app/globals.css`, **sin una línea de JavaScript**: cada carácter va en su propio
+`<span>` con un índice y el CSS decide cuándo se enciende.
+
+Tres cosas que conviene saber antes de tocarlo:
+
+- **El texto va completo en el HTML.** El nombre es el `<h1>` que alguien busca en Google, así que no
+  puede depender de un temporizador que lo escriba en cliente. Un contador en `useState` tendría además
+  un destello: el servidor pinta la frase entera y la hidratación la borraría para reescribirla.
+- **Se revela en su sitio, no crece.** Los caracteres ocultos ocupan su hueco desde el primer
+  fotograma (`opacity: 0`). El hero apoya su texto en el borde de abajo, así que un texto que crece lo
+  empujaría entero — salto de maquetación en la primera pantalla. Por lo mismo **no hay cursor**: una
+  barra parpadeante al final de una frase que se revela en su sitio se queda a la derecha del hueco
+  vacío.
+- **El escalonado va en la DURACIÓN, no en `animation-delay`.** Es contraintuitivo y es la corrección
+  de un fallo real: Chrome deja de aplicar el `forwards` de una animación de duración mínima cuando su
+  retardo pasa del segundo, y la portada se quedaba en «Hola, soy Luis Fernánde» **para siempre**, sin
+  que el `check`, `check:mobile` ni el build dijeran nada. Aquí cada carácter arranca a la vez y dura
+  hasta su turno. Si alguien lo devuelve a un retardo, vuelve el fallo.
+
+Con `prefers-reduced-motion` y en papel, la frase aparece puesta.
+
 ### El orden de las secciones
 
-`hero → proyectos → experiencia → formación → stack → perfil → contacto`.
+`hero → proyectos → experiencia → formación → perfil (con el stack dentro) → contacto`.
 
 Los proyectos van primero porque son la única sección con prueba visual, y quien dedica treinta
-segundos a un CV los gasta mirando. El perfil —tres párrafos de prosa— va al final, para quien ya
-ha decidido seguir leyendo.
+segundos a un CV los gasta mirando. El perfil —prosa— va al final, para quien ya ha decidido seguir
+leyendo.
+
+**Son cinco secciones y no seis: el stack es la subsección que cierra el perfil**, no una sección
+propia. Las dos contestan la misma pregunta por sus dos mitades —el perfil dice cómo trabaja alguien y
+el stack dice con qué—, y con un rótulo numerado en medio la lista de tecnologías se leía como un
+anexo. Por eso `stack` no está en `sections` ni en `navigation` (`lib/i18n/routes.ts`), `Stack.tsx` no
+tiene `<section>` ni `id`, y sus títulos de grupo son `<h4>`: dentro del perfil el `<h2>` es «Perfil» y
+el `<h3>` es «Stack».
 
 **Cambiar este orden toca tres sitios**, y no hay nada que avise si se olvida uno:
-`app/(site)/[locale]/page.tsx`, el `index` de cada `SectionHeading` (la numeración `01`…`06`, que es
+`app/(site)/[locale]/page.tsx`, el `index` de cada `SectionHeading` (la numeración `01`…`05`, que es
 el índice implícito de la página) y `navigation` en `lib/i18n/routes.ts`, que es el menú.
 
 ### Volver arriba
@@ -405,7 +439,7 @@ máscaras, mira el filete de cifras antes de cerrar.
 
 ### En la barra de direcciones nunca se ve una almohadilla
 
-Las seis secciones de la portada son anclas y las fichas de proyecto son páginas. Es una diferencia
+Las secciones de la portada son anclas y las fichas de proyecto son páginas. Es una diferencia
 real —el fragmento es la única parte de una URL que no llega al servidor—, pero al visitante le
 llega como una incoherencia: pulsar en el menú dejaría `/es#experience` y pulsar una tarjeta,
 `/es/projects/swiftmet`.
@@ -509,6 +543,16 @@ Falla del lado seguro: si mañana falta la variable, no se indexa.
 ## Pendiente
 
 Cosas que están así a propósito y con quién se resuelven:
+
+- **Los textos reescritos del CV están en `content/` pero NO en el panel** (2026-08-04). Se
+  reescribieron los resúmenes de los cuatro puestos, la nota de formación y los tres párrafos del
+  perfil, y el panel manda sobre `content/`: la web pública sigue enseñando los textos viejos hasta
+  editarlos a mano en `/admin` → **Experiencia** (×4, campo «Descripción»), **Formación** (campo
+  «Nota») y **Perfil** (campo «Perfil (párrafos)») → _Publish_. El webhook revalida los dos entornos. **No** con
+  `npm run migrate:import`: corre con `--replace` y machacaría el retrato vacío del perfil, el enlace
+  de Sangil Studio y el orden de los documentos arrastrables. Es el caso general de la regla del
+  contenido, y el síntoma engaña: `npm run check` y el build pasan limpios porque en local, sin
+  `.env.local`, se sirve `content/`.
 
 - ~~**El panel sigue con la lista de proyectos vieja.**~~ Resuelto el 2026-08-03: reimportado
   (`npm run migrate:build && npm run migrate:import`) y borrado el documento de Manfisa
