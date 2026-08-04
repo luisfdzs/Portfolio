@@ -132,8 +132,10 @@ cifras, así que el desfase real es de meses.
 El proyecto de Sanity existe desde el **2026-08-03**: `Portfolio`, id **`3pdexisd`**, dataset
 `production` **público**, con los documentos del CV importados y sus capturas subidas. La web ya
 se construye leyendo del panel; `content/` sigue en su sitio como respaldo y como suelo de la
-regla de arriba. La importación inicial subió dieciséis documentos y siete imágenes; **la lista de
-proyectos del panel ya no coincide con la del repositorio** (ver «Pendiente»).
+regla de arriba. La importación inicial subió dieciséis documentos y siete imágenes, y desde entonces
+el panel se ha sincronizado dos veces a mano: la lista de proyectos (2026-08-03) y los textos del CV
+(2026-08-04). **Cada cambio en `content/` necesita ese segundo paso**, y la forma de darlo está en
+«Pendiente»: parcheando campos con `sanity exec`, no con `migrate:import`.
 
 Público a propósito: la web lee **sin token** al construir, así que un dataset privado obligaría
 a meter una credencial de lectura en los dos proyectos de Vercel para servir un CV que es
@@ -544,15 +546,25 @@ Falla del lado seguro: si mañana falta la variable, no se indexa.
 
 Cosas que están así a propósito y con quién se resuelven:
 
-- **Los textos reescritos del CV están en `content/` pero NO en el panel** (2026-08-04). Se
-  reescribieron los resúmenes de los cuatro puestos, la nota de formación y los tres párrafos del
-  perfil, y el panel manda sobre `content/`: la web pública sigue enseñando los textos viejos hasta
-  editarlos a mano en `/admin` → **Experiencia** (×4, campo «Descripción»), **Formación** (campo
-  «Nota») y **Perfil** (campo «Perfil (párrafos)») → _Publish_. El webhook revalida los dos entornos. **No** con
-  `npm run migrate:import`: corre con `--replace` y machacaría el retrato vacío del perfil, el enlace
-  de Sangil Studio y el orden de los documentos arrastrables. Es el caso general de la regla del
-  contenido, y el síntoma engaña: `npm run check` y el build pasan limpios porque en local, sin
-  `.env.local`, se sirve `content/`.
+- ~~**Los textos reescritos del CV están en `content/` pero NO en el panel.**~~ Resuelto el
+  2026-08-04, y **cómo** se hizo es lo que conviene recordar, porque es la receta para la próxima vez:
+  **no** con `migrate:import` —corre con `--replace` y habría machacado el retrato vacío del perfil, el
+  enlace de Sangil Studio y el `orderRank` de los documentos arrastrables— sino con un script de un
+  solo uso ejecutado con `npx sanity exec <script>.ts --with-user-token`, que **parchea campos
+  concretos** (`patch().set()`) **leyendo los textos de `content/profile.ts`** en vez de reescribirlos
+  a mano. Seis documentos en **una única transacción** —los cuatro `summary`, la `note` de formación y
+  el `bio` del perfil, más el `institution` del punto siguiente—: con seis commits sueltos, un fallo a
+  la mitad deja el CV con tres puestos reescritos y uno viejo. El `--with-user-token` usa la sesión de
+  `sanity login`, así que **no hace falta `SANITY_API_WRITE_TOKEN`**.
+  Las dos reglas: parchear campos y nunca reemplazar documentos, y leer los valores del repositorio
+  para que las dos fuentes digan literalmente lo mismo. Un cambio de texto en `content/profile.ts`
+  siempre necesita este segundo paso.
+- ~~**El `institution` del panel es una cadena y tumba el documento de formación.**~~ Resuelto en el
+  mismo parche del 2026-08-04: ya es `{es, en}`, el documento valida y la sección deja de caer al
+  respaldo. Era el fallo silencioso de la regla del contenido —la web se veía bien porque `content/`
+  decía lo correcto, con dos avisos en el log del build como única señal—, y **sin arreglarlo la nota
+  nueva de formación no se habría visto**: se sube al panel, el documento sigue inválido y la sección
+  entera se sirve del respaldo.
 
 - ~~**El panel sigue con la lista de proyectos vieja.**~~ Resuelto el 2026-08-03: reimportado
   (`npm run migrate:build && npm run migrate:import`) y borrado el documento de Manfisa

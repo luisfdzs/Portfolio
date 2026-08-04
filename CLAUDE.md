@@ -305,11 +305,15 @@ perfeccionista con el trabajo y no con el ego → las habilidades blandas por en
 último al final porque es una opinión y una opinión se defiende cuando ya se ha demostrado lo demás.
 `npm run check` limpio y `check:mobile` **23/23 en los dos idiomas** sobre el build de producción, con
 el tecleado medido (27/27 caracteres, el nombre en una línea y `nameTop` idéntico antes y después),
-el esquema de encabezados comprobado y la hoja de impresión con la frase entera. **Lo que este cambio
-NO arregla solo:** los textos viven también en el panel, que manda en lo desplegado, así que la web
-pública sigue con los viejos hasta editar `/admin` → Experiencia ×4, Formación y Perfil → Publish —
-**nunca con `migrate:import`**, que corre con `--replace`. Ver [[perfil-cv]], [[hero-sanity]] y
-[[navegacion-y-orden]]._
+el esquema de encabezados comprobado y la hoja de impresión con la frase entera. **Y el panel se
+sincronizó el mismo día**, que es el segundo paso que estos textos siempre necesitan: un script de un
+solo uso con `npx sanity exec … --with-user-token` que **parchea campos concretos**
+(`patch().set()`) leyendo los valores de `content/profile.ts`, los seis documentos en una sola
+transacción — **nunca `migrate:import`**, que corre con `--replace`. De paso hubo que arreglar el
+`institution` de formación, que era una cadena y tumbaba el documento: sin eso, la nota nueva se subía
+al panel y **no se veía**, porque la sección se servía del respaldo. Comprobadas las cuatro URLs vivas
+(`/es` y `/en` de producción y de test); el webhook sirve la copia vieja una vez antes de regenerar, no
+hace falta redesplegar. Ver [[perfil-cv]], [[hero-sanity]] y [[navegacion-y-orden]]._
 
 _2026-08-03 (rama `feature/proyectos-sin-indice`, en worktree propio): **se retira el índice de
 proyectos y el menú pasa a decir dónde estás.** Encargo de Luis: «quita la pantalla `/es/projects`,
