@@ -1057,6 +1057,44 @@
     animation: typed-char calc(var(--typed-start) + var(--typed-index) * var(--typed-step) + 60ms)
       steps(1, end) forwards;
   }
+
+  /* --------------------------------------------------------------------------
+     EL NOMBRE, QUE ENFOCA — la otra mitad de la entrada de la portada
+
+     El nombre no se teclea: aparece entero, desenfocado, y enfoca de golpe. Se
+     eligió comparando las cuatro versiones en pantalla (tecleado, tecleado
+     rápido, palabra a palabra y ésta), y el argumento está en `Hero.tsx`: el
+     tecleado es el gesto más visto en un portfolio de desarrollador y en el
+     `<h1>` dice «plantilla».
+
+     Las tres cosas que hay que respetar si se toca:
+
+     - **Los dos tiempos son UNA cuenta y viven aquí.** El titular del puesto
+       empieza a teclearse 180 ms antes de que el enfoque termine, y ese solape es
+       lo que hace que las dos líneas se lean como un movimiento en vez de como
+       dos turnos. `Typed` recibe el arranque como variable justo por esto: si el
+       número viviera en `Hero.tsx`, cambiar la duración del enfoque descuadraría
+       el solape sin que nada avisara.
+     - **`inline-block` no es decorativo.** Un elemento en línea ignora
+       `transform`, así que sin él el nombre enfocaría sin el punto de escala. No
+       cambia el reparto de líneas: el `<h1>` es un bloque centrado y esto es su
+       único hijo.
+     - **`filter` también hay que apagarlo a mano** en movimiento reducido y en
+       papel. Aquí el nombre no se esconde sólo con la opacidad, y una regla que
+       devuelva la opacidad pero deje el desenfoque deja el titular del CV
+       ilegible. Es un caso que el atajo general de la capa base no cubre.
+     -------------------------------------------------------------------------- */
+
+  .hero-copy {
+    --hero-focus-duration: 760ms;
+    --hero-step-headline: 18ms;
+    --hero-headline-start: calc(var(--hero-focus-duration) - 180ms);
+  }
+
+  .hero-name {
+    display: inline-block;
+    animation: hero-focus var(--hero-focus-duration) cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
 @keyframes typed-char {
@@ -1065,52 +1103,15 @@
   }
 }
 
-/* ============================================================================
-   LA PORTADA, QUE SE MONTA SOLA — lo que aparece cuando el texto ya está escrito
-
-   Cuando la última línea del hero ha terminado de escribirse, van apareciendo con
-   un fundido corto los botones, las cuatro cifras y el aviso de seguir bajando,
-   uno detrás de otro. Es la segunda mitad de la secuencia de la portada; la
-   primera es el tecleado del bloque de arriba, y las dos están unidas por una
-   sola cuenta que se hace en `components/sections/Hero.tsx`: `--hero-enter-start`
-   es el instante en que acaba el tecleado, y cada elemento pone su turno en
-   `--hero-enter-index`.
-
-   Las tres cosas que hay que respetar si se toca:
-
-   - **El estado estático es VISIBLE.** Aquí no hay ningún `opacity: 0` en la
-     regla: lo que esconde los elementos antes de su turno es el relleno hacia
-     atrás de la animación (`both`). Si la animación no se ejecuta —navegador sin
-     soporte, hoja a medio cargar, cualquier cosa— la portada aparece puesta, que
-     es el fallback correcto. Es el mismo criterio que `reveal` y que el tecleado:
-     nunca contenido invisible por una animación que no corre.
-   - **Aquí sí hay `animation-delay`, y no contradice al bloque de arriba.** El
-     tecleado no puede usarlo porque su truco necesita duraciones despreciables, y
-     Chrome deja de aplicar el `forwards` de esas animaciones pasado el segundo.
-     Éste es un fundido de 520 ms de verdad, que es el caso normal para el que el
-     retardo está pensado. Comprobado con el retardo real de la portada, que pasa
-     de los dos segundos y medio.
-   - **El recorrido es mínimo (10 px) y va con el fundido.** Los botones y las
-     cifras están dentro de la primera pantalla y su hueco lo reservan desde el
-     primer fotograma —el `transform` no ocupa espacio—, así que esto no mueve la
-     maquetación. Con más recorrido el bloque se lee como algo que entra volando y
-     el hero deja de estar quieto, que es lo contrario de lo que se busca.
-   ========================================================================= */
-
-@layer components {
-  .hero-enter {
-    animation: hero-enter 520ms ease-out
-      calc(var(--hero-enter-start, 0ms) + var(--hero-enter-index, 0) * 150ms) both;
-  }
-}
-
-@keyframes hero-enter {
+@keyframes hero-focus {
   from {
     opacity: 0;
-    transform: translate3d(0, 0.625rem, 0);
+    filter: blur(14px);
+    transform: scale(1.04);
   }
   to {
     opacity: 1;
+    filter: blur(0);
     transform: none;
   }
 }
@@ -1413,6 +1414,97 @@
   }
 }
 
+/* ============================================================================
+   La línea temporal de experiencia
+
+   El filete vertical de la sección de experiencia, en el acento de la web y con
+   una barra de progreso de lectura encima. Era `border-l border-line` —un gris de
+   1px— y pasa a ser cobre por encargo: es la única línea de la página que
+   representa algo (una trayectoria sin huecos, que es lo primero que comprueba
+   quien lee un CV), así que es la única que se gana el color.
+
+   **El filete NO es el borde, son dos pseudoelementos**, y esto es lo que permite
+   todo lo demás. Un `border-left` no se puede recortar, ni degradar, ni animar
+   por tramos. El borde sigue ahí, transparente, sólo para que la maquetación no
+   se mueva: los `li` sangran respecto al borde interior de la lista y los puntos
+   se colocan a `-5px` de él, así que quitarlo desplazaría un píxel la sección
+   entera. Los dos pseudoelementos se dibujan justo encima, en `left: -1px`.
+
+   Y **son dos capas y no una**: el `::before` es la línea completa, apagada, y el
+   `::after` es el tramo leído, encendido y creciendo con el scroll. Con una sola
+   capa el tramo que queda por leer no se vería y esto sería una línea que se
+   dibuja, no una que mide.
+
+   La lista se lee **de antiguo a reciente** (`Experience.tsx` invierte el orden
+   sólo para la vista), y de ahí viene todo: una barra de progreso que avanza
+   mientras el CV retrocede en el tiempo estaría contando la historia al revés.
+   ========================================================================= */
+
+@layer components {
+  /* El borde se queda, transparente: es el que reserva el píxel. Ver arriba.
+     **Quien lo apaga es la utilidad `border-transparent` del JSX**, no una regla de
+     aquí: esto vive en `@layer components` y `border-line` es una utilidad, así que
+     perdería y la línea saldría de dos píxeles —el gris del borde y el cobre pegado
+     a su izquierda—. */
+  .exp-timeline {
+    position: relative;
+  }
+
+  /* El recorrido entero, apagado: lo que queda por leer. Muy tenue a propósito
+     —esto es el raíl, no la señal—, pero no invisible, o la sección perdería la
+     continuidad vertical que hace que cuatro puestos se lean como una trayectoria
+     y no como cuatro bloques sueltos. */
+  .exp-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1px;
+    width: 1px;
+    background: var(--color-signal);
+    opacity: 0.16;
+  }
+
+  /* El tramo leído. Crece con el scroll y **sin una línea de JavaScript**:
+     `animation-timeline: view()` es el mismo mecanismo que la utilidad `reveal`.
+
+     El rango no llega a los extremos (`cover 5%` … `cover 92%`) porque el sujeto
+     es la lista entera, que mide varias pantallas: con `0%`–`100%` la barra no
+     empezaría hasta que la lista tocara el borde inferior de la ventana y no
+     terminaría hasta que hubiera salido del todo por arriba, o sea que nunca se
+     vería ni vacía ni llena estando la sección en pantalla.
+
+     La cabeza va degradada en el primer 22 % para que el arranque no sea un corte
+     seco de cobre a nada. */
+  .exp-timeline::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1px;
+    width: 1px;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-signal) 35%, transparent) 0%,
+      var(--color-signal) 22%,
+      var(--color-signal) 100%
+    );
+    transform-origin: top;
+    animation: exp-draw linear both;
+    animation-timeline: view();
+    animation-range: cover 5% cover 92%;
+  }
+}
+
+@keyframes exp-draw {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
 /* El marco del retrato, apagado. La foto del hero es un RECORTE con canal alfa —sólo
    el busto, sin la calle de detrás—, y el marco que `Figure` pone a todas las imágenes
    (`bg-ink-raised`, `border` y `rounded-lg`) era invisible mientras la foto era opaca y
@@ -1506,14 +1598,27 @@
     opacity: 1;
   }
 
-  /* Y lo que aparece detrás del texto, ya aparecido. Esto NO es opcional: el atajo
-     general de la capa base recorta la duración pero **no el retardo**, así que sin
-     esta regla los botones, las cifras y el aviso de bajar se quedarían invisibles
-     los dos segundos y medio que dura el tecleado que no se está viendo. Es el
-     fallo que tiene cualquier aparición con retardo y movimiento reducido. */
-  .hero-enter {
+  /* La línea temporal, ENTERA y quieta: sin barra de progreso, el filete completo.
+
+     Y hace falta la regla, porque **el atajo general de 0,01 ms no vale aquí**: la
+     barra crece con `animation-timeline`, y en una animación de scroll lo que manda
+     antes de entrar en el rango es el relleno hacia atrás — o sea `scaleY(0)`—, no
+     el paso del tiempo. Sin esto, quien pide menos movimiento se quedaría con una
+     línea casi invisible hasta que la sección apareciera, que es peor que la
+     animación que estaba evitando. */
+  .exp-timeline::after {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Y el nombre, enfocado. `filter: none` explícito y no sólo la opacidad: el
+     enfoque esconde el nombre con un desenfoque de 14 px, y una regla que devuelva
+     la opacidad dejando el desenfoque puesto deja el titular del CV ilegible para
+     siempre — que es peor que la animación que se estaba evitando. */
+  .hero-name {
     animation: none !important;
     opacity: 1;
+    filter: none;
     transform: none;
   }
 }
@@ -1592,18 +1697,48 @@
   /* La frase del hero se imprime entera. En pantalla se escribe letra a letra; en
      papel no hay tiempo, y un navegador que mande a imprimir antes de que la
      animación termine dejaría el nombre —el titular del CV— recortado a la mitad. */
-  .typed__char {
+  .typed__char,
+  .hero-name {
     opacity: 1 !important;
     animation: none !important;
+    filter: none !important;
+    transform: none !important;
   }
 
-  /* Y lo mismo con lo que aparece después: en papel no hay secuencia que seguir, y
-     un navegador que imprima antes de que termine se llevaría el hero sin las
-     cifras, que son el resumen del CV. */
-  .hero-enter {
-    opacity: 1 !important;
-    animation: none !important;
-    transform: none !important;
+  /* La línea temporal vuelve a ser un borde gris. En papel el cobre saldría
+     lavado —o directamente no saldría, porque los navegadores no imprimen fondos
+     por defecto y el filete es un pseudoelemento con `background`—, y una
+     trayectoria sin línea son cuatro puestos sueltos. Se devuelve el borde, que
+     sí se imprime, y se apaga todo lo demás. */
+  .exp-timeline {
+    border-left-color: #bbb !important;
+    /* Y EN PAPEL, LO MÁS RECIENTE PRIMERO. En pantalla la sección se lee de antiguo
+       a reciente para que la barra de progreso avance al bajar; un CV impreso al
+       revés, en cambio, obliga a quien lo hojea a llegar al final para saber dónde
+       trabajas hoy — y eso es lo primero que se mira. `column-reverse` deshace la
+       inversión sin tocar el DOM, que en papel no tiene ningún coste: no hay foco,
+       ni tabulador, ni lector de pantalla que se descoloque.
+       Quien quite la inversión de `Experience.tsx` tiene que quitar esto también, o
+       el papel saldrá invertido de verdad. */
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .exp-timeline::before,
+  .exp-timeline::after {
+    display: none !important;
+  }
+
+  /* El hueco de debajo de cada puesto, recolocado. `last:pb-0` apunta al último del
+     DOM —el puesto actual—, que con `column-reverse` es el que sale ARRIBA: sin
+     esto, el papel abriría con un puesto pegado al siguiente y cerraría con 3,5rem
+     de blanco. Se le devuelve el hueco a él y se le quita al que ahora cierra. */
+  .exp-timeline > li {
+    padding-bottom: 3.5rem;
+  }
+
+  .exp-timeline > li:first-child {
+    padding-bottom: 0;
   }
 
   /* El carrusel, deshecho: en papel no hay scroll, así que un `overflow-x`

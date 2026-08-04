@@ -95,8 +95,28 @@ export function Education({
               )}
             </p>
 
-            {entry.note ? (
-              <p className="mt-4 mx-auto max-w-measure text-paper-soft">{entry.note[locale]}</p>
+            {/*
+             * LA NOTA SON PÁRRAFOS, y cada uno se pinta como tal.
+             *
+             * Era un único `<p>` porque la nota era una frase. Al reescribirla en dos ideas —la
+             * cita que resume qué deja una ingeniería y la lista de en qué se nota hoy—, con un
+             * solo párrafo quedaba un bloque de cinco líneas centradas con la cita enterrada en
+             * medio, que es justo lo que había que retener.
+             *
+             * La caja es la misma que en experiencia (`max-w-measure` + `space-y-3.5`) y por la
+             * misma razón: con el texto centrado, el ancho de lectura lo pone la caja, y el aire
+             * entre párrafos tiene que ser mayor que el interlineado o los dos vuelven a leerse
+             * como uno. El `mt-4` va en el contenedor y no en el `<p>`: ahí se lo comería el
+             * `space-y`, que sólo separa hermanos.
+             */}
+            {entry.note && entry.note[locale].length > 0 ? (
+              <div className="mt-4 mx-auto max-w-measure space-y-3.5">
+                {entry.note[locale].map((paragraph) => (
+                  <p key={paragraph.slice(0, 40)} className="text-paper-soft">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
             ) : null}
           </Reveal>
         ))}
