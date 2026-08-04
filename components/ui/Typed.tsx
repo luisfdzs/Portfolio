@@ -1,15 +1,44 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 
+/**
+ * El paso por carácter de la frase de portada, en milisegundos. 45 ms dan poco más de un
+ * segundo para «Hola, soy Luis Fernández Sangil».
+ */
+export const TYPED_STEP = 45
+
+/**
+ * El paso de los bloques largos —el titular del puesto y la ubicación—, en milisegundos.
+ *
+ * No es un capricho de ritmo: a 45 ms, los cuarenta caracteres del titular más los
+ * veinticinco de la ubicación añadirían tres segundos a los 1,4 que ya gasta el nombre, y
+ * los botones y las cifras no aparecerían hasta pasados cuatro segundos y medio. Quien
+ * decide en treinta segundos si esto merece un scroll no espera cuatro. Con 20 ms el
+ * tecleado completo cabe en 2,7 s y sigue leyéndose como alguien escribiendo.
+ */
+export const TYPED_STEP_DENSE = 20
+
+/**
+ * La pausa entre dos bloques que se escriben seguidos, en milisegundos. Es el respiro de
+ * quien teclea al terminar una línea y empezar la siguiente; sin ella las cuatro líneas de
+ * la portada se leen como un solo chorro de caracteres.
+ */
+export const TYPED_PAUSE = 220
+
 type Props = {
   /** El texto, tal cual. Se parte aquí; nadie de fuera tiene que trocearlo. */
   text: string
   /**
-   * Cuántos caracteres se han tecleado ANTES de este bloque. Es lo que permite que el
-   * saludo y el nombre —dos elementos distintos, con tipografía distinta— se escriban como
-   * una sola frase seguida en vez de arrancar los dos a la vez.
+   * Cuándo empieza a escribirse este bloque, en milisegundos desde que carga la página. Es
+   * lo que encadena las cuatro líneas de la portada —saludo, nombre, titular y ubicación—
+   * como si las escribiera la misma persona en vez de arrancar las cuatro a la vez.
+   *
+   * Va en milisegundos y no en caracteres, que es lo que había antes: desde que cada bloque
+   * puede tener su propio paso, un índice de caracteres no dice cuánto tiempo se ha gastado.
    */
-  offset?: number
+  start?: number
+  /** Milisegundos por carácter. Ver `TYPED_STEP` y `TYPED_STEP_DENSE`. */
+  step?: number
   className?: string
 }
 
@@ -18,15 +47,21 @@ type Props = {
  *
  * El encargo era que al abrir la web dé la impresión de que alguien está escribiendo «Hola,
  * soy Luis Fernández Sangil» en vez de encontrarlo ya puesto. Lo hace CSS: cada carácter va
- * en su propio `<span>` con un `animation-delay` proporcional a su posición, así que aparecen
- * en cascada. Es la misma familia de decisiones que `Reveal` y que el cover flow — la
- * animación la lleva la hoja de estilos y el componente sólo reparte los índices.
+ * en su propio `<span>` con un índice, y la hoja de estilos lo convierte en el momento en que
+ * se enciende, así que aparecen en cascada. Es la misma familia de decisiones que `Reveal` y
+ * que el cover flow — la animación la lleva el CSS y el componente sólo reparte los índices.
+ *
+ * **Se usa cuatro veces en la portada y las cuatro son una sola frase**: saludo, nombre,
+ * titular y ubicación se escriben seguidos porque cada bloque recibe en `start` el momento en
+ * que terminó el anterior (ver `typedEnd` y `components/sections/Hero.tsx`). Los dos últimos
+ * van a `TYPED_STEP_DENSE` porque son largos; el paso es de cada bloque, no del sitio.
  *
  * Las cinco decisiones que lo hacen seguro, y ninguna es evidente:
  *
  * - **El índice no es un retardo, es una duración.** Éste no es un detalle del CSS que se
- *   pueda ignorar desde aquí, porque decide qué significa `--typed-index`: cada carácter
- *   arranca a la vez y dura hasta su turno. Con `animation-delay`, que es lo evidente, Chrome
+ *   pueda ignorar desde aquí, porque decide qué significan `--typed-index` y `--typed-start`:
+ *   cada carácter arranca a la vez y dura hasta su turno —el arranque del bloque incluido, que
+ *   se suma a la duración—. Con `animation-delay`, que es lo evidente, Chrome
  *   deja de aplicar el `forwards` de las animaciones de duración mínima cuyo retardo pase del
  *   segundo, y la frase se quedaba clavada en «Luis Fernánde» sin que ni el `check` ni el
  *   build tuvieran nada que decir. Está medido y contado en el bloque «Texto que se escribe»
@@ -60,14 +95,14 @@ type Props = {
  * Con `prefers-reduced-motion: reduce` y en papel, todo aparece puesto y el cursor no
  * existe: ver el bloque «Texto que se escribe» de `globals.css`.
  */
-export function Typed({ text, offset = 0, className }: Props) {
+export function Typed({ text, start = 0, step = TYPED_STEP, className }: Props) {
   const words = text.split(' ')
   const nodes: ReactNode[] = []
 
-  // El índice del carácter dentro de la frase COMPLETA (de ahí el `offset`), que es lo que
-  // multiplica el retardo. Se lleva a mano porque el espacio entre palabras también gasta un
-  // turno sin ser un elemento animado, así que la cuenta no coincide con ningún `map`.
-  let index = offset
+  // El índice del carácter dentro de ESTE bloque, que es lo que multiplica el paso. Se lleva
+  // a mano porque el espacio entre palabras también gasta un turno sin ser un elemento
+  // animado, así que la cuenta no coincide con ningún `map`.
+  let index = 0
 
   words.forEach((word, position) => {
     if (position > 0) {
@@ -92,17 +127,24 @@ export function Typed({ text, offset = 0, className }: Props) {
     )
   })
 
-  return <span className={cn('typed', className)}>{nodes}</span>
+  return (
+    <span
+      className={cn('typed', className)}
+      style={{ '--typed-start': `${start}ms`, '--typed-step': `${step}ms` } as CSSProperties}
+    >
+      {nodes}
+    </span>
+  )
 }
 
 /**
- * Cuántos turnos gasta un texto: sus caracteres, espacios incluidos. Es lo que se le pasa
- * como `offset` al bloque siguiente para que la frase se escriba seguida.
+ * Cuándo termina de escribirse un bloque, en milisegundos: lo que se le pasa como `start` al
+ * siguiente (más una pausa, si se quiere el respiro de `TYPED_PAUSE`).
  *
- * Existe como función y no como `texto.length` escrito en el sitio de la llamada porque el
- * día que el reparto de turnos cambie —que los signos de puntuación tarden más, por ejemplo—
- * la cuenta tiene que cambiar en un solo sitio y no en dos que se desincronizan.
+ * Existe como función y no como aritmética escrita en el sitio de la llamada porque el día
+ * que el reparto de turnos cambie —que los signos de puntuación tarden más, por ejemplo— la
+ * cuenta tiene que cambiar en un solo sitio y no en cuatro que se desincronizan.
  */
-export function typedLength(text: string): number {
-  return text.length
+export function typedEnd(start: number, text: string, step = TYPED_STEP): number {
+  return start + text.length * step
 }

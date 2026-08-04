@@ -1027,8 +1027,12 @@
 
 @layer components {
   .typed {
-    /* El paso, en un solo sitio. */
+    /* Los dos valores por defecto. En la portada los pone el componente en el `style` —cada
+       bloque tiene su propio arranque y su propio paso, que es lo que encadena las cuatro
+       líneas como una sola frase—, así que esto es sólo el suelo para un uso sin nada
+       declarado. */
     --typed-step: 45ms;
+    --typed-start: 0ms;
   }
 
   /* La palabra: dentro NO se parte. Con un `<span>` por letra el navegador puede
@@ -1043,19 +1047,71 @@
     /* El estado de partida, y el que se ve mientras la animación corre: la
        animación no cambia nada hasta su último fotograma. */
     opacity: 0;
-    /* La duración ES el momento en que le toca a este carácter. El `+ 60ms` es
-       para que el primero (índice 0) tenga una duración de verdad y no una de
-       cero, que es el caso que el navegador se salta.
+    /* La duración ES el momento en que le toca a este carácter: cuándo empieza su
+       bloque más lo que gastan los caracteres que tiene delante. El `+ 60ms` es
+       para que el primero de todos (arranque 0, índice 0) tenga una duración de
+       verdad y no una de cero, que es el caso que el navegador se salta.
        `steps(1, end)`: la letra no se desvanece, aparece. Un fundido por carácter
        con veintisiete solapados se lee como una nube que se aclara, no como
        alguien escribiendo. */
-    animation: typed-char calc(var(--typed-index) * var(--typed-step) + 60ms) steps(1, end) forwards;
+    animation: typed-char calc(var(--typed-start) + var(--typed-index) * var(--typed-step) + 60ms)
+      steps(1, end) forwards;
   }
 }
 
 @keyframes typed-char {
   to {
     opacity: 1;
+  }
+}
+
+/* ============================================================================
+   LA PORTADA, QUE SE MONTA SOLA — lo que aparece cuando el texto ya está escrito
+
+   Cuando la última línea del hero ha terminado de escribirse, van apareciendo con
+   un fundido corto los botones, las cuatro cifras y el aviso de seguir bajando,
+   uno detrás de otro. Es la segunda mitad de la secuencia de la portada; la
+   primera es el tecleado del bloque de arriba, y las dos están unidas por una
+   sola cuenta que se hace en `components/sections/Hero.tsx`: `--hero-enter-start`
+   es el instante en que acaba el tecleado, y cada elemento pone su turno en
+   `--hero-enter-index`.
+
+   Las tres cosas que hay que respetar si se toca:
+
+   - **El estado estático es VISIBLE.** Aquí no hay ningún `opacity: 0` en la
+     regla: lo que esconde los elementos antes de su turno es el relleno hacia
+     atrás de la animación (`both`). Si la animación no se ejecuta —navegador sin
+     soporte, hoja a medio cargar, cualquier cosa— la portada aparece puesta, que
+     es el fallback correcto. Es el mismo criterio que `reveal` y que el tecleado:
+     nunca contenido invisible por una animación que no corre.
+   - **Aquí sí hay `animation-delay`, y no contradice al bloque de arriba.** El
+     tecleado no puede usarlo porque su truco necesita duraciones despreciables, y
+     Chrome deja de aplicar el `forwards` de esas animaciones pasado el segundo.
+     Éste es un fundido de 520 ms de verdad, que es el caso normal para el que el
+     retardo está pensado. Comprobado con el retardo real de la portada, que pasa
+     de los dos segundos y medio.
+   - **El recorrido es mínimo (10 px) y va con el fundido.** Los botones y las
+     cifras están dentro de la primera pantalla y su hueco lo reservan desde el
+     primer fotograma —el `transform` no ocupa espacio—, así que esto no mueve la
+     maquetación. Con más recorrido el bloque se lee como algo que entra volando y
+     el hero deja de estar quieto, que es lo contrario de lo que se busca.
+   ========================================================================= */
+
+@layer components {
+  .hero-enter {
+    animation: hero-enter 520ms ease-out
+      calc(var(--hero-enter-start, 0ms) + var(--hero-enter-index, 0) * 150ms) both;
+  }
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.625rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -1449,6 +1505,17 @@
     animation: none !important;
     opacity: 1;
   }
+
+  /* Y lo que aparece detrás del texto, ya aparecido. Esto NO es opcional: el atajo
+     general de la capa base recorta la duración pero **no el retardo**, así que sin
+     esta regla los botones, las cifras y el aviso de bajar se quedarían invisibles
+     los dos segundos y medio que dura el tecleado que no se está viendo. Es el
+     fallo que tiene cualquier aparición con retardo y movimiento reducido. */
+  .hero-enter {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ============================================================================
@@ -1528,6 +1595,15 @@
   .typed__char {
     opacity: 1 !important;
     animation: none !important;
+  }
+
+  /* Y lo mismo con lo que aparece después: en papel no hay secuencia que seguir, y
+     un navegador que imprima antes de que termine se llevaría el hero sin las
+     cifras, que son el resumen del CV. */
+  .hero-enter {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
   }
 
   /* El carrusel, deshecho: en papel no hay scroll, así que un `overflow-x`
