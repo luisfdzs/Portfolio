@@ -19,8 +19,8 @@ import { TagList } from '@/components/ui/Tag'
  *   huecos entre puestos — que es exactamente lo que un recruiter comprueba primero.
  * - **La duración, entre paréntesis y calculada**, nunca escrita a mano: se saca de las
  *   fechas, así que el puesto actual no puede quedarse diciendo «6 meses» dos años después.
- * - **La empresa y el cliente final, separados.** «Altia · para Banco Santander Portugal»
- *   es la verdad completa; cualquiera de las dos mitades sola engaña en una dirección.
+ * - **La empresa y el cliente final, separados.** «Altia → INDRA & Kids&Us» es la verdad
+ *   completa; cualquiera de las dos mitades sola engaña en una dirección.
  * - **El filete vertical y el punto** dan continuidad visual sin bordes de tarjeta: cuatro
  *   tarjetas serían cuatro bloques sueltos, y esto es una trayectoria.
  *
@@ -144,9 +144,13 @@ export function Experience({
                   ) : (
                     entry.company
                   )}
+                  {/* SIN « · » DELANTE, y no es un descuido: desde el 2026-08-04 el enlace de
+                      la unión es una flecha («Altia → INDRA & Kids&Us») en vez de la palabra
+                      «para», y una flecha ya separa. Con el punto medio delante quedaban dos
+                      separadores seguidos, « · → », que se lee como un error de plantilla. */}
                   {entry.client ? (
                     <span className="text-paper-faint">
-                      {' · '}
+                      {' '}
                       {t.experience.forClient} {entry.client}
                     </span>
                   ) : null}

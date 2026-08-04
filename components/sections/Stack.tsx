@@ -30,10 +30,12 @@ import { Tag } from '@/components/ui/Tag'
  *   rótulo que los agrupa y rompería el esquema de encabezados de la página, que es cómo se
  *   navega con lector de pantalla.
  *
- * La nota al pie —«ordenado por lo que uso a diario, no por lo que he tocado alguna vez»— es
- * la parte que da valor a la lista. Una lista de tecnologías sin jerarquía es exactamente
- * igual de creíble esté lo que esté escrito, y quien la lee lo sabe; decir en voz alta cuál es
- * el criterio de orden es lo único que la convierte en información.
+ * **La nota al pie se quitó el 2026-08-04**, por encargo. Decía «ordenado por lo que uso a
+ * diario, no por lo que he tocado alguna vez» y el argumento para tenerla era bueno —una lista
+ * de tecnologías sin jerarquía es igual de creíble esté lo que esté escrito—, pero dentro del
+ * perfil son dos líneas de letra pequeña al final de la sección de prosa, justo antes del
+ * contacto. El orden de cada grupo sigue siendo el mismo, de más a menos uso real; lo que ya no
+ * se hace es explicarlo.
  */
 export function Stack({ locale, groups }: { locale: Locale; groups: readonly SkillGroup[] }) {
   const t = getDictionary(locale)
@@ -55,6 +57,8 @@ export function Stack({ locale, groups }: { locale: Locale; groups: readonly Ski
         <p className="mt-6 mx-auto max-w-measure text-lead text-paper-soft">{t.stack.kicker}</p>
       </Reveal>
 
+      {/* SIN NOTA AL PIE, y la clave `stack.note` ya no existe: quien la reponga tiene que
+          añadir las dos cosas. Ver el diccionario. */}
       <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
         {groups.map((group, index) => (
           <Reveal key={group.key} step={index}>
@@ -69,10 +73,6 @@ export function Stack({ locale, groups }: { locale: Locale; groups: readonly Ski
           </Reveal>
         ))}
       </div>
-
-      <Reveal className="mt-12">
-        <p className="mx-auto max-w-measure text-small text-paper-faint">{t.stack.note}</p>
-      </Reveal>
     </div>
   )
 }

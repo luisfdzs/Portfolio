@@ -30,7 +30,7 @@ export type ExperienceEntry = {
    * El cliente final, cuando el puesto es de consultoría. Se separa de `company` a
    * propósito: decir «desarrollador en Banco Santander» cuando la nómina la firma Altia
    * es la clase de imprecisión que un recruiter detecta al comprobar referencias, y
-   * cuesta más de lo que da. La web escribe «Altia · para Banco Santander Portugal».
+   * cuesta más de lo que da. La web escribe «Altia → INDRA & Kids&Us».
    */
   client?: string | null
   range: DateRange
