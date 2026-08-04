@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import type { Profile } from '@/content/types'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
@@ -5,7 +6,7 @@ import { href } from '@/lib/i18n/routes'
 import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
 import { ArrowDown, GitHub, LinkedIn, Mail, MapPin } from '@/components/ui/Icons'
-import { Typed, typedLength } from '@/components/ui/Typed'
+import { Typed, TYPED_PAUSE, TYPED_STEP, TYPED_STEP_DENSE, typedEnd } from '@/components/ui/Typed'
 import { HeroStage } from '@/components/sections/HeroStage'
 
 type Stat = { value: string; label: string }
@@ -40,11 +41,20 @@ type Props = {
  *
  * - **El nombre es el titular**, en la serif y al tamaño más grande del sitio. En un
  *   portfolio el producto es la persona; poner «Desarrollador Full Stack» de titular y el
- *   nombre en pequeño es esconder lo que se busca en Google. **Y se escribe solo**: el saludo
- *   y el nombre aparecen letra a letra al abrir la página, como si alguien los estuviera
- *   tecleando delante. Es lo único que se mueve en el bloque de texto y va donde tiene que ir
- *   —en la primera línea que se lee—; el resto de la portada aparece puesto. Lo hace CSS sin
- *   una línea de JavaScript, con el texto completo en el HTML: ver `components/ui/Typed.tsx`.
+ *   nombre en pequeño es esconder lo que se busca en Google. **Y se escribe solo**, como el
+ *   resto del bloque: ver el punto siguiente.
+ * - **LA PORTADA SE MONTA SOLA, EN SECUENCIA, Y NO HAY UNA LÍNEA DE JAVASCRIPT EN ELLO.**
+ *   Primero se escriben letra a letra las cuatro líneas de texto —saludo, nombre, titular y
+ *   ubicación— como si las teclease alguien delante, y cuando la última termina van
+ *   apareciendo con un fundido corto los botones, las cuatro cifras y el aviso de seguir
+ *   bajando, uno detrás de otro. Son dos mecanismos (`Typed` y la clase `hero-enter`) unidos
+ *   por una sola cuenta, que está unas líneas más abajo: el momento en que acaba el tecleado
+ *   es el momento cero de las apariciones. **El texto va COMPLETO en el HTML del servidor** y
+ *   nada se revela creciendo, así que no hay salto de maquetación en la primera pantalla ni
+ *   depende de un temporizador que el nombre —el `<h1>` que se busca en Google— exista. El
+ *   razonamiento largo, con el fallo de Chrome que decide cómo se escribe, en
+ *   `components/ui/Typed.tsx` y en los bloques «Texto que se escribe» y «La portada, que se
+ *   monta sola» de `globals.css`.
  * - **Menos texto, y por esto.** La entradilla de tres líneas que había aquí —la que enumeraba
  *   Santander, INDRA, ABB e Ingeteam— se quitó: sobre un fondo en movimiento, un párrafo largo
  *   obliga a elegir entre leerlo o mirar, y quien decide en treinta segundos no hace ni una
@@ -71,6 +81,28 @@ type Props = {
  */
 export function Hero({ locale, profile, stats }: Props) {
   const t = getDictionary(locale)
+
+  /*
+   * LA CRONOLOGÍA DE LA PORTADA, EN UN SITIO.
+   *
+   * Las cuatro líneas de texto se escriben seguidas —saludo, nombre, titular y ubicación— y
+   * lo que aparece después (los botones, las cifras y el aviso de seguir bajando) espera a
+   * que la última haya terminado. Es una sola cuenta y se hace aquí, no repartida entre el
+   * CSS y cuatro llamadas: el `start` de cada bloque es el final del anterior, así que
+   * cambiar un texto o un paso recoloca todo lo demás sin tocar nada más.
+   *
+   * Los dos primeros bloques van al paso normal y son **una sola frase**: el espacio que
+   * separa el saludo del nombre se teclea también, de ahí el `+ TYPED_STEP`. Los dos últimos
+   * van al paso corto y con una pausa delante, que es el respiro de cambiar de línea.
+   */
+  const greeting = t.hero.greeting
+  const headline = profile.headline[locale]
+  const location = profile.location[locale]
+
+  const nameStart = typedEnd(0, greeting) + TYPED_STEP
+  const headlineStart = typedEnd(nameStart, profile.name) + TYPED_PAUSE
+  const locationStart = typedEnd(headlineStart, headline, TYPED_STEP_DENSE) + TYPED_PAUSE
+  const typingEnd = typedEnd(locationStart, location, TYPED_STEP_DENSE)
 
   const socials = [
     { href: profile.linkedin, label: t.contact.linkedinLabel, Icon: LinkedIn },
@@ -134,7 +166,17 @@ export function Hero({ locale, profile, stats }: Props) {
           />
         </div>
 
-        <div className="hero-copy flex flex-col items-center">
+        {/*
+         * `--hero-enter-start` es la costura entre las dos animaciones de la portada: lo que
+         * tarda en escribirse la última línea de texto es lo que esperan los botones, las
+         * cifras y el aviso de bajar antes de aparecer. Va aquí, en el bloque que los contiene
+         * a todos, porque las variables se heredan: cada elemento sólo declara su turno
+         * (`--hero-enter-index`) y el momento cero lo pone el padre una vez.
+         */}
+        <div
+          className="hero-copy flex flex-col items-center"
+          style={{ '--hero-enter-start': `${typingEnd}ms` } as CSSProperties}
+        >
           {/* Estado actual, no «disponible para trabajar»: es un dato verificable en
               LinkedIn y no una señal que pueda leer un jefe actual.
 
@@ -161,7 +203,7 @@ export function Hero({ locale, profile, stats }: Props) {
            * está el razonamiento — incluido el fallo de Chrome que decide cómo se escribe).
            */}
           <p className="mt-7 font-display text-lead text-paper-soft">
-            <Typed text={t.hero.greeting} />
+            <Typed text={greeting} />
           </p>
           <h1
             id="hero-name"
@@ -170,20 +212,43 @@ export function Hero({ locale, profile, stats }: Props) {
             // de pantalla en inglés lee «Sangil» con fonética inglesa.
             lang="es"
           >
-            {/* +1: el espacio que separa el saludo del nombre también se teclea. */}
-            <Typed text={profile.name} offset={typedLength(t.hero.greeting) + 1} />
+            <Typed text={profile.name} start={nameStart} />
           </h1>
 
+          {/* El titular del puesto y la ubicación se escriben también, al paso corto: son
+              largos, y al paso del nombre añadirían tres segundos de espera a lo que aparece
+              después. */}
           <p className="mx-auto mt-5 max-w-[30ch] font-display text-title text-signal">
-            {profile.headline[locale]}
+            <Typed text={headline} start={headlineStart} step={TYPED_STEP_DENSE} />
           </p>
 
+          {/* El icono no se teclea, aparece con la línea: es un pictograma, y revelarlo letra
+              a letra no significa nada. Va con el turno cero de la aparición general —el
+              mismo instante en que arranca a escribirse la ubicación—, así que la línea nace
+              completa en vez de con un hueco delante. */}
           <p className="figure-num mt-5 flex items-center justify-center gap-2 text-small text-paper-faint">
-            <MapPin className="size-4" />
-            {profile.location[locale]}
+            <MapPin
+              className="hero-enter size-4"
+              style={{ '--hero-enter-start': `${locationStart}ms` } as CSSProperties}
+            />
+            <Typed text={location} start={locationStart} step={TYPED_STEP_DENSE} />
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          {/*
+           * A PARTIR DE AQUÍ TODO APARECE SOLO, y en este orden: los botones, las cifras y el
+           * aviso de seguir bajando, cada uno un turno detrás del anterior (ver `hero-enter`
+           * en `globals.css`). Los tres esperan a que el texto haya terminado de escribirse,
+           * que es lo que hace que la portada se lea como una secuencia y no como tres cosas
+           * que se mueven a la vez.
+           *
+           * El fundido va con relleno hacia atrás y **sin `opacity: 0` en el estado estático**:
+           * un navegador que no ejecute la animación deja los botones puestos, que es el
+           * fallback correcto. Es el criterio de `reveal` y del tecleado.
+           */}
+          <div
+            className="hero-enter mt-8 flex flex-wrap items-center justify-center gap-3"
+            style={{ '--hero-enter-index': 0 } as CSSProperties}
+          >
             <Action href={href(locale, 'projects')} variant="primary">
               {t.hero.primaryCta}
             </Action>
@@ -217,7 +282,10 @@ export function Hero({ locale, profile, stats }: Props) {
               separado: son un mismo dato de cuatro cifras —el resumen del CV en una línea— y
               hay que poder abarcarlas de un golpe. A 390 px cada hueco mide unos 82 px, así
               que el reparto es justo y lo que hay que cuidar es el rótulo. */}
-          <dl className="mt-10 grid w-full grid-cols-4 gap-x-2 gap-y-7 border-t border-line pt-8 text-center lg:mt-12 lg:gap-x-8">
+          <dl
+            className="hero-enter mt-10 grid w-full grid-cols-4 gap-x-2 gap-y-7 border-t border-line pt-8 text-center lg:mt-12 lg:gap-x-8"
+            style={{ '--hero-enter-index': 1 } as CSSProperties}
+          >
             {stats.map((stat) => (
               <div key={stat.label}>
                 <dd className="figure-num text-figure text-paper">{stat.value}</dd>
@@ -248,7 +316,8 @@ export function Hero({ locale, profile, stats }: Props) {
            */}
           <p
             data-print="hide"
-            className="mt-12 hidden items-center justify-center gap-2 text-small text-paper-faint lg:flex"
+            className="hero-enter mt-12 hidden items-center justify-center gap-2 text-small text-paper-faint lg:flex"
+            style={{ '--hero-enter-index': 2 } as CSSProperties}
           >
             {t.hero.scrollHint}
             <ArrowDown className="hero-hint__arrow size-4" />

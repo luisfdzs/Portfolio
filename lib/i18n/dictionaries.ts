@@ -129,9 +129,13 @@ const es = {
     backToProjects: 'Volver a los proyectos',
   },
 
+  /**
+   * **Sin `kicker`, y es la única sección que no lo tiene.** Decía «De la ingeniería industrial
+   * al desarrollo web» y se quitó por encargo: resumía la trayectoria, que es lo que cuenta la
+   * experiencia, no esta sección. `SectionHeading` lo admite y el rótulo pasa a ser el `<h2>`.
+   */
   education: {
     title: 'Formación',
-    kicker: 'De la ingeniería industrial al desarrollo web',
     ongoing: 'en curso',
   },
 
@@ -269,7 +273,6 @@ const en: Dictionary = {
 
   education: {
     title: 'Education',
-    kicker: 'From industrial engineering to web development',
     ongoing: 'ongoing',
   },
 

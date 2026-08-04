@@ -121,12 +121,13 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
 - **Alineación: el texto va centrado** en el espacio que ocupa, como en `sangilstudio`. `text-center`
   en la sección + `mx-auto` en las cajas con ancho máximo + `justify-center` en las filas flex; las
   tres cosas juntas, porque ninguna hace el trabajo de las otras. **En papel no**: `@media print` lo
-  deshace. Y **centrar el texto en una columna no lo centra en la sección**: experiencia y formación
-  maquetan cada entrada en una retícula con un carril de `13rem` a la izquierda, así que llevan una
-  **tercera columna vacía** (`13rem` en formación, `15,5rem` en experiencia, que suma el sangrado de
-  la línea temporal) para que el contenido caiga en el mismo eje que el rótulo. Quien toque el
-  carril, el `gap` o el sangrado tiene que recalcular ese valor. Qué quedó sin centrar y por qué, en
-  [[decisiones-de-diseno]].
+  deshace. Y **centrar el texto en una columna no lo centra en la sección**: experiencia maqueta cada
+  entrada en una retícula con un carril de fechas de `13rem` a la izquierda, así que **lo que la
+  centra son dos valores que son la misma cuenta** (2026-08-04): `lg:ml-36` en el `ol` y una tercera
+  columna vacía de `6,5rem`, que reparten a medias los 18rem que empuja el carril y dejan **el bloque
+  que se ve** centrado en la sección. Quien toque el carril, el `gap`, el sangrado o uno de los dos
+  valores tiene que recalcular el otro, y nada avisa. Formación ya no tiene carril: al quitarse la
+  ubicación se fue la retícula. Qué quedó sin centrar y por qué, en [[decisiones-de-diseno]].
 - **Los proyectos de la portada van en un carrusel «cover flow», van TODOS y el carrusel es
   INFINITO** (bloque «COVER FLOW» de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D
   dirigido por el scroll, y de JavaScript sólo los dos botones y el salto del bucle. El bucle es
@@ -162,15 +163,22 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   estáticos aunque venga antes. Por eso `globals.css` sube `body > main` y `body > footer` a
   `position: relative` con `z-index: 1`. **Si añades un hermano directo del `<body>` que tenga que
   verse, súbelo también.**
-- **El saludo y el nombre del hero SE ESCRIBEN letra a letra, y lo hace CSS** (2026-08-04).
-  `components/ui/Typed.tsx` es de **servidor** y sólo reparte índices: pinta cada carácter en su
-  `<span>` y el bloque «Texto que se escribe» de `globals.css` decide cuándo se enciende. El texto va
-  **completo en el HTML** —el nombre es el `<h1>` que se busca en Google— y **se revela en su sitio,
-  sin crecer**, porque el hero apoya su texto en el borde de abajo y un texto que crece lo empujaría
-  entero. Por lo mismo **no hay cursor**. **La trampa, y es un fallo real de Chrome: el escalonado va
-  en la DURACIÓN y no en `animation-delay`** — con el retardo, todo carácter que pase del segundo se
-  queda invisible para siempre y la portada decía «Hola, soy Luis Fernánde» sin que el `check`, el
-  `check:mobile` ni el build dijeran nada. Ver [[hero-sanity]].
+- **LA PORTADA SE MONTA SOLA, EN SECUENCIA, Y LO HACE TODO CSS** (2026-08-04). Primero se escriben
+  letra a letra las **cuatro** líneas de texto —saludo, nombre, titular del puesto y ubicación— y
+  cuando la última termina van apareciendo con un fundido corto los botones, las cuatro cifras y el
+  «Sigue bajando», uno detrás de otro. Son dos mecanismos unidos por una sola cuenta, que se hace en
+  `Hero.tsx`: `components/ui/Typed.tsx` es de **servidor** y reparte índices —cada bloque con su
+  `start` en ms y su `step`, que es 45 ms en el nombre y 20 en los dos textos largos, o el tecleado
+  duraría seis segundos—, y la clase `hero-enter` (bloque «La portada, que se monta sola» de
+  `globals.css`) hace el resto con el final del tecleado como momento cero. El texto va **completo en
+  el HTML** —el nombre es el `<h1>` que se busca en Google— y **nada se revela creciendo**, porque el
+  hero apoya su texto en el borde de abajo. Por lo mismo **no hay cursor**. **La trampa, y es un fallo
+  real de Chrome: el escalonado del tecleado va en la DURACIÓN y no en `animation-delay`** — con el
+  retardo, todo carácter que pase del segundo se queda invisible para siempre y la portada decía
+  «Hola, soy Luis Fernánde» sin que el `check`, el `check:mobile` ni el build dijeran nada. En
+  `hero-enter` sí hay retardo, y no es contradictorio: ahí la animación dura 520 ms de verdad. Lo que
+  **sí** necesita regla propia es el movimiento reducido, porque el atajo general recorta la duración
+  pero no el retardo. Ver [[hero-sanity]].
 - **El contraste del hero lo da un velo anclado al TEXTO** (`.hero-copy::before`), no un
   porcentaje del alto del hero, y el rótulo del puesto lleva pastilla propia (`.hero-chip`). Las
   dos cosas son la corrección de un fallo real. Regla corta: **si tocas el velo, vuelve a mirar el
@@ -273,6 +281,37 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-04 (en `develop`, por encargo de trabajar ahí directamente): **la portada se monta sola y
+formación se queda en el hueso.** Tres encargos. (1) **Se escriben también el titular del puesto y la
+ubicación**, y cuando el texto termina van apareciendo los botones, las cuatro cifras y el «Sigue
+bajando». `Typed` pasa de contar caracteres a **contar milisegundos** —`offset` se cambia por `start`
+(ms) y `step` (ms), y `typedLength` por `typedEnd`—, porque desde que cada bloque tiene su propio paso
+un índice de caracteres ya no dice cuánto tiempo se ha gastado; la cronología de las cuatro líneas se
+calcula de una vez en `Hero.tsx`. Los dos textos largos van a **20 ms por carácter** y no a 45: a 45
+los botones no aparecerían hasta pasados cuatro segundos y medio, y quien decide en treinta segundos
+no espera. Lo que aparece detrás es la clase nueva **`hero-enter`**, con el final del tecleado como
+momento cero heredado de `.hero-copy` y un turno por elemento. **Aquí sí hay `animation-delay` y no
+contradice al tecleado** —el fallo de Chrome es de animaciones de duración despreciable y ésta dura
+520 ms—, pero **el movimiento reducido necesitó regla propia**: el atajo general de la capa base
+recorta la duración y **no el retardo**, así que sin ella los botones se quedaban invisibles los tres
+segundos de un tecleado que nadie estaba viendo. El icono de la ubicación no se teclea, aparece con su
+línea. (2) **Experiencia se centra por el criterio del revés.** La columna vacía dejaba el titular del
+puesto en el eje del rótulo, pero el bloque **que se ve** —filete, fechas y puesto— empezaba en el
+margen izquierdo y acababa 18rem antes del derecho, y de lejos la sección se leía corrida. Los 18rem
+se reparten a medias: `lg:ml-36` en el `ol` y la tercera columna a `6,5rem`. **`ml` y no `pl`**, porque
+el filete de la línea temporal es el borde izquierdo de esa lista y con relleno se queda clavado.
+Medido a 1024, 1440 y 1920: el conjunto queda a 0 px del centro. (3) **Formación pierde la frase del
+rótulo y la ubicación**: «De la ingeniería industrial al desarrollo web» resumía la trayectoria, que
+es lo que cuenta la experiencia, y «Vigo, Galicia» ya está en el hero y en cada puesto. Arrastra dos
+cosas que no se ven venir: `kicker` pasa a ser **opcional** en `SectionHeading` y, sin frase, **el
+rótulo tiene que ser el `<h2>`** o la sección se queda sin encabezado y el esquema salta del `<h1>` a
+los `<h3>`; y **se cae la retícula de tres columnas**, que sólo existía para compensar un carril que
+ahora está vacío. `npm run check` limpio y `check:mobile` **23/23 en los dos idiomas** sobre el build
+de producción, con la secuencia medida en Chrome real a 1440 y a 390 px muestreando opacidades (las
+cuatro líneas en orden, nada por debajo de 0,99 a los 4 s), movimiento reducido comprobado y cero
+desbordamiento. **Pendiente de nada en el panel**: los tres cambios son de código y de diccionario, no
+de contenido. Ver [[hero-sanity]], [[decisiones-de-diseno]] y [[perfil-cv]]._
 
 _2026-08-04 (rama `feature/hero-tecleado-y-textos`, en worktree propio): **el nombre se escribe solo,
 el stack se mete dentro del perfil y se reescriben los textos del CV.** Cinco encargos de una tanda.
