@@ -157,7 +157,11 @@ const educationSchema = z.object({
   institution: localizedString,
   range: dateRange,
   location: localizedString.nullish(),
-  note: localizedString.nullish(),
+  // Párrafos y no una cadena desde el 2026-08-04 (ver `EducationEntry.note`). El cambio tiene
+  // un efecto que conviene tener presente: un documento del panel cuyo `note` siga siendo una
+  // cadena **no valida**, y la sección entera cae al respaldo de `content/` sin más aviso que
+  // una línea en el log del build. El panel se parcheó el mismo día.
+  note: localizedParagraphs.nullish(),
   url: z.url().nullish(),
 })
 
