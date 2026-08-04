@@ -303,6 +303,41 @@ proyecto.**
 
 ---
 
+_2026-08-04 (rama `feature/textos-formacion-y-perfil`, en worktree propio): **tercera tanda de textos
+escritos por Luis en el inspector, y las dos maquetaciones que le habían quedado raras.** Mismo método
+que la tanda anterior —la pestaña en el grupo de la extensión y el DOM en vivo comparado contra el HTML
+del servidor—, pero el encargo traía una segunda mitad: «ponlos de otra forma porque me han quedado
+raros». Y las dos rarezas eran de maquetación, no de texto, y **las dos venían de una poda anterior**.
+(1) **La nota de formación son ahora DOS párrafos de verdad**: Luis la escribió como idea + cita y,
+debajo, la lista de en qué se nota hoy, y en el inspector eso quedaba como un `<p>` sin clases pegado
+al anterior —sin color, sin `max-w-measure` y sin aire—. La solución no es maquillar ese párrafo: es
+que **`note` pase de `Localized` a `Localized<string[]>`**, la misma forma que `summary` en la
+experiencia. Toca seis sitios (tipo, respaldo, validación, esquema del panel de `localizedText` a
+`localizedParagraphs`, la vista y el panel) y **la consulta de GROQ no**, porque `note { es, en }`
+proyecta igual una cadena que un array. El criterio ya estaba escrito en `sanity/schemas/localized.ts`:
+párrafos como array y **nunca** partir una cadena por `\n\n`. (2) **El perfil deja de tener media
+sección en blanco**: el bloque de detrás de la entradilla se maquetaba en `lg:grid-cols-2` fijo y desde
+que el perfil bajó a dos párrafos sólo quedaba **uno** para dos columnas, así que la retícula producía
+exactamente el vacío que existía para evitar. Ahora depende de cuántos párrafos haya
+(`rest.length > 1`): con uno, una columna centrada de medida de lectura. (3) **La lista de la ingeniería
+se queda en un solo sitio.** Luis la pegó también en la entradilla del perfil, en el hueco de la frase
+que borró, y el CV la enseñaba dos veces palabra por palabra a media pantalla de distancia — eso se lee
+como un copia y pega. Vive **sólo en la nota de formación**, que es la sección que habla del grado; el
+borrado sí se respeta, así que la entradilla del perfil es una sola frase. **Ojo: esa entradilla es
+también la `description` del JSON-LD `Person`** (`bio[locale][0]`). Corregido del tecleo rápido:
+`<<…>>` → «…», la concordancia de «se dividan», «métricas calidad» → «métricas de calidad», «test» →
+«tests» y el «etc.» final por «…». El inglés traducido aquí. **Y aquí el parche del panel NO era
+opcional, que es lo que esta tanda añade a la receta:** al cambiar la **forma** del campo, el valor
+viejo del panel no se queda anticuado, **deja de validar**, y con él se cae el documento de formación
+entero y la sección se sirve del respaldo (`note.es Invalid input: expected array, received string` en
+el log del build y en ningún otro sitio). **La trampa al comprobarlo:** el segundo build seguía dando
+el mismo aviso con el panel ya parcheado, porque Next reutiliza las respuestas cacheadas en
+`.next/cache` — hay que **borrar `.next`** para ver un cambio hecho en el panel. `npm run check` limpio,
+build sin un solo aviso leyendo del panel, las dos versiones prerrenderizadas comprobadas cadena a
+cadena y `check:mobile` **23/23 en los dos idiomas** sobre el build de producción; medido además a 1440
+y 390 px, los dos bloques centrados al píxel en el eje de su sección. Ver [[perfil-cv]] y
+[[decisiones-de-diseno]]._
+
 _2026-08-04 (en `develop`): **la línea temporal es cobre, mide lo leído, y la sección se lee al
 revés.** Encargo de Luis en dos tiempos: primero el color, y con él cinco efectos montados en un
 conmutador de desarrollo —hermano del del hero, con los atajos en Mayúsculas para no pisarse— del

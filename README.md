@@ -133,9 +133,12 @@ El proyecto de Sanity existe desde el **2026-08-03**: `Portfolio`, id **`3pdexis
 `production` **público**, con los documentos del CV importados y sus capturas subidas. La web ya
 se construye leyendo del panel; `content/` sigue en su sitio como respaldo y como suelo de la
 regla de arriba. La importación inicial subió dieciséis documentos y siete imágenes, y desde entonces
-el panel se ha sincronizado tres veces a mano: la lista de proyectos (2026-08-03) y los textos del CV
-(2026-08-04, dos tandas). **Cada cambio en `content/` necesita ese segundo paso**, y la forma de darlo está en
-«Pendiente»: parcheando campos con `sanity exec`, no con `migrate:import`.
+el panel se ha sincronizado cuatro veces a mano: la lista de proyectos (2026-08-03) y los textos del CV
+(2026-08-04, tres tandas). **Cada cambio en `content/` necesita ese segundo paso**, y la forma de darlo está en
+«Pendiente»: parcheando campos con `sanity exec`, no con `migrate:import`. Y cuando lo que cambia es
+la **forma** de un campo y no su texto —la `note` de formación pasó de cadena a lista de párrafos—,
+ese paso deja de ser opcional: el valor viejo del panel no valida y la sección entera se cae al
+respaldo.
 
 Público a propósito: la web lee **sin token** al construir, así que un dataset privado obligaría
 a meter una credencial de lectura en los dos proyectos de Vercel para servir un CV que es
@@ -587,6 +590,16 @@ Cosas que están así a propósito y con quién se resuelven:
   editando el HTML de la web en producción con las herramientas de desarrollo del navegador—: los
   mismos seis documentos, el mismo script de un solo uso, una sola transacción, y borrado después.
   Que funcione dos veces seguidas es lo que la convierte en el procedimiento y no en una anécdota.
+  **Y una tercera, esa misma tarde**, con la nota de formación y los dos párrafos del perfil. Esa
+  tercera vez enseña algo que las dos primeras no podían: **cuando el cambio es de FORMA y no sólo
+  de texto, el parche del panel deja de ser un segundo paso y pasa a ser obligatorio**. La `note`
+  de formación pasó de cadena a lista de párrafos, así que el valor viejo del panel no se quedaba
+  anticuado — **no validaba**, y con él se caía el documento entero y la sección se servía del
+  respaldo. Eso se ve en el log del build (`note.es Invalid input: expected array, received
+string`) y en ningún otro sitio. Y **hay una trampa al comprobarlo**: el segundo `npm run build`
+  seguía dando el mismo aviso con el panel ya parcheado, porque Next reutiliza las respuestas
+  cacheadas en `.next/cache`. Para verificar un cambio hecho en el panel hay que **borrar `.next`
+  antes de construir**.
 - ~~**El `institution` del panel es una cadena y tumba el documento de formación.**~~ Resuelto en el
   mismo parche del 2026-08-04: ya es `{es, en}`, el documento valida y la sección deja de caer al
   respaldo. Era el fallo silencioso de la regla del contenido —la web se veía bien porque `content/`
