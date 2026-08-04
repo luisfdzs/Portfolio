@@ -69,23 +69,31 @@ export const profile: Profile = {
    * Es la sección más personal del CV y la única de prosa, así que el riesgo no es quedarse
    * corto: es escribir seis párrafos que nadie lea. Cada uno dice una cosa y se aparta.
    *
-   * Lo que dicen, en orden: que la formación como desarrollador es autodidacta y de dónde
-   * viene —la ingeniería tocaba programación, pero orientada a procesos industriales—; y que
-   * lo que de verdad marca la diferencia son las habilidades blandas. Ese segundo párrafo es
-   * el que hay que dejar al final: es una opinión, y una opinión se defiende cuando ya se ha
-   * demostrado lo demás.
+   * Lo que dicen, en orden: que la formación como desarrollador es autodidacta a pesar de venir
+   * de una ingeniería; y que lo que de verdad marca la diferencia son las habilidades blandas.
+   * Ese segundo párrafo es el que hay que dejar al final: es una opinión, y una opinión se
+   * defiende cuando ya se ha demostrado lo demás.
+   *
+   * **La entradilla se queda en una sola frase, y eso es de la tanda del 2026-08-04.** Luis
+   * borró en el inspector la segunda frase —«en la carrera sí que se tocaba algo de
+   * programación, quizá más enfocada a procesos industriales…»— y pegó en su lugar la lista de
+   * lo que le dejó la ingeniería. Esa lista se queda **sólo en la nota de formación**, que es
+   * la sección que habla del grado: repetida aquí palabra por palabra se lee como un
+   * copia y pega, y el CV entero pierde crédito por un párrafo. Lo que sí se respeta es el
+   * borrado, así que la entradilla es ahora una frase y ya está — no le hace falta más, porque
+   * de dónde viene el perfil lo cuentan la sección de formación y la de experiencia.
    *
    * No hay una sola cifra ni un solo cliente aquí, a propósito: eso está en las secciones que
    * se pueden comprobar, con las fechas al lado. Aquí no se demuestra nada, se dice quién eres.
    */
   bio: {
     es: [
-      'Como muchos otros desarrolladores, mi formación ha sido 100 % autodidacta, ya que a pesar de haber estudiado ingeniería industrial, me enfoqué en el desarrollo de software y dediqué un tiempo importante a realizar cursos y proyectos personales. En la carrera sí que se tocaba algo de programación, quizá más enfocada a procesos industriales, pero rápidamente vi el potencial que tenía aprender esta habilidad.',
-      'Fuera de la parte técnica, soy muy consciente de que lo que realmente marca la diferencia es la parte humana, lo que llamamos «habilidades blandas». Esto significa ser sincero, humilde para pedir y prestar ayuda, honesto, puntual, agradable, comprometido con la compañía… ser un buen profesional. Ahí es donde se marca la diferencia, y por eso cada día intento mejorar en ese aspecto, en cómo me comporto y me comunico con mis compañeros y con mis superiores.',
+      'Como muchos otros desarrolladores, mi formación ha sido 100 % autodidacta, ya que a pesar de haber estudiado ingeniería industrial, me enfoqué en el desarrollo de software y dediqué un tiempo importante a realizar cursos y proyectos personales.',
+      'Fuera de la parte puramente técnica, soy muy consciente de que lo que realmente marca la diferencia es la parte humana, lo que llamamos «habilidades blandas». Esto significa ser sincero, humilde para pedir y prestar ayuda, honesto, puntual, agradable, comprometido con la compañía… ser un buen profesional. Ahí es donde se marca la diferencia, y por eso cada día intento mejorar en ese aspecto, en cómo me comporto y me comunico con mis compañeros y con mis superiores.',
     ],
     en: [
-      'Like many other developers, my training has been entirely self-taught: despite having studied industrial engineering, I focused on software development and put serious time into courses and personal projects. The degree did cover some programming, more oriented towards industrial processes, but I quickly saw the potential of learning this skill.',
-      'Beyond the technical side, I am very aware that what really makes the difference is the human side — what we call “soft skills”. That means being sincere, humble enough to ask for help and to give it, honest, punctual, pleasant, committed to the company… being a good professional. That is where the difference is made, and that is why I try to get better at it every day, at how I behave and how I communicate with my colleagues and with the people I report to.',
+      'Like many other developers, my training has been entirely self-taught: despite having studied industrial engineering, I focused on software development and put serious time into courses and personal projects.',
+      'Beyond the purely technical side, I am very aware that what really makes the difference is the human side — what we call “soft skills”. That means being sincere, humble enough to ask for help and to give it, honest, punctual, pleasant, committed to the company… being a good professional. That is where the difference is made, and that is why I try to get better at it every day, at how I behave and how I communicate with my colleagues and with the people I report to.',
     ],
   },
   photo: portrait,
@@ -258,10 +266,24 @@ export const education: EducationEntry[] = [
      * La versión de Luis aterriza eso en un ejemplo de hoy —cómo escribe los prompts cuando
      * trabaja con IA— y es a propósito: es el único sitio del CV donde una asignatura de 2020
      * se conecta con algo que se hace en 2026.
+     *
+     * **Y desde la segunda tanda del 2026-08-04 son DOS párrafos, no una frase larga.** El
+     * primero es la idea en una línea, con la cita que la resume; el segundo, la lista de en qué
+     * se nota hoy. Partirla es lo que la hace legible: en un párrafo único de cinco líneas
+     * centradas, la cita quedaba enterrada en medio y era justo lo que había que retener. Aquí
+     * vive **la única copia** de esa lista: estuvo también en la entradilla del perfil por un
+     * pegado en el inspector, y de las dos ésta es la que le corresponde, porque es la sección
+     * que habla del grado (ver el comentario de `bio`).
      */
     note: {
-      es: 'Quizás lo mejor que me ha dado estudiar una carrera como esta es una forma de pensar bien estructurada. Esto me permite hoy en día en mi trabajo hacer muy buenos prompts cuando usamos IA: soy muy específico y concreto escribiendo a agentes de inteligencia artificial y no sólo les pido escribir el código, también métricas concretas de QA y de UAT, test unitarios y de integración, etc. En una carrera como esta se aprende a pensar de forma global y a tener la perspectiva clara de cada tarea antes de comenzar a picar código.',
-      en: 'Perhaps the best thing a degree like this gave me is a well-structured way of thinking. It is what lets me write very good prompts at work today when we use AI: I am specific and concrete when writing to AI agents, and I do not only ask them for the code — I also ask for concrete QA and UAT metrics, unit and integration tests, and so on. A degree like this teaches you to think globally and to have a clear view of each task before you start writing code.',
+      es: [
+        'Quizás lo mejor que me ha aportado este grado es una forma de pensar bien estructurada: «todos los problemas pueden resolverse, siempre y cuando se dividan primero en partes más sencillas y manejables».',
+        'Pensar de forma global en el problema, tener perspectiva antes de picar código, redactar buenos prompts cuando uso IA, ser específico y concreto, implementar métricas de calidad, tests… son cosas para las que siento que me ha ayudado muchísimo estudiar una ingeniería.',
+      ],
+      en: [
+        'Perhaps the best thing this degree gave me is a well-structured way of thinking: “every problem can be solved, as long as it is first broken down into simpler, more manageable parts”.',
+        'Thinking about the problem as a whole, having perspective before writing any code, writing good prompts when I use AI, being specific and concrete, putting quality metrics and tests in place… studying engineering has helped me enormously with all of that.',
+      ],
     },
     url: 'https://www.uvigo.gal/',
   },
