@@ -33,11 +33,14 @@ comprobaciones de la sección activa el 2026-08-03). El flujo `develop` → `tes
 `develop` no despliega nada y cada push a `test` y a `main` despliega en su entorno. IDs y detalles
 en la memoria [[despliegue]].
 
-**El orden de la portada es `hero → proyectos → experiencia → formación → stack → perfil →
-contacto` (2026-08-03).** Los proyectos van delante porque son la única sección con prueba visual;
-el perfil, que es prosa, cierra antes de contacto. **Cambiarlo obliga a tocar tres sitios**: la
-página, el `index` de cada `SectionHeading` —la numeración `01…06` está escrita a mano— y
-`navigation` en `lib/i18n/routes.ts`. Ver [[navegacion-y-orden]].
+**El orden de la portada es `hero → proyectos → experiencia → formación → perfil (con el stack
+dentro) → contacto` (2026-08-04).** Los proyectos van delante porque son la única sección con
+prueba visual; el perfil, que es prosa, cierra antes de contacto. **Son CINCO secciones y no seis
+desde el 2026-08-04**: el stack dejó de ser sección propia y pasó a ser la subsección que cierra el
+perfil, por encargo — las dos contestan la misma pregunta por sus dos mitades (cómo trabajo / con
+qué), y con un rótulo numerado en medio la lista de tecnologías se leía como un anexo. **Cambiar el
+orden obliga a tocar tres sitios**: la página, el `index` de cada `SectionHeading` —la numeración
+`01…05` está escrita a mano— y `navigation` en `lib/i18n/routes.ts`. Ver [[navegacion-y-orden]].
 
 **La web publica ocho proyectos y la lista se decide en un fichero (2026-08-03).**
 `content/projects.config.ts` dice qué proyectos salen y en qué orden; las fichas viven en
@@ -99,8 +102,11 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   autoalojadas por `next/font` — ninguna petición a Google en tiempo de ejecución.
 - **Navegación:** cabecera fija en escritorio; en móvil (`< lg`), barra inferior de cinco iconos,
   y su quinto icono abre un **menú a pantalla completa con TODAS las secciones** y los dos idiomas
-  detrás de un filete horizontal (el menú de `Swiftmet`). Nunca la cabecera y la barra a la vez.
-  **Las seis entradas llevan a las seis secciones de la portada** —desde que no hay índice de
+  detrás de un filete horizontal (el menú de `Swiftmet`) **y sin rótulo delante: sólo «ES / EN»**
+  (2026-08-04; el nombre completo del idioma lo sigue anunciando `LocaleSwitch` para lector de
+  pantalla, y con el rótulo se cayó la clave `a11y.changeLanguage`). Nunca la cabecera y la barra a
+  la vez.
+  **Las cinco entradas llevan a las cinco secciones de la portada** —desde que no hay índice de
   proyectos, ninguna se va de página— **y la que se está leyendo va resaltada en amarillo**, con su
   filete puesto porque el color no puede ser la única señal. Lo mide
   `components/layout/useActiveSection.ts` con **una línea de lectura** a un cuarto de pantalla por
@@ -156,6 +162,15 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   estáticos aunque venga antes. Por eso `globals.css` sube `body > main` y `body > footer` a
   `position: relative` con `z-index: 1`. **Si añades un hermano directo del `<body>` que tenga que
   verse, súbelo también.**
+- **El saludo y el nombre del hero SE ESCRIBEN letra a letra, y lo hace CSS** (2026-08-04).
+  `components/ui/Typed.tsx` es de **servidor** y sólo reparte índices: pinta cada carácter en su
+  `<span>` y el bloque «Texto que se escribe» de `globals.css` decide cuándo se enciende. El texto va
+  **completo en el HTML** —el nombre es el `<h1>` que se busca en Google— y **se revela en su sitio,
+  sin crecer**, porque el hero apoya su texto en el borde de abajo y un texto que crece lo empujaría
+  entero. Por lo mismo **no hay cursor**. **La trampa, y es un fallo real de Chrome: el escalonado va
+  en la DURACIÓN y no en `animation-delay`** — con el retardo, todo carácter que pase del segundo se
+  queda invisible para siempre y la portada decía «Hola, soy Luis Fernánde» sin que el `check`, el
+  `check:mobile` ni el build dijeran nada. Ver [[hero-sanity]].
 - **El contraste del hero lo da un velo anclado al TEXTO** (`.hero-copy::before`), no un
   porcentaje del alto del hero, y el rótulo del puesto lleva pastilla propia (`.hero-chip`). Las
   dos cosas son la corrección de un fallo real. Regla corta: **si tocas el velo, vuelve a mirar el
@@ -258,6 +273,43 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-04 (rama `feature/hero-tecleado-y-textos`, en worktree propio): **el nombre se escribe solo,
+el stack se mete dentro del perfil y se reescriben los textos del CV.** Cinco encargos de una tanda.
+(1) **El menú de móvil pierde el «Cambiar de idioma»** y deja sólo «ES / EN»: decía en cuatro palabras
+lo que dicen cuatro letras y, entre destinos a tamaño de titular, se leía como la única instrucción de
+la pantalla. El nombre completo del idioma no se pierde —lo pone `LocaleSwitch` desde `localeLabels`,
+en el `aria-label` del grupo y en el `sr-only` de cada enlace—, así que se cae de paso la clave
+`a11y.changeLanguage` de los dos diccionarios. (2) **«Hola, soy Luis Fernández Sangil» se escribe letra
+a letra al abrir la web**, y lo hace CSS: `components/ui/Typed.tsx` es de servidor y pinta cada
+carácter en su `<span>` con un índice; el HTML va completo —el nombre es el `<h1>` que se busca en
+Google— y el revelado es **en su sitio**, sin crecer, porque el hero apoya el texto en el borde de
+abajo. **La trampa de la sesión fue de Chrome**: con el escalonado en `animation-delay`, todo carácter
+cuyo retardo pase del segundo se queda en `opacity: 0` **para siempre** y la portada decía «Hola, soy
+Luis Fernánde» — sin que el `check`, el `check:mobile` ni el build dijeran nada, porque el HTML está
+completo. Se arregla poniendo el escalonado en la **duración** (cada carácter dura hasta su turno y
+`steps(1, end)` lo enciende al final), comprobado con sesenta caracteres. De paso se cayó el cursor:
+parado al final de una frase que se revela en su sitio, señalaba donde no pasaba nada. (3)
+**Reescritos los cuatro resúmenes de experiencia en los dos idiomas.** Mobile Smart City pasa a decir a
+qué se dedica la empresa, leído de su web oficial —pagos digitales y movilidad urbana: aparcamiento,
+permisos, denuncias, control y tráfico—, porque el nombre no lo dice; del papel sólo se cuenta lo que
+consta en LinkedIn. La anécdota del AGV se mueve del perfil a su puesto, que es donde tiene fecha al
+lado. (4) **La nota de formación habla de la base y no del calendario**: fuera el «cursado en paralelo
+a los tres primeros puestos», y en su lugar qué forma de pensar deja una ingeniería. Es el mismo
+argumento que tumbó las fechas de esa sección. (5) **El stack se mete dentro del perfil** y la portada
+pasa de seis secciones a **cinco**: `stack` sale de `sections` y de `navigation`, `Stack.tsx` pierde su
+`<section>`, su `id` y su `SectionHeading` —numerarlo diría que es la sexta sección justo después de
+decidir que no lo es—, sus grupos bajan de `<h3>` a `<h4>`, y la numeración se recorre (perfil `04`,
+contacto `05`). Los tres párrafos del perfil se reescriben cortos: autodidacta y programar por gusto →
+perfeccionista con el trabajo y no con el ego → las habilidades blandas por encima de lo técnico, ese
+último al final porque es una opinión y una opinión se defiende cuando ya se ha demostrado lo demás.
+`npm run check` limpio y `check:mobile` **23/23 en los dos idiomas** sobre el build de producción, con
+el tecleado medido (27/27 caracteres, el nombre en una línea y `nameTop` idéntico antes y después),
+el esquema de encabezados comprobado y la hoja de impresión con la frase entera. **Lo que este cambio
+NO arregla solo:** los textos viven también en el panel, que manda en lo desplegado, así que la web
+pública sigue con los viejos hasta editar `/admin` → Experiencia ×4, Formación y Perfil → Publish —
+**nunca con `migrate:import`**, que corre con `--replace`. Ver [[perfil-cv]], [[hero-sanity]] y
+[[navegacion-y-orden]]._
 
 _2026-08-03 (rama `feature/proyectos-sin-indice`, en worktree propio): **se retira el índice de
 proyectos y el menú pasa a decir dónde estás.** Encargo de Luis: «quita la pantalla `/es/projects`,

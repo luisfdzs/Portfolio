@@ -1,13 +1,21 @@
-import type { Profile } from '@/content/types'
+import type { Profile, SkillGroup } from '@/content/types'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { User } from '@/components/ui/Icons'
+import { Stack } from '@/components/sections/Stack'
 
 /**
- * Perfil: los tres párrafos que explican de dónde sales y cómo trabajas.
+ * Perfil: los tres párrafos que explican quién eres y cómo trabajas — **y el stack debajo**.
+ *
+ * **Las dos eran secciones distintas hasta el 2026-08-04 y ahora son una.** El encargo era
+ * juntarlas, y la razón por la que funciona es que contestan la misma pregunta por sus dos
+ * mitades: el perfil dice cómo trabaja alguien y el stack dice con qué. Con un rótulo numerado
+ * en medio, la lista de tecnologías se leía como un anexo; pegada a los párrafos, es la prueba
+ * de lo que acaban de decir. `Stack` es ahora una subsección sin `<section>` ni ancla propia
+ * —ver su propio comentario, que es donde está lo que eso arrastró—.
  *
  * Es la única sección de prosa larga del sitio, y por eso va **al final**, justo antes de
  * contacto. Estuvo primera, con el argumento de que explica por qué un ingeniero industrial
@@ -31,7 +39,15 @@ import { User } from '@/components/ui/Icons'
  * Con el texto centrado, las dos columnas siguen siendo la maquetación correcta: cada
  * párrafo se centra en la columna que ocupa, y el bloque no deja media página en blanco.
  */
-export function About({ locale, profile }: { locale: Locale; profile: Profile }) {
+export function About({
+  locale,
+  profile,
+  skills,
+}: {
+  locale: Locale
+  profile: Profile
+  skills: readonly SkillGroup[]
+}) {
   const t = getDictionary(locale)
   // Desestructurar en vez de indexar: con `noUncheckedIndexedAccess`, `paragraphs[0]` es
   // `string | undefined` y habría que comprobarlo de todas formas. Así el tipo lo dice solo,
@@ -43,7 +59,10 @@ export function About({ locale, profile }: { locale: Locale; profile: Profile })
       id={sections.about}
       className="page-gutter mx-auto max-w-7xl section-block text-center"
     >
-      <SectionHeading index="05" title={t.about.title} kicker={t.about.kicker} icon={User} />
+      {/* «04» y no «05»: al fundirse con el stack, la portada pasa de seis secciones
+          numeradas a cinco. La numeración está escrita a mano en cada cabecera y nada
+          avisa si se olvida una — ver el protocolo en `CLAUDE.md`. */}
+      <SectionHeading index="04" title={t.about.title} kicker={t.about.kicker} icon={User} />
 
       {lead ? (
         <Reveal>
@@ -60,6 +79,8 @@ export function About({ locale, profile }: { locale: Locale; profile: Profile })
           ))}
         </div>
       ) : null}
+
+      <Stack locale={locale} groups={skills} />
     </section>
   )
 }

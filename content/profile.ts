@@ -63,16 +63,31 @@ export const profile: Profile = {
   email: 'luisfsangil@gmail.com',
   linkedin: 'https://www.linkedin.com/in/luisfernandezsangil',
   github: 'https://github.com/luisfdzs',
+  /**
+   * LOS TRES PÁRRAFOS DEL PERFIL, y por qué son cortos.
+   *
+   * Es la sección más personal del CV y la única de prosa, así que el riesgo no es quedarse
+   * corto: es escribir seis párrafos que nadie lea. Cada uno dice una cosa y se aparta.
+   *
+   * Lo que dicen, en orden: que lo de programar es afición antes que oficio y que el stack lo
+   * he aprendido solo; que el perfeccionismo va en el trabajo y no en el ego; y que las
+   * habilidades blandas no son el complemento del perfil técnico, sino lo que decide si
+   * merece la pena trabajar con alguien. Ese último párrafo es el que de verdad hay que dejar
+   * al final: es una opinión, y una opinión se defiende cuando ya se ha demostrado lo demás.
+   *
+   * No hay una sola cifra ni un solo cliente aquí, a propósito: eso está en las secciones que
+   * se pueden comprobar, con las fechas al lado. Aquí no se demuestra nada, se dice quién eres.
+   */
   bio: {
     es: [
-      'Llegué al software desde la ingeniería industrial, y esa es la parte que más me diferencia: mi primer trabajo fue programar vehículos de guiado automático en planta, donde un error no lanza una excepción en un log, sino que para una línea de producción. Eso enseña a pensar en el sistema completo antes que en el código.',
-      'Desde entonces he pasado cinco años en consultoría, desarrollando y manteniendo aplicaciones para clientes grandes —banca, ingeniería, robótica— con .NET y SQL en el backend y React en el frontend. Mucho de ese trabajo fue lo menos glamuroso y lo más formativo que hay: mantener sistemas heredados que no se pueden parar, resolver incidencias con el cliente al teléfono y migrar proyectos legacy sin romper lo que ya funcionaba.',
-      'En paralelo construyo webs completas por mi cuenta, y ahí es donde elijo yo el stack: Next.js, Sanity y Vercel. No sólo la interfaz: el modelo de contenido, el panel para que el cliente se edite lo suyo, el despliegue con entornos separados y el mantenimiento. Los proyectos de aquí abajo son eso, y todos están en producción.',
+      'Soy ingeniero industrial y programo porque me gusta programar. Todo lo que hay detrás de esta web —el stack, el panel de administración, el despliegue— lo he aprendido por mi cuenta, construyendo cosas y rompiéndolas hasta entenderlas.',
+      'Soy perfeccionista con el trabajo y poco con el ego: repaso cada detalle antes de darlo por bueno, y doy por hecho que quien tengo al lado sabe algo que yo no. Preguntar antes de suponer me ha ahorrado más tiempo que cualquier atajo técnico.',
+      'Y lo que de verdad creo: la tecnología se aprende, la persona no. Escuchar, explicarse claro y ser alguien con quien se puede contar vale más que cualquier línea de este CV.',
     ],
     en: [
-      'I came to software from industrial engineering, and that is what sets me apart most: my first job was programming automated guided vehicles on the factory floor, where a mistake does not throw an exception into a log — it stops a production line. That teaches you to think about the whole system before the code.',
-      'Since then I have spent five years in consultancy, building and maintaining applications for large clients — banking, engineering, robotics — with .NET and SQL on the backend and React on the frontend. Much of that work was the least glamorous and most formative there is: keeping inherited systems running that cannot be stopped, solving incidents with the client on the phone, and migrating legacy projects without breaking what already worked.',
-      'Alongside that I build complete websites on my own, and there I choose the stack: Next.js, Sanity and Vercel. Not just the interface: the content model, the panel so the client edits their own copy, the deployment with separate environments, and the maintenance. The projects below are exactly that, and all of them are in production.',
+      'I am an industrial engineer and I write software because I enjoy writing software. Everything behind this site — the stack, the admin panel, the deployment — I taught myself, by building things and breaking them until they made sense.',
+      'I am a perfectionist about the work and not about my ego: I go over every detail before calling it done, and I assume the person next to me knows something I do not. Asking before assuming has saved me more time than any technical shortcut.',
+      'And what I actually believe: technology can be learned, character cannot. Listening, explaining yourself clearly and being someone people can count on is worth more than any line of this CV.',
     ],
   },
   photo: portrait,
@@ -94,12 +109,24 @@ export const experience: ExperienceEntry[] = [
     range: { start: '2026-03', end: null },
     location: { es: 'España · En remoto', en: 'Spain · Remote' },
     remote: true,
+    /**
+     * La actividad de la empresa sale de su web oficial (mobilesmart.city): plataforma de
+     * pagos digitales y movilidad urbana —aparcamiento, permisos, denuncias, control y
+     * tráfico— para ayuntamientos, universidades, aeropuertos y recintos privados. Está aquí
+     * porque el nombre no dice a qué se dedica, y un recruiter que no lo sepa no puede valorar
+     * el puesto.
+     *
+     * Lo que se cuenta del papel es lo que consta en LinkedIn —análisis e implementación— y
+     * nada más. Ni tecnologías concretas del producto ni logros: eso sería inventar.
+     */
     summary: {
       es: [
-        'Desarrollo y mantenimiento de aplicaciones web, con responsabilidad tanto de análisis como de implementación.',
+        'Plataforma de pagos digitales y movilidad urbana: aparcamiento, permisos, denuncias, control y tráfico para ayuntamientos, universidades, aeropuertos y recintos privados.',
+        'Desarrollo y mantenimiento de sus aplicaciones web, con el análisis y la implementación en la misma mano: entender el problema con quien lo tiene, decidir cómo se resuelve y dejarlo funcionando en producción.',
       ],
       en: [
-        'Development and maintenance of web applications, responsible for both analysis and implementation.',
+        'A digital payments and urban mobility platform: parking, permits, citations, enforcement and traffic for city councils, universities, airports and private venues.',
+        'Development and maintenance of its web applications, with analysis and implementation in the same pair of hands: understanding the problem with whoever has it, deciding how to solve it, and leaving it running in production.',
       ],
     },
     stack: ['C#', '.NET', 'SQL', 'JavaScript', 'TypeScript', 'React'],
@@ -117,12 +144,12 @@ export const experience: ExperienceEntry[] = [
     remote: true,
     summary: {
       es: [
-        'Desarrollo y mantenimiento de varias aplicaciones web para clientes de gran envergadura, principalmente Banco Santander Portugal e INDRA. Participación en todo el ciclo de vida: análisis, implementación, pruebas y soporte.',
-        'Equipo multidisciplinar con metodologías ágiles y contacto directo con el cliente final, en un entorno corporativo internacional y 100 % en remoto.',
+        'Dos años de consultoría grande: desarrollo y mantenimiento de varias aplicaciones web para Banco Santander Portugal e INDRA, de punta a punta del ciclo —análisis, implementación, pruebas y soporte—.',
+        'Equipo multidisciplinar en metodología ágil, con el cliente final al otro lado del teléfono y todo en remoto. En un entorno así lo que se aprende no es un framework: es escribir código que va a mantener otra persona y explicar una decisión técnica a quien no es técnico.',
       ],
       en: [
-        'Development and maintenance of several web applications for large clients, mainly Banco Santander Portugal and INDRA. Involved across the full lifecycle: analysis, implementation, testing and support.',
-        'Cross-functional team working with agile methodologies and direct contact with the end client, in an international corporate environment and fully remote.',
+        'Two years in large-scale consultancy: developing and maintaining several web applications for Banco Santander Portugal and INDRA, across the whole lifecycle — analysis, implementation, testing and support.',
+        'A cross-functional team working in agile, with the end client on the other end of the phone and everything remote. What you learn in a place like that is not a framework: it is writing code somebody else will maintain, and explaining a technical decision to someone who is not technical.',
       ],
     },
     stack: [
@@ -151,12 +178,12 @@ export const experience: ExperienceEntry[] = [
     remote: true,
     summary: {
       es: [
-        'Mantenimiento de los ERPs y las aplicaciones web de todo el grupo Ingeteam: resolución de incidencias, desarrollo de soluciones nuevas y migración de proyectos legacy hacia tecnologías actuales.',
-        'Autonomía total en los desarrollos y modalidad 100 % en remoto.',
+        'Los ERPs y las aplicaciones web de todo el grupo Ingeteam a mi cargo: incidencias, desarrollos nuevos y migración de proyectos legacy a tecnologías actuales sin parar lo que ya estaba en marcha.',
+        'Autonomía total sobre los desarrollos y 100 % en remoto. Es el puesto en el que aprendí a leer el código de otro antes de tocarlo, que es la mitad del oficio.',
       ],
       en: [
-        'Maintenance of the ERPs and web applications across the whole Ingeteam group: incident resolution, development of new solutions, and migration of legacy projects to current technologies.',
-        'Full autonomy over the work and fully remote.',
+        'The ERPs and web applications of the whole Ingeteam group in my hands: incidents, new development, and migrating legacy projects to current technologies without stopping what was already running.',
+        'Full autonomy over the work and fully remote. This is the job where I learned to read somebody else’s code before touching it, which is half the trade.',
       ],
     },
     stack: [
@@ -188,12 +215,12 @@ export const experience: ExperienceEntry[] = [
     remote: false,
     summary: {
       es: [
-        'Responsable junior en el departamento de IT, encargado de la programación de vehículos de guiado automático (AGVs): definir el esquema funcional con el cliente, desarrollar la solución integral de automatización de la planta y hacer la puesta en marcha.',
-        'Trabajo en remoto con viajes puntuales a planta para las puestas en marcha.',
+        'Responsable junior en el departamento de IT, a cargo de la programación de vehículos de guiado automático (AGVs): definir el esquema funcional con el cliente, desarrollar la solución integral de automatización de la planta y hacer la puesta en marcha allí mismo.',
+        'Aquí un error no lanza una excepción en un log: para una línea de producción. Es el trabajo que me enseñó a mirar el sistema entero antes que el código, y sigue siendo la forma en la que programo.',
       ],
       en: [
-        'Junior lead in the IT department, responsible for programming automated guided vehicles (AGVs): defining the functional design with the client, developing the complete plant automation solution, and commissioning it on site.',
-        'Remote work with occasional travel to the plant for commissioning.',
+        'Junior lead in the IT department, in charge of programming automated guided vehicles (AGVs): defining the functional design with the client, building the plant-wide automation solution, and commissioning it on site.',
+        'Here a mistake does not throw an exception into a log — it stops a production line. That is the job that taught me to look at the whole system before the code, and it is still how I write software.',
       ],
     },
     stack: ['C#', '.NET', 'ASP.NET', 'ASP.NET Core', 'Visual Basic', 'SQL', 'JavaScript'],
@@ -214,9 +241,19 @@ export const education: EducationEntry[] = [
     institution: { es: 'Universidad de Vigo', en: 'University of Vigo' },
     range: { start: '2020-09', end: '2025-06' },
     location: { es: 'Vigo, Galicia', en: 'Vigo, Spain' },
+    /**
+     * LA NOTA HABLA DE LA BASE, no del calendario.
+     *
+     * Decía que la carrera se cursó en paralelo a los tres primeros puestos, y se ha cambiado
+     * por encargo. El argumento es el mismo por el que esta sección dejó de pintar las fechas:
+     * contar cuánto se solapó invita a la cuenta de los años y a preguntarse cómo se reparte
+     * una jornada, y ninguna de las dos cosas dice nada sobre lo que sabe hacer alguien. Lo que
+     * sí lo dice es qué deja una ingeniería cuando ya no se ejerce de ingeniero, y es de eso de
+     * lo que habla ahora.
+     */
     note: {
-      es: 'Cursado en paralelo a los tres primeros puestos de la lista de arriba: cinco años compaginando la carrera con jornada completa de desarrollo.',
-      en: 'Studied in parallel with the first three roles listed above: five years combining the degree with full-time development work.',
+      es: 'Una ingeniería no deja una lista de asignaturas: deja una forma de pensar. Descomponer el problema antes de tocarlo, medir antes de decidir y responder de que lo que sale funciona — la base con la que me siento a programar cada día.',
+      en: 'An engineering degree does not leave you a list of subjects: it leaves you a way of thinking. Break the problem down before touching it, measure before deciding, and stand behind what ships — the foundation I sit down to write software with every day.',
     },
     url: 'https://www.uvigo.gal/',
   },

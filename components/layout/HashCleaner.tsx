@@ -68,7 +68,7 @@ function focusSection(element: HTMLElement) {
  *
  * Lo que se pierde a cambio, dicho en voz alta: **copiar la URL ya no comparte la sección**, y
  * «atrás» después de pulsar una entrada del menú sale de la página en vez de recorrer las
- * secciones visitadas. Es el precio de que el menú se comporte igual en sus seis entradas.
+ * secciones visitadas. Es el precio de que el menú se comporte igual en sus cinco entradas.
  */
 export function HashCleaner() {
   const router = useRouter()

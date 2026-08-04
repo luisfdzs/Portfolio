@@ -46,7 +46,9 @@ export function Contact({ locale, profile }: { locale: Locale; profile: Profile 
       id={sections.contact}
       className="page-gutter mx-auto max-w-7xl section-block text-center"
     >
-      <SectionHeading index="06" title={t.contact.title} kicker={t.contact.kicker} icon={Mail}>
+      {/* «05» y no «06»: la portada tiene cinco secciones desde que el stack se metió
+          dentro del perfil. La numeración va a mano en cada cabecera. */}
+      <SectionHeading index="05" title={t.contact.title} kicker={t.contact.kicker} icon={Mail}>
         <p>{t.contact.lead}</p>
       </SectionHeading>
 
