@@ -122,12 +122,16 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   en la sección + `mx-auto` en las cajas con ancho máximo + `justify-center` en las filas flex; las
   tres cosas juntas, porque ninguna hace el trabajo de las otras. **En papel no**: `@media print` lo
   deshace. Y **centrar el texto en una columna no lo centra en la sección**: experiencia maqueta cada
-  entrada en una retícula con un carril de fechas de `13rem` a la izquierda, así que **lo que la
-  centra son dos valores que son la misma cuenta** (2026-08-04): `lg:ml-36` en el `ol` y una tercera
-  columna vacía de `6,5rem`, que reparten a medias los 18rem que empuja el carril y dejan **el bloque
-  que se ve** centrado en la sección. Quien toque el carril, el `gap`, el sangrado o uno de los dos
-  valores tiene que recalcular el otro, y nada avisa. Formación ya no tiene carril: al quitarse la
-  ubicación se fue la retícula. Qué quedó sin centrar y por qué, en [[decisiones-de-diseno]].
+  entrada en una retícula con un carril de fechas de `13rem` a la izquierda, así que **lo que se
+  mueve para cuadrarla es la CABECERA, no la lista** (2026-08-04, tercera vuelta de esto): se le pasa
+  `textIndent="lg:pl-72"` —prop opcional de `SectionHeading`— con los **18rem** que el carril empuja
+  el texto (`lg:pl-10` + 13rem + `gap` de 2,5rem), y el rótulo cae en el eje del titular del puesto.
+  La lista no compensa nada: se fueron el `lg:ml-36` y la columna vacía de `6,5rem`, que intentaban
+  lo contrario y obligaban a mantener dos números cuya suma tenía que ser constante. **Es `pl` y no
+  `ml`** para que el filete de la cabecera siga cruzando la sección entera, y **quien toque el
+  carril, el `gap` o el sangrado tiene que recalcular los 18rem** — ahora es un número y no dos, pero
+  nada avisa igual. Formación ya no tiene carril: al quitarse la ubicación se fue la retícula. Qué
+  quedó sin centrar y por qué, en [[decisiones-de-diseno]].
 - **Los proyectos de la portada van en un carrusel «cover flow», van TODOS y el carrusel es
   INFINITO** (bloque «COVER FLOW» de `app/globals.css` + `components/ui/CoverFlow.tsx`): giro 3D
   dirigido por el scroll, y de JavaScript sólo los dos botones y el salto del bucle. El bucle es
@@ -163,22 +167,27 @@ y el host del endpoint de webhooks— en [[sanity-enchufado]].
   estáticos aunque venga antes. Por eso `globals.css` sube `body > main` y `body > footer` a
   `position: relative` con `z-index: 1`. **Si añades un hermano directo del `<body>` que tenga que
   verse, súbelo también.**
-- **LA PORTADA SE MONTA SOLA, EN SECUENCIA, Y LO HACE TODO CSS** (2026-08-04). Primero se escriben
-  letra a letra las **cuatro** líneas de texto —saludo, nombre, titular del puesto y ubicación— y
-  cuando la última termina van apareciendo con un fundido corto los botones, las cuatro cifras y el
-  «Sigue bajando», uno detrás de otro. Son dos mecanismos unidos por una sola cuenta, que se hace en
-  `Hero.tsx`: `components/ui/Typed.tsx` es de **servidor** y reparte índices —cada bloque con su
-  `start` en ms y su `step`, que es 45 ms en el nombre y 20 en los dos textos largos, o el tecleado
-  duraría seis segundos—, y la clase `hero-enter` (bloque «La portada, que se monta sola» de
-  `globals.css`) hace el resto con el final del tecleado como momento cero. El texto va **completo en
-  el HTML** —el nombre es el `<h1>` que se busca en Google— y **nada se revela creciendo**, porque el
-  hero apoya su texto en el borde de abajo. Por lo mismo **no hay cursor**. **La trampa, y es un fallo
-  real de Chrome: el escalonado del tecleado va en la DURACIÓN y no en `animation-delay`** — con el
-  retardo, todo carácter que pase del segundo se queda invisible para siempre y la portada decía
-  «Hola, soy Luis Fernánde» sin que el `check`, el `check:mobile` ni el build dijeran nada. En
-  `hero-enter` sí hay retardo, y no es contradictorio: ahí la animación dura 520 ms de verdad. Lo que
-  **sí** necesita regla propia es el movimiento reducido, porque el atajo general recorta la duración
-  pero no el retardo. Ver [[hero-sanity]].
+- **DE LA PORTADA SÓLO SE ANIMAN DOS LÍNEAS, Y LO HACE TODO CSS** (2026-08-04, tercera vuelta). El
+  nombre aparece **desenfocado y enfoca de golpe** en 760 ms; el titular del puesto se **teclea** a
+  18 ms por carácter arrancando 180 ms antes de que el enfoque acabe. **Todo lo demás está puesto
+  desde el primer fotograma**: el saludo, la ubicación, los botones, las cuatro cifras y el «Sigue
+  bajando». La secuencia acaba en **1,34 s**, y ése es el número que hay que defender: la versión
+  anterior escribía las cuatro líneas y encadenaba detrás las apariciones (`hero-enter`, retirada),
+  y no había primera pantalla hasta los **2,9 s** — el 10 % de la atención de quien decide en treinta
+  segundos, gastado viendo la web montarse sin nada que pulsar. **El nombre no se teclea a propósito**:
+  el tecleado es el gesto más visto en un portfolio de desarrollador y en el `<h1>` se lee como
+  plantilla; se eligió entre cuatro versiones comparadas en pantalla. Piezas:
+  `components/ui/Typed.tsx`, de **servidor**, y el bloque «Texto que se escribe» de `globals.css`.
+  **Los dos tiempos son UNA cuenta y viven en el CSS** (`--hero-focus-duration` y
+  `--hero-headline-start`, juntos en `.hero-copy`), porque separarlos descuadra el solape en silencio.
+  El texto va **completo en el HTML** —el nombre es el `<h1>` que se busca en Google— y **nada se
+  revela creciendo**, porque el hero apoya su texto en el borde de abajo; por lo mismo **no hay
+  cursor**. **La trampa, y es un fallo real de Chrome: el escalonado del tecleado va en la DURACIÓN y
+  no en `animation-delay`** — con el retardo, todo carácter que pase del segundo se queda invisible
+  para siempre y la portada decía «Hola, soy Luis Fernánde» sin que el `check`, el `check:mobile` ni
+  el build dijeran nada. Y **al nombre hay que apagarle el `filter` a mano** en movimiento reducido y
+  en papel: devolver sólo la opacidad deja el titular del CV desenfocado para siempre. Ver
+  [[hero-sanity]].
 - **El contraste del hero lo da un velo anclado al TEXTO** (`.hero-copy::before`), no un
   porcentaje del alto del hero, y el rótulo del puesto lleva pastilla propia (`.hero-chip`). Las
   dos cosas son la corrección de un fallo real. Regla corta: **si tocas el velo, vuelve a mirar el
@@ -281,6 +290,53 @@ Regla de oro: **el contexto nunca debe quedar desactualizado respecto al estado 
 proyecto.**
 
 ---
+
+_2026-08-04 (en `develop`): **experiencia se centra moviendo la cabecera, y las dos vueltas
+anteriores se desmontan.** El diagnóstico es de Luis y es la solución entera: la cabecera y el `<ol>`
+estaban centrados **como elementos**, pero lo que hay que centrar es el texto, y el ancho se reparte
+entre dos columnas. Todo lo que se había intentado —la tercera columna vacía, el `lg:ml-36`, el
+desplazamiento a ojo— movía la lista para traer el texto al eje de la sección, y eso no sale gratis:
+o estrecha la columna del puesto o descuelga el filete. Al revés sí. `SectionHeading` gana una prop
+opcional `textIndent` y experiencia le pasa `lg:pl-72`, los **18rem** que el carril de fechas empuja
+el texto (`lg:pl-10` 2,5 + 13 + `gap` 2,5); la lista vuelve a `border-l` a secas y a dos columnas.
+**Relleno y no margen**, para que el filete de la cabecera siga cruzando la sección de lado a lado —
+al contrario que en el `ol`, donde tenía que ser margen porque el filete es su borde izquierdo. El
+rótulo pequeño se centra como grupo («02 · icono · EXPERIENCIA»), así que la palabra sola queda algo
+a la derecha del eje: es de siempre, no lo trae el sangrado. Medido a 1024, 1440 y 1920: el centro
+del rótulo y el del titular del puesto coinciden al píxel. `npm run check` limpio y `check:mobile`
+23/23 en castellano; en inglés 22/23 por el aviso de hidratación del conmutador de variantes del hero
+que está sin commitear en `develop`, ajeno a esto. Ver [[decisiones-de-diseno]]._
+
+_2026-08-04 (en `develop`, por encargo de trabajar ahí directamente): **la portada deja de montarse
+sola: sólo se animan dos líneas, y el nombre enfoca en vez de teclearse.** Encargo de Luis, planteado
+como una búsqueda —«que impacte sin saturar»— y concretado en «animar sólo el nombre y el titular del
+puesto y dejar lo demás puesto desde el principio», con cuatro versiones para verlas antes de decidir.
+Se montaron las cuatro en la web de verdad con un conmutador de desarrollo —tecleado (45/20 ms),
+tecleado rápido (26/11), palabra a palabra y enfoque— y **eligió la del enfoque**: el nombre aparece
+desenfocado 14 px y enfoca de golpe en 760 ms, con el titular tecleándose a 18 ms desde los 580, o sea
+**solapado los últimos 180 ms** —lo que hace que las dos líneas se lean como un movimiento y no como
+dos turnos—. El conmutador y `heroVariants.ts` se borraron al decidir: eran material de decisión.
+**Lo que se cae es la cadena `hero-enter` entera**, con su bloque de CSS, sus dos reglas de movimiento
+reducido y de papel y los tres turnos que repartía; con ella se van `typedEnd`, `TYPED_PAUSE` y
+`TYPED_STEP_DENSE`, porque la cronología ya no se calcula en `Hero.tsx`. **Y ahí está el cambio de
+arquitectura que conviene no deshacer**: los dos tiempos viven ahora en el CSS
+(`--hero-focus-duration` y `--hero-headline-start`, juntos en `.hero-copy`) y `Typed` acepta `start` y
+`step` como **expresión de CSS** además de como número; separarlos otra vez descuadraría el solape sin
+que nada avise. El nombre deja de pasar por `Typed` —no se teclea— y es un `<span class="hero-name">`
+con el texto tal cual. **El argumento de por qué menos animación impacta más, que es lo que se
+preguntaba el encargo:** la versión anterior no tenía primera pantalla montada hasta los **2,9 s**, o
+sea el 10 % de los treinta segundos que dedica un recruiter, gastados sin nada que pulsar; y el
+tecleado, en el `<h1>`, es el gesto más visto en un portfolio de desarrollador. Ahora acaba en
+**1,34 s** y el guiño de teclado se queda en el titular, donde no compite con el nombre. **El fallo de
+la sesión fue de herencia de variables**: la cuenta del arranque del titular se declaraba en la
+sección y los contadores del nombre en el bloque de dentro, así que se resolvía contra una variable
+inexistente, quedaba inválida y el titular aparecía entero de golpe — con el `check` limpio y sin un
+aviso en consola. `npm run check` limpio, build sin un aviso y `check:mobile` **23/23 en los dos
+idiomas** sobre el build de producción, con la secuencia medida fotograma a fotograma congelando las
+animaciones con `getAnimations()` (en t=0: nombre a 0 con su desenfoque y los cinco elementos
+estáticos a 1,00; a 700 ms nombre enfocado y titular 4/36; a 1400 ms, 36/36), movimiento reducido y
+papel comprobados —nombre a `opacity: 1` y `filter: none`— y cero desbordamiento a 390 y 1440.
+**Pendiente de nada en el panel**: es código y no contenido. Ver [[hero-sanity]]._
 
 _2026-08-04 (en `develop`, por encargo de trabajar ahí directamente): **los textos del CV los
 reescribió Luis editando el HTML de la web en producción, y de ahí se han traído al repo y al
