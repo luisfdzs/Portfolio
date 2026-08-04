@@ -1,6 +1,6 @@
 ---
 name: decisiones-de-diseno
-description: Oscuro sin conmutador, serif de titular, un solo acento, texto centrado, hoja de impresión — y los ajustes de maquetación que hubo que corregir mirándolo
+description: Oscuro sin conmutador, serif de titular, un solo acento, texto centrado, hoja de impresión, la retícula del perfil que sólo se monta si hay párrafos para llenarla — y los ajustes de maquetación que hubo que corregir mirándolo
 metadata:
   type: project
 ---
@@ -172,6 +172,28 @@ Ninguna la habría detectado un test. Están aquí porque son el tipo de fallo q
 Y un cuarto, pequeño pero visible: el icono de enlace externo en `opacity-0` **seguía ocupando su
 hueco** en la línea de la empresa, así que metía un espacio de más entre «Altia» y el «·» del
 cliente. Se quitó; el subrayado al pasar por encima ya dice que es un enlace.
+
+## La retícula del perfil se monta según cuántos párrafos haya (2026-08-04)
+
+El bloque de detrás de la entradilla del perfil se maquetaba en `lg:grid-cols-2` **fijo**. La razón
+era buena: es la única sección del sitio que es prosa y nada más, y con una sola columna de medida de
+lectura, a 1400 px quedaba la mitad derecha en blanco. Pero cuando el perfil bajó de tres párrafos a
+dos, sólo quedaba **uno** detrás de la entradilla — y la retícula lo pintaba en la columna izquierda
+dejando la derecha vacía, o sea produciendo exactamente el vacío que existía para evitar. Luis lo vio
+antes de que lo viera nadie más: «queda raro el segundo texto, porque borré el que había a su
+derecha».
+
+Ahora la condición es `rest.length > 1`: con dos o más párrafos, la retícula; con uno, `mx-auto
+max-w-measure`, la misma caja que la entradilla. **Se cambia el contenedor entero y no una clase
+suelta**, porque lo que sobra con un párrafo es la retícula, no una de sus columnas.
+
+**How to apply:** una maquetación en columnas fijas es una apuesta sobre cuántos elementos va a
+haber, y en este repo el contenido lo edita otra persona en un panel — así que la apuesta se pierde
+sin que nada avise. Condicionar el contenedor cuesta tres líneas. Vale para cualquier sección que
+reciba una lista de longitud variable.
+
+Medido a 1440 px sobre el build de producción: el bloque va de 388 a 1052 px en una sección que va de
+80 a 1360, o sea centrado al píxel; a 390 px no cambia nada, porque la retícula era `lg:`.
 
 ## Detalles que responden a un porqué
 

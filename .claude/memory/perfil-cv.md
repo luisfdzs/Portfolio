@@ -1,6 +1,6 @@
 ---
 name: perfil-cv
-description: De dónde salen los datos del CV, qué está verificado, la regla de no inventar nada, las dos tandas de textos del 2026-08-04 —la segunda escrita por Luis en el inspector del navegador, con el método para recogerla— y qué ha ido dejando de enseñar formación (fechas, frase del rótulo y ubicación)
+description: De dónde salen los datos del CV, qué está verificado, la regla de no inventar nada, las tres tandas de textos del 2026-08-04 —dos de ellas escritas por Luis en el inspector del navegador, con el método para recogerlas— por qué la lista de la ingeniería vive en un solo sitio, y qué ha ido dejando de enseñar formación (fechas, frase del rótulo y ubicación)
 metadata:
   type: project
 ---
@@ -207,6 +207,63 @@ roza la regla 8, avisado y mantenido por decisión de Luis.
 
 El panel se parcheó el mismo día con la receta de la sección anterior, sin una sola variación: script
 de un solo uso, `patch().set()` sobre los mismos seis documentos, una transacción, borrado después.
+
+## La tercera tanda: formación y perfil, y las dos maquetaciones que dejó a medias (2026-08-04)
+
+Mismo día y mismo método que la segunda —Luis editando los `<p>` en el inspector de Chrome, la
+pestaña metida en el grupo de la extensión, el DOM en vivo comparado contra el HTML del servidor—,
+pero el encargo llevaba una segunda mitad: **«ponlos de otra forma porque me han quedado raros»**. Y
+tenía razón las dos veces, así que lo que hay que recordar de esta tanda no son los textos: es que
+**las dos rarezas eran de maquetación y las dos venían de una poda anterior**.
+
+**Qué escribió Luis.** En la nota de formación, la idea en una línea con una cita que la resume
+—«todos los problemas pueden resolverse, siempre y cuando se dividan primero en partes más sencillas
+y manejables»— y **debajo, en un párrafo aparte**, la lista de en qué se nota hoy (pensar en global,
+perspectiva antes de picar código, buenos prompts, ser específico, métricas de calidad y tests). En el
+perfil, «Fuera de la parte técnica» → «Fuera de la parte **puramente** técnica», y borrada la segunda
+frase de la entradilla, la de «en la carrera sí que se tocaba algo de programación».
+
+**El texto que aparecía dos veces, y por qué se quedó una sola copia.** Luis pegó la lista de la
+ingeniería **también** en la entradilla del perfil, en el hueco de la frase que borró: el CV la
+enseñaba dos veces, palabra por palabra, a media pantalla de distancia. Eso no se lee como énfasis, se
+lee como un copia y pega. **Se queda sólo en la nota de formación**, que es la sección que habla del
+grado; el borrado sí se respeta, así que la entradilla del perfil es ahora **una sola frase** — y le
+sobra con eso, porque de dónde viene el perfil ya lo cuentan formación y experiencia. **Ojo:** esa
+entradilla es también la `description` del JSON-LD `Person` (`bio[locale][0]`), así que acortarla
+cambia lo que lee Google.
+
+**Rareza 1: la nota de formación era UN `<p>` y Luis escribía dos párrafos.** En el inspector se ve
+como un `<p>` sin clases pegado debajo: sin color, sin `max-w-measure` y sin aire. La solución no es
+maquillar ese párrafo, es que **`note` pase de `Localized` a `Localized<string[]>`**, la misma forma
+que `summary` en la experiencia. Toca seis sitios —tipo, respaldo, validación de `lib/content.ts`,
+esquema del panel (`localizedText` → `localizedParagraphs`), la vista y el panel mismo— y la consulta
+de GROQ **no**, porque `note { es, en }` proyecta igual una cadena que un array. El criterio estaba
+escrito desde el principio en `sanity/schemas/localized.ts`: párrafos como array y **nunca** partir
+una cadena por `\n\n`, que es donde aparece el párrafo vacío que rompe la maquetación.
+
+**Rareza 2: el perfil tenía media sección en blanco, y no lo trajo esta tanda.** El bloque de detrás
+de la entradilla se maquetaba en `lg:grid-cols-2` fijo, y desde que el perfil bajó de tres párrafos a
+dos —poda de la tanda anterior— sólo quedaba **uno** para dos columnas: en escritorio se pintaba a la
+izquierda y la mitad derecha se quedaba vacía. La retícula existía justamente para evitar la media
+página en blanco, así que estaba produciendo lo que venía a evitar. Ahora **depende de cuántos
+párrafos haya** (`rest.length > 1`): con uno, una columna centrada de medida de lectura, como la
+entradilla. **How to apply:** una maquetación en columnas fijas es una apuesta sobre cuántos elementos
+va a haber, y en este repo el contenido lo edita otra persona en un panel — condicionar el contenedor
+cuesta tres líneas y quita la apuesta.
+
+**Lo que se corrigió del tecleo en el inspector**, con el mismo criterio que las cinco erratas de la
+tanda anterior: `<<…>>` → «…» (comillas latinas, y “…” en la versión inglesa), «siempre y cuando este
+problema se divida» → «se dividan» —concordancia con «todos los problemas»—, «métricas calidad» →
+«métricas de calidad», «test» → «tests», y el «etc.» final por «…», que evita el choque de «etc. son
+cosas». El inglés se tradujo aquí, como siempre.
+
+**Y el parche del panel aquí NO era opcional**, que es lo que esta tanda añade a la receta: al cambiar
+la **forma** del campo, el valor viejo del panel no se queda anticuado, **deja de validar**, y con él
+se cae el documento de formación entero y la sección se sirve del respaldo. Aviso exacto en el log del
+build: `note.es Invalid input: expected array, received string`. Y **la trampa al comprobarlo**: el
+segundo build seguía dando el mismo aviso con el panel ya parcheado, porque Next reutiliza las
+respuestas cacheadas en `.next/cache` — hay que **borrar `.next`** antes de reconstruir para ver un
+cambio hecho en el panel. Ver [[contenido-dos-fuentes]] y [[decisiones-de-diseno]].
 
 ## El portfolio anterior tenía los datos mal
 
