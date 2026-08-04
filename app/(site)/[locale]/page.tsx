@@ -17,7 +17,6 @@ import { Education } from '@/components/sections/Education'
 import { Experience } from '@/components/sections/Experience'
 import { Hero } from '@/components/sections/Hero'
 import { Projects } from '@/components/sections/Projects'
-import { Stack } from '@/components/sections/Stack'
 
 /**
  * PORTADA — el CV completo en una página.
@@ -134,9 +133,13 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
        *
        * Los proyectos van primero, justo detrás del hero: es la única sección con prueba
        * visual —capturas de webs en producción— y quien dedica treinta segundos al CV los
-       * gasta mirando, no leyendo. Después la trayectoria comprobable (experiencia,
-       * formación, stack), y el perfil —tres párrafos de prosa, la sección más lenta— al
-       * final, ya para quien ha decidido seguir leyendo. Contacto cierra siempre.
+       * gasta mirando, no leyendo. Después la trayectoria comprobable (experiencia y
+       * formación), y el perfil —prosa, la sección más lenta— al final, ya para quien ha
+       * decidido seguir leyendo. Contacto cierra siempre.
+       *
+       * **Son CINCO secciones y no seis**: el stack ya no es una de ellas, va dentro del
+       * perfil (de ahí el `skills` que baja a `About`). Se juntaron el 2026-08-04 por
+       * encargo, y el argumento está en `About.tsx`.
        *
        * Cambiar este orden obliga a tocar dos cosas más: la numeración de las cabeceras
        * (`index` de `SectionHeading`, que es el índice implícito de la página) y el orden
@@ -146,8 +149,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <Projects locale={locale} projects={projects} />
       <Experience locale={locale} entries={experience} />
       <Education locale={locale} entries={education} />
-      <Stack locale={locale} groups={skills} />
-      <About locale={locale} profile={profile} />
+      <About locale={locale} profile={profile} skills={skills} />
       <Contact locale={locale} profile={profile} />
     </>
   )

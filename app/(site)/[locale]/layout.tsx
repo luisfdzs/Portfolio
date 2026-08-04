@@ -152,7 +152,7 @@ export default async function SiteLayout({
         <SiteField />
 
         {/* Primer elemento enfocable de la página: quien navega con teclado no debería
-            tener que tabular por los seis enlaces del menú en cada carga. Sólo se ve
+            tener que tabular por los cinco enlaces del menú en cada carga. Sólo se ve
             cuando tiene el foco. */}
         <a
           href="#main"

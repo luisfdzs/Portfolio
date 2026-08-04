@@ -21,11 +21,11 @@ import { useActiveSection } from './useActiveSection'
  * pantalla entera hasta el borde de la barra. Es el menú de `Swiftmet`, adoptado por
  * encargo, y el argumento es que un menú que sólo lista el sobrante obliga a mirar la barra
  * para deducir qué falta: se abre buscando el índice del sitio y aparece media lista. A
- * pantalla completa las seis entradas caben centradas y al tamaño de titular, que a 390 px
+ * pantalla completa las cinco entradas caben centradas y al tamaño de titular, que a 390 px
  * es la diferencia entre leerlas y buscarlas.
  *
  * Los dos idiomas van al final, **detrás de un filete horizontal**: son lo único del panel
- * que no es un destino, y sin la línea se leen como una séptima y una octava sección.
+ * que no es un destino, y sin la línea se leen como una sexta y una séptima sección.
  *
  * **La sección que se está leyendo va resaltada en amarillo**, en la barra y en el panel, y
  * es lo que convierte cinco atajos en una posición: sin eso, la barra dice a dónde se puede
@@ -127,9 +127,16 @@ export function MobileNav({ locale }: { locale: Locale }) {
             ))}
           </ul>
 
-          {/* El filete es el que separa los destinos de los idiomas. */}
-          <div className="mt-10 flex items-center gap-4 border-t border-line pt-8">
-            <span className="eyebrow">{t.a11y.changeLanguage}</span>
+          {/* El filete es el que separa los destinos de los idiomas.
+           *
+           * **Sin rótulo**, por encargo: el «Cambiar de idioma» que había delante decía en
+           * cuatro palabras lo que «ES / EN» dice en cuatro letras, y en un panel donde todo
+           * lo demás son destinos a tamaño de titular, ese rótulo pequeño se leía como una
+           * instrucción — la única de la pantalla. El nombre completo del idioma sigue estando
+           * para quien navega con lector de pantalla: lo pone `LocaleSwitch` en el
+           * `aria-label` del grupo y en el `sr-only` de cada enlace, así que se quita el texto
+           * visible sin quitar información a nadie. */}
+          <div className="mt-10 flex items-center justify-center border-t border-line pt-8">
             <LocaleSwitch current={locale} />
           </div>
         </nav>
