@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode, SVGProps } from 'react'
+import { cn } from '@/lib/cn'
 import { Reveal } from './Reveal'
 
 type Props = {
@@ -13,6 +14,17 @@ type Props = {
   kicker?: string
   icon: ComponentType<SVGProps<SVGSVGElement>>
   children?: ReactNode
+  /**
+   * Sangrado que centra **el texto** de la cabecera sobre la columna de texto de la sección,
+   * en vez de sobre la sección entera. Se pasa como clase de relleno (`lg:pl-72`), porque el
+   * número es aritmética de la sección que lo usa y tiene que vivir allí — hoy sólo lo usa
+   * experiencia, cuyo carril de fechas empuja el texto 18rem a la derecha.
+   *
+   * **Es relleno y no margen a propósito**: el filete de debajo del rótulo pequeño tiene que
+   * seguir cruzando la sección de lado a lado. Con margen se acortaría por la izquierda y la
+   * cabecera dejaría de leerse como el borde superior de la sección.
+   */
+  textIndent?: string
 }
 
 /**
@@ -30,6 +42,11 @@ type Props = {
  * pegada a la izquierda con el texto centrado dentro: el bloque parece descolocado justo
  * porque el texto sí está centrado y la caja no.
  *
+ * **Centrado en la sección salvo que la sección diga otra cosa** (`textIndent`): donde el
+ * contenido no ocupa el ancho entero —experiencia, con su carril de fechas a la izquierda—,
+ * centrar la cabecera en la sección la deja desalineada respecto al texto que encabeza. Ahí
+ * se pasa un sangrado y la cabecera se centra sobre la columna de texto.
+ *
  * **El ancho máximo del rótulo son dos valores, no uno.** En móvil sigue en 24ch, que es lo
  * que impide que un titular a 24 px se lea como un párrafo; en escritorio sube a 52ch para
  * que los rótulos de una frase quepan **en una sola línea**. El que lo pedía es «Cinco años
@@ -38,11 +55,16 @@ type Props = {
  * `max-w-none`: sin tope, en un monitor de 1920 px el rótulo se estiraría hasta los 80rem
  * del contenedor y dejaría de leerse como un titular.
  */
-export function SectionHeading({ index, title, kicker, icon: Icon, children }: Props) {
+export function SectionHeading({ index, title, kicker, icon: Icon, children, textIndent }: Props) {
   return (
     <header className="mb-12 text-center lg:mb-16">
       <Reveal>
-        <div className="flex items-center justify-center gap-3 border-b border-line pb-4">
+        <div
+          className={cn(
+            'flex items-center justify-center gap-3 border-b border-line pb-4',
+            textIndent,
+          )}
+        >
           <span className="figure-num text-small text-signal" aria-hidden="true">
             {index}
           </span>
@@ -59,7 +81,7 @@ export function SectionHeading({ index, title, kicker, icon: Icon, children }: P
       </Reveal>
 
       {kicker ? (
-        <Reveal step={1}>
+        <Reveal step={1} className={textIndent}>
           <h2 className="mt-6 mx-auto max-w-[24ch] text-title text-paper lg:mt-8 lg:max-w-[52ch]">
             {kicker}
           </h2>
@@ -67,7 +89,7 @@ export function SectionHeading({ index, title, kicker, icon: Icon, children }: P
       ) : null}
 
       {children ? (
-        <Reveal step={2}>
+        <Reveal step={2} className={textIndent}>
           <div className="mt-5 mx-auto max-w-measure text-paper-soft">{children}</div>
         </Reveal>
       ) : null}

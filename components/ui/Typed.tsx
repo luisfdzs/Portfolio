@@ -7,39 +7,26 @@ import { cn } from '@/lib/cn'
  */
 export const TYPED_STEP = 45
 
-/**
- * El paso de los bloques largos —el titular del puesto y la ubicación—, en milisegundos.
- *
- * No es un capricho de ritmo: a 45 ms, los cuarenta caracteres del titular más los
- * veinticinco de la ubicación añadirían tres segundos a los 1,4 que ya gasta el nombre, y
- * los botones y las cifras no aparecerían hasta pasados cuatro segundos y medio. Quien
- * decide en treinta segundos si esto merece un scroll no espera cuatro. Con 20 ms el
- * tecleado completo cabe en 2,7 s y sigue leyéndose como alguien escribiendo.
- */
-export const TYPED_STEP_DENSE = 20
-
-/**
- * La pausa entre dos bloques que se escriben seguidos, en milisegundos. Es el respiro de
- * quien teclea al terminar una línea y empezar la siguiente; sin ella las cuatro líneas de
- * la portada se leen como un solo chorro de caracteres.
- */
-export const TYPED_PAUSE = 220
-
 type Props = {
   /** El texto, tal cual. Se parte aquí; nadie de fuera tiene que trocearlo. */
   text: string
   /**
-   * Cuándo empieza a escribirse este bloque, en milisegundos desde que carga la página. Es
-   * lo que encadena las cuatro líneas de la portada —saludo, nombre, titular y ubicación—
-   * como si las escribiera la misma persona en vez de arrancar las cuatro a la vez.
+   * Cuándo empieza a escribirse este bloque: un número de milisegundos o **cualquier
+   * expresión CSS de tiempo**, incluida una que lea variables (`calc(var(--x) * 3)`).
    *
-   * Va en milisegundos y no en caracteres, que es lo que había antes: desde que cada bloque
-   * puede tener su propio paso, un índice de caracteres no dice cuánto tiempo se ha gastado.
+   * Lo segundo es lo que usa la portada, y no es un lujo: el ritmo de las dos líneas que se
+   * escriben se decide en la hoja de estilos, por versión, así que el arranque del titular
+   * tiene que poder calcularse a partir del paso del nombre sin volver a renderizar nada.
    */
-  start?: number
-  /** Milisegundos por carácter. Ver `TYPED_STEP` y `TYPED_STEP_DENSE`. */
-  step?: number
+  start?: number | string
+  /** El paso por carácter: milisegundos o expresión CSS. Ver `TYPED_STEP`. */
+  step?: number | string
   className?: string
+}
+
+/** Un tiempo para el CSS: los números se leen en milisegundos, lo demás pasa tal cual. */
+function time(value: number | string): string {
+  return typeof value === 'number' ? `${value}ms` : value
 }
 
 /**
@@ -51,10 +38,13 @@ type Props = {
  * se enciende, así que aparecen en cascada. Es la misma familia de decisiones que `Reveal` y
  * que el cover flow — la animación la lleva el CSS y el componente sólo reparte los índices.
  *
- * **Se usa cuatro veces en la portada y las cuatro son una sola frase**: saludo, nombre,
- * titular y ubicación se escriben seguidos porque cada bloque recibe en `start` el momento en
- * que terminó el anterior (ver `typedEnd` y `components/sections/Hero.tsx`). Los dos últimos
- * van a `TYPED_STEP_DENSE` porque son largos; el paso es de cada bloque, no del sitio.
+ * **Se usa UNA sola vez en la portada: el titular del puesto.** El nombre no se teclea —enfoca
+ * de golpe— y todo lo demás está puesto desde el primer fotograma; el razonamiento de por qué
+ * el gesto se concentra ahí está en `components/sections/Hero.tsx`. El `start` y el `step` le
+ * llegan como variables de CSS y no como números calculados aquí, y es a propósito: el
+ * tecleado del titular arranca **solapado** con el final del enfoque del nombre, así que las
+ * dos mitades de la secuencia son una sola cuenta y esa cuenta tiene que vivir donde vive la
+ * animación (bloque «Texto que se escribe» de `globals.css`).
  *
  * Las cinco decisiones que lo hacen seguro, y ninguna es evidente:
  *
@@ -130,21 +120,9 @@ export function Typed({ text, start = 0, step = TYPED_STEP, className }: Props) 
   return (
     <span
       className={cn('typed', className)}
-      style={{ '--typed-start': `${start}ms`, '--typed-step': `${step}ms` } as CSSProperties}
+      style={{ '--typed-start': time(start), '--typed-step': time(step) } as CSSProperties}
     >
       {nodes}
     </span>
   )
-}
-
-/**
- * Cuándo termina de escribirse un bloque, en milisegundos: lo que se le pasa como `start` al
- * siguiente (más una pausa, si se quiere el respiro de `TYPED_PAUSE`).
- *
- * Existe como función y no como aritmética escrita en el sitio de la llamada porque el día
- * que el reparto de turnos cambie —que los signos de puntuación tarden más, por ejemplo— la
- * cuenta tiene que cambiar en un solo sitio y no en cuatro que se desincronizan.
- */
-export function typedEnd(start: number, text: string, step = TYPED_STEP): number {
-  return start + text.length * step
 }

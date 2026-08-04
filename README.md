@@ -133,9 +133,12 @@ El proyecto de Sanity existe desde el **2026-08-03**: `Portfolio`, id **`3pdexis
 `production` **público**, con los documentos del CV importados y sus capturas subidas. La web ya
 se construye leyendo del panel; `content/` sigue en su sitio como respaldo y como suelo de la
 regla de arriba. La importación inicial subió dieciséis documentos y siete imágenes, y desde entonces
-el panel se ha sincronizado tres veces a mano: la lista de proyectos (2026-08-03) y los textos del CV
-(2026-08-04, dos tandas). **Cada cambio en `content/` necesita ese segundo paso**, y la forma de darlo está en
-«Pendiente»: parcheando campos con `sanity exec`, no con `migrate:import`.
+el panel se ha sincronizado cuatro veces a mano: la lista de proyectos (2026-08-03) y los textos del CV
+(2026-08-04, tres tandas). **Cada cambio en `content/` necesita ese segundo paso**, y la forma de darlo está en
+«Pendiente»: parcheando campos con `sanity exec`, no con `migrate:import`. Y cuando lo que cambia es
+la **forma** de un campo y no su texto —la `note` de formación pasó de cadena a lista de párrafos—,
+ese paso deja de ser opcional: el valor viejo del panel no valida y la sección entera se cae al
+respaldo.
 
 Público a propósito: la web lee **sin token** al construir, así que un dataset privado obligaría
 a meter una credencial de lectura en los dos proyectos de Vercel para servir un CV que es
@@ -253,22 +256,29 @@ línea da una sola respuesta y cambia exactamente al pasar de una sección a la 
 ficha de proyecto no hay secciones que medir, así que ahí manda la ruta y se marca «Proyectos», que
 es de donde se ha entrado.
 
-### La portada se monta sola
+### La entrada de la portada: el nombre enfoca y el titular se teclea
 
-Al abrir la web no hay nada puesto: se escriben **carácter a carácter** las cuatro líneas de texto
-—«Hola, soy», el nombre, «Ingeniero industrial y desarrollador web» y la ubicación—, como si alguien
-las estuviera tecleando, y cuando la última termina van apareciendo con un fundido corto los dos
-botones y los tres iconos, las cuatro cifras y el «Sigue bajando», uno detrás de otro.
+Al abrir la web **sólo se animan dos líneas**: el nombre aparece entero y desenfocado y **enfoca de
+golpe** en 760 ms, y «Ingeniero industrial y desarrollador web» se **teclea** carácter a carácter
+detrás, arrancando 180 ms antes de que el enfoque acabe. Todo lo demás —«Hola, soy», la ubicación,
+los dos botones y los tres iconos, las cuatro cifras y el «Sigue bajando»— está puesto desde el
+primer fotograma. La secuencia entera termina en **1,34 s**.
 
-Lo hacen `components/ui/Typed.tsx` (componente de **servidor**), la clase `hero-enter` y los bloques
-«Texto que se escribe» y «La portada, que se monta sola» de `app/globals.css`, **sin una línea de
-JavaScript**: cada carácter va en su propio `<span>` con un índice y el CSS decide cuándo se enciende.
-Las dos mitades están unidas por una sola cuenta, que se hace en `Hero.tsx`: cada bloque de texto
-recibe en `start` el milisegundo en que acabó el anterior, y el final del tecleado es el momento cero
-de las apariciones. Los dos textos largos se escriben a 20 ms por carácter y no a los 45 del nombre:
-al paso del nombre, los botones no aparecerían hasta pasados cuatro segundos y medio.
+Lo hacen `components/ui/Typed.tsx` (componente de **servidor**) y el bloque «Texto que se escribe»
+de `app/globals.css`, **sin una línea de JavaScript**: cada carácter va en su propio `<span>` con un
+índice y el CSS decide cuándo se enciende.
 
-Cuatro cosas que conviene saber antes de tocarlo:
+**Antes se escribían las cuatro líneas y detrás iban apareciendo los botones y las cifras en
+cadena, y se cambió por una razón medible**: la primera pantalla no estaba montada hasta los 2,9 s,
+o sea que durante el 10 % de la atención que alguien le dedica a decidir si esto merece un scroll no
+había nada que pulsar. Concentrar el gesto en las dos líneas que dicen quién eres y qué haces deja
+lo demás legible y accionable desde el milisegundo cero, y hace que la animación signifique algo en
+vez de ser el tono de la página. **El nombre no se teclea a propósito**: el tecleado es el gesto más
+visto en un portfolio de desarrollador, y en el `<h1>` se lee como plantilla; el guiño se queda en el
+titular de debajo, donde no compite. Se decidió comparando cuatro versiones en pantalla —tecleado,
+tecleado rápido, palabra a palabra y enfoque—.
+
+Cinco cosas que conviene saber antes de tocarlo:
 
 - **El texto va completo en el HTML.** El nombre es el `<h1>` que alguien busca en Google, así que no
   puede depender de un temporizador que lo escriba en cliente. Un contador en `useState` tendría además
@@ -278,20 +288,22 @@ Cuatro cosas que conviene saber antes de tocarlo:
   empujaría entero — salto de maquetación en la primera pantalla. Por lo mismo **no hay cursor**: una
   barra parpadeante al final de una frase que se revela en su sitio se queda a la derecha del hueco
   vacío.
-- **El escalonado va en la DURACIÓN, no en `animation-delay`.** Es contraintuitivo y es la corrección
-  de un fallo real: Chrome deja de aplicar el `forwards` de una animación de duración mínima cuando su
-  retardo pasa del segundo, y la portada se quedaba en «Hola, soy Luis Fernánde» **para siempre**, sin
-  que el `check`, `check:mobile` ni el build dijeran nada. Aquí cada carácter arranca a la vez y dura
-  hasta su turno. Si alguien lo devuelve a un retardo, vuelve el fallo.
-- **Lo que aparece después SÍ usa `animation-delay`, y no es una contradicción.** El fallo de arriba es
-  de animaciones de duración despreciable; el fundido de `hero-enter` dura 520 ms de verdad, que es el
-  caso normal para el que el retardo está pensado. Lo que ese retardo sí obliga es a apagarlo a mano
-  con `prefers-reduced-motion`: el atajo general de la hoja recorta la **duración** y no el **retardo**,
-  así que sin la regla los botones y las cifras se quedarían invisibles los tres segundos que dura un
-  tecleado que no se está viendo. Y nada lleva `opacity: 0` en su estado estático: si la animación no
-  corre, la portada aparece puesta.
+- **El escalonado del tecleado va en la DURACIÓN, no en `animation-delay`.** Es contraintuitivo y es la
+  corrección de un fallo real: Chrome deja de aplicar el `forwards` de una animación de duración mínima
+  cuando su retardo pasa del segundo, y la portada se quedaba en «Hola, soy Luis Fernánde» **para
+  siempre**, sin que el `check`, `check:mobile` ni el build dijeran nada. Aquí cada carácter arranca a la
+  vez y dura hasta su turno. Si alguien lo devuelve a un retardo, vuelve el fallo.
+- **Los dos tiempos son una sola cuenta y viven en el CSS.** `--hero-focus-duration` y
+  `--hero-headline-start` se declaran juntos en `.hero-copy`, y `Typed` recibe el arranque como
+  variable en vez de como número calculado en `Hero.tsx`. Es lo que impide que cambiar la duración del
+  enfoque descuadre en silencio el solape de 180 ms, que es lo que hace que las dos líneas se lean
+  como un movimiento y no como dos turnos.
+- **Al nombre hay que apagarle el `filter` a mano** con `prefers-reduced-motion` y en papel. Se
+  esconde con un desenfoque de 14 px y no sólo con la opacidad, así que una regla que devuelva la
+  opacidad dejando el desenfoque puesto deja el titular del CV ilegible para siempre — peor que la
+  animación que se estaba evitando.
 
-Con `prefers-reduced-motion` y en papel, todo aparece puesto.
+Con `prefers-reduced-motion` y en papel, todo aparece puesto y sin desenfoque.
 
 ### El orden de las secciones
 
@@ -578,6 +590,16 @@ Cosas que están así a propósito y con quién se resuelven:
   editando el HTML de la web en producción con las herramientas de desarrollo del navegador—: los
   mismos seis documentos, el mismo script de un solo uso, una sola transacción, y borrado después.
   Que funcione dos veces seguidas es lo que la convierte en el procedimiento y no en una anécdota.
+  **Y una tercera, esa misma tarde**, con la nota de formación y los dos párrafos del perfil. Esa
+  tercera vez enseña algo que las dos primeras no podían: **cuando el cambio es de FORMA y no sólo
+  de texto, el parche del panel deja de ser un segundo paso y pasa a ser obligatorio**. La `note`
+  de formación pasó de cadena a lista de párrafos, así que el valor viejo del panel no se quedaba
+  anticuado — **no validaba**, y con él se caía el documento entero y la sección se servía del
+  respaldo. Eso se ve en el log del build (`note.es Invalid input: expected array, received
+string`) y en ningún otro sitio. Y **hay una trampa al comprobarlo**: el segundo `npm run build`
+  seguía dando el mismo aviso con el panel ya parcheado, porque Next reutiliza las respuestas
+  cacheadas en `.next/cache`. Para verificar un cambio hecho en el panel hay que **borrar `.next`
+  antes de construir**.
 - ~~**El `institution` del panel es una cadena y tumba el documento de formación.**~~ Resuelto en el
   mismo parche del 2026-08-04: ya es `{es, en}`, el documento valida y la sección deja de caer al
   respaldo. Era el fallo silencioso de la regla del contenido —la web se veía bien porque `content/`

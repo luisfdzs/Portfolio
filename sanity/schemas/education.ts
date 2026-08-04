@@ -59,10 +59,14 @@ export const education = defineType({
     }),
     defineField({
       name: 'note',
-      title: 'Nota',
-      type: 'localizedText',
+      title: 'Nota (párrafos)',
+      // Párrafos y no un campo de texto: la nota son dos ideas —qué base te dejó el grado y en
+      // qué se nota hoy— y cada una tiene que ser su propio párrafo en la web. Con un `text`
+      // habría que partir por `\n\n` al pintar, que es el fallo que este tipo existe para
+      // evitar (ver `localized.ts`).
+      type: 'localizedParagraphs',
       description:
-        'El matiz que da valor a la entrada. Por ejemplo, que la carrera se cursó compaginada con jornada completa.',
+        'Qué base te dejó la titulación. Un párrafo por idea: la web los pinta separados y centrados.',
     }),
     defineField({
       name: 'url',

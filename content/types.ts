@@ -57,7 +57,17 @@ export type EducationEntry = {
   institution: Localized
   range: DateRange
   location?: Localized | null
-  note?: Localized | null
+  /**
+   * Párrafos, y no una cadena, desde el 2026-08-04.
+   *
+   * Era `Localized` a secas porque la nota siempre había sido una frase. Luis la reescribió en
+   * dos párrafos —la idea y los ejemplos—, y con un solo campo de texto eso obliga a partir por
+   * `\n\n` al pintar, que es justo donde aparece el párrafo vacío que rompe la maquetación
+   * (está escrito en `sanity/schemas/localized.ts`, y es la razón por la que existe
+   * `localizedParagraphs`). Ahora tiene la misma forma que `summary` en la experiencia: una
+   * lista de párrafos que se reordenan arrastrando en el panel.
+   */
+  note?: Localized<string[]> | null
   url?: string | null
 }
 
