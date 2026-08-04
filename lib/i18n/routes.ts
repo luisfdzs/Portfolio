@@ -39,6 +39,11 @@ const PROJECT_SEGMENT = 'projects'
  * índice: el menú lleva al carrusel de la portada, no a otra página. Cada proyecto sigue
  * teniendo ficha, pero se enlaza con `projectHref` y no desde el menú.
  *
+ * **`stack` NO está aquí desde el 2026-08-04**, y no porque se haya quitado el contenido: el
+ * stack se metió dentro del perfil por encargo, así que dejó de tener `<section>` propia y de
+ * ser un destino. Un ancla a un `id` que no existe deja al navegador donde estaba y al menú
+ * con una entrada que no hace nada, que es peor que no tenerla. Ver `components/sections/Stack.tsx`.
+ *
  * El orden es el de la portada, que es también el del menú (`navigation`) y el que
  * recorre `useActiveSection` para saber dónde estamos.
  *
@@ -48,7 +53,6 @@ export const sections = {
   projects: 'projects',
   experience: 'experience',
   education: 'education',
-  stack: 'stack',
   about: 'about',
   contact: 'contact',
 } as const
@@ -100,7 +104,6 @@ export const navigation = [
   'projects',
   'experience',
   'education',
-  'stack',
   'about',
   'contact',
 ] as const satisfies readonly LinkKey[]
@@ -110,8 +113,8 @@ export type NavKey = (typeof navigation)[number]
 /**
  * Barra inferior de móvil: **cinco** destinos y no seis. Con el pulgar, cinco iconos es
  * el máximo que cabe a 390 px sin que el área táctil baje de los 24 px que pide
- * WCAG 2.2. En la barra van los cuatro atajos que alguien busca a propósito —se caen
- * `education` y `stack`, que se leen de paso al bajar— y el quinto hueco abre el menú
+ * WCAG 2.2. En la barra van los cuatro atajos que alguien busca a propósito —se cae
+ * `education`, que se lee de paso al bajar— y el quinto hueco abre el menú
  * completo, que repite **todas** las entradas: la barra es el atajo y el menú es el
  * índice, así que quien lo abre no tiene que reconstruir el sitio a partir de lo que
  * *no* está en la barra.

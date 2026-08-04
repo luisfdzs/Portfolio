@@ -14,7 +14,7 @@ const keys = Object.keys(sections) as SectionKey[]
 /**
  * QUÉ SECCIÓN SE ESTÁ LEYENDO, para que el menú la deje resaltada.
  *
- * Sin esto el menú es una lista de seis enlaces idénticos en una página de siete pantallas:
+ * Sin esto el menú es una lista de cinco enlaces idénticos en una página de siete pantallas:
  * dice a dónde se puede ir y no dice dónde estás, que en un documento largo es justo la
  * mitad que falta. Devuelve la clave activa o `null` cuando no hay ninguna (el hero).
  *
