@@ -5,7 +5,12 @@ type Props = {
   /** Numeración de la sección: «01», «02»… Ver por qué más abajo. */
   index: string
   title: string
-  kicker: string
+  /**
+   * La frase de debajo del rótulo. **Opcional**, y cuando falta la sección se queda sólo con
+   * el rótulo: es el caso de formación, cuyo «De la ingeniería industrial al desarrollo web»
+   * se quitó por encargo. Ver por qué eso cambia qué elemento es el `<h2>`, más abajo.
+   */
+  kicker?: string
   icon: ComponentType<SVGProps<SVGSVGElement>>
   children?: ReactNode
 }
@@ -42,15 +47,24 @@ export function SectionHeading({ index, title, kicker, icon: Icon, children }: P
             {index}
           </span>
           <Icon className="size-4 text-paper-faint" />
-          <span className="eyebrow">{title}</span>
+          {/*
+           * EL `<h2>` DE LA SECCIÓN ES EL RÓTULO CUANDO NO HAY FRASE, y esto no es un detalle
+           * de estilo: sin frase, poner el rótulo en un `<span>` dejaría la sección sin
+           * encabezado y el esquema del documento saltaría del `<h1>` del hero a los `<h3>` de
+           * las entradas. El aspecto es idéntico —la clase `eyebrow` es la misma— y quien
+           * navega con lector de pantalla sigue teniendo las cinco secciones en su lista.
+           */}
+          {kicker ? <span className="eyebrow">{title}</span> : <h2 className="eyebrow">{title}</h2>}
         </div>
       </Reveal>
 
-      <Reveal step={1}>
-        <h2 className="mt-6 mx-auto max-w-[24ch] text-title text-paper lg:mt-8 lg:max-w-[52ch]">
-          {kicker}
-        </h2>
-      </Reveal>
+      {kicker ? (
+        <Reveal step={1}>
+          <h2 className="mt-6 mx-auto max-w-[24ch] text-title text-paper lg:mt-8 lg:max-w-[52ch]">
+            {kicker}
+          </h2>
+        </Reveal>
+      ) : null}
 
       {children ? (
         <Reveal step={2}>

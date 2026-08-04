@@ -24,6 +24,10 @@ import { TagList } from '@/components/ui/Tag'
  * - **El filete vertical y el punto** dan continuidad visual sin bordes de tarjeta: cuatro
  *   tarjetas serían cuatro bloques sueltos, y esto es una trayectoria.
  *
+ * **Y en escritorio la lista entera va corrida a la derecha**, que es lo que hace que el
+ * conjunto —filete, fechas y puesto— quede centrado en la sección en vez de pegado al margen
+ * izquierdo con un hueco de 18rem a la derecha. La cuenta está donde se aplica, en el `ol`.
+ *
  * El texto va centrado en cada una de las dos columnas —fechas y puesto—, y el filete y los
  * puntos siguen a la izquierda: son la línea del tiempo, no texto, y moverlos al centro
  * partiría cada entrada en dos mitades. La columna de fechas mantiene `tabular-nums`, así
@@ -50,7 +54,28 @@ export function Experience({
         icon={Briefcase}
       />
 
-      <ol className="border-l border-line">
+      {/*
+       * EL MARGEN DE 9REM EN ESCRITORIO ES LO QUE CENTRA LA SECCIÓN, y sin él la lista se ve
+       * corrida a la izquierda por mucho que cada texto esté centrado en su columna.
+       *
+       * La cuenta, que es toda la explicación: lo que se ve de cada entrada va desde el filete
+       * de la línea temporal hasta el borde derecho de la columna del puesto, y a la derecha de
+       * eso queda una columna vacía —la que existe para que el titular del puesto caiga en el
+       * mismo eje que el rótulo de la sección—. Con la columna vacía entera a la derecha, ese
+       * bloque visible acababa 18rem antes del borde y no empezaba hasta el borde mismo: el ojo
+       * lee un bloque descentrado, porque lo está. Los 18rem se reparten ahora a medias, 9 y 9,
+       * y el conjunto queda centrado en la sección; el resto lo absorbe la columna del puesto,
+       * que es `1fr`.
+       *
+       * `ml` y no `pl`: el filete es el borde izquierdo de esta lista y los puntos se colocan
+       * respecto a él. Con relleno, el filete se quedaría clavado en el margen de la página y
+       * las fechas se irían solas a la derecha.
+       *
+       * **Quien cambie el margen tiene que cambiar la tercera columna, y al revés**: la suma de
+       * los dos más el hueco de la retícula es constante, y descuadrar uno mueve el bloque
+       * entero sin que nada avise. Es la misma aritmética a mano que ya había en la retícula.
+       */}
+      <ol className="border-l border-line lg:ml-36">
         {entries.map((entry, index) => (
           <Reveal
             as="li"
@@ -75,12 +100,13 @@ export function Experience({
                 y el sangrado de la línea temporal (2,5rem) empujan el contenido
                 18rem a la derecha, así que su centro caía 9rem por delante del centro
                 del rótulo. Se veía como un desfase entre la cabecera y las entradas.
-                La columna vacía mide lo que hay que devolver: 13rem + 2,5rem del
-                sangrado = 15,5rem, y con ella el centro del contenido coincide con el
-                del rótulo. Sin elemento de más: la pista existe por la plantilla.
-                Quien toque `lg:pl-10`, la columna de fechas o el `gap` tiene que
-                recalcular este valor. */}
-            <div className="lg:grid lg:grid-cols-[13rem_1fr_15.5rem] lg:gap-10">
+                La columna vacía es lo que devuelve eso, y **mide 6,5rem porque los
+                otros 9rem los pone ya el margen de la lista**: 6,5 + 2,5 de hueco
+                son los 9 que faltan hasta los 18. Sin elemento de más: la pista
+                existe por la plantilla. Quien toque `lg:pl-10`, la columna de fechas,
+                el `gap` o el `lg:ml-36` de la lista tiene que recalcular este valor
+                —los dos ajustes son la misma cuenta y se descuadran juntos—. */}
+            <div className="lg:grid lg:grid-cols-[13rem_1fr_6.5rem] lg:gap-10">
               <div className="lg:pt-0.5">
                 <p className="figure-num text-small text-signal">
                   {formatRange(entry.range, locale, t.experience.present)}
