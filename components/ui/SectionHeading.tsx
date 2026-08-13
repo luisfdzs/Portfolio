@@ -1,5 +1,4 @@
 import type { ComponentType, ReactNode, SVGProps } from 'react'
-import { cn } from '@/lib/cn'
 import { Reveal } from './Reveal'
 
 type Props = {
@@ -8,19 +7,13 @@ type Props = {
   kicker?: string
   icon: ComponentType<SVGProps<SVGSVGElement>>
   children?: ReactNode
-  textIndent?: string
 }
 
-export function SectionHeading({ index, title, kicker, icon: Icon, children, textIndent }: Props) {
+export function SectionHeading({ index, title, kicker, icon: Icon, children }: Props) {
   return (
     <header className="mb-12 text-center lg:mb-16">
       <Reveal>
-        <div
-          className={cn(
-            'flex items-center justify-center gap-3 border-b border-line pb-4',
-            textIndent,
-          )}
-        >
+        <div className="flex items-center justify-center gap-3 border-b border-line pb-4">
           <span className="figure-num text-small text-signal" aria-hidden="true">
             {index}
           </span>
@@ -30,7 +23,7 @@ export function SectionHeading({ index, title, kicker, icon: Icon, children, tex
       </Reveal>
 
       {kicker ? (
-        <Reveal step={1} className={textIndent}>
+        <Reveal step={1}>
           <h2 className="mt-6 mx-auto max-w-[24ch] text-title text-paper lg:mt-8 lg:max-w-[52ch]">
             {kicker}
           </h2>
@@ -38,7 +31,7 @@ export function SectionHeading({ index, title, kicker, icon: Icon, children, tex
       ) : null}
 
       {children ? (
-        <Reveal step={2} className={textIndent}>
+        <Reveal step={2}>
           <div className="mt-5 mx-auto max-w-measure text-paper-soft">{children}</div>
         </Reveal>
       ) : null}

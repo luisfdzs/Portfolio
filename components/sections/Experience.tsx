@@ -30,7 +30,6 @@ export function Experience({
         title={t.experience.title}
         kicker={t.experience.kicker}
         icon={Briefcase}
-        textIndent="lg:pl-72"
       />
 
       <ol className="exp-timeline border-l border-transparent">
@@ -39,7 +38,7 @@ export function Experience({
             as="li"
             key={entry.slug}
             step={index}
-            className="relative pb-14 pl-6 last:pb-0 lg:pl-10"
+            className="relative pb-14 pl-6 last:pb-0 xl:pl-10 xl:pr-72"
           >
             <span
               aria-hidden="true"
@@ -50,8 +49,8 @@ export function Experience({
               }
             />
 
-            <div className="lg:grid lg:grid-cols-[13rem_1fr] lg:gap-10">
-              <div className="lg:pt-0.5">
+            <div className="xl:grid xl:grid-cols-[13rem_1fr] xl:gap-10">
+              <div className="xl:pt-0.5">
                 <p className="figure-num text-small text-signal">
                   {formatRange(entry.range, locale, t.experience.present)}
                 </p>
@@ -63,7 +62,7 @@ export function Experience({
                 </p>
               </div>
 
-              <div className="mt-4 lg:mt-0">
+              <div className="mt-4 xl:mt-0">
                 <h3 className="text-title text-paper">{entry.role[locale]}</h3>
 
                 <p className="mt-1.5 text-lead text-paper-soft">
