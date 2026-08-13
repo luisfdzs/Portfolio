@@ -6,20 +6,8 @@ import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { GitHub, LinkedIn, Mail } from '@/components/ui/Icons'
 
-/**
- * Pie.
- *
- * Repite los tres contactos a propósito: quien llega hasta aquí ha leído el CV entero y es
- * exactamente la persona que puede querer escribir, y hacerle subir a la sección de
- * contacto para encontrar un correo que cabe en esta línea sería tirar la conversión.
- *
- * El enlace al **código de esta web** no es presumir: es la única prueba verificable de
- * todo el portfolio. Cualquiera puede escribir «Next.js y Sanity» en una lista; aquí está
- * el repositorio para comprobarlo.
- */
 export function Footer({ locale, profile }: { locale: Locale; profile: Profile }) {
   const t = getDictionary(locale)
-  // El año del build, no el de ahora: ver `lib/format.ts` y `next.config.ts`.
   const year = buildYear()
 
   const links = [
@@ -72,11 +60,6 @@ export function Footer({ locale, profile }: { locale: Locale; profile: Profile }
           </div>
         </div>
 
-        {/* Aquí había una flecha de «volver arriba» y se ha quitado: era un `<Link>` al
-            idioma actual —o sea, a la ruta en la que ya estás—, que no navega y no mueve el
-            scroll. Ahora es un botón flotante que aparece pasada la primera pantalla y en
-            todas las páginas (`components/ui/BackToTop.tsx`), que además es donde se necesita:
-            quien ha llegado al pie ya ha terminado de leer. */}
         <div className="mt-12 border-t border-line pt-6">
           <p className="figure-num text-small text-paper-faint">
             © {year} {profile.name}. {t.footer.rights}

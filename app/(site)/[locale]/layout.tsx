@@ -14,15 +14,6 @@ import { SiteField } from '@/components/layout/SiteField'
 import { BackToTop } from '@/components/ui/BackToTop'
 import '@/app/globals.css'
 
-/**
- * Las tres familias, autoalojadas por `next/font`: se descargan en el build y se sirven
- * desde el propio dominio. No hay ninguna petición a fonts.googleapis.com en tiempo de
- * ejecución, lo que ahorra una conexión a un tercero y, de paso, evita meter a Google en
- * el camino de cada visita — que en una web europea es también una cuestión de RGPD.
- *
- * `display: 'swap'` en las tres: se ve texto con la fuente del sistema desde el primer
- * pintado en lugar de un hueco en blanco. En un CV, leer antes vale más que leer perfecto.
- */
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -42,14 +33,11 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 })
 
-/** Las dos rutas de idioma se generan en el build: no hay nada dinámico que negociar. */
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))
 }
 
 export const viewport: Viewport = {
-  // Debe coincidir con `--color-ink`: es el color de la barra del navegador en móvil, y
-  // si no coincide se ve una franja de otro tono sobre el lienzo.
   themeColor: '#08090b',
   colorScheme: 'dark',
 }
@@ -70,7 +58,6 @@ export async function generateMetadata({
     metadataBase: new URL(site.url),
     title: {
       default: t.meta.title,
-      // Las páginas interiores añaden su nombre delante: «Swiftmet · Luis Fernández».
       template: `%s · ${site.shortName}`,
     },
     description: t.meta.description,
@@ -79,9 +66,6 @@ export async function generateMetadata({
     creator: profile.name,
     alternates: {
       canonical: `${site.url}/${locale}`,
-      // Los `hreflang` son lo que le dice a Google que estas dos URLs son la misma página
-      // en dos idiomas, y no contenido duplicado. `x-default` marca a dónde mandar a quien
-      // no encaje en ninguno de los dos: el castellano, que es el idioma por defecto.
       languages: {
         ...Object.fromEntries(
           locales.map((entry) => [localeHtmlLang[entry], `${site.url}/${entry}`]),
@@ -116,8 +100,6 @@ export default async function SiteLayout({
   params: Promise<{ locale: string }>
 }) {
   const { locale: raw } = await params
-  // Una ruta como `/fr` no existe: sin esta comprobación llegaría al diccionario con una
-  // clave que no está y reventaría con un error de acceso a `undefined` en vez de un 404.
   if (!isLocale(raw)) notFound()
   const locale: Locale = raw
 
@@ -130,30 +112,8 @@ export default async function SiteLayout({
       className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
     >
       <body>
-        {/*
-         * EL FONDO DE TODO EL SITIO, montado una sola vez y aquí.
-         *
-         * Es una capa fija que ocupa la ventana y pasa por debajo de la cabecera, del contenido
-         * y del pie. Va en el layout y no en la portada por dos razones que no son de comodidad:
-         *
-         * 1. **Para que exista en las páginas interiores.** La lista de proyectos y la ficha de
-         *    cada proyecto son páginas propias; si el campo viviera en el hero, entrar en un
-         *    proyecto significaría salir a un fondo negro liso y la web parecería otra.
-         * 2. **Para que no se reinicie al navegar.** El layout no se vuelve a montar al cambiar
-         *    de página dentro del mismo idioma, así que el lienzo sobrevive a la navegación: ni
-         *    se rearma la retícula, ni se repite la animación de entrada, ni la luz vuelve al
-         *    rincón. La superficie es la misma; lo que cambia es lo que hay encima.
-         *
-         * Va antes que todo lo demás en el documento porque es lo que está detrás de todo lo
-         * demás. Que quede efectivamente detrás no lo decide este orden sino una regla explícita
-         * en `globals.css` (`body > main, body > footer`): un elemento posicionado con
-         * `z-index: 0` gana al contenido de los estáticos aunque venga antes.
-         */}
         <SiteField />
 
-        {/* Primer elemento enfocable de la página: quien navega con teclado no debería
-            tener que tabular por los cinco enlaces del menú en cada carga. Sólo se ve
-            cuando tiene el foco. */}
         <a
           href="#main"
           data-print="hide"
@@ -167,14 +127,8 @@ export default async function SiteLayout({
         <Footer locale={locale} profile={profile} />
         <MobileNav locale={locale} />
 
-        {/* Volver arriba. Va en el layout, no en la portada: hace falta también en el índice
-            de proyectos y en cada ficha, que son páginas largas. Se esconde solo mientras se
-            está en la primera pantalla. */}
         <BackToTop locale={locale} />
 
-        {/* No pinta nada: borra el `#seccion` de la barra de direcciones una vez el
-            navegador lo ha usado, para que el menú deje siempre una URL con la misma
-            forma. Todo el razonamiento, en el propio componente. */}
         <HashCleaner />
       </body>
     </html>

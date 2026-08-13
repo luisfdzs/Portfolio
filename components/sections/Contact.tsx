@@ -8,19 +8,6 @@ import { GitHub, LinkedIn, Mail, MapPin } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 
-/**
- * Contacto.
- *
- * **No hay formulario, y es una decisión.** Un formulario en un portfolio añade un
- * backend, una dependencia de un servicio de correo, un captcha —o spam— y una pantalla de
- * «gracias», y a cambio le pide a quien escribe que confíe en que el mensaje ha salido de
- * verdad. Un `mailto:` con la dirección visible deja el mensaje en su propia bandeja de
- * enviados, que es donde quiere tenerlo alguien que escribe por trabajo. Y la dirección
- * escrita entera permite copiarla a mano, que es lo que hace la mitad de la gente.
- *
- * El correo va en monoespaciada por la misma razón que las cifras: se lee carácter a
- * carácter cuando alguien lo teclea, y en una sans un `l` y un `1` se confunden.
- */
 export function Contact({ locale, profile }: { locale: Locale; profile: Profile }) {
   const t = getDictionary(locale)
 
@@ -46,14 +33,11 @@ export function Contact({ locale, profile }: { locale: Locale; profile: Profile 
       id={sections.contact}
       className="page-gutter mx-auto max-w-7xl section-block text-center"
     >
-      {/* «05» y no «06»: la portada tiene cinco secciones desde que el stack se metió
-          dentro del perfil. La numeración va a mano en cada cabecera. */}
       <SectionHeading index="05" title={t.contact.title} kicker={t.contact.kicker} icon={Mail}>
         <p>{t.contact.lead}</p>
       </SectionHeading>
 
       <Reveal>
-        {/* El correo, al tamaño de titular: es la conversión de toda la página. */}
         <Link
           href={`mailto:${profile.email}`}
           className="figure-num group inline-flex max-w-full items-center gap-3 text-title break-all text-paper transition-colors hover:text-signal"

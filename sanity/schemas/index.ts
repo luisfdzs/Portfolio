@@ -6,10 +6,6 @@ import { profile } from './profile'
 import { project } from './project'
 import { skillGroup } from './skillGroup'
 
-/**
- * Los tipos de objeto traducibles van primero por legibilidad, no por necesidad: Sanity
- * resuelve las referencias entre tipos sin importar el orden del array.
- */
 export const schemaTypes: SchemaTypeDefinition[] = [
   localizedString,
   localizedText,
