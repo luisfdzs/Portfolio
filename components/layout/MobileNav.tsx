@@ -10,33 +10,6 @@ import { Briefcase, Close, Code, Mail, Menu, User } from '@/components/ui/Icons'
 import { LocaleSwitch } from './LocaleSwitch'
 import { useActiveSection } from './useActiveSection'
 
-/**
- * Navegación de móvil: barra inferior fija de cinco destinos.
- *
- * Abajo y no arriba porque se maneja con el pulgar, que es lo que sujeta el teléfono. Los
- * cuatro primeros son las secciones que alguien busca a propósito; el quinto abre el menú
- * completo. Ver `mobileNavigation` en `lib/i18n/routes.ts` para el criterio.
- *
- * **El panel enseña TODAS las entradas, no sólo las que no caben en la barra**, y ocupa la
- * pantalla entera hasta el borde de la barra. Es el menú de `Swiftmet`, adoptado por
- * encargo, y el argumento es que un menú que sólo lista el sobrante obliga a mirar la barra
- * para deducir qué falta: se abre buscando el índice del sitio y aparece media lista. A
- * pantalla completa las cinco entradas caben centradas y al tamaño de titular, que a 390 px
- * es la diferencia entre leerlas y buscarlas.
- *
- * Los dos idiomas van al final, **detrás de un filete horizontal**: son lo único del panel
- * que no es un destino, y sin la línea se leen como una sexta y una séptima sección.
- *
- * **La sección que se está leyendo va resaltada en amarillo**, en la barra y en el panel, y
- * es lo que convierte cinco atajos en una posición: sin eso, la barra dice a dónde se puede
- * ir en una página de siete pantallas y no dice dónde estás. Lo mide `useActiveSection`.
- *
- * Es el único componente de cliente con estado del sitio, y ya no sólo por el panel: la
- * barra necesita el scroll para saber qué icono encender.
- *
- * El icono de «Perfil» es una **persona** y no la casa que había: junto a ese rótulo, un
- * icono de inicio promete volver arriba y lleva a la mitad de la página.
- */
 const icons = {
   about: User,
   experience: Briefcase,
@@ -44,14 +17,6 @@ const icons = {
   contact: Mail,
 } as const
 
-/**
- * Identificador fijo del panel, no un `useId()`.
- *
- * Es la diana de `aria-controls` y de `npm run check:mobile`, que abre el menú en un Chrome
- * real y comprueba que el panel tiene altura de verdad. Con un `useId()` el identificador
- * cambia entre compilaciones y la comprobación tendría que adivinarlo. Sólo hay una barra de
- * móvil por página, así que no hay riesgo de colisión — que es lo único que `useId` resuelve.
- */
 const PANEL_ID = 'mobile-menu'
 
 export function MobileNav({ locale }: { locale: Locale }) {
@@ -59,13 +24,6 @@ export function MobileNav({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false)
   const active = useActiveSection()
 
-  /**
-   * Cerrar con Escape y bloquear el scroll del fondo mientras el panel está abierto.
-   *
-   * El bloqueo importa más de lo que parece en móvil: sin él se hace scroll de la página
-   * *detrás* del panel, y al cerrarlo apareces en un sitio distinto del que estabas sin
-   * haber pulsado nada.
-   */
   useEffect(() => {
     if (!open) return
 
@@ -85,26 +43,11 @@ export function MobileNav({ locale }: { locale: Locale }) {
 
   return (
     <>
-      {/*
-       * Panel del menú: de arriba de la pantalla al borde de la barra.
-       *
-       * Sin cortina, y no por descuido: la que había aquí sólo tenía sentido cuando el panel
-       * era una tira sobre la barra y quedaba página a la vista alrededor. Ocupando la
-       * pantalla entera no hay «fuera» donde pulsar, así que cerrar es el mismo botón con el
-       * que se abrió —que la barra deja siempre encima— o Escape.
-       *
-       * Fondo OPACO (`bg-ink-raised`): con uno translúcido se leerían las secciones por
-       * debajo de las entradas del menú, que es el fallo clásico de un panel a pantalla
-       * completa. `overflow-y-auto` para que, si algún día hay más entradas o alguien usa el
-       * tipo del sistema muy grande, se puedan alcanzar en vez de quedar cortadas.
-       */}
       <div
         id={PANEL_ID}
         hidden={!open}
         className="page-gutter fixed inset-x-0 top-0 bottom-nav-mobile z-50 overflow-y-auto bg-ink-raised lg:hidden"
       >
-        {/* `min-h-full` y no `h-full`: el menú se centra en la pantalla, pero si no cabe
-            crece y el `overflow-y-auto` de arriba lo deja alcanzable. */}
         <nav
           aria-label={t.a11y.menu}
           className="flex min-h-full flex-col items-center justify-center py-14"
@@ -127,22 +70,12 @@ export function MobileNav({ locale }: { locale: Locale }) {
             ))}
           </ul>
 
-          {/* El filete es el que separa los destinos de los idiomas.
-           *
-           * **Sin rótulo**, por encargo: el «Cambiar de idioma» que había delante decía en
-           * cuatro palabras lo que «ES / EN» dice en cuatro letras, y en un panel donde todo
-           * lo demás son destinos a tamaño de titular, ese rótulo pequeño se leía como una
-           * instrucción — la única de la pantalla. El nombre completo del idioma sigue estando
-           * para quien navega con lector de pantalla: lo pone `LocaleSwitch` en el
-           * `aria-label` del grupo y en el `sr-only` de cada enlace, así que se quita el texto
-           * visible sin quitar información a nadie. */}
           <div className="mt-10 flex items-center justify-center border-t border-line pt-8">
             <LocaleSwitch current={locale} />
           </div>
         </nav>
       </div>
 
-      {/* La barra. */}
       <nav
         data-print="hide"
         aria-label={t.a11y.mobileNavigation}
@@ -166,9 +99,6 @@ export function MobileNav({ locale }: { locale: Locale }) {
                 >
                   <Icon className="size-5" />
                   <span className="text-[0.625rem] leading-none">{t.nav[key]}</span>
-                  {/* El filete superior, sólo en la activa: el amarillo es la señal
-                      principal y ésta es la que la acompaña, porque un icono a 20 px
-                      teñido de un color no es una diferencia que todo el mundo vea. */}
                   <span
                     aria-hidden="true"
                     className={cn(
@@ -192,9 +122,6 @@ export function MobileNav({ locale }: { locale: Locale }) {
               )}
             >
               {open ? <Close className="size-5" /> : <Menu className="size-5" />}
-              {/* El rótulo no cambia al abrir: «Cerrar el menú» no cabe a 390 px sin
-                  partirse en dos líneas y descuadrar la altura de la barra. El estado ya
-                  lo dicen el icono y `aria-expanded`. */}
               <span className="text-[0.625rem] leading-none">{t.a11y.menu}</span>
             </button>
           </li>

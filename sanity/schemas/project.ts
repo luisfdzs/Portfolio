@@ -1,19 +1,6 @@
 import { orderRankField } from '@sanity/orderable-document-list'
 import { defineField, defineType } from 'sanity'
 
-/**
- * Un proyecto propio.
- *
- * **El `slug` sí es la URL** (`/es/projects/swiftmet`), al contrario que en los demás
- * documentos, donde es sólo una clave interna. Por eso lleva `isUnique` implícito por el
- * tipo `slug` y por eso conviene no tocarlo una vez publicado: cambiarlo rompe cualquier
- * enlace que se haya mandado en una candidatura, que es exactamente para lo que existen
- * estas fichas.
- *
- * `highlights` es el campo que hace o deshace la ficha: tres o cuatro **decisiones
- * técnicas concretas**, no adjetivos. La descripción del campo lo dice, porque es el único
- * sitio donde alguien lo va a leer justo antes de escribirlas.
- */
 export const project = defineType({
   name: 'project',
   title: 'Proyectos',

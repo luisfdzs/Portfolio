@@ -1,38 +1,4 @@
 #!/usr/bin/env node
-/**
- * VERIFICACIÓN EN MÓVIL · `npm run check:mobile`
- *
- * Abre el sitio en un Chrome real a 390×844 (tamaño de iPhone) y comprueba lo que en
- * escritorio no se ve. No es un test unitario: es la lista de cosas que se rompen en móvil y
- * que desde un portátil no se notan —varias de ellas ya han pasado en los proyectos de los
- * que este hereda la arquitectura—.
- *
- * Lo que este script existe para impedir:
- *  1. **Desbordamiento horizontal.** La causa más habitual es un correo o una URL larga sin
- *     `break-all` en una caja de 390 px. Aquí hay un correo a tamaño de titular, así que es
- *     el candidato número uno.
- *  2. **El panel del menú midiendo 0 px de alto.** El `backdrop-blur` de la barra convierte
- *     al elemento que lo contiene en bloque contenedor de sus descendientes `fixed`, y el
- *     panel se colapsa. Se ve correcto en el DOM y no se ve en pantalla.
- *  3. **La barra fija tapando el final del pie.** El `<body>` se reserva un hueco de
- *     `--spacing-nav-mobile`; si alguien lo quita, el copyright queda detrás de los iconos.
- *  4. **Áreas pulsables por debajo de los 24 px que pide WCAG 2.2**, que es exactamente el
- *     problema de los enlaces pequeños del pie y del selector de idioma cuando se usan con
- *     el dedo y no con el ratón.
- *  5. **`href()` devolviendo rutas relativas**, que se encadenan y dan 404. Se comprueba
- *     desde una ficha de proyecto, que es donde el fallo aparece y no desde la portada,
- *     donde cuela por casualidad.
- *  6. **Las dos navegaciones con el mismo nombre accesible.** Cabecera y barra de móvil
- *     coexisten en el DOM; si comparten `aria-label`, un lector de pantalla las lista
- *     idénticas.
- *
- * Usa `playwright-core` con el Chrome YA instalado: no descarga navegadores.
- * Requiere el servidor levantado (`npm run dev` o `npm start`) o un despliegue:
- *
- *   npm run check:mobile
- *   BASE=https://luisfernandezsangiltest.vercel.app npm run check:mobile
- *   LOCALE=en npm run check:mobile
- */
 
 import process from 'node:process'
 import { chromium } from 'playwright-core'
@@ -40,7 +6,6 @@ import { chromium } from 'playwright-core'
 const BASE = process.env.BASE ?? 'http://localhost:3000'
 const LOCALE = process.env.LOCALE ?? 'es'
 
-/** Chrome instalado en el sistema. Se puede sobreescribir con CHROME_PATH. */
 const CHROME =
   process.env.CHROME_PATH ??
   (process.platform === 'win32'
@@ -55,15 +20,10 @@ const check = (ok, label) => {
   console.log(`${ok ? '  ✓' : '  ✗'} ${label}`)
 }
 
-/** Cuántos píxeles desborda el documento por los lados. Debe ser 0 (se tolera 1 por redondeo). */
 function horizontalOverflow(page) {
   return page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
 }
 
-/**
- * El elemento más ancho que sobresale del viewport. Sin esto, un fallo de desbordamiento sólo
- * dice «desborda 240 px» y hay que buscarlo a mano por toda la página.
- */
 function overflowCulprit(page) {
   return page.evaluate(() => {
     const width = window.innerWidth
@@ -98,20 +58,12 @@ async function main() {
   const errors = []
   page.on('console', (message) => message.type() === 'error' && errors.push(message.text()))
   page.on('pageerror', (error) => errors.push(String(error)))
-  /**
-   * El estado y la URL de cada respuesta fallida.
-   *
-   * Sin esto, un recurso que da 404 llega a la consola como «Failed to load resource: 404» sin
-   * decir cuál, y hay que abrir las herramientas del navegador a mano para averiguarlo. Pasó
-   * en la primera ejecución de este script.
-   */
   page.on('response', (response) => {
     if (response.status() >= 400) errors.push(`HTTP ${response.status()} · ${response.url()}`)
   })
 
   console.log(`\nRevisión móvil (390×844) sobre ${BASE}/${LOCALE}\n`)
 
-  // --- Portada ---------------------------------------------------------------------------
   console.log('Portada')
   await page.goto(`${BASE}/${LOCALE}`, { waitUntil: 'networkidle' })
 
@@ -119,8 +71,6 @@ async function main() {
   if (homeOverflow > 1) console.log('    culpable:', await overflowCulprit(page))
   check(homeOverflow <= 1, 'la portada no desborda en horizontal')
 
-  // La cabecera es de escritorio y no debe existir visualmente en móvil: si se ve, se están
-  // gastando 4 rem de pantalla en una navegación que ya está abajo.
   check(
     !(await page.locator('header nav').first().isVisible()),
     'la cabecera de escritorio está oculta en móvil',
@@ -131,7 +81,6 @@ async function main() {
   )
   check(await bar.isVisible(), 'la barra inferior de móvil se ve')
 
-  // Los dos `<nav>` de navegación no pueden llamarse igual (ver el punto 6 de la cabecera).
   const navNames = await page.evaluate(() =>
     [...document.querySelectorAll('nav[aria-label]')].map((n) => n.getAttribute('aria-label')),
   )
@@ -140,13 +89,11 @@ async function main() {
     `cada <nav> tiene un nombre distinto (${navNames.length})`,
   )
 
-  // Cinco destinos: cuatro secciones y el menú.
   check(
     (await bar.locator('li').count()) === 5,
     `la barra tiene cinco destinos (${await bar.locator('li').count()})`,
   )
 
-  // --- El menú: abrir, medir, bloquear scroll, cerrar -------------------------------------
   console.log('\nMenú')
   const menuButton = bar.locator('button[aria-controls="mobile-menu"]')
   await menuButton.click()
@@ -159,14 +106,11 @@ async function main() {
   check(opened, 'el panel del menú se abre')
 
   const panelBox = await panel.boundingBox()
-  // El fallo del `backdrop-blur`: el panel existe pero mide cero. Con dos entradas y el
-  // selector de idioma no baja de 150 px; por debajo de eso, está colapsado.
   check(
     (panelBox?.height ?? 0) > 150,
     `el panel tiene altura real (${Math.round(panelBox?.height ?? 0)} px)`,
   )
 
-  // No puede solaparse con la barra: si lo hace, tapa los iconos con los que se cierra.
   const barBox = await bar.boundingBox()
   check(
     (panelBox?.y ?? 0) + (panelBox?.height ?? 0) <= (barBox?.y ?? 0) + 2,
@@ -178,7 +122,6 @@ async function main() {
     'el scroll de la página se bloquea con el menú abierto',
   )
 
-  // Las entradas del panel tienen que LEERSE: papel sobre papel es el fallo clásico.
   const contrastOk = await panel
     .locator('a')
     .first()
@@ -192,7 +135,6 @@ async function main() {
         return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
       }
       const fg = luminance(parse(getComputedStyle(el).color))
-      // El fondo lo pinta el panel, no el enlace.
       const bg = luminance(parse(getComputedStyle(el.closest('#mobile-menu')).backgroundColor))
       const [light, dark] = fg > bg ? [fg, bg] : [bg, fg]
       return (light + 0.05) / (dark + 0.05)
@@ -211,7 +153,6 @@ async function main() {
     'el panel se cierra con Escape',
   )
 
-  // --- El pie no queda debajo de la barra -------------------------------------------------
   console.log('\nPie')
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
   await page.waitForTimeout(600)
@@ -222,29 +163,20 @@ async function main() {
     if (!footer || !nav) return null
     return Math.round(nav.getBoundingClientRect().top - footer.getBoundingClientRect().bottom)
   })
-  // Tolerancia de 1 px, igual que en el desbordamiento horizontal: el hueco que el `<body>`
-  // se reserva y el alto de la barra son los dos 4rem, así que la holgura ideal es 0 y el
-  // navegador redondea a −1. Un solapamiento real se cuenta en decenas de píxeles.
   check(
     (footerClear ?? -99) >= -1,
     `el pie termina por encima de la barra (${footerClear} px de holgura)`,
   )
 
-  // --- Áreas pulsables (WCAG 2.2, 24×24 CSS px) ------------------------------------------
   console.log('\nÁreas pulsables')
   const tooSmall = await page.evaluate(() => {
     const offenders = []
     for (const el of document.querySelectorAll('a[href], button')) {
       const style = getComputedStyle(el)
       if (style.display === 'none' || style.visibility === 'hidden') continue
-      // Los elementos ocultos visualmente pero accesibles (`sr-only`) miden 1×1 a propósito:
-      // el enlace «Saltar al contenido» sólo aparece cuando recibe el foco, y entonces sí es
-      // grande. Contarlo como área pulsable pequeña era un falso positivo del script.
       if (el.classList.contains('sr-only')) continue
       const rect = el.getBoundingClientRect()
       if (rect.width === 0 || rect.height === 0) continue
-      // La utilidad `tap` amplía el área con un ::before invisible que no entra en el
-      // rectángulo del elemento: se le suma su margen negativo declarado.
       const grow = el.classList.contains('tap') ? 12 : 0
       if (rect.width + grow < 24 || rect.height + grow < 24) {
         offenders.push(
@@ -258,14 +190,6 @@ async function main() {
   if (tooSmall.length > 0) console.log('    ', tooSmall.join('\n     '))
   check(tooSmall.length === 0, 'todo lo pulsable llega a 24×24 px')
 
-  // --- La sección que se está leyendo, resaltada -------------------------------------------
-  /**
-   * El menú tiene que decir **dónde estás**, no sólo a dónde se puede ir. Se comprueba en la
-   * barra de móvil porque es la navegación que se ve a 390 px, y con los dos casos que
-   * importan: sobre el hero no hay sección que resaltar, y dentro de una sí — exactamente una.
-   * Dos entradas marcadas a la vez es el fallo típico de medir «la más visible» en vez de una
-   * línea de lectura (ver `useActiveSection`).
-   */
   console.log('\nSección activa')
   await page.goto(`${BASE}/${LOCALE}`, { waitUntil: 'networkidle' })
   check(
@@ -289,31 +213,18 @@ async function main() {
     `en experiencia se resalta sólo esa entrada (${JSON.stringify(marked)})`,
   )
 
-  // --- Ficha de proyecto: el sitio donde las rutas relativas explotan ---------------------
   console.log('\nFicha de proyecto')
-  /**
-   * El índice de proyectos se retiró: `/es/projects` ya no es una página y la redirección de
-   * `next.config.ts` tiene que llevar a la sección de la portada. Es la comprobación de que
-   * una URL que estuvo en el `sitemap.xml` no devuelve un 404 — y el 404 lo cazaría igual el
-   * escuchador de respuestas, pero diciendo sólo «HTTP 404» sin explicar qué se esperaba.
-   */
   await page.goto(`${BASE}/${LOCALE}/projects`, { waitUntil: 'networkidle' })
   check(
     new URL(page.url()).pathname === `/${LOCALE}`,
     `/${LOCALE}/projects redirige a la portada (${new URL(page.url()).pathname})`,
   )
 
-  // La primera tarjeta de la copia CENTRAL del carrusel: las otras dos son clones `inert` y
-  // un clic sobre ellas no llega a ningún sitio (ver `CoverFlow`).
   const firstCard = page.locator('li:not([data-clone]) article h3 a').first()
   const cardHref = await firstCard.getAttribute('href')
   check(Boolean(cardHref?.startsWith('/')), `los enlaces de tarjeta son absolutos (${cardHref})`)
 
   await firstCard.click()
-  // `waitForURL` y no `waitForLoadState('networkidle')`: la navegación de Next es de cliente,
-  // así que la red se queda quieta enseguida y `networkidle` resolvía **antes** de que la
-  // ruta hubiera cambiado. La comprobación fallaba con la URL de partida, dando a entender
-  // que el enlace estaba roto cuando lo que estaba mal era la espera.
   const navigated = await page
     .waitForURL(new RegExp(`/${LOCALE}/projects/.+`), { timeout: 8000 })
     .then(() => true)
@@ -325,27 +236,12 @@ async function main() {
   if (detailOverflow > 1) console.log('    culpable:', await overflowCulprit(page))
   check(detailOverflow <= 1, 'la ficha no desborda en horizontal')
 
-  // Desde la ficha, el enlace de vuelta y el del idioma tienen que seguir siendo absolutos:
-  // es aquí donde una ruta relativa se encadenaría a `/es/projects/…`.
   const backHref = await page
     .locator('a', { hasText: /proyectos|projects/i })
     .first()
     .getAttribute('href')
   check(Boolean(backHref?.startsWith('/')), `el enlace de vuelta es absoluto (${backHref})`)
 
-  // --- Metadatos que sólo piden los rastreadores -------------------------------------------
-  /**
-   * La imagen de apertura social y el favicon, pedidos **a mano**.
-   *
-   * Hacen falta porque un navegador normal no descarga la imagen de `og:image`: sólo la piden
-   * LinkedIn, WhatsApp o Slack al desplegar la vista previa de un enlace. Así que un fallo ahí
-   * es invisible en local, invisible en producción y visible justo el día que se comparte el
-   * enlace en una candidatura.
-   *
-   * Y pasó: `ImageResponse` devolvía 500 porque Satori exige `display: flex` explícito en
-   * cualquier `div` con más de un hijo, y una interpolación de texto creaba dos. El error era
-   * «failed to pipe response», sin más pista. Ver `app/(site)/[locale]/opengraph-image.tsx`.
-   */
   console.log('\nMetadatos sociales')
   await page.goto(`${BASE}/${LOCALE}`, { waitUntil: 'networkidle' })
 
@@ -359,14 +255,6 @@ async function main() {
       check(false, `${label}: no se declara en el HTML`)
       continue
     }
-    /**
-     * Se reconstruye contra `BASE` quedándose sólo con la ruta y la query.
-     *
-     * `og:image` se escribe **absoluta y apuntando al dominio canónico de producción** (lo
-     * exige `metadataBase`), así que usar la URL tal cual haría que una revisión en local
-     * comprobara producción. Sonaba a error del script y era lo contrario: la primera vez que
-     * se ejecutó, delató que producción seguía con el build roto.
-     */
     const target = new URL(url, BASE)
     const response = await page.request.get(`${BASE}${target.pathname}${target.search}`)
     check(
@@ -375,7 +263,6 @@ async function main() {
     )
   }
 
-  // --- Sin errores de consola -------------------------------------------------------------
   console.log('\nConsola')
   if (errors.length > 0) console.log('    ', errors.join('\n     '))
   check(errors.length === 0, 'ningún error de consola')

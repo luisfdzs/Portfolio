@@ -5,4 +5,3 @@ public
 next-env.d.ts
 *.tsbuildinfo
 package-lock.json
-scripts/migration/import.ndjson

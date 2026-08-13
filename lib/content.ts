@@ -26,66 +26,8 @@ import {
 } from '@/sanity/queries'
 import type { Localized } from '@/lib/i18n/config'
 
-/**
- * ÚNICA PUERTA DE ACCESO AL CONTENIDO
- *
- * Ninguna página consulta Sanity ni importa `content/` directamente: todas pasan por
- * aquí. Es lo que permite cambiar de dónde sale el contenido sin tocar una sola vista.
- *
- * ## La regla, que es la decisión de diseño de todo el proyecto
- *
- * **El panel manda cuando tiene contenido; el repositorio es el suelo.**
- *
- *   1. Sin proyecto de Sanity configurado → se sirve `content/`.
- *   2. Con Sanity configurado pero sin documentos de un tipo → se sirve `content/` para
- *      ese tipo, y sólo para ese.
- *   3. Con documentos → mandan los del panel.
- *
- * Por qué así, y no como en los proyectos de cliente (donde Sanity es la única fuente y
- * su ausencia es un error): un portfolio es el sitio donde uno NO quiere depender de un
- * servicio externo para existir. Este repositorio se clona y se despliega sin
- * credenciales de nada, y el CV sale completo. Enchufar el panel después es una mejora
- * —editar desde el móvil sin desplegar— y no un requisito.
- *
- * El punto 2 es el que evita el fallo más probable: crear el proyecto de Sanity, no
- * haber importado todavía el contenido, y que la web se quede en blanco justo el día que
- * alguien la mira. Un dataset vacío no es una instrucción de borrar el CV.
- *
- * ## La excepción: el retrato
- *
- * Los tres puntos de arriba funcionan **por documento**, y hay un caso en el que eso no
- * alcanza: el campo del retrato en el «Perfil». Un perfil sin foto elegida es un documento
- * válido —no dispara ningún respaldo— y dejaría el hero con el hueco de trama de `Figure`.
- * Así que el retrato tiene respaldo **por campo**: si el panel no trae ninguno, se sirve el de
- * `content/profile.ts`. Es la única excepción; ver `getProfile`.
- *
- * ## Documentos a medias
- *
- * Se valida cada documento por separado y se descarta el que no cumple, con un aviso en
- * el log del build. Nunca se tumba la web entera: un puesto sin descripción no puede
- * hacer desaparecer los otros tres.
- */
-
-/** Etiqueta de caché: el webhook de Sanity la invalida al publicar. */
 export const CONTENT_TAG = 'sanity-content'
 
-/* ========================================================================== *
- * Esquemas
- * ========================================================================== */
-
-/**
- * Un texto traducido, con el castellano como única obligación.
- *
- * El `transform` es la pieza importante: rellena el inglés con el castellano cuando
- * falta. Sin esto habría que decidir en cada vista qué hacer con un hueco —¿cadena
- * vacía?, ¿ocultar el bloque?— y acabaríamos con dos criterios distintos y con huecos
- * visibles. Con esto la regla es una y está aquí: **si no está traducido, se lee en
- * castellano.**
- *
- * Es el compromiso menos malo, no el ideal. Un párrafo del CV en castellano dentro de la
- * versión inglesa se ve raro; en blanco se ve roto, y quien lo lee es alguien decidiendo
- * si te llama.
- */
 const localizedString = z
   .object({
     es: z.string().min(1),
@@ -113,14 +55,8 @@ const imageSchema = z.object({
   alt: localizedString,
 })
 
-/** `YYYY-MM`. Ver `lib/format.ts` para por qué no es un `Date`. */
 const yearMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, 'debe tener el formato YYYY-MM')
 
-/**
- * Un intervalo del CV. Se valida que el fin no sea anterior al principio: es el error de
- * tecleo más fácil de cometer en el panel y el más vergonzoso de publicar, porque la web
- * escribiría una duración negativa junto al puesto.
- */
 const dateRange = z
   .object({ start: yearMonth, end: yearMonth.nullish() })
   .transform((value) => ({ start: value.start, end: value.end ?? null }))
@@ -128,14 +64,6 @@ const dateRange = z
     message: 'la fecha de fin es anterior a la de inicio',
   })
 
-/**
- * El `transform` final normaliza `stack` a un array vacío.
- *
- * Es lo que permite que las vistas escriban `entry.stack.length` sin comprobar nada: un
- * campo que el panel deja sin rellenar llega como `undefined`, y si eso se propagara habría
- * que poner un `?? []` en cada sitio donde se usa —y olvidarse en uno—. La normalización va
- * aquí, en la frontera, que es el único punto por el que pasa todo el contenido.
- */
 const experienceSchema = z
   .object({
     slug: z.string().min(1),
@@ -157,10 +85,6 @@ const educationSchema = z.object({
   institution: localizedString,
   range: dateRange,
   location: localizedString.nullish(),
-  // Párrafos y no una cadena desde el 2026-08-04 (ver `EducationEntry.note`). El cambio tiene
-  // un efecto que conviene tener presente: un documento del panel cuyo `note` siga siendo una
-  // cadena **no valida**, y la sección entera cae al respaldo de `content/` sin más aviso que
-  // una línea en el log del build. El panel se parcheó el mismo día.
   note: localizedParagraphs.nullish(),
   url: z.url().nullish(),
 })
@@ -171,7 +95,6 @@ const skillGroupSchema = z.object({
   items: z.array(z.string().min(1)).min(1),
 })
 
-/** Mismo criterio que en `experienceSchema`: las listas opcionales se normalizan aquí. */
 const projectSchema = z
   .object({
     slug: z.string().min(1),
@@ -193,8 +116,6 @@ const projectSchema = z
     ...value,
     highlights: value.highlights ?? [],
     stack: value.stack ?? [],
-    // `Boolean` y no `?? false`: el panel manda `null` cuando el interruptor nunca se ha
-    // tocado, y `null` no lo absorbe el operador de coalescencia hacia un booleano.
     featured: Boolean(value.featured),
   }))
 
@@ -206,38 +127,16 @@ const profileSchema = z.object({
   linkedin: z.url(),
   github: z.url(),
   bio: localizedParagraphs,
-  // Opcional aquí y obligatorio en el tipo `Profile`: el hueco lo rellena `getProfile` con
-  // el retrato del repositorio. Es la única normalización de esta frontera que trae un valor
-  // de `content/` en vez de limitarse a poner un array vacío.
   photo: imageSchema.nullish(),
 })
 
-/* ========================================================================== *
- * Lectura
- * ========================================================================== */
-
-/**
- * Lee de Sanity y **cachea con etiqueta**: la web se sirve estática hasta que alguien
- * publica, y entonces el webhook invalida esta etiqueta y se regenera.
- *
- * La forma correcta en Next 16 es la directiva `use cache` con `cacheTag`. Pasar
- * `{ next: { tags } }` como tercer argumento de `client.fetch` **no funciona**:
- * `@sanity/client` ignora esa opción porque no usa el `fetch` de Next con sus
- * extensiones. El resultado es un fallo silencioso —los datos quedan horneados en el
- * build sin etiqueta, el webhook responde 200 y la web no se actualiza nunca—.
- */
 async function fetchContent<T>(query: string): Promise<T> {
   'use cache'
   cacheTag(CONTENT_TAG)
-  // 'max': se sirve de caché indefinidamente y sólo cambia cuando se publica algo.
   cacheLife('max')
   return getClient().fetch<T>(query)
 }
 
-/**
- * Valida cada elemento por separado y descarta los que no cumplen. El aviso queda en el
- * log del build, que es donde alguien lo va a leer.
- */
 function keepValid<T>(items: unknown[], schema: z.ZodType<T>, label: string): T[] {
   const valid: T[] = []
   for (const item of items) {
@@ -257,11 +156,6 @@ function keepValid<T>(items: unknown[], schema: z.ZodType<T>, label: string): T[
   return valid
 }
 
-/**
- * El patrón que implementa la regla de arriba, en un solo sitio para las cinco
- * colecciones: si no hay Sanity o la consulta no devuelve nada válido, se sirve el
- * respaldo del repositorio.
- */
 async function collection<T>(
   query: string,
   schema: z.ZodType<T>,
@@ -275,9 +169,7 @@ async function collection<T>(
 
   if (valid.length === 0) {
     console.warn(
-      `[contenido] El panel no tiene ${label} publicado: se sirve el respaldo de content/. ` +
-        'Si es la primera vez que se despliega con Sanity, importa el contenido con ' +
-        '`npm run migrate:build && npm run migrate:import`.',
+      `[contenido] El panel no tiene ${label} publicado: se sirve el respaldo de content/.`,
     )
     return fallback
   }
@@ -292,9 +184,6 @@ export async function getProfile(): Promise<Profile> {
   const result = profileSchema.safeParse(raw)
 
   if (!result.success) {
-    // El perfil afecta a la cabecera, al pie y a los metadatos de todas las páginas, así
-    // que aquí el respaldo no es una comodidad: es lo que impide que un documento a
-    // medias en el panel deje el sitio sin nombre ni contacto.
     console.warn(
       `[contenido] El documento «Perfil» del panel no es válido, se sirve el respaldo de ` +
         `content/profile.ts: ${result.error.issues
@@ -304,12 +193,6 @@ export async function getProfile(): Promise<Profile> {
     return localProfile
   }
 
-  // **El retrato tiene respaldo propio, por campo.** Todo lo demás en este módulo cae al
-  // repositorio por documento entero, y con la foto no vale: un «Perfil» del panel sin
-  // imagen elegida es un documento válido, así que no dispara el respaldo de arriba y el
-  // hero se quedaría con el hueco de trama de `Figure` —una portada con un rectángulo
-  // rayado donde va la cara—. El panel manda cuando ha elegido una; si no, se sirve la del
-  // repositorio, que es el recorte calibrado para el marco del hero.
   return { ...result.data, photo: result.data.photo ?? portrait }
 }
 
@@ -329,19 +212,6 @@ export function getProjects(): Promise<ProjectEntry[]> {
   return collection(PROJECTS_QUERY, projectSchema, 'el proyecto', localProjects)
 }
 
-/**
- * Los proyectos del carrusel de la portada: **todos**, con los destacados delante.
- *
- * Antes eran sólo los cuatro destacados, con el argumento de que la portada tenía que
- * enseñar una muestra y dejar paso a la siguiente sección. Se cambió a propósito: quien lee
- * un CV en dos minutos no siempre entra en el índice de `/projects`, y en un carrusel las
- * tarjetas se pasan de lado y no hacia abajo, así que las ocho cuestan el mismo scroll que
- * cuatro. Esconder la mitad del trabajo no compraba nada.
- *
- * `featured` sigue significando algo, y es esto: **por dónde abre el carrusel**. Primero los
- * marcados y después el resto, cada grupo en el orden de la lista —`Array.prototype.sort` es
- * estable, así que dentro de cada grupo no se mueve nada—.
- */
 export async function getCarouselProjects(): Promise<ProjectEntry[]> {
   const projects = await getProjects()
   return [...projects].sort((a, b) => Number(b.featured) - Number(a.featured))
@@ -352,17 +222,11 @@ export async function getProject(slug: string): Promise<ProjectEntry | undefined
   return projects.find((project) => project.slug === slug)
 }
 
-/** Para `generateStaticParams`: sólo los proyectos que de verdad se van a poder pintar. */
 export async function getProjectSlugs(): Promise<string[]> {
   const projects = await getProjects()
   return projects.map((project) => project.slug)
 }
 
-/**
- * Proyecto anterior y siguiente, en bucle, para recorrer la lista sin volver al índice.
- * Con menos de dos proyectos no hay nada que recorrer y se devuelve `null`, que es lo que
- * la ficha usa para no pintar el bloque.
- */
 export async function getProjectNeighbours(
   slug: string,
 ): Promise<{ previous: ProjectEntry; next: ProjectEntry } | null> {

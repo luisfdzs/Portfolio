@@ -1,13 +1,6 @@
 import { orderRankField } from '@sanity/orderable-document-list'
 import { defineField, defineType } from 'sanity'
 
-/**
- * Un grupo del stack: «Backend», «Frontend», «Datos», «Plataforma y proceso».
- *
- * El orden **dentro** de cada grupo es el del array y significa algo: de más a menos uso
- * real. La web lo dice en voz alta al pie de la sección, así que reordenar aquí no es
- * cosmético — es cambiar una afirmación.
- */
 export const skillGroup = defineType({
   name: 'skillGroup',
   title: 'Stack',

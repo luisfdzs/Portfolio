@@ -7,23 +7,6 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href, navigation } from '@/lib/i18n/routes'
 import { useActiveSection } from './useActiveSection'
 
-/**
- * Las cinco entradas del menú de escritorio, con la sección que se está leyendo **resaltada
- * en amarillo** (`text-signal`, el único acento del sistema) y con su filete ya trazado.
- *
- * Es de cliente sólo por eso: saber dónde estás exige medir el scroll. La cabecera que lo
- * contiene sigue siendo de servidor, así que lo que baja al navegador son estas seis
- * entradas y no la barra entera.
- *
- * `aria-current` va sólo cuando toca —y con `location`, que es lo que significa «estás
- * aquí dentro de esta página»—: puesto siempre a `false` un lector de pantalla no lo
- * anuncia, pero el `[aria-current]` de `link-underline` sí lo vería y dejaría las cinco
- * entradas subrayadas. El color no es la única señal, que es la regla de contraste: el
- * filete del subrayado marca la activa también para quien no distinga el amarillo.
- *
- * `Link` también para las anclas: Next resuelve `/es#about` haciendo scroll si ya estás en
- * la portada y navegando si vienes de una ficha de proyecto, que es justo lo que hace falta.
- */
 export function NavList({ locale }: { locale: Locale }) {
   const t = getDictionary(locale)
   const active = useActiveSection()

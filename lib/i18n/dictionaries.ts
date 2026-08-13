@@ -1,24 +1,7 @@
 import type { Locale } from './config'
 import type { NavKey } from './routes'
 
-/**
- * TODO EL TEXTO DE INTERFAZ, EN UN SOLO SITIO
- *
- * Aquí viven los rótulos, los botones y los textos que no son contenido editorial:
- * eso último —la presentación, la experiencia, los proyectos— está en `content/` y en
- * el panel de Sanity. La frontera es útil: cambiar «Ver el código» no debería obligar
- * a entrar en el CMS, y corregir la descripción de un puesto no debería ser un commit.
- *
- * El tipo `Dictionary` se deriva del castellano, así que **si se añade una clave en
- * `es` y no en `en`, no compila**. Es la única forma de que un idioma no se quede atrás
- * en silencio, que es exactamente lo que le pasa a la mayoría de las webs bilingües.
- */
 const es = {
-  /**
-   * Sin `stack`: dejó de ser una sección el 2026-08-04 —va dentro del perfil— y con ella se
-   * fue su entrada del menú. El rótulo de la subsección no sale de aquí sino de `stack.title`,
-   * que es contenido de sección y no de navegación.
-   */
   nav: {
     about: 'Perfil',
     experience: 'Experiencia',
@@ -30,46 +13,22 @@ const es = {
   a11y: {
     skipToContent: 'Saltar al contenido',
     mainNavigation: 'Navegación principal',
-    /**
-     * La barra de móvil necesita un nombre DISTINTO del de la cabecera. Las dos existen en
-     * el DOM a la vez —una oculta por CSS según el ancho— y dos `<nav>` con el mismo nombre
-     * accesible dejan a quien usa un lector de pantalla sin forma de saber a cuál está
-     * saltando desde la lista de regiones de la página.
-     */
     mobileNavigation: 'Navegación de móvil',
     openMenu: 'Abrir el menú',
     closeMenu: 'Cerrar el menú',
     menu: 'Menú',
     backToTop: 'Volver arriba',
-    /**
-     * Aquí había un `changeLanguage: 'Cambiar de idioma'` que rotulaba el par de idiomas del
-     * menú de móvil. Se quitó con el rótulo el 2026-08-04: el nombre del idioma sigue
-     * anunciándose, pero lo pone `LocaleSwitch` desde `localeLabels` —«Español», «English»—,
-     * que es el sitio correcto, porque es el mismo dato en los dos usos y no una cadena de
-     * interfaz aparte que haya que mantener traducida dos veces.
-     */
     externalLink: 'se abre en una pestaña nueva',
   },
 
   hero: {
-    // El saludo va aparte del nombre porque en la portada son dos líneas con peso
-    // tipográfico distinto: el saludo es pequeño, el nombre es el titular.
     greeting: 'Hola, soy',
     availability: 'Analista programador senior en Mobile Smart City',
-    // Aquí había una entradilla de tres líneas con los clientes (Santander, INDRA, ABB,
-    // Ingeteam). Se quitó al pasar la portada al escenario a pantalla completa: sobre un fondo
-    // en movimiento un párrafo largo no se lee, y esos clientes están en la sección de
-    // experiencia con las fechas al lado, que es donde se pueden comprobar. El porqué completo
-    // está en `components/sections/Hero.tsx`.
     primaryCta: 'Ver proyectos',
     secondaryCta: 'Hablemos',
     scrollHint: 'Sigue bajando',
   },
 
-  /**
-   * Rótulos de las cuatro cifras del hero. Los valores NO están aquí: se calculan del
-   * contenido real en la portada, para que no puedan quedarse viejos.
-   */
   stats: {
     experience: 'Años de experiencia',
     projects: 'Proyectos en producción',
@@ -77,12 +36,6 @@ const es = {
     technologies: 'Tecnologías',
   },
 
-  /**
-   * El rótulo es la pregunta desnuda, no el índice de la sección. Decía «Quién soy, cómo
-   * trabajo y con qué» —las dos mitades, párrafos y stack— y se acortó por encargo: enumerar
-   * lo que viene a continuación se lee como un sumario, y a un titular de tres palabras le
-   * sobra el sumario.
-   */
   about: {
     title: 'Perfil',
     kicker: 'Quién soy',
@@ -92,13 +45,6 @@ const es = {
     title: 'Experiencia',
     kicker: 'Experiencia laboral',
     present: 'actualidad',
-    /**
-     * Une la consultora con el cliente final: «Altia → INDRA & Kids&Us».
-     *
-     * **Es una flecha y no la palabra «para»**, y por eso no lleva el « · » delante que tenía
-     * antes: una flecha ya es el separador. Al ser un signo y no una palabra, vale igual en
-     * los dos idiomas.
-     */
     forClient: '→',
     visitCompany: 'Sobre la empresa',
     stackLabel: 'Tecnologías',
@@ -108,12 +54,8 @@ const es = {
   projects: {
     title: 'Proyectos',
     kicker: 'Proyectos',
-    // Aparece bajo el título de la sección en la portada.
     intro: 'Webs reales en producción',
     viewProject: 'Ver el proyecto',
-    // El carrusel de la portada. Los rótulos de los dos botones son de lector de
-    // pantalla: en pantalla sólo hay una flecha, porque «Siguiente» al lado de una flecha
-    // que apunta a la derecha es la misma información dos veces.
     carousel: 'Proyectos',
     carouselPrevious: 'Proyecto anterior',
     carouselNext: 'Proyecto siguiente',
@@ -131,30 +73,14 @@ const es = {
     },
     previous: 'Anterior',
     next: 'Siguiente',
-    // Lleva al carrusel de la portada, no a un índice: se dice «volver» porque es de ahí
-    // de donde se entra a una ficha.
     backToProjects: 'Volver a los proyectos',
   },
 
-  /**
-   * **Sin `kicker`, y es la única sección que no lo tiene.** Decía «De la ingeniería industrial
-   * al desarrollo web» y se quitó por encargo: resumía la trayectoria, que es lo que cuenta la
-   * experiencia, no esta sección. `SectionHeading` lo admite y el rótulo pasa a ser el `<h2>`.
-   */
   education: {
     title: 'Formación',
     ongoing: 'en curso',
   },
 
-  /**
-   * `stack` ya no es una sección: es la subsección que cierra el perfil. `title` es su rótulo
-   * y `kicker` la línea de debajo — más corta que antes, porque ya no es el titular de una
-   * sección sino una aclaración dentro de otra.
-   *
-   * **Y ya no hay `note`.** La nota al pie decía «ordenado por lo que uso a diario, no por lo
-   * que he tocado alguna vez» y se quitó por encargo. Quien la quiera de vuelta tiene que
-   * reponer también el párrafo del final de `Stack.tsx`, que se fue con ella.
-   */
   stack: {
     title: 'Stack',
     kicker: 'Tecnologías que manejo',
@@ -185,7 +111,6 @@ const es = {
   },
 
   meta: {
-    // {years} se sustituye igual que en el hero.
     title: 'Luis Fernández Sangil · Ingeniero industrial y desarrollador web',
     description:
       'Portfolio y CV de Luis Fernández Sangil. Ingeniero industrial y desarrollador web con {years} años de experiencia en .NET, React y Next.js. Proyectos, experiencia y formación.',
@@ -193,15 +118,6 @@ const es = {
   },
 }
 
-/**
- * El castellano define la forma; el inglés debe rellenarla completa o no compila.
- *
- * **Sin `as const`**, y es la diferencia entre que esto funcione y que no: con `as const`
- * cada valor sería su propio tipo literal («Perfil» y no `string`), así que la traducción
- * inglesa fallaría en las ciento y pico claves por no ser idéntica al castellano — que es
- * justo lo contrario de lo que se quiere comprobar. Lo que interesa validar son **las
- * claves**, no los valores.
- */
 export type Dictionary = typeof es
 
 const en: Dictionary = {
@@ -248,7 +164,6 @@ const en: Dictionary = {
     title: 'Experience',
     kicker: 'Work experience',
     present: 'Present',
-    // La flecha es la misma en los dos idiomas: es un signo, no una palabra. Ver el castellano.
     forClient: '→',
     visitCompany: 'About the company',
     stackLabel: 'Technologies',
@@ -328,11 +243,6 @@ export function getDictionary(locale: Locale): Dictionary {
   return dictionaries[locale]
 }
 
-/**
- * Sustituye `{clave}` por su valor. Existe porque hay dos frases —el titular y la
- * descripción para buscadores— donde la cifra de años se calcula de las fechas reales
- * del CV y no puede estar escrita a mano: el día que se escriba a mano, se queda vieja.
- */
 export function interpolate(template: string, values: Record<string, string | number>): string {
   return template.replace(/\{(\w+)\}/g, (match, key: string) => {
     const value = values[key]
