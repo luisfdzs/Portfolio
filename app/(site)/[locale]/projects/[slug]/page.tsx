@@ -12,11 +12,6 @@ import { ArrowLeft, ArrowRight } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 import { TagList } from '@/components/ui/Tag'
 
-/**
- * Las rutas se generan del **producto cartesiano de idiomas y slugs**, y los slugs salen
- * de la lista ya validada (ver `getProjectSlugs`): un proyecto que la validación descarta
- * no genera ruta, así que no puede quedar una URL prerrenderizada devolviendo 404.
- */
 export async function generateStaticParams() {
   const slugs = await getProjectSlugs()
   return locales.flatMap((locale) => slugs.map((slug) => ({ locale, slug })))
@@ -48,24 +43,11 @@ export async function generateMetadata({
   }
 }
 
-/**
- * Ficha de proyecto.
- *
- * La estructura responde al orden en que se lee un proyecto ajeno: **qué es** (nombre y
- * frase), **cómo se ve** (captura), **qué había que resolver** (resumen), **qué decisiones
- * se tomaron** (lo que tiene dentro) y **con qué** (stack). Los enlaces a la web y al
- * repositorio van arriba y abajo: arriba para quien sólo quiere verlo, abajo para quien ha
- * leído y ahora sí quiere el código.
- *
- * El bloque de anterior/siguiente cierra el bucle de la lista, para que se puedan recorrer
- * la lista entera sin volver al índice entre cada dos fichas.
- */
 export default async function ProjectPage({
   params,
 }: {
   params: Promise<{ locale: string; slug: string }>
 }) {
-  // Estática completa, por lo mismo que la portada: ver el comentario en `[locale]/page.tsx`.
   'use cache'
   cacheLife('max')
 
@@ -133,7 +115,6 @@ export default async function ProjectPage({
         <Figure image={project.image} locale={locale} sizes="(min-width: 1024px) 64rem, 100vw" />
       </Reveal>
 
-      {/* Los tres datos de cabecera, en una fila de definiciones. */}
       <dl className="mt-12 grid gap-8 border-y border-line py-8 sm:grid-cols-3">
         {facts.map((fact) => (
           <div key={fact.label}>
@@ -151,13 +132,6 @@ export default async function ProjectPage({
         ))}
       </div>
 
-      {/* La nota, cuando hay algo que matizar: dominio pendiente, datos de ejemplo… Va en
-          un bloque marcado y no dentro del resumen, porque es una advertencia y tiene que
-          leerse como tal. Es la sección que hace que el resto se crea.
-
-          El filete es SUPERIOR y no lateral: un filete a la izquierda marca el margen desde
-          el que arranca cada línea, y con el texto centrado ninguna línea arranca ahí. Arriba
-          señala el bloque entero, que es lo que hace falta, y no una alineación que no existe. */}
       {project.note ? (
         <Reveal className="mt-10 mx-auto max-w-measure border-t-2 border-signal-dim bg-ink-raised px-5 py-4">
           <p className="text-small text-paper-soft">{project.note[locale]}</p>
@@ -172,9 +146,6 @@ export default async function ProjectPage({
           <ol className="mt-8 space-y-7">
             {project.highlights.map((highlight, index) => (
               <Reveal as="li" key={highlight[locale].slice(0, 40)} step={index}>
-                {/* El número, ENCIMA del texto y no a su izquierda: en una fila el número
-                    fija el margen izquierdo del párrafo, y un párrafo centrado no tiene ese
-                    margen. Arriba y centrado numera el punto sin fingir una alineación. */}
                 <div className="flex flex-col items-center gap-2">
                   <span className="figure-num text-small text-paper-faint" aria-hidden="true">
                     {String(index + 1).padStart(2, '0')}

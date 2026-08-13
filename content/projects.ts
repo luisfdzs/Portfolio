@@ -1,36 +1,6 @@
 import type { ProjectEntry } from './types'
-import { projectList, type ProjectListing } from './projects.config.ts'
+import { projectList, type ProjectListing } from './projects.config'
 
-/**
- * FICHAS DE LOS PROYECTOS
- *
- * **Aquí está el contenido; qué se publica y en qué orden lo decide
- * `content/projects.config.ts`.** Una ficha que no esté en esa lista no sale en la web, y
- * eso es lo que permite añadir o retirar un proyecto tocando un título en un sitio.
- *
- * Los `highlights` son decisiones técnicas comprobables en el código, no adjetivos: es la
- * diferencia entre un portfolio que se lee y uno que se cree. Las `note` son el matiz
- * honesto —dominio pendiente, datos de ejemplo, repositorio privado—: es la sección que hace
- * que el resto se crea.
- *
- * El `name` de la ficha tiene que ser **exactamente** el título de la lista: es la clave que
- * une las dos. El `slug` es otra cosa y no se toca a la ligera: es la URL de la ficha y el
- * nombre del fichero de la captura, y también el `_id` del documento en Sanity (ver
- * `scripts/build-sanity-import.mjs`).
- *
- * `import './projects.config.ts'` **con la extensión escrita**, y no es un descuido: los
- * scripts de `scripts/` importan este fichero con el despojado de tipos de Node, que no
- * resuelve especificadores sin extensión. Por eso `tsconfig.json` lleva
- * `allowImportingTsExtensions`.
- *
- * Quedan fuera a propósito los directorios de `C:\Proyectos` que no son proyectos:
- * `manfisa-claude` y `sangil-claude` son worktrees de git del mismo repo, `manfisa-imagenes`
- * es material gráfico, y `Porfolio` es el portfolio anterior en Astro al que esta web
- * sustituye. Manfisa sí es un proyecto y sí tiene repositorio, pero está retirado de la web
- * por decisión propia: ver `projects.config.ts`.
- */
-
-/** Una ficha es un proyecto **menos** su sitio en la web, que lo decide la lista. */
 type ProjectSheet = Omit<ProjectEntry, 'featured'>
 
 const sheets: ProjectSheet[] = [
@@ -491,7 +461,6 @@ const sheets: ProjectSheet[] = [
   },
 ]
 
-/** El título y las banderas de una entrada de la lista, venga como cadena o como objeto. */
 function listing(entry: ProjectListing): { title: string; featured: boolean } {
   return typeof entry === 'string'
     ? { title: entry, featured: false }
@@ -500,14 +469,6 @@ function listing(entry: ProjectListing): { title: string; featured: boolean } {
 
 const byName = new Map(sheets.map((sheet) => [sheet.name, sheet]))
 
-/**
- * Los proyectos publicados: la lista de `projects.config.ts` resuelta contra las fichas de
- * arriba, en el orden de la lista.
- *
- * Un título sin ficha **no se publica** y deja un aviso con su nombre. El aviso importa tanto
- * como el descarte: sin él, quien añade un título y no ve nada en la web supone que el fichero
- * de configuración no funciona.
- */
 export const projects: ProjectEntry[] = projectList.flatMap((entry) => {
   const { title, featured } = listing(entry)
   const sheet = byName.get(title)
@@ -515,8 +476,7 @@ export const projects: ProjectEntry[] = projectList.flatMap((entry) => {
   if (!sheet) {
     console.warn(
       `[proyectos] «${title}» está en content/projects.config.ts pero no tiene ficha: ` +
-        'escríbela en content/projects.ts con ese mismo `name` y genera su captura con ' +
-        '`npm run shots -- <slug>`. Hasta entonces no se publica.',
+        'escríbela en content/projects.ts con ese mismo `name`. Hasta entonces no se publica.',
     )
     return []
   }

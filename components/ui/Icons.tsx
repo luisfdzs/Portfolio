@@ -1,17 +1,5 @@
 import type { SVGProps } from 'react'
 
-/**
- * Iconos en un único fichero, dibujados a mano sobre una retícula de 24.
- *
- * No hay librería de iconos a propósito: son doce trazos y una dependencia como
- * `lucide-react` mete 1.500 iconos en el árbol para usar doce. Todos comparten
- * `stroke-width` y terminaciones redondeadas, que es lo que hace que un juego de iconos
- * se vea como un juego y no como una colección.
- *
- * Ninguno lleva `<title>`: son decorativos y van siempre acompañados de texto o de un
- * `aria-label` en el elemento que los contiene, así que `aria-hidden` es lo correcto —un
- * lector de pantalla que los anunciara diría el nombre dos veces.
- */
 type IconProps = SVGProps<SVGSVGElement>
 
 function Icon({ children, ...props }: IconProps) {
@@ -77,15 +65,6 @@ export function ArrowDown(props: IconProps) {
   )
 }
 
-/**
- * Perfil.
- *
- * Aquí había una casa, y la usaban las dos cosas que representan la sección «Perfil»: su
- * cabecera y el icono de la barra de móvil. Un icono de inicio junto al rótulo «Perfil»
- * promete volver arriba y lleva a la mitad de la página — que es la clase de desajuste que
- * hace desconfiar de una barra de navegación entera. La casa se fue con ella porque no
- * quedaba nada que la usara.
- */
 export function User(props: IconProps) {
   return (
     <Icon {...props}>
@@ -171,10 +150,6 @@ export function Close(props: IconProps) {
   )
 }
 
-/**
- * Los dos logotipos van rellenos y no en trazo: son marcas registradas con una forma
- * concreta y redibujarlas en línea las haría irreconocibles al tamaño en que se usan.
- */
 export function GitHub(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" {...props}>

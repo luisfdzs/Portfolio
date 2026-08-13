@@ -11,10 +11,7 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint && prettier --check .",
     "format": "prettier --write .",
-    "check:mobile": "node scripts/check-mobile.mjs",
-    "shots": "node scripts/build-project-shots.mjs",
-    "migrate:build": "node scripts/build-sanity-import.mjs",
-    "migrate:import": "sanity dataset import scripts/migration/import.ndjson --dataset production --replace"
+    "check:mobile": "node scripts/check-mobile.mjs"
   },
   "dependencies": {
     "@sanity/client": "^7.25.0",
@@ -38,7 +35,6 @@
     "playwright-core": "^1.62.0",
     "prettier": "^3.9.6",
     "sanity": "^6.6.0",
-    "sharp": "^0.34.4",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2"
   }

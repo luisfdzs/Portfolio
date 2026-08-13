@@ -1,45 +1,5 @@
 import type { DescribedImage, EducationEntry, ExperienceEntry, Profile, SkillGroup } from './types'
 
-/**
- * EL CV, COMO DATOS
- *
- * Fuente: el perfil de LinkedIn (linkedin.com/in/luisfernandezsangil), que es el
- * documento que se mantiene al día. Cuando cambie allí, cambia aquí —o, mejor, en el
- * panel de /admin, que es lo que gana sobre este fichero (ver `lib/content.ts`)—.
- *
- * **Nada de esto se inventa.** Las fechas, los puestos, las empresas y el cliente final
- * de cada consultoría son los que constan en LinkedIn. Lo único redactado aquí son los
- * resúmenes, que reordenan esa información para que se lea en pantalla; no añaden
- * hechos. Si algún día hace falta un dato que no consta, se deja fuera: un CV con un
- * dato dudoso vale menos que uno con un hueco.
- */
-
-/**
- * EL RETRATO DE RESPALDO, y **el único respaldo que se usa por campo y no por documento**.
- *
- * El panel sigue teniendo su campo «Retrato» y sigue mandando cuando hay una imagen elegida;
- * lo que cambia es qué pasa cuando no la hay. La regla general del contenido cae al respaldo
- * **por documento entero** —perfil, puesto, proyecto—, y con el retrato eso no basta: el
- * documento «Perfil» del panel es perfectamente válido con el campo de la foto vacío, así que
- * no se cae a `content/` y el hero se quedaba con el hueco de trama de `Figure`. Por eso el
- * respaldo del retrato es por campo y lo pone `getProfile` (ver `lib/content.ts`).
- *
- * Va suelto y no sólo dentro de `profile` porque el respaldo de campo tiene que poder usarse
- * cuando el resto del perfil viene de Sanity, que es el caso normal. Se declara **antes** de
- * `profile`, que lo referencia: al revés sería un `const` usado antes de inicializarse y el
- * módulo rompería al cargar.
- *
- * **Es un RECORTE con canal alfa**: el busto sin la calle de detrás, calibrado contra
- * `.hero-portrait__frame` — una foto con fondo subida al panel deja el busto como una tarjeta
- * oscura en el hero. Si alguna vez se repone el original a 800×800, hay que volver a
- * recortarlo.
- *
- * 200×200 es el original que había: es justo el mínimo para el retrato circular de móvil
- * (160 px) pero se queda corto para los 320 px de escritorio, donde se ve blando en pantallas
- * de alta densidad. Está apuntado en el README como pendiente: hace falta el original a
- * 800×800. Se declaran las medidas reales y no las deseadas, porque `next/image` reserva el
- * hueco con ellas y mentir aquí provoca salto de maquetación.
- */
 export const portrait: DescribedImage = {
   src: '/luis.webp',
   width: 200,
@@ -63,29 +23,6 @@ export const profile: Profile = {
   email: 'luisfsangil@gmail.com',
   linkedin: 'https://www.linkedin.com/in/luisfernandezsangil',
   github: 'https://github.com/luisfdzs',
-  /**
-   * LOS DOS PÁRRAFOS DEL PERFIL. Eran tres y los reescribió Luis en persona el 2026-08-04.
-   *
-   * Es la sección más personal del CV y la única de prosa, así que el riesgo no es quedarse
-   * corto: es escribir seis párrafos que nadie lea. Cada uno dice una cosa y se aparta.
-   *
-   * Lo que dicen, en orden: que la formación como desarrollador es autodidacta a pesar de venir
-   * de una ingeniería; y que lo que de verdad marca la diferencia son las habilidades blandas.
-   * Ese segundo párrafo es el que hay que dejar al final: es una opinión, y una opinión se
-   * defiende cuando ya se ha demostrado lo demás.
-   *
-   * **La entradilla se queda en una sola frase, y eso es de la tanda del 2026-08-04.** Luis
-   * borró en el inspector la segunda frase —«en la carrera sí que se tocaba algo de
-   * programación, quizá más enfocada a procesos industriales…»— y pegó en su lugar la lista de
-   * lo que le dejó la ingeniería. Esa lista se queda **sólo en la nota de formación**, que es
-   * la sección que habla del grado: repetida aquí palabra por palabra se lee como un
-   * copia y pega, y el CV entero pierde crédito por un párrafo. Lo que sí se respeta es el
-   * borrado, así que la entradilla es ahora una frase y ya está — no le hace falta más, porque
-   * de dónde viene el perfil lo cuentan la sección de formación y la de experiencia.
-   *
-   * No hay una sola cifra ni un solo cliente aquí, a propósito: eso está en las secciones que
-   * se pueden comprobar, con las fechas al lado. Aquí no se demuestra nada, se dice quién eres.
-   */
   bio: {
     es: [
       'Como muchos otros desarrolladores, mi formación ha sido 100 % autodidacta, ya que a pesar de haber estudiado ingeniería industrial, me enfoqué en el desarrollo de software y dediqué un tiempo importante a realizar cursos y proyectos personales.',
@@ -99,11 +36,6 @@ export const profile: Profile = {
   photo: portrait,
 }
 
-/**
- * Experiencia, de lo más reciente a lo más antiguo. El orden es el del array: no se
- * ordena por fecha en tiempo de ejecución, porque un CV no siempre quiere el orden
- * estrictamente cronológico y prefiero que se vea aquí cuál es.
- */
 export const experience: ExperienceEntry[] = [
   {
     slug: 'mobile-smart-city',
@@ -115,17 +47,6 @@ export const experience: ExperienceEntry[] = [
     range: { start: '2026-03', end: null },
     location: { es: 'España · En remoto', en: 'Spain · Remote' },
     remote: true,
-    /**
-     * ESTE RESUMEN LO ESCRIBIÓ LUIS EN PRIMERA PERSONA (2026-08-04), y por eso suena distinto
-     * al que había: la actividad de la empresa se explica con una comparación —«el Telpark de
-     * Estados Unidos»— en vez de con la descripción de su web oficial, que no le decía nada a
-     * quien no conoce el sector.
-     *
-     * El primer párrafo está aquí porque el nombre de la empresa no dice a qué se dedica, y un
-     * recruiter que no lo sepa no puede valorar el puesto. El segundo dice qué hace Luis, y la
-     * frase que no hay que perder es «formando parte de la plantilla interna»: es lo que
-     * distingue este puesto de los tres anteriores, todos de consultoría con cliente final.
-     */
     summary: {
       es: [
         'Mobile Smart City es «el Telpark de Estados Unidos». Es la empresa más grande para gestión de parkings, permisos anuales para zonas de aparcamiento, reservas de plaza en el aeropuerto, etc.',
@@ -142,8 +63,6 @@ export const experience: ExperienceEntry[] = [
     slug: 'altia',
     role: { es: 'Desarrollador full stack', en: 'Full stack developer' },
     company: 'Altia',
-    // Dos clientes y no cuatro: Luis quitó Banco Santander Portugal y GETNET el 2026-08-04.
-    // Es su CV y su decisión; lo que queda sigue constando en LinkedIn.
     client: 'INDRA & Kids&Us',
     range: { start: '2024-02', end: '2026-01' },
     location: {
@@ -215,9 +134,6 @@ export const experience: ExperienceEntry[] = [
     slug: 'zemsania-asti-abb',
     role: { es: 'Programador de AGVs', en: 'AGV programmer' },
     company: 'Zemsania Global Group',
-    // Sólo ASTI: ABB salió del rótulo el 2026-08-04 y pasó al primer párrafo del resumen, que
-    // es donde la compra se puede contar con su contexto («ahora forma parte de…») en vez de
-    // parecer un segundo cliente simultáneo.
     client: 'ASTI Mobile Robotics',
     range: { start: '2021-08', end: '2022-12' },
     location: {
@@ -247,34 +163,9 @@ export const education: EducationEntry[] = [
       es: 'Grado en Ingeniería Industrial',
       en: "Bachelor's degree in Industrial Engineering",
     },
-    // El castellano es el que ya estaba editado en el panel («Universidad», no
-    // «Universidade»), para que el respaldo y el panel digan lo mismo. El inglés es el
-    // nombre oficial que usa la propia uvigo.gal en su versión inglesa.
     institution: { es: 'Universidad de Vigo', en: 'University of Vigo' },
     range: { start: '2020-09', end: '2025-06' },
     location: { es: 'Vigo, Galicia', en: 'Vigo, Spain' },
-    /**
-     * LA NOTA HABLA DE LA BASE, no del calendario, y desde el 2026-08-04 la escribe Luis en
-     * primera persona.
-     *
-     * Decía que la carrera se cursó en paralelo a los tres primeros puestos, y eso se quitó por
-     * el mismo argumento por el que esta sección dejó de pintar las fechas: contar cuánto se
-     * solapó invita a la cuenta de los años y a preguntarse cómo se reparte una jornada, y
-     * ninguna de las dos cosas dice nada sobre lo que sabe hacer alguien. Lo que sí lo dice es
-     * qué deja una ingeniería cuando ya no se ejerce de ingeniero.
-     *
-     * La versión de Luis aterriza eso en un ejemplo de hoy —cómo escribe los prompts cuando
-     * trabaja con IA— y es a propósito: es el único sitio del CV donde una asignatura de 2020
-     * se conecta con algo que se hace en 2026.
-     *
-     * **Y desde la segunda tanda del 2026-08-04 son DOS párrafos, no una frase larga.** El
-     * primero es la idea en una línea, con la cita que la resume; el segundo, la lista de en qué
-     * se nota hoy. Partirla es lo que la hace legible: en un párrafo único de cinco líneas
-     * centradas, la cita quedaba enterrada en medio y era justo lo que había que retener. Aquí
-     * vive **la única copia** de esa lista: estuvo también en la entradilla del perfil por un
-     * pegado en el inspector, y de las dos ésta es la que le corresponde, porque es la sección
-     * que habla del grado (ver el comentario de `bio`).
-     */
     note: {
       es: [
         'Quizás lo mejor que me ha aportado este grado es una forma de pensar bien estructurada: «todos los problemas pueden resolverse, siempre y cuando se dividan primero en partes más sencillas y manejables».',
@@ -289,14 +180,6 @@ export const education: EducationEntry[] = [
   },
 ]
 
-/**
- * Stack agrupado por para qué sirve, no por «lenguajes / frameworks / herramientas».
- *
- * La razón es lo que hace un recruiter técnico con esta sección: comprueba si cubres el
- * hueco que tiene. Una lista plana de treinta logos no responde a eso; cuatro grupos que
- * dicen «esto es lo que hago en backend, esto en frontend» sí. Y dentro de cada grupo el
- * orden es de más a menos uso real, que es la única jerarquía honesta.
- */
 export const skills: SkillGroup[] = [
   {
     key: 'backend',
@@ -333,8 +216,6 @@ export const skills: SkillGroup[] = [
   {
     key: 'platform',
     title: { es: 'Plataforma y proceso', en: 'Platform & process' },
-    // Los nombres del stack no se traducen (son la misma palabra en los dos idiomas), así
-    // que aquí sólo caben términos que ya son neutros: «Agile» y no «metodologías ágiles».
     items: ['Vercel', 'Git', 'GitHub', 'CI/CD', 'Agile', 'ERP'],
   },
 ]
