@@ -1,63 +1,26 @@
 @import 'tailwindcss';
 
-/* ============================================================================
-   PORTFOLIO · Luis Fernández Sangil — Sistema de diseño
-
-   Los tokens viven aquí y SÓLO aquí. Las utilidades de Tailwind se generan a
-   partir de este @theme, así que no existe forma de usar un color o un espaciado
-   que no esté en el sistema. Regla: si algo no está en esta lista, no se usa.
-
-   Quien lee esto es un recruiter o un cliente potencial que dedica entre treinta
-   segundos y dos minutos. De ahí las cuatro decisiones de fondo:
-
-   1. OSCURO, y sin conmutador de tema. Un portfolio de desarrollador oscuro es
-      lo que el lector espera, y comprometerse con un solo modo permite ajustar
-      el contraste de cada tono en vez de buscar el valor que aguante los dos.
-      Lo que sí hay es un bloque @media print: si alguien imprime esto como CV
-      —y pasa—, sale en papel blanco con tinta negra y sin gastar un cartucho.
-   2. UNA SERIF DE TITULAR sobre una sans neutra. Es la decisión que separa esto
-      de los cientos de portfolios que usan la misma sans para todo: la serif da
-      voz editorial a los titulares, y la sans se queda con el trabajo de que el
-      cuerpo se lea. Diferencia sin disfrazarse de agencia creativa.
-   3. LAS CIFRAS Y LOS DATOS TÉCNICOS, EN MONOESPACIADA. Fechas, duraciones,
-      nombres de tecnología, rótulos de sección. Es lo que hace que una línea
-      temporal se lea como una tabla y no como prosa con números dentro.
-   4. UN ÚNICO ACENTO (`signal`), cobre. Marca lo accionable y el dato
-      destacado. Nunca decora, y nunca dos veces en el mismo bloque: en cuanto
-      un acento aparece en todas partes deja de señalar nada.
-   ========================================================================= */
-
 @theme {
-  /* --- Color: grafito, papel frío y un acento de cobre ------------------- */
-  --color-ink: #08090b; /* lienzo, casi negro pero no negro puro */
-  --color-ink-raised: #0f1116; /* tarjetas, bloques elevados */
-  --color-ink-sunken: #050608; /* pie y bandas hundidas */
-  --color-paper: #edeef0; /* texto principal */
-  --color-paper-soft: #a2a8b0; /* texto secundario, párrafos largos */
-  --color-paper-faint: #6d747c; /* metadatos, unidades, numeración */
-  --color-line: #1b1f25; /* filetes de 1px: la retícula */
-  --color-line-strong: #2a3037; /* bordes de tarjeta, separadores fuertes */
+  --color-ink: #08090b;
+  --color-ink-raised: #0f1116;
+  --color-ink-sunken: #050608;
+  --color-paper: #edeef0;
+  --color-paper-soft: #a2a8b0;
+  --color-paper-faint: #6d747c;
+  --color-line: #1b1f25;
+  --color-line-strong: #2a3037;
 
-  /* Acento único. Cobre: metal, que es de donde viene este perfil, y el único
-     tono cálido de la paleta, así que destaca sobre el grafito sin necesitar
-     saturación. 8.9:1 sobre el lienzo — AAA para texto grande y AA para el
-     cuerpo, así que puede usarse en un enlace y no sólo en un adorno. */
   --color-signal: #e0a458;
-  --color-signal-dim: #b8823f; /* hover y bordes: mismo tono, menos brillo */
+  --color-signal-dim: #b8823f;
 
-  /* --- Tipografía -------------------------------------------------------- */
-  /* Tres funciones, tres familias, sin solaparse:
-     display → titulares y el nombre; sans → todo el cuerpo; mono → datos. */
   --font-display: var(--font-instrument-serif), ui-serif, Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
 
-  /* Escala fluida: un valor por peldaño, sin variantes intermedias.
-     clamp() evita media queries para tipografía y elimina saltos bruscos. */
-  --text-micro: 0.6875rem; /* 11px · rótulos, unidades, numeración */
+  --text-micro: 0.6875rem;
   --text-micro--line-height: 1.4;
   --text-micro--letter-spacing: 0.14em;
-  --text-small: 0.8125rem; /* 13px · metadatos, etiquetas de stack */
+  --text-small: 0.8125rem;
   --text-small--line-height: 1.5;
   --text-body: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
   --text-body--line-height: 1.7;
@@ -69,30 +32,17 @@
   --text-display--line-height: 0.98;
   --text-display--letter-spacing: -0.025em;
 
-  /* Cifra grande de dato (años de experiencia, proyectos entregados). Va
-     siempre en mono con `tabular-nums`: dos cifras ocupan lo mismo aunque
-     cambien, así que la retícula no baila entre despliegues. */
   --text-figure: clamp(1.75rem, 1.2rem + 2.2vw, 3rem);
   --text-figure--line-height: 1;
   --text-figure--letter-spacing: -0.03em;
 
-  /* --- Ritmo espacial ---------------------------------------------------- */
-  --spacing-gutter: clamp(1.25rem, 5vw, 4rem); /* margen lateral de página */
-  --spacing-section: clamp(4.5rem, 10vw, 10rem); /* aire vertical entre bloques */
+  --spacing-gutter: clamp(1.25rem, 5vw, 4rem);
+  --spacing-section: clamp(4.5rem, 10vw, 10rem);
 
-  /* Alto de la barra de navegación inferior de móvil. Vive en el sistema porque
-     lo necesitan tres sitios que tienen que cuadrar al píxel: la barra, el panel
-     del menú que se abre justo encima, y el hueco que el <body> se reserva bajo
-     el pie para que la barra no tape la última línea.
-     El env() es la franja del gesto de inicio del iPhone: sin sumarla, los
-     iconos caen debajo de la rayita del sistema. */
   --spacing-nav-mobile: calc(4rem + env(safe-area-inset-bottom));
 
-  /* Medida de lectura. 62ch y no 75ch: el cuerpo es una sans a 17px sobre fondo
-     oscuro, y en oscuro la línea larga cansa antes porque el texto «irradia». */
   --container-measure: 62ch;
 
-  /* --- Movimiento -------------------------------------------------------- */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --animate-reveal: reveal 0.9s var(--ease-out-soft) both;
 }
@@ -108,21 +58,11 @@
   }
 }
 
-/* ============================================================================
-   Base
-   ========================================================================= */
-
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* Las secciones son anclas de la portada y la cabecera es fija: sin este
-       margen, pulsar «Experiencia» deja el titular de la sección debajo de la
-       cabecera y parece que el enlace ha fallado. */
     scroll-padding-block-start: 5rem;
     -webkit-text-size-adjust: 100%;
-    /* Fija el esquema para los controles nativos (barras de scroll, selects):
-       sin esto, en un sistema en modo claro salen barras blancas sobre el
-       lienzo negro. */
     color-scheme: dark;
   }
 
@@ -132,22 +72,10 @@
     font-family: var(--font-sans);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
-    /* Hueco bajo el pie para la barra de navegación de móvil, que es fija y
-       taparía la última línea. En >= lg la barra no existe y se anula abajo. */
     padding-block-end: var(--spacing-nav-mobile);
     -webkit-font-smoothing: antialiased;
   }
 
-  /* EL CONTENIDO, POR ENCIMA DEL CAMPO.
-     El fondo interactivo (`.site-field`) es una capa fija con `z-index: 0`, y
-     ése es el detalle que obliga a estas dos líneas: en el orden de pintado de
-     CSS, un elemento POSICIONADO con `z-index: 0` va por encima del contenido
-     de los elementos estáticos, aunque esté antes en el documento. Sin esto el
-     campo se dibujaría delante del texto de las secciones y no detrás.
-     La cabecera y la barra de móvil no aparecen aquí porque ya tienen su propio
-     `z-40`/`z-50`, y el pie tampoco lo necesitaría —su fondo es opaco— pero se
-     incluye para que la regla sea «todo lo que cuelga del body, encima» y no una
-     lista de excepciones que hay que recordar al añadir la siguiente. */
   body > main,
   body > footer {
     position: relative;
@@ -165,7 +93,7 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 400; /* La Instrument Serif sólo tiene un peso: no se finge negrita. */
+    font-weight: 400;
     text-wrap: balance;
   }
 
@@ -173,14 +101,12 @@
     text-wrap: pretty;
   }
 
-  /* Foco visible y coherente en todo el sitio (accesibilidad). */
   :focus-visible {
     outline: 2px solid var(--color-signal);
     outline-offset: 3px;
     border-radius: 2px;
   }
 
-  /* La selección con el acento: detalle pequeño que se nota al copiar un correo. */
   ::selection {
     background-color: var(--color-signal);
     color: var(--color-ink);
@@ -198,7 +124,6 @@
     height: auto;
   }
 
-  /* Nadie debería marearse con nuestras animaciones. */
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
@@ -213,26 +138,14 @@
   }
 }
 
-/* ============================================================================
-   Utilidades del sistema
-   Sólo patrones que se repiten de verdad. Todo lo demás, utilidades de Tailwind.
-   ========================================================================= */
-
 @utility page-gutter {
   padding-inline: var(--spacing-gutter);
 }
 
-/* Aire vertical de una sección: LA MITAD de `--spacing-section` arriba y abajo.
-   La mitad, y no el valor entero, porque las secciones son contiguas y sus
-   paddings se suman: con `py-section` en las cinco, entre el final del texto de
-   una y el rótulo de la siguiente quedaban 18rem de vacío y la página parecía
-   partida. Así la suma de los dos paddings adyacentes es exactamente
-   `--spacing-section`, que es lo que ese token dice ser: el aire ENTRE bloques. */
 @utility section-block {
   padding-block: calc(var(--spacing-section) / 2);
 }
 
-/* Rótulo en versalitas: títulos de sección, categorías, estados. */
 @utility eyebrow {
   font-family: var(--font-mono);
   font-size: var(--text-micro);
@@ -242,19 +155,12 @@
   color: var(--color-paper-faint);
 }
 
-/* Cifra o dato técnico. `tabular-nums` es lo que mantiene alineadas las columnas
-   de fechas de la línea temporal: sin ella, «ago. 2021» y «feb. 2024» empiezan
-   en sitios distintos y la columna deja de leerse en vertical. */
 @utility figure-num {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'zero' 1;
 }
 
-/* Enlace con subrayado que se dibuja al pasar por encima. Crece desde el
-   CENTRO hacia los dos lados, porque el texto de este sitio está centrado: un
-   subrayado que nace en el borde izquierdo de una línea centrada arranca en un
-   punto que no coincide con nada y se lee como un desajuste. */
 @utility link-underline {
   position: relative;
   display: inline-block;
@@ -271,11 +177,6 @@
     transition: transform 0.45s var(--ease-out-soft);
   }
 
-  /* `[aria-current]` es la entrada del menú de la sección que se está leyendo: se queda
-     con el subrayado puesto. El color amarillo ya la distingue, pero el color no puede ser
-     la única señal —es la regla de contraste del proyecto—, y el filete la marca también
-     para quien no lo vea. Sólo entra por el atributo cuando está, nunca puesto a `false`:
-     el selector mira la presencia, no el valor. */
   &:hover::after,
   &:focus-visible::after,
   &[aria-current]::after {
@@ -283,10 +184,6 @@
   }
 }
 
-/* Amplía el área pulsable a los 24px que exige WCAG 2.2 sin cambiar el diseño:
-   el texto sigue midiendo lo que mide; lo que crece es una capa invisible por
-   encima. Imprescindible en los enlaces pequeños (pie, contacto, etiquetas)
-   cuando se usan con el dedo. */
 @utility tap {
   position: relative;
 
@@ -298,9 +195,6 @@
   }
 }
 
-/* Aparición al entrar en viewport. La hace CSS con scroll-driven animations
-   (cero JS); si el navegador no las soporta, el contenido se ve fijo — que es el
-   fallback correcto, nunca contenido invisible por una animación que no corre. */
 @utility reveal {
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
@@ -312,9 +206,6 @@
   }
 }
 
-/* Trama de placeholder para las capturas de proyecto que todavía no existen.
-   Debe verse como un hueco y no disimularse: cuando haya captura, <Figure> deja
-   de pintar esto y no hay nada que borrar. */
 @utility placeholder-grid {
   background-color: var(--color-ink-raised);
   background-image: repeating-linear-gradient(
@@ -324,79 +215,18 @@
   );
 }
 
-/* ============================================================================
-   COVER FLOW — los proyectos de la portada (todos, y en bucle infinito)
-
-   Un carrusel 3D: la tarjeta centrada se mira de frente y las demás se giran
-   sobre su eje vertical, se alejan y se apagan. Lo mueve el scroll y nada más
-   —`view-timeline` + `animation-timeline`, la misma técnica que `reveal`—, así
-   que no hay JavaScript calculando posiciones ni un bucle de animación
-   corriendo detrás. De `CoverFlow.tsx` vienen sólo los dos botones —una rueda de
-   ratón no hace scroll horizontal— y el salto del bucle.
-
-   **El carrusel no tiene extremos.** La lista se pinta tres veces y el scroll se
-   recoloca una lista entera cuando se ha ido de largo, con lo que después de la
-   última tarjeta vuelve la primera. Aquí eso no se nota: cada tarjeta se anima
-   por su propia posición (`view-timeline` es de cada `li`), así que las copias
-   giran igual que los originales sin una línea más de CSS. Lo único que las
-   distingue es `[data-clone]`, y sólo lo usa la hoja de impresión. El cómo y el
-   por qué están en `CoverFlow.tsx`.
-
-   La geometría es lo único delicado:
-
-   - `--cover-flow-card` es lo que MIDE la tarjeta y `--cover-flow-step` lo que
-     AVANZA el scroll de una a la siguiente. Al ser el paso más corto que la
-     tarjeta, las tarjetas se solapan, y ese solape ES el efecto. Se consigue
-     con márgenes laterales negativos y no con posicionamiento absoluto: así
-     cada tarjeta conserva su alto natural y la fila se iguala sola con
-     `align-items: stretch`.
-   - Cuánto scroll dura el giro lo fija **el ancho del carrusel**, y no un
-     `view-timeline-inset` como en la mayoría de los ejemplos. Con
-     `animation-range: contain` el giro ocupa `ancho − tarjeta` de scroll, así
-     que con un `max-width` de `tarjeta + 2,6 · paso` el giro dura 2,6 pasos: la
-     vecina inmediata queda a media vuelta y la siguiente, al máximo. Con un
-     tramo más corto todas las laterales estarían clavadas a 52° y el movimiento
-     parecería un salto en vez de un giro.
-     Medirlo por el ancho en vez de por el inset tiene una segunda ventaja, que
-     es la que decidió: el carrusel no es de ancho completo, es una ventana
-     centrada de 2,6 pasos. A ancho completo, en un monitor de 1900 px quedaba
-     medio metro de vacío a la izquierda de la primera tarjeta, porque un
-     carrusel centrado sólo tiene tarjetas a un lado cuando está al principio.
-     En móvil el `max-width` no llega a aplicarse —la ventana es más estrecha que
-     2,6 pasos— y el giro dura lo que dé el viewport, que es cerca de un paso.
-   - El `z-index` se anima también, en una ventana estrecha alrededor del centro
-     (ver el comentario del fotograma). Sin él la tarjeta de la derecha
-     —posterior en el DOM— taparía el borde de la centrada justo cuando ésta
-     pasa al frente.
-
-   Si el navegador no soporta scroll-driven animations, o si el sistema pide
-   menos movimiento, queda un carrusel horizontal normal: tarjetas separadas,
-   ninguna girada y el mismo contenido. Es el criterio de `reveal`: el fallback
-   nunca esconde nada.
-   ========================================================================= */
-
 .cover-flow {
   --cover-flow-card: clamp(15rem, 64vw, 28rem);
   --cover-flow-step: calc(var(--cover-flow-card) * 0.6);
   --cover-flow-turn: 52deg;
 
-  /* El ancho del propio carrusel, que es lo que decide cuánto scroll dura el
-     giro: con `animation-range: contain`, el giro completo ocupa
-     `ancho − tarjeta`, o sea 2,6 pasos. Ver el por qué arriba. */
   max-width: calc(var(--cover-flow-card) + var(--cover-flow-step) * 2.6);
   margin-inline: auto;
-  /* Posicionado a propósito: es el `offsetParent` que miden los botones para
-     saber dónde está el sitio de cada tarjeta en la fila. */
   position: relative;
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
-  /* Aire para el anillo de foco del teclado y para lo que crece la tarjeta
-     central al acercarse, que `overflow-y: hidden` recortaría. */
   padding-block: 1.5rem;
-  /* La barra de scroll sobra: debajo de un carrusel 3D una barra de sistema
-     canta, y el gesto ya es la barra. El teclado (tabulador) y los dos botones
-     dan la alternativa a quien no arrastra. */
   scrollbar-width: none;
 }
 
@@ -406,23 +236,9 @@
 
 .cover-flow-track {
   display: flex;
-  align-items: stretch; /* todas las tarjetas, del mismo alto */
-  /* La pista mide lo que miden sus tarjetas, no lo que mide la ventana. Un
-     `<ul>` es de bloque y con el ancho automático se quedaría clavado al ancho
-     del contenedor: el recorrido del scroll se calcularía contra esa caja y las
-     últimas tarjetas quedarían fuera de alcance. */
+  align-items: stretch;
   width: max-content;
-  gap: 1.25rem; /* sólo lo usa el fallback: con 3D lo sustituye el solape */
-  /* Los medios huecos que centran la primera tarjeta y la última: sin ellos la
-     primera nace pegada al borde y la última no se puede llegar a mirar de
-     frente.
-     Van en la PISTA y no en el contenedor con scroll, que es donde se pondrían
-     por instinto. Puesto ahí, el relleno se come el ancho de contenido —deja
-     265 px de caja útil en una pantalla de 1900— y el desbordamiento a la
-     derecha se calcula contra esa caja: el scroll se quedaba en 185 px cuando
-     hacen falta 807 para centrar la cuarta tarjeta, así que las dos últimas no
-     se podían mirar de frente. En la pista el relleno forma parte de su propio
-     ancho y el recorrido sale exacto. */
+  gap: 1.25rem;
   padding-inline: calc(50% - var(--cover-flow-card) / 2);
 }
 
@@ -435,24 +251,18 @@
   @media (prefers-reduced-motion: no-preference) {
     .cover-flow-track {
       gap: 0;
-      /* El paso y no el ancho de la tarjeta: los márgenes negativos de abajo
-         corren la fila justo esa diferencia. */
       padding-inline: calc(50% - var(--cover-flow-step) / 2);
     }
 
     .cover-flow-item {
-      /* El solape: la caja mide una tarjeta y ocupa un paso. */
       margin-inline: calc((var(--cover-flow-step) - var(--cover-flow-card)) / 2);
       view-timeline-name: --cover-flow;
       view-timeline-axis: inline;
     }
 
     .cover-flow-stage {
-      position: relative; /* para que el z-index animado cuente */
+      position: relative;
       height: 100%;
-      /* La perspectiva va en cada tarjeta y no en la pista: con un único punto
-         de fuga para toda la fila, las de los extremos saldrían deformadas por
-         estar lejos del centro de la escena. */
       perspective: calc(var(--cover-flow-card) * 2.4);
       animation: cover-flow-slide linear both;
       animation-timeline: --cover-flow;
@@ -468,20 +278,11 @@
   }
 }
 
-/* El desplazamiento lateral y el orden de pintado. Va en el elemento exterior,
-   en 2D, para no mezclarlo con el giro: así el `translateZ` del interior se
-   proyecta contra la perspectiva y no arrastra el desplazamiento. */
 @keyframes cover-flow-slide {
   0% {
     z-index: 1;
     transform: translateX(24%);
   }
-  /* La ventana del `z-index` es estrecha a propósito. `z-index` NO se anima a
-     saltos: se interpola como entero y se redondea, así que con los fotogramas
-     repartidos (0 %, 40 %, 60 %) la vecina de la derecha llegaba al mismo valor
-     que la centrada, empataba, y al ser posterior en el DOM la tapaba. Entre el
-     46 % y el 54 % sólo puede estar una tarjeta —las vecinas van a 38 puntos de
-     progreso— y el empate no existe. */
   44% {
     z-index: 1;
   }
@@ -503,8 +304,6 @@
   }
 }
 
-/* El giro. `translateZ` antes de `rotateY` para que la profundidad se mida en
-   el eje de la escena y no en el de la tarjeta ya girada. */
 @keyframes cover-flow-turn {
   0% {
     opacity: 0.55;
@@ -520,36 +319,6 @@
   }
 }
 
-/* ============================================================================
-   ESCENARIO CINÉTICO DE LA PORTADA
-
-   El fondo animado de la PRIMERA SECCIÓN, y sólo de ella: un mosaico de código,
-   servidores, red y cacharrería que ocupa el alto de la ventana, con el texto
-   apoyado abajo sobre él. El razonamiento de diseño está en
-   `components/sections/HeroStage.tsx`; aquí está la mecánica.
-
-   **Convive con el campo interactivo, no lo sustituye.** El campo
-   (`.site-field`, bloque siguiente) es una capa fija que pasa por debajo de toda
-   la web; el escenario es una capa OPACA dentro del hero que se pone delante de
-   él durante la primera pantalla. El reparto lo pide el encargo: fotografías en
-   la portada, retícula de nodos en el resto. Quien toque una de las dos capas
-   tiene que mirar la costura entre ambas — ver el degradado de disolución de
-   `.hero-stage`.
-
-   Dos reglas gobiernan este bloque:
-
-   1. **Nada que no sea `transform` u `opacity`.** Son las dos propiedades que el
-      navegador puede animar en el compositor, sin volver a medir ni repintar.
-      Animar `top`, `filter` o `background-position` en cuarenta elementos a la
-      vez es lo que convierte un fondo bonito en un ventilador encendido.
-
-   2. **La geometría se mide en unidades de VENTANA, no de columna.** El alto de
-      teja va en `vh` a propósito, y es lo que hace que el bucle no pueda tener
-      costura: ver `.hero-stage__tile`.
-   ========================================================================= */
-
-/* El bucle. Hasta el −50 % exacto porque la lista de tejas está duplicada: al
-   acabar la vuelta, la copia está donde arrancó el original y no hay salto. */
 @keyframes hero-drift {
   from {
     transform: translate3d(0, 0, 0);
@@ -559,8 +328,6 @@
   }
 }
 
-/* El resplandor de cobre, respirando. Lento y desacompasado del resto (37 s, que
-   no es múltiplo de ninguna duración de columna) para que no se note el ciclo. */
 @keyframes hero-glow {
   0%,
   100% {
@@ -573,9 +340,6 @@
   }
 }
 
-/* La entrada, una sola vez. El escenario no aparece de golpe con la página: se
-   revela en algo menos de dos segundos, que es lo que hace que se lea como una
-   escena que se enciende y no como una imagen que tardó en cargar. */
 @keyframes hero-stage-enter {
   from {
     opacity: 0;
@@ -588,122 +352,39 @@
 }
 
 @layer components {
-  /* --- La caja del escenario -------------------------------------------------
-     `overflow: hidden` no es cosmético: es lo que impide que las columnas —que
-     salen del encuadre por arriba y por abajo— ensanchen o alarguen el
-     documento. `check:mobile` comprueba que la portada no desborde ni un píxel a
-     390 px, y un mosaico de fondo es el sospechoso número uno de ese fallo.
-
-     **EL FONDO OPACO Y LA MÁSCARA SON LO QUE HACE QUE ESTO CONVIVA CON EL
-     CAMPO**, y no se pueden quitar por separado:
-
-     - `background: var(--color-ink)` tapa la capa fija del campo mientras dura
-       la primera pantalla. Sin él, la retícula de nodos se vería por los huecos
-       entre tejas y por debajo del mosaico: dos fondos distintos superpuestos,
-       que es exactamente lo que no se quiere.
-     - `mask-image` disuelve el escenario ENTERO —tejas, resplandor, velo y
-       fondo opaco— entre los 16 y los 8 rem finales del hero. Sin ella, el borde
-       inferior del hero sería un canto recto entre grafito liso y la retícula
-       del campo, o sea una raya horizontal a media pantalla. Con ella, el
-       mosaico se apaga y el campo emerge por debajo.
-
-     **LOS DOS NÚMEROS SE MIDEN CONTRA LAS CIFRAS DEL CV, Y ÉSA ES LA TRAMPA DE
-     ESTE BLOQUE.** El primer intento disolvía sólo los últimos 9 rem, que sobre
-     el papel bastaba para matar la costura y en la captura dejaba el filete de
-     cifras —«5 AÑOS DE EXPERIENCIA», en versalitas pequeñas y apagadas— justo
-     encima de una fotografía de un armario de servidores todavía a tres cuartos
-     de opacidad. Ilegible. El escenario tiene que estar **del todo apagado antes
-     de que empiecen las cifras**, no a mitad de camino: por eso acaba a 8 rem
-     del borde y no a 0. Lo que queda por debajo es campo, que es un fondo mucho
-     más benévolo, y encima de él el velo del texto llega entero.
-
-     El tramo va en `rem` y no en porcentaje por lo mismo que los topes del velo
-     del texto: se mide contra el bloque de cifras que tiene delante, no contra
-     una ventana de alto desconocido.
-
-     No lleva máscara lateral. En la versión anterior el escenario era una banda
-     en la mitad derecha y hacían falta dos máscaras y un velo coordinados en la
-     misma unidad para que el texto se leyera. Ahora el escenario es la pantalla
-     entera y el contraste lo resuelve un único degradado vertical, el velo, que
-     además es el mismo en móvil y en escritorio. */
   .hero-stage {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    /* Nunca se come un clic destinado a un botón que esté encima. */
     pointer-events: none;
-    /* Detrás de todo el contenido del hero, y por delante de la capa del campo:
-       el hero está en `main`, que va en `z-index: 1`, y el campo en 0. */
     z-index: 0;
     background: var(--color-ink);
     mask-image: linear-gradient(to bottom, #000 calc(100% - 16rem), transparent calc(100% - 8rem));
 
-    /* La separación entre tejas, en un solo sitio: la usan el carril (entre
-       columnas) y la pista (entre tejas), y tienen que ser la misma o el mosaico
-       se lee como una retícula mal cuadrada. */
     --hero-gap: clamp(0.5rem, 0.9vw, 1rem);
   }
 
-  /* --- La zona --------------------------------------------------------------
-     Existe sólo para llevar la animación de entrada. La lleva ella y no el
-     carril **a propósito**: el fotograma final de `hero-stage-enter` declara
-     `transform: none`, y una animación gana siempre a una declaración normal.
-     Puesta en el carril machacaría cualquier `transform` estático que se le
-     ponga en el futuro; ya pasó una vez con la inclinación de la versión
-     anterior y costó de diagnosticar, porque el CSS «se ve bien».
-
-     **La entrada va aquí y no en `.hero-stage`**, y ahora importa más que antes:
-     `.hero-stage` es lo que tapa el campo, y animarle la opacidad desde cero
-     dejaría ver la retícula debajo durante el segundo y medio del arranque. */
   .hero-stage__area {
     position: absolute;
     inset: 0;
     animation: hero-stage-enter 1.8s var(--ease-out-soft) 0.15s both;
   }
 
-  /* --- El carril de columnas -------------------------------------------------
-     A sangre: ocupa la ventana completa. Ya no hay un «empieza en el 62 %»,
-     porque ya no hay una columna de texto al lado que respetar — el texto va
-     debajo, no al lado. Ese número era el acoplamiento más frágil del hero
-     anterior: dependía de la proporción de la retícula y de si el texto estaba
-     centrado o no. */
   .hero-stage__rail {
     position: absolute;
     inset: 0;
     display: flex;
     gap: var(--hero-gap);
-    /* El mosaico no puede ganarle en peso visual al nombre. El resto del
-       contraste lo pone el velo. */
     opacity: 0.85;
   }
 
-  /* --- Una columna ---------------------------------------------------------- */
   .hero-stage__column {
     position: relative;
     flex: 1 1 0;
     height: 100%;
-    /* Recorta su propia pista: sin esto, la segunda copia de las tejas se vería
-       asomar por encima de la columna de al lado. */
     overflow: hidden;
   }
 
-  /*
-   * Las columnas que sólo aparecen al haber ancho. `display: none` y no una
-   * opacidad: así un móvil estrecho **no descarga** las fotos que no va a ver
-   * —`next/image` con `loading="lazy"` no pide nada de un contenedor oculto—.
-   *
-   * Los tres tramos salen del ancho de teja que queda, que es lo que decide si
-   * el mosaico se lee o no:
-   *
-   * - 2 columnas por debajo de 40rem: a 390 px son tejas de ~185 px, que es el
-   *   mínimo para reconocer de qué es una foto. Con tres bajarían a 120 px y el
-   *   fondo se convertiría en confeti.
-   * - 3 desde 40rem: a 834 px (tableta) dos columnas darían tejas de 410 px y el
-   *   fondo dejaría de ser mosaico para ser un carrusel de fotos grandes.
-   * - 4 desde 64rem y 5 desde 90rem, por lo mismo al revés: en un monitor de
-   *   1920 px, cuatro columnas dan tejas de 470 px de ancho y el conjunto pierde
-   *   la densidad que lo hace parecer una pared de pantallas.
-   */
   .hero-stage__column--tablet,
   .hero-stage__column--desktop,
   .hero-stage__column--wide {
@@ -728,53 +409,19 @@
     }
   }
 
-  /* --- La pista que se desplaza --------------------------------------------
-     `--hero-phase` desfasa el arranque de cada columna con un margen negativo, y
-     va en margen y no en `transform` porque el `transform` de la pista está
-     ocupado por la animación del bucle. Sin el desfase, las cinco columnas
-     empiezan con una teja alineada en la misma línea y el mosaico se lee como
-     una tabla que se mueve, no como cinco planos independientes. */
   .hero-stage__track {
     display: flex;
     flex-direction: column;
     gap: var(--hero-gap);
     margin-block-start: var(--hero-phase, 0);
-    /* `linear` y no una curva: cualquier aceleración en un bucle infinito se
-       percibe como un tirón cada vuelta. */
     animation: hero-drift var(--hero-drift, 80s) linear infinite;
-    /* Aviso al compositor de que esto se va a mover durante toda la visita. Sin
-       él, Chrome promueve la capa al detectar el movimiento y el primer ciclo
-       tiene micro-tirones. */
     will-change: transform;
   }
 
-  /* La dirección contraria, sin duplicar la animación. */
   .hero-stage__track--reverse {
     animation-direction: reverse;
   }
 
-  /* --- Una teja ------------------------------------------------------------
-     EL ALTO VA EN `vh`, Y ES LA PIEZA QUE EVITA LA COSTURA DEL BUCLE.
-
-     El bucle funciona porque la pista lleva la lista de tejas dos veces y se
-     desplaza exactamente un 50 %. Para que no se vea el final de la pista, una
-     copia tiene que ser **más alta que la ventana**. Con el alto derivado del
-     ancho de la columna (una proporción 3:2, como en la versión anterior) eso
-     dependía de la forma de la pantalla: en una tableta de 1024×1366 las tejas
-     salían de 165 px, ocho copias no llegaban al alto de la ventana y aparecía
-     un hueco al final de cada vuelta. En `vh`, las siete tejas de una columna
-     miden 112 vh + huecos **en cualquier pantalla**, y el problema no puede
-     volver. Si alguien cambia el número de tejas por columna en `HeroStage.tsx`,
-     este es el cálculo que hay que rehacer: siete × 16 vh > 100 vh.
-
-     `max()` y no `clamp()`: el mínimo protege las ventanas bajas (un portátil en
-     1366×768) y no hay máximo a propósito — un tope volvería a romper la
-     garantía justo en las pantallas más altas, que es donde importa.
-
-     Con el alto fijado, la proporción de la teja la pone el ancho de la columna,
-     así que cambia con el tramo. No es un problema: **todas las tejas comparten
-     forma en cada ancho dado**, y eso es lo que hace que el ritmo se lea como
-     ritmo. Por eso las fotos van con `object-fit: cover`. */
   .hero-stage__tile,
   .hero-panel {
     flex: none;
@@ -786,15 +433,10 @@
   }
 
   .hero-stage__tile {
-    /* El grado fotográfico va horneado en el archivo (ver `CREDITS.md`); aquí
-       sólo queda el recorte y el peso visual que separa la teja del fondo. */
     object-fit: cover;
   }
 
-  /* --- Los paneles dibujados ----------------------------------------------- */
   .hero-panel {
-    /* `overflow: hidden` recorta el código que se sale: el panel es una ventana
-       a un editor, no una caja que se estira hasta caber. */
     overflow: hidden;
     background: color-mix(in srgb, var(--color-ink-raised) 92%, transparent);
   }
@@ -812,8 +454,6 @@
     color: var(--color-paper-faint);
   }
 
-  /* Los tres puntos de la barra de título, con un solo elemento y tres sombras.
-     Tres `<span>` para tres círculos decorativos habría sido markup por nada. */
   .hero-panel__dots {
     width: 0.25rem;
     height: 0.25rem;
@@ -823,7 +463,6 @@
     box-shadow:
       0.4rem 0 0 var(--color-line-strong),
       0.8rem 0 0 var(--color-line-strong);
-    /* Deja sitio a las dos sombras, que no ocupan espacio en la maquetación. */
     margin-inline-end: 0.8rem;
   }
 
@@ -831,8 +470,6 @@
     margin: 0;
     padding: 0.6rem;
     font-family: var(--font-mono);
-    /* Diminuto a propósito: a este tamaño el bloque se lee como *textura de
-       código*, que es lo que tiene que aportar, y quien se acerque puede leerlo. */
     font-size: 0.4375rem;
     line-height: 1.7;
     color: var(--color-paper-soft);
@@ -852,9 +489,6 @@
     color: var(--color-signal);
   }
 
-  /* El panel de red: un diagrama de nodos dibujado con la retícula del sistema.
-     Es SVG y no una foto porque una foto de un armario de red a 200 px es una
-     mancha azul, y esto se lee como una topología a cualquier tamaño. */
   .hero-panel__svg {
     display: block;
     width: 100%;
@@ -862,11 +496,8 @@
     color: var(--color-signal);
   }
 
-  /* --- El resplandor ------------------------------------------------------- */
   .hero-stage__glow {
     position: absolute;
-    /* A sangre y centrado en la franja donde el mosaico se ve de verdad: la
-       mitad de arriba. Abajo lo tapa el velo, así que allí no aportaría nada. */
     inset: -25% -15% 25%;
     border-radius: 50%;
     background: radial-gradient(
@@ -875,30 +506,11 @@
       color-mix(in srgb, var(--color-signal) 8%, transparent) 45%,
       transparent 70%
     );
-    /* El desenfoque es estático: `filter` NO se anima (ver la regla de arriba).
-       Lo que se anima es la opacidad y la escala de algo ya desenfocado. */
     filter: blur(3rem);
     animation: hero-glow 37s ease-in-out infinite;
     will-change: opacity, transform;
   }
 
-  /* --- El velo del escenario ----------------------------------------------
-     ENCIMA de las tejas, y es ATMÓSFERA: baja el mosaico entero para que no le
-     gane en peso visual al titular, y protege dos bordes.
-
-     1. Grafito casi opaco en los primeros 4 rem (el 8 %): ahí vive la cabecera
-        fija, que es translúcida (`bg-ink/80`) y sobre una teja clara perdería
-        contraste.
-     2. Abierto de ahí para abajo, que es donde se ve el mosaico.
-     3. Y una vuelta suave al final, para que la costura con la sección siguiente
-        no se note.
-
-     **El contraste del texto NO lo hace este velo**, lo hace `.hero-copy::before`,
-     que va anclado al bloque de texto. Ese reparto es deliberado y está explicado
-     ahí abajo: es la corrección de un fallo real de la primera versión.
-
-     La segunda capa, plana y muy floja, cierra el caso de la foto clara que llena
-     toda la franja abierta. */
   .hero-stage__scrim {
     position: absolute;
     inset: 0;
@@ -917,28 +529,6 @@
   }
 }
 
-/* ============================================================================
-   CAMPO INTERACTIVO DEL SITIO
-
-   El fondo de toda la web MENOS la primera pantalla, donde manda el escenario
-   cinético del bloque anterior. El razonamiento de diseño —y todo
-   lo que ocurre dentro del lienzo— está en `components/layout/SiteField.tsx`;
-   aquí sólo están las capas que lo rodean.
-
-   El reparto entre CSS y lienzo no es arbitrario, y es la regla de este bloque:
-   **el CSS pone lo que no cambia y el lienzo lo que responde.** La atmósfera
-   desenfocada y la retícula de planos son degradados enormes que el compositor
-   dibuja una vez y no vuelve a tocar; pedírselos al contexto 2D sesenta veces
-   por segundo costaría más que los dos mil nodos juntos. Y al revés: nada de lo
-   que reacciona al puntero está aquí, porque haría falta escribir una variable
-   CSS por fotograma y con ella un recálculo de estilo por fotograma.
-   ========================================================================= */
-
-/* La atmósfera, respirando. Lenta (41 s) y sin relación con ninguna otra
-   duración del sitio, para que no se le vea el ciclo. Sólo `transform` y
-   `opacity`: son las dos propiedades que el navegador anima en el compositor
-   sin volver a medir ni repintar. El desenfoque es estático — `filter` no se
-   anima; lo que se anima es la escala de algo ya desenfocado. */
 @keyframes hero-aurora {
   0%,
   100% {
@@ -951,11 +541,6 @@
   }
 }
 
-/* La entrada, una sola vez. El campo no aparece de golpe con la página: se
-   enciende en algo más de un segundo, que es lo que hace que se lea como un
-   sistema que arranca y no como algo que tardó en cargar. Empieza en 0 y sube:
-   el primer fotograma del lienzo se pinta con el retículo ya colocado, así que
-   sin esto la retícula aparecería entera y seca. */
 @keyframes site-field-enter {
   from {
     opacity: 0;
@@ -967,8 +552,6 @@
   }
 }
 
-/* La flotación del retrato. Amplitud mínima (6 px en catorce segundos): lo justo
-   para que el avatar no parezca pegado al fondo. */
 @keyframes hero-float {
   0%,
   100% {
@@ -979,111 +562,21 @@
   }
 }
 
-/* ============================================================================
-   TEXTO QUE SE ESCRIBE — el saludo y el nombre de la portada
-
-   «Hola, soy Luis Fernández Sangil» aparece letra a letra al abrir la web, como
-   si alguien lo estuviera tecleando. Lo hace esto y nada más: cada carácter viene
-   del servidor en su propio `<span>` con un `--typed-index`, y aquí se convierte
-   en el momento en que se enciende. Cero JavaScript, y el texto va COMPLETO en el
-   HTML —el nombre es el `<h1>` que alguien busca en Google, así que no puede
-   depender de que un temporizador lo escriba (ver `components/ui/Typed.tsx`).
-
-   **EL ESCALONADO VA EN LA DURACIÓN Y NO EN `animation-delay`, y no es cuestión de
-   gusto: con el retardo, la frase se queda a medias.** Lo evidente es una
-   animación mínima con `animation-delay: índice × paso`, y en Chrome falla. Medido
-   en Chrome 1xx sobre esta misma página: con `1ms` de duración, todo carácter cuyo
-   retardo pase del segundo se queda en `opacity: 0` **para siempre** — «Luis
-   Fernández Sangil» se leía «Luis Fernánde» y ahí se paraba, y ni el `check` ni el
-   build dicen nada porque el HTML está completo. El navegador da por finiquitada
-   una animación de duración despreciable y deja de aplicar su `forwards`; subir la
-   duración a 60 ms sólo mueve la frontera. Así que aquí **no hay ningún retardo**:
-   cada carácter arranca a la vez y **dura hasta su propio momento**, y
-   `steps(1, end)` lo hace saltar a visible justo al terminar. El efecto en
-   pantalla es idéntico, la cuenta es la misma y no hay ninguna frontera que
-   respetar. Comprobado con sesenta caracteres, el doble de los que hay aquí.
-
-   Las otras tres cosas que hay que respetar si se toca:
-
-   - **El revelado es en sitio.** `opacity: 0` y no `display: none`: los
-     caracteres ocultos ocupan su hueco desde el primer fotograma. Si se cambia
-     por algo que haga crecer la caja, el hero —que se apoya en el borde de abajo—
-     se mueve entero mientras se escribe, y eso es un salto de maquetación en la
-     primera pantalla. Es también la razón de que **no haya cursor**: una barra
-     parpadeando al final de una frase que se revela en su sitio se queda a la
-     derecha del hueco todavía vacío, señalando donde no está pasando nada. Hubo
-     uno y se quitó al verlo en la captura.
-   - **El paso es corto a propósito.** 45 ms por carácter dan poco más de un
-     segundo para los veintisiete caracteres de la frase. Es una fracción del
-     tiempo que se le dedica a decidir si esta web merece un scroll: con 80 ms el
-     gesto pasa de simpático a peaje.
-   - **La animación no tiene fase de salida.** Cada carácter va a `opacity: 1` y
-     se queda; nada devuelve el bloque a su estado inicial. Es lo que hace que un
-     navegador que no llegue a ejecutarla —o que la ejecute a 0,01 ms por el atajo
-     de movimiento reducido— acabe con la frase puesta, que es el fallback
-     correcto. El criterio es el de `reveal`: nunca contenido invisible por una
-     animación que no corre.
-   ========================================================================= */
-
 @layer components {
   .typed {
-    /* Los dos valores por defecto. En la portada los pone el componente en el `style` —cada
-       bloque tiene su propio arranque y su propio paso, que es lo que encadena las cuatro
-       líneas como una sola frase—, así que esto es sólo el suelo para un uso sin nada
-       declarado. */
     --typed-step: 45ms;
     --typed-start: 0ms;
   }
 
-  /* La palabra: dentro NO se parte. Con un `<span>` por letra el navegador puede
-     meter el salto de línea entre dos cualesquiera, y a 390 px el nombre se
-     rompería en «Fernán / dez». El espacio entre palabras queda fuera, como nodo
-     de texto normal, y es ahí donde el salto tiene que caer. */
   .typed__word {
     white-space: nowrap;
   }
 
   .typed__char {
-    /* El estado de partida, y el que se ve mientras la animación corre: la
-       animación no cambia nada hasta su último fotograma. */
     opacity: 0;
-    /* La duración ES el momento en que le toca a este carácter: cuándo empieza su
-       bloque más lo que gastan los caracteres que tiene delante. El `+ 60ms` es
-       para que el primero de todos (arranque 0, índice 0) tenga una duración de
-       verdad y no una de cero, que es el caso que el navegador se salta.
-       `steps(1, end)`: la letra no se desvanece, aparece. Un fundido por carácter
-       con veintisiete solapados se lee como una nube que se aclara, no como
-       alguien escribiendo. */
     animation: typed-char calc(var(--typed-start) + var(--typed-index) * var(--typed-step) + 60ms)
       steps(1, end) forwards;
   }
-
-  /* --------------------------------------------------------------------------
-     EL NOMBRE, QUE ENFOCA — la otra mitad de la entrada de la portada
-
-     El nombre no se teclea: aparece entero, desenfocado, y enfoca de golpe. Se
-     eligió comparando las cuatro versiones en pantalla (tecleado, tecleado
-     rápido, palabra a palabra y ésta), y el argumento está en `Hero.tsx`: el
-     tecleado es el gesto más visto en un portfolio de desarrollador y en el
-     `<h1>` dice «plantilla».
-
-     Las tres cosas que hay que respetar si se toca:
-
-     - **Los dos tiempos son UNA cuenta y viven aquí.** El titular del puesto
-       empieza a teclearse 180 ms antes de que el enfoque termine, y ese solape es
-       lo que hace que las dos líneas se lean como un movimiento en vez de como
-       dos turnos. `Typed` recibe el arranque como variable justo por esto: si el
-       número viviera en `Hero.tsx`, cambiar la duración del enfoque descuadraría
-       el solape sin que nada avisara.
-     - **`inline-block` no es decorativo.** Un elemento en línea ignora
-       `transform`, así que sin él el nombre enfocaría sin el punto de escala. No
-       cambia el reparto de líneas: el `<h1>` es un bloque centrado y esto es su
-       único hijo.
-     - **`filter` también hay que apagarlo a mano** en movimiento reducido y en
-       papel. Aquí el nombre no se esconde sólo con la opacidad, y una regla que
-       devuelva la opacidad pero deje el desenfoque deja el titular del CV
-       ilegible. Es un caso que el atajo general de la capa base no cubre.
-     -------------------------------------------------------------------------- */
 
   .hero-copy {
     --hero-focus-duration: 760ms;
@@ -1116,8 +609,6 @@
   }
 }
 
-/* El aviso de que hay más abajo. Recorrido corto y pausa larga: una flecha que
-   bota sin parar es un elemento parpadeante más, y esto sólo tiene que insinuar. */
 @keyframes hero-hint {
   0%,
   55%,
@@ -1130,28 +621,6 @@
 }
 
 @layer components {
-  /* --- La caja del campo -----------------------------------------------------
-     `fixed` y no `absolute`, y es LA decisión de este bloque. El campo es el
-     fondo de todo el sitio: si se estirase a lo alto del documento serían
-     decenas de miles de nodos y un mapa de bits de varios megapíxeles. Fijo a la
-     ventana son siempre los mismos dos mil, el coste no depende de lo que mida
-     el contenido, y el texto viaja sobre una superficie quieta en vez de
-     arrastrar la retícula consigo.
-
-     `overflow: hidden` no es cosmético: el retículo del lienzo sangra por los
-     cuatro bordes a propósito y la atmósfera se sale de la caja. `check:mobile`
-     comprueba que no haya ni un píxel de desbordamiento a 390 px.
-
-     `pointer-events: none` en toda la capa, no sólo en el lienzo: el campo
-     reacciona al puntero **sin recibirlo**. Los eventos se escuchan en `window`
-     (ver `SiteField.tsx`), así que un clic destinado a un botón llega siempre al
-     botón. Un fondo decorativo que se come una pulsación es un fallo de
-     accesibilidad, no un detalle.
-
-     `z-index: 0` y no `-1`: con negativo dependería de que el fondo del `body`
-     se propague al lienzo de la raíz para no taparlo, que funciona pero se rompe
-     el día que alguien le ponga un fondo al `html`. Con cero, el orden lo fija
-     una regla explícita en la capa base (`body > main, body > footer`). */
   .site-field {
     position: fixed;
     inset: 0;
@@ -1160,16 +629,6 @@
     z-index: 0;
   }
 
-  /* --- La atmósfera ---------------------------------------------------------
-     Dos manchas de cobre desenfocadas. Es lo que le da temperatura al grafito y
-     lo que evita que un campo de puntos cobrizos sobre negro se lea como una
-     terminal.
-
-     Cuando el campo era del hero se apoyaban arriba, porque abajo estaba el
-     texto de la portada. Ahora la capa es fija y por debajo puede haber
-     cualquier sección: se reparten por la ventana, se abren un poco más y bajan
-     de intensidad. Una mancha de cobre al 30 % detrás de un titular de seis rem
-     es atmósfera; detrás de un párrafo de la experiencia es niebla. */
   .site-field__aurora {
     position: absolute;
     inset: -18% -12%;
@@ -1189,17 +648,6 @@
     will-change: opacity, transform;
   }
 
-  /* --- La retícula de planos ------------------------------------------------
-     Dos juegos de líneas de un píxel, estáticos y casi invisibles. No es
-     decoración repetida: es el SUELO del campo. Sin ellas los nodos flotan en
-     negro y el conjunto se lee como un salvapantallas de partículas; con ellas
-     se lee como una superficie medida, que es de lo que va un CV de ingeniero.
-
-     La máscara es ahora una viñeta centrada en vez de un óvalo apoyado arriba:
-     desvanece las líneas antes de que lleguen a cualquiera de los cuatro bordes,
-     que es lo que evita que se vea dónde empieza y acaba el fondo. Ninguna línea
-     muere en un canto recto — eso es exactamente lo que delata un fondo de
-     retícula pegado encima. */
   .site-field__grid {
     position: absolute;
     inset: 0;
@@ -1211,11 +659,6 @@
     mask-image: radial-gradient(ellipse 82% 72% at 50% 42%, #000 0%, transparent 78%);
   }
 
-  /* --- El lienzo ------------------------------------------------------------
-     `display: block` y las medidas al 100 %: los atributos `width`/`height` del
-     elemento son la resolución del mapa de bits —los pone el componente, con el
-     ratio de píxel dentro— y no el tamaño en pantalla. Sin estas dos líneas el
-     lienzo se dibujaría al doble en una pantalla retina. */
   .site-field__canvas {
     position: absolute;
     inset: 0;
@@ -1225,26 +668,6 @@
     animation: site-field-enter 1.3s var(--ease-out-soft) 0.1s both;
   }
 
-  /* --- El velo del campo ----------------------------------------------------
-     Tres trabajos, y los tres cambiaron al pasar el campo a fondo del sitio:
-
-     1. Grafito casi opaco en los primeros 4 rem: ahí vive la cabecera fija, que
-        es translúcida (`bg-ink/80`), y un pulso pasando por debajo se leería
-        como un parpadeo en la navegación.
-     2. Lo mismo en los últimos 4 rem, que antes no hacía falta porque abajo del
-        hero no había nada fijo. Ahora ahí está la barra de iconos de móvil.
-     3. Y un velo BASE por toda la ventana que antes tampoco existía, porque el
-        campo pasa ahora por debajo de todo el texto de la web y no sólo de un
-        titular.
-
-     **El 3 está en el 12 %, y llegar ahí costó una captura.** El primer intento
-     lo puso al 30 %, que sobre el papel era «bajar el conjunto un punto» y en
-     pantalla dejaba el fondo prácticamente negro: los nodos en reposo pintan a
-     una opacidad de 0,2 largos, así que taparlos con un 30 % de grafito los
-     borra. Un fondo que hay que buscar no es un fondo. El 12 % quita el filo sin
-     apagar la retícula, y la protección de verdad la dan las tres piezas que
-     estaban pensadas para eso: el velo del texto de la portada, la pastilla del
-     rótulo y el propio techo de brillo del lienzo. */
   .site-field__scrim {
     position: absolute;
     inset: 0;
@@ -1257,49 +680,6 @@
     );
   }
 
-  /* --- El velo del texto ---------------------------------------------------
-     LA PIEZA QUE HACE LEGIBLE EL BLOQUE DE TEXTO, Y VA ANCLADA AL TEXTO.
-
-     Se mide **desde el propio bloque de texto, no desde un porcentaje del hero**,
-     y la diferencia no es de estilo. Una versión anterior cerraba el degradado en
-     el 62 % del alto del hero, un número sacado a ojo de una captura. Fallaba: el
-     bloque de texto mide lo que miden sus líneas —unos 40 rem con las cifras
-     dentro—, así que en una ventana de 900 px empieza bastante más arriba de ese
-     62 %, y el rótulo del puesto y la línea de «Vigo, Galicia» caían fuera. Son
-     los dos textos más pequeños y más apagados de la portada, justo los que menos
-     aguantan un fondo detrás. Con el nombre no pasaba —es enorme y casi blanco—,
-     y por eso una revisión rápida lo deja pasar.
-
-     **Los topes están calibrados contra el MOSAICO, que es el fondo más duro de
-     los dos que puede haber detrás.** En la primera pantalla lo que pasa por
-     debajo del texto es el escenario cinético, y una fotografía clara detrás de
-     un texto pequeño y apagado es mucho peor que la retícula de nodos del campo.
-     Así que valen los topes del escenario (28 / 58 / 88 %), no los más flojos que
-     bastaban cuando el fondo de la portada era el campo: calibrar contra el más
-     benévolo de los dos fondos es cómo se cuela un rótulo ilegible.
-
-     No cierra en grafito puro, y esa parte sí la manda el campo: el escenario se
-     disuelve en los últimos 9 rem del hero (ver la máscara de `.hero-stage`), así
-     que las cifras y la sección siguiente van sobre la retícula. Un rectángulo
-     opaco ahí se leería como un corte. Cierra al 90 %.
-
-     Los topes van en `rem` a propósito: se miden contra las líneas que tienen que
-     proteger, no contra una ventana que no sabemos cuánto mide.
-
-     **El avatar queda fuera a propósito**, por encima de este bloque: es una
-     imagen con su propio halo y su propia sombra, y dejarlo en la zona abierta es
-     lo que mantiene el campo visible arriba incluso a 390 px.
-
-     `inset-inline: calc(50% - 50vw)` lo saca a sangre desde un contenedor
-     centrado de 80 rem, y el sobrante lo recorta el `overflow-hidden` de la
-     sección. Y **dónde ACABA lo decide la máscara, no el sobrante**: ver la nota
-     de `mask-image` ahí abajo, que es la pieza que evita la raya horizontal
-     entre el hero y la primera sección.
-
-     `z-index: -1` y `pointer-events: none`: se pinta detrás del texto de su
-     propio contenedor —que ya está en `z-10`, o sea por encima de los dos
-     fondos— y no
-     puede interceptar el clic de un botón. */
   .hero-copy {
     position: relative;
   }
@@ -1319,41 +699,9 @@
       color-mix(in srgb, var(--color-ink) 88%, transparent) 20rem,
       color-mix(in srgb, var(--color-ink) 90%, transparent) 27rem
     );
-    /* Y SE APAGA ANTES DE LLEGAR AL BORDE DEL HERO, medido desde abajo.
-       Sin esto el velo llega al canto inferior de la sección valiendo un 90 %
-       de grafito, y justo debajo empieza la retícula del campo a plena vista:
-       una raya horizontal de lado a lado a la altura de las cifras. Se vio en
-       la captura. El degradado de fondo no puede resolverlo solo porque se mide
-       desde ARRIBA, y lo que hay que fijar es dónde acaba.
-
-       El desvanecido es CORTO —6 rem— y no puede alargarse sin mirar antes las
-       cifras: el filete del CV vive unos 7 rem por encima del borde del hero, o
-       sea justo al principio de este tramo. Con 12 rem el velo llegaba allí a
-       menos de la mitad de su valor y las versalitas se quedaban sin fondo. Con
-       6 rem las cifras cogen el velo entero y lo que se desvanece es el hueco de
-       debajo, donde no hay texto.
-
-       El `-1.5rem` de sobrante hace que el velo termine **por encima** del borde
-       de la sección en los dos casos: el hueco que el contenedor reserva abajo
-       son 3,5 rem en escritorio y algo más de 5 en móvil, donde va la barra de
-       iconos. El antiguo sobrante de 10 rem existía para tapar las tejas que
-       asomaban por debajo de las cifras, y ya no hace falta: allí el escenario
-       está disuelto por su propia máscara. */
     mask-image: linear-gradient(to top, transparent 0, #000 6rem);
   }
 
-  /* --- La pastilla del rótulo de estado ------------------------------------
-     El puesto actual va en un texto pequeño, en versalitas y apagado: es el texto
-     menos legible de la portada y está en la parte ALTA del hero, que es
-     precisamente donde el fondo tiene que verse. Las dos cosas no caben.
-
-     La pastilla lo resuelve donde está el problema en vez de a manotazos: un
-     fondo propio, casi opaco, con desenfoque detrás y un filete. Así el rótulo se
-     lee pase lo que pase por detrás —incluida la cabeza de un pulso, que es lo
-     más brillante que dibuja el campo—, y el velo del texto puede empezar cuatro
-     rem más abajo y con la mitad de intensidad. De paso, un chip de estado con su
-     punto es como se enseña «lo que estoy haciendo ahora» en cualquier interfaz
-     reciente, así que el arreglo técnico coincide con lo que pedía el encargo. */
   .hero-chip {
     display: inline-flex;
     align-items: center;
@@ -1362,35 +710,15 @@
     border: 1px solid var(--color-line-strong);
     background: color-mix(in srgb, var(--color-ink-raised) 78%, transparent);
     padding: 0.4rem 0.9rem;
-    /* El desenfoque es lo que evita que se lea la retícula a través de la
-       pastilla, que es lo que la haría parecer un recuadro sucio en vez de una
-       superficie. */
     backdrop-filter: blur(0.5rem);
   }
 
-  /* --- El retrato, flotando sobre el campo ---------------------------------
-     Es un avatar pequeño: el protagonista de la primera pantalla es el campo, y
-     una foto de 20 rem en el centro lo partía en dos. El tamaño lo pone
-     `Hero.tsx`; aquí sólo está lo que lo despega del fondo. */
   .hero-portrait {
     position: relative;
     animation: hero-float 14s ease-in-out infinite;
-    /* `drop-shadow` y no `box-shadow`: sigue el contorno real del contenido, así
-       que vale igual para el círculo del avatar sin repetir el radio en dos
-       sitios que luego se desincronizan. Es la sombra la que separa la cara del
-       fondo cuando le toca pasar por detrás la parte encendida del campo. */
     filter: drop-shadow(0 1rem 1.75rem rgb(0 0 0 / 0.7));
   }
 
-  /* La sombra suave detrás del retrato. **Sin cobre**: hubo un halo dorado ahí y se
-     quitó por encargo — se leía como un aro de luz alrededor de la cara, que es
-     justo lo que una foto de perfil no necesita.
-     Lo que queda es grafito y cumple la función que el cobre sólo acompañaba:
-     apagar el fondo pegado a la silueta —los nodos del campo o una teja clara del
-     mosaico— para que la cara no se lea como un elemento más del fondo. Sobre
-     grafito no se ve; sobre una fotografía clara, sí, y para eso está.
-     Quien vuelva a meter color aquí está deshaciendo el encargo, no afinando un
-     matiz. */
   .hero-portrait::before {
     content: '';
     position: absolute;
@@ -1406,54 +734,16 @@
     filter: blur(0.6rem);
   }
 
-  /* --- El aviso de que hay más abajo --------------------------------------
-     Un hero que ocupa la ventana entera y acaba en un filete de cifras se puede
-     leer como una página completa. Esto es lo único que dice que no lo es. */
   .hero-hint__arrow {
     animation: hero-hint 2.6s ease-in-out infinite;
   }
 }
 
-/* ============================================================================
-   La línea temporal de experiencia
-
-   El filete vertical de la sección de experiencia, en el acento de la web y con
-   una barra de progreso de lectura encima. Era `border-l border-line` —un gris de
-   1px— y pasa a ser cobre por encargo: es la única línea de la página que
-   representa algo (una trayectoria sin huecos, que es lo primero que comprueba
-   quien lee un CV), así que es la única que se gana el color.
-
-   **El filete NO es el borde, son dos pseudoelementos**, y esto es lo que permite
-   todo lo demás. Un `border-left` no se puede recortar, ni degradar, ni animar
-   por tramos. El borde sigue ahí, transparente, sólo para que la maquetación no
-   se mueva: los `li` sangran respecto al borde interior de la lista y los puntos
-   se colocan a `-5px` de él, así que quitarlo desplazaría un píxel la sección
-   entera. Los dos pseudoelementos se dibujan justo encima, en `left: -1px`.
-
-   Y **son dos capas y no una**: el `::before` es la línea completa, apagada, y el
-   `::after` es el tramo leído, encendido y creciendo con el scroll. Con una sola
-   capa el tramo que queda por leer no se vería y esto sería una línea que se
-   dibuja, no una que mide.
-
-   La lista se lee **de antiguo a reciente** (`Experience.tsx` invierte el orden
-   sólo para la vista), y de ahí viene todo: una barra de progreso que avanza
-   mientras el CV retrocede en el tiempo estaría contando la historia al revés.
-   ========================================================================= */
-
 @layer components {
-  /* El borde se queda, transparente: es el que reserva el píxel. Ver arriba.
-     **Quien lo apaga es la utilidad `border-transparent` del JSX**, no una regla de
-     aquí: esto vive en `@layer components` y `border-line` es una utilidad, así que
-     perdería y la línea saldría de dos píxeles —el gris del borde y el cobre pegado
-     a su izquierda—. */
   .exp-timeline {
     position: relative;
   }
 
-  /* El recorrido entero, apagado: lo que queda por leer. Muy tenue a propósito
-     —esto es el raíl, no la señal—, pero no invisible, o la sección perdería la
-     continuidad vertical que hace que cuatro puestos se lean como una trayectoria
-     y no como cuatro bloques sueltos. */
   .exp-timeline::before {
     content: '';
     position: absolute;
@@ -1465,17 +755,6 @@
     opacity: 0.16;
   }
 
-  /* El tramo leído. Crece con el scroll y **sin una línea de JavaScript**:
-     `animation-timeline: view()` es el mismo mecanismo que la utilidad `reveal`.
-
-     El rango no llega a los extremos (`cover 5%` … `cover 92%`) porque el sujeto
-     es la lista entera, que mide varias pantallas: con `0%`–`100%` la barra no
-     empezaría hasta que la lista tocara el borde inferior de la ventana y no
-     terminaría hasta que hubiera salido del todo por arriba, o sea que nunca se
-     vería ni vacía ni llena estando la sección en pantalla.
-
-     La cabeza va degradada en el primer 22 % para que el arranque no sea un corte
-     seco de cobre a nada. */
   .exp-timeline::after {
     content: '';
     position: absolute;
@@ -1505,24 +784,6 @@
   }
 }
 
-/* El marco del retrato, apagado. La foto del hero es un RECORTE con canal alfa —sólo
-   el busto, sin la calle de detrás—, y el marco que `Figure` pone a todas las imágenes
-   (`bg-ink-raised`, `border` y `rounded-lg`) era invisible mientras la foto era opaca y
-   lo tapaba entero. Con transparencia se convierte en una tarjeta oscura alrededor del
-   busto, que es justo lo contrario de recortarlo.
-
-   `overflow: visible` porque el recorte llega al borde inferior del cuadro: con el
-   recorte del contenedor, los hombros se cortarían en arco.
-
-   **Va SIN `@layer`, y ése es el motivo de que esté aquí abajo y no junto a
-   `.hero-portrait`.** Lo que hay que ganar son utilidades de Tailwind, que viven en
-   `@layer utilities`; una regla en `@layer components` pierde contra ellas por muy
-   específica que sea, porque entre capas manda el orden de las capas. El CSS sin capa
-   gana a todas. Tampoco se resuelve pasando `bg-transparent` desde `Hero.tsx`: `cn()`
-   concatena y no desempata utilidades en conflicto (ver `lib/cn.ts`).
-
-   Quien vuelva a poner una foto CON fondo tiene que deshacer este bloque, no sólo
-   cambiar el archivo. */
 .hero-portrait__frame {
   overflow: visible;
   border-color: transparent;
@@ -1530,29 +791,7 @@
   background: transparent;
 }
 
-/* Movimiento reducido: los dos fondos se CONGELAN, no se esconden.
-
-   Son dos, y la lista de abajo tiene que nombrarlos a los dos: el escenario
-   cinético de la portada (`.hero-stage__*`) y el campo del resto del sitio
-   (`.site-field__*`). Olvidar uno no se ve en una revisión rápida, porque el
-   atajo general de 0,01 ms deja el fotograma inicial, que es el correcto — lo
-   que no hace es dejar de ejecutar el ciclo miles de veces por segundo.
-
-   El lienzo se para en `SiteField.tsx`, que es donde puede pararse de verdad:
-   con `prefers-reduced-motion` no se registra ni un escuchador y se dibuja un
-   único fotograma. Lo que hace falta aquí es lo otro: apagar las animaciones CSS
-   que rodean al lienzo, y dejarlo VISIBLE — su animación de entrada arranca en
-   `opacity: 0`, así que sin esto el campo congelado sería un campo invisible.
-
-   Se repite con `!important` aunque el bloque general de `prefers-reduced-motion`
-   ya lleve la duración a 0,01 ms: ese atajo aplicado a una animación infinita
-   deja el fotograma inicial, que es el correcto, pero sigue ejecutando el ciclo
-   miles de veces por segundo. `animation: none` lo apaga de verdad. */
 @media (prefers-reduced-motion: reduce) {
-  /* `.hero-stage__area` y no `.hero-stage__rail`: la animación de entrada del
-     escenario está en la zona. Apuntar al elemento equivocado aquí no se vería
-     —el atajo general de 0,01 ms deja el resultado correcto igual—, y por eso
-     conviene que la lista nombre exactamente lo que está animado. */
   .hero-stage__area,
   .hero-stage__track,
   .hero-stage__glow,
@@ -1563,58 +802,29 @@
     animation: none !important;
   }
 
-  /* `opacity: 1` sólo donde la animación podía dejarlo a cero: las dos entradas
-     arrancan desde `opacity: 0`, y sin esto un fondo congelado sería un fondo
-     invisible en vez de un fondo quieto. */
   .hero-stage__area,
   .site-field__canvas {
     opacity: 1;
   }
 
-  /* El resplandor del escenario se congela a media respiración. Su ciclo va del
-     40 % al 75 %, así que dejarlo en el 100 % —que es lo que valdría sin
-     animación— sería MÁS cobre del que se ve nunca con el movimiento activado:
-     quien pide menos movimiento acabaría con un fondo más intenso. */
   .hero-stage__glow {
     opacity: 0.55;
   }
 
-  /* La atmósfera se congela a media respiración. Su ciclo va del 45 % al 70 %,
-     así que dejarla en el 100 % —que es lo que valdría sin animación— sería MÁS
-     cobre del que se ve nunca con el movimiento activado: quien pide menos
-     movimiento acabaría con un fondo más intenso. */
   .site-field__aurora {
     opacity: 0.6;
   }
 
-  /* La frase del hero, ya escrita. Va explícito aunque el atajo general de 0,01 ms
-     de la capa base **también** la apagaría —aquí el escalonado está en la
-     duración, y llevarla a 0,01 ms enciende los veintisiete caracteres de golpe—,
-     porque depender de eso es depender de una coincidencia: el día que el
-     escalonado vuelva a un `animation-delay`, el atajo dejaría de servir sin que
-     nada avise. `opacity: 1` es lo que garantiza el resultado en los dos casos. */
   .typed__char {
     animation: none !important;
     opacity: 1;
   }
 
-  /* La línea temporal, ENTERA y quieta: sin barra de progreso, el filete completo.
-
-     Y hace falta la regla, porque **el atajo general de 0,01 ms no vale aquí**: la
-     barra crece con `animation-timeline`, y en una animación de scroll lo que manda
-     antes de entrar en el rango es el relleno hacia atrás — o sea `scaleY(0)`—, no
-     el paso del tiempo. Sin esto, quien pide menos movimiento se quedaría con una
-     línea casi invisible hasta que la sección apareciera, que es peor que la
-     animación que estaba evitando. */
   .exp-timeline::after {
     animation: none !important;
     transform: none !important;
   }
 
-  /* Y el nombre, enfocado. `filter: none` explícito y no sólo la opacidad: el
-     enfoque esconde el nombre con un desenfoque de 14 px, y una regla que devuelva
-     la opacidad dejando el desenfoque puesto deja el titular del CV ilegible para
-     siempre — que es peor que la animación que se estaba evitando. */
   .hero-name {
     animation: none !important;
     opacity: 1;
@@ -1622,16 +832,6 @@
     transform: none;
   }
 }
-
-/* ============================================================================
-   Impresión
-
-   Un recruiter que quiere guardar el CV pulsa Ctrl+P: es el camino más corto
-   entre esta web y una carpeta de candidaturas. Sin este bloque saldrían diez
-   páginas de fondo negro. Con él sale un CV en papel, con las URLs de los
-   enlaces escritas al lado —en papel un enlace no se puede pulsar— y sin la
-   navegación, que no lleva a ninguna parte impresa.
-   ========================================================================= */
 
 @media print {
   html {
@@ -1645,16 +845,10 @@
     padding-block-end: 0;
   }
 
-  /* En pantalla el texto va centrado; en papel, NO. Un CV impreso con los
-     párrafos centrados se lee peor —el ojo pierde el punto de retorno de cada
-     línea— y además es lo que hace un currículum de plantilla. La decisión de
-     centrar es de la web como pieza de diseño, no del documento imprimible, así
-     que aquí se deshace de una vez para todo el árbol. */
   body * {
     text-align: left !important;
   }
 
-  /* Fuera lo que no significa nada en papel. */
   header[data-print='hide'],
   nav[data-print='hide'],
   [data-print='hide'] {
@@ -1666,8 +860,6 @@
     text-decoration: underline;
   }
 
-  /* La URL, junto al enlace. Se excluyen los `mailto:` porque el texto del
-     enlace ya ES la dirección y saldría dos veces. */
   a[href^='http']::after {
     content: ' (' attr(href) ')';
     font-size: 8.5pt;
@@ -1675,7 +867,6 @@
     word-break: break-all;
   }
 
-  /* Nada de secciones partidas por la mitad de un salto de página. */
   section,
   li,
   article {
@@ -1694,9 +885,6 @@
     animation: none !important;
   }
 
-  /* La frase del hero se imprime entera. En pantalla se escribe letra a letra; en
-     papel no hay tiempo, y un navegador que mande a imprimir antes de que la
-     animación termine dejaría el nombre —el titular del CV— recortado a la mitad. */
   .typed__char,
   .hero-name {
     opacity: 1 !important;
@@ -1705,21 +893,8 @@
     transform: none !important;
   }
 
-  /* La línea temporal vuelve a ser un borde gris. En papel el cobre saldría
-     lavado —o directamente no saldría, porque los navegadores no imprimen fondos
-     por defecto y el filete es un pseudoelemento con `background`—, y una
-     trayectoria sin línea son cuatro puestos sueltos. Se devuelve el borde, que
-     sí se imprime, y se apaga todo lo demás. */
   .exp-timeline {
     border-left-color: #bbb !important;
-    /* Y EN PAPEL, LO MÁS RECIENTE PRIMERO. En pantalla la sección se lee de antiguo
-       a reciente para que la barra de progreso avance al bajar; un CV impreso al
-       revés, en cambio, obliga a quien lo hojea a llegar al final para saber dónde
-       trabajas hoy — y eso es lo primero que se mira. `column-reverse` deshace la
-       inversión sin tocar el DOM, que en papel no tiene ningún coste: no hay foco,
-       ni tabulador, ni lector de pantalla que se descoloque.
-       Quien quite la inversión de `Experience.tsx` tiene que quitar esto también, o
-       el papel saldrá invertido de verdad. */
     display: flex;
     flex-direction: column-reverse;
   }
@@ -1729,10 +904,6 @@
     display: none !important;
   }
 
-  /* El hueco de debajo de cada puesto, recolocado. `last:pb-0` apunta al último del
-     DOM —el puesto actual—, que con `column-reverse` es el que sale ARRIBA: sin
-     esto, el papel abriría con un puesto pegado al siguiente y cerraría con 3,5rem
-     de blanco. Se le devuelve el hueco a él y se le quita al que ahora cierra. */
   .exp-timeline > li {
     padding-bottom: 3.5rem;
   }
@@ -1741,14 +912,6 @@
     padding-bottom: 0;
   }
 
-  /* El carrusel, deshecho: en papel no hay scroll, así que un `overflow-x`
-     imprimiría el primer proyecto y recortaría todos los demás. Se convierte en
-     la retícula de dos columnas que tenía la sección antes del carrusel, sin
-     giro, sin solape y sin opacidad.
-     Dos columnas y no una lista en vertical: a lo ancho de una hoja, una tarjeta
-     por fila deja la captura a 19 cm y su hueco de 2:1 mide 9,5 cm de alto, así
-     que ya con cuatro proyectos se comía dos páginas de papel — y desde que en la
-     portada salen los ocho, el doble. */
   .cover-flow {
     overflow: visible;
     max-width: none;
@@ -1769,10 +932,6 @@
     view-timeline-name: none;
   }
 
-  /* Las copias del bucle infinito NO se imprimen. En pantalla la lista se pinta
-     tres veces para que el carrusel no tenga extremos (ver `CoverFlow.tsx`); en
-     papel, donde no hay scroll ni bucle, eso serían veinticuatro tarjetas y seis
-     hojas de proyectos repitiendo los ocho tres veces. */
   .cover-flow-item[data-clone] {
     display: none;
   }
@@ -1786,32 +945,15 @@
     animation: none !important;
   }
 
-  /* El campo no existe en papel, y ahora importa el doble: es una capa FIJA, y una capa fija se
-     imprime **en todas las hojas**. Sin esto, un CV de cinco páginas saldría con la retícula en
-     gris —o en negro sólido, según cómo resuelva el navegador `print-color-adjust`— repetida
-     cinco veces. Basta con esconder la capa.
-
-     Y con la capa se va el escenario cinético de la portada, por su propio motivo: es lo
-     primero de la página, así que sin esto un CV impreso empezaría por media hoja de
-     fotografías de servidores en escala de grises —y con `print-color-adjust` de por medio,
-     puede que en negro sólido—. */
   .site-field,
   .hero-stage {
     display: none !important;
   }
 
-  /* Y el velo del texto tampoco. Es un degradado a grafito sólido: sin quitarlo, el
-     bloque del nombre y las cifras saldría impreso sobre un rectángulo negro —el
-     escenario que justificaba el velo ya no está, pero el velo sí—. */
   .hero-copy::before {
     display: none !important;
   }
 
-  /* LA SOMBRA DEL RETRATO, FUERA. En pantalla es grafito que separa la silueta del
-     fondo; en papel, con el fondo ya quitado, es un nubarrón gris de cuatro
-     centímetros alrededor de la cara — se vio en la captura de impresión, y se volvió a ver
-     al reescribir este bloque. Van los dos: el degradado radial del `::before` y el
-     `drop-shadow` del contenedor, porque cada uno pinta la mitad de la nube. */
   .hero-portrait {
     filter: none !important;
   }
@@ -1820,9 +962,6 @@
     display: none !important;
   }
 
-  /* La pastilla del rótulo, deshecha. Su fondo es grafito translúcido y su texto es
-     claro: impresa, sale una píldora gris oscuro con el puesto ilegible dentro.
-     En papel no hay fondo del que defenderse, así que se queda el texto solo. */
   .hero-chip {
     border: 0;
     background: none;
@@ -1830,23 +969,10 @@
     backdrop-filter: none;
   }
 
-  /* Las cifras del hero, en negro. `text-paper` es un gris casi blanco: sobre papel
-     las cuatro cifras que resumen el CV salían en gris claro, al borde de no
-     imprimirse en una impresora doméstica. Es el bloque que un recruiter mira
-     primero en la hoja, así que no puede ser lo más flojo de la página. */
   .hero-copy .figure-num {
     color: #000;
   }
 
-  /* EL HERO DEJA DE MEDIR UNA PANTALLA. En la web ocupa `min-h-svh` con el texto
-     apoyado abajo, que es lo que deja sitio al campo. En papel el campo no
-     se imprime, así que ese alto se convierte en una hoja casi en blanco con el
-     nombre al final — la primera página del CV, precisamente. Se vio en la captura
-     de impresión: el titular caía a dos tercios de la hoja.
-
-     Con el alto suelto, el bloque sube al principio de la página y el CV empieza
-     donde tiene que empezar. El `padding-top` de 7 rem que en pantalla despeja la
-     cabecera fija tampoco tiene sentido aquí: en papel no hay cabecera. */
   .hero-section {
     min-height: 0;
   }

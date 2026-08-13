@@ -3,15 +3,6 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href } from '@/lib/i18n/routes'
 import { Action } from '@/components/ui/Action'
 
-/**
- * 404 dentro del grupo del sitio, así que hereda la cabecera, el pie y las tipografías: un
- * 404 desnudo parece que la web se ha caído, y no que un enlace estaba mal.
- *
- * **Va en castellano siempre**, y aquí no hay más remedio: `not-found.tsx` no recibe
- * `params`, porque Next la renderiza sin haber resuelto la ruta —eso es justamente lo que
- * ha fallado—. Se usa el idioma por defecto, que es lo que hace el `proxy` con cualquier
- * visita que no declare ninguno.
- */
 export default function NotFound() {
   const t = getDictionary(defaultLocale)
 

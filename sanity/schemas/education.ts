@@ -1,7 +1,6 @@
 import { orderRankField } from '@sanity/orderable-document-list'
 import { defineField, defineType } from 'sanity'
 
-/** Mismo criterio de fechas que en `experience.ts`, y por las mismas razones. */
 const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/
 
 export const education = defineType({
@@ -26,8 +25,6 @@ export const education = defineType({
     defineField({
       name: 'institution',
       title: 'Centro',
-      // Traducido: una universidad tiene nombre oficial en cada idioma («Universidade de
-      // Vigo» / «University of Vigo»). Sin el inglés se cae al castellano, como el resto.
       type: 'localizedString',
       validation: (rule) => rule.required(),
     }),
@@ -60,10 +57,6 @@ export const education = defineType({
     defineField({
       name: 'note',
       title: 'Nota (párrafos)',
-      // Párrafos y no un campo de texto: la nota son dos ideas —qué base te dejó el grado y en
-      // qué se nota hoy— y cada una tiene que ser su propio párrafo en la web. Con un `text`
-      // habría que partir por `\n\n` al pintar, que es el fallo que este tipo existe para
-      // evitar (ver `localized.ts`).
       type: 'localizedParagraphs',
       description:
         'Qué base te dejó la titulación. Un párrafo por idea: la web los pinta separados y centrados.',

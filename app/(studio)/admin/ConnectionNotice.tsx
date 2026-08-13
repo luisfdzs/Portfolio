@@ -1,20 +1,8 @@
-/**
- * Lo que se ve en /admin cuando no hay proyecto de Sanity configurado.
- *
- * Existe porque el fallo por defecto sería mucho peor: sin `projectId`, el panel de Sanity
- * lanza una excepción al montarse y en producción eso es una pantalla en blanco o un error
- * genérico, sin ninguna pista de qué falta. Aquí se dice exactamente qué variable falta,
- * dónde se consigue y en qué orden.
- *
- * **Y la web sigue funcionando**: el contenido del CV vive en `content/`, así que lo único
- * que no está disponible es la edición. Merece la pena decirlo, porque quien llegue aquí
- * puede pensar que el sitio entero está roto.
- */
 const steps = [
   'Crea un proyecto en sanity.io/manage (plan gratuito).',
   'Copia .env.example a .env.local y pega el Project ID en NEXT_PUBLIC_SANITY_PROJECT_ID.',
   'En Vercel, añade la misma variable a los dos proyectos (producción y test).',
-  'Importa el contenido inicial: npm run migrate:build && npm run migrate:import',
+  'Crea los documentos del CV desde este panel.',
 ]
 
 export function ConnectionNotice() {
@@ -28,8 +16,6 @@ export function ConnectionNotice() {
         padding: '2rem',
         background: '#08090b',
         color: '#edeef0',
-        // Estilos en línea y no Tailwind: este grupo de rutas no importa `globals.css`
-        // (ver `(studio)/layout.tsx`), así que aquí no existe ninguna utilidad.
         fontFamily: 'ui-sans-serif, system-ui, sans-serif',
         lineHeight: 1.7,
       }}
@@ -65,10 +51,6 @@ export function ConnectionNotice() {
             </li>
           ))}
         </ol>
-
-        <p style={{ color: '#6d747c', fontSize: '0.8125rem', marginTop: '2rem' }}>
-          El detalle completo está en el README, en «Puesta en marcha del panel».
-        </p>
       </div>
     </main>
   )

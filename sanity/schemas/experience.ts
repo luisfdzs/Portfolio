@@ -1,18 +1,6 @@
 import { orderRankField } from '@sanity/orderable-document-list'
 import { defineField, defineType } from 'sanity'
 
-/**
- * Un puesto de trabajo.
- *
- * Las fechas son **cadenas `YYYY-MM` con una expresión regular**, no el tipo `date` de
- * Sanity. Es deliberado: `date` obliga a elegir un día concreto y un CV no tiene días —un
- * puesto empieza «en marzo de 2026»—, así que el calendario del panel invitaría a inventar
- * un dato que además luego hay que ignorar. Ver `lib/format.ts`.
- *
- * El orden lo pone `orderRank`, que se edita arrastrando en la lista del panel. No se ordena
- * por fecha automáticamente porque un CV no siempre quiere el orden estrictamente
- * cronológico, y cuando lo quiere, arrastrar cuatro filas cuesta menos que discutirlo.
- */
 const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/
 
 export const experience = defineType({
@@ -67,8 +55,6 @@ export const experience = defineType({
           .custom((end, context) => {
             const start = (context.document as { startDate?: string } | undefined)?.startDate
             if (!end || !start) return true
-            // Comparación de cadenas y no de fechas: `YYYY-MM` ordena igual alfabética que
-            // cronológicamente, que es la mitad de la razón para usar este formato.
             return end >= start || 'El fin no puede ser anterior al inicio'
           }),
     }),
