@@ -27,7 +27,14 @@ const BEAM_EVERY = { min: 2.4, max: 5.2 }
 
 const IDLE_AFTER = 2.4
 
-const EASE = { energy: 11, displacement: 7 }
+const EASE = { energy: 11, displacement: 7, damp: 6 }
+
+const TEXT = { damp: 0.12, padX: 26, padY: 12, every: 0.06 }
+
+type CaretDoc = Document & {
+  caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null
+  caretRangeFromPoint?: (x: number, y: number) => Range | null
+}
 
 function spacingFor(width: number) {
   if (width < 640) return 25
@@ -110,7 +117,63 @@ export function SiteField() {
     const beams: Beam[] = []
     let untilBeam = 1.4
 
-    const pointer = { x: 0, y: 0, weight: 0, want: 0, still: 0, seen: false }
+    const pointer = {
+      x: 0,
+      y: 0,
+      weight: 0,
+      want: 0,
+      still: 0,
+      seen: false,
+      damp: 1,
+      onText: false,
+      probe: false,
+      sinceProbe: 0,
+    }
+
+    const caretDoc = document as CaretDoc
+    const probeRange = document.createRange()
+
+    const overText = (x: number, y: number) => {
+      let node: Node | null = null
+      let offset = 0
+
+      if (caretDoc.caretPositionFromPoint) {
+        const spot = caretDoc.caretPositionFromPoint(x, y)
+        if (spot) {
+          node = spot.offsetNode
+          offset = spot.offset
+        }
+      } else if (caretDoc.caretRangeFromPoint) {
+        const spot = caretDoc.caretRangeFromPoint(x, y)
+        if (spot) {
+          node = spot.startContainer
+          offset = spot.startOffset
+        }
+      }
+
+      if (!node || node.nodeType !== Node.TEXT_NODE) return false
+
+      const length = node.nodeValue?.length ?? 0
+      if (length === 0) return false
+
+      const from = Math.min(offset, length - 1)
+      probeRange.setStart(node, from)
+      probeRange.setEnd(node, from + 1)
+
+      for (const rect of probeRange.getClientRects()) {
+        if (rect.width === 0 || rect.height === 0) continue
+        if (
+          x >= rect.left - TEXT.padX &&
+          x <= rect.right + TEXT.padX &&
+          y >= rect.top - TEXT.padY &&
+          y <= rect.bottom + TEXT.padY
+        ) {
+          return true
+        }
+      }
+
+      return false
+    }
 
     let clock = 0
     let frame = 0
@@ -240,7 +303,8 @@ export function SiteField() {
       toX.fill(0)
       toY.fill(0)
 
-      light(pointer.x, pointer.y, lightRadius, pointer.weight, PUSH)
+      const reach = pointer.weight * pointer.damp
+      light(pointer.x, pointer.y, lightRadius, reach, PUSH)
 
       const drift = 1 - pointer.weight
       if (drift > 0.001) {
@@ -358,8 +422,8 @@ export function SiteField() {
       if (haloCtx) {
         ctx.globalCompositeOperation = 'lighter'
         const size = lightRadius * 3.4
-        if (pointer.weight > 0.01) {
-          ctx.globalAlpha = pointer.weight
+        if (reach > 0.01) {
+          ctx.globalAlpha = reach
           ctx.drawImage(halo, pointer.x - size / 2, pointer.y - size / 2, size, size)
         }
         if (drift > 0.01) {
@@ -381,6 +445,16 @@ export function SiteField() {
       pointer.still += delta
       if (pointer.still > IDLE_AFTER) pointer.want = 0
       pointer.weight += (pointer.want - pointer.weight) * (1 - Math.exp(-delta * 3))
+
+      pointer.sinceProbe += delta
+      if (pointer.probe && pointer.sinceProbe >= TEXT.every) {
+        pointer.probe = false
+        pointer.sinceProbe = 0
+        pointer.onText = pointer.seen && overText(pointer.x, pointer.y)
+      }
+
+      const damp = pointer.onText ? TEXT.damp : 1
+      pointer.damp += (damp - pointer.damp) * (1 - Math.exp(-delta * EASE.damp))
 
       for (let i = pulses.length - 1; i >= 0; i--) {
         const item = pulses[i]!
@@ -432,10 +506,15 @@ export function SiteField() {
       pointer.y = event.clientY
       pointer.want = 1
       pointer.still = 0
+      pointer.probe = true
     }
 
     const onLeave = () => {
       pointer.want = 0
+    }
+
+    const onScroll = () => {
+      pointer.probe = true
     }
 
     const onPress = (event: PointerEvent) => {
@@ -447,6 +526,7 @@ export function SiteField() {
       pointer.want = 1
       pointer.still = 0
       pointer.seen = true
+      pointer.probe = true
     }
 
     const onVisibility = () => {
@@ -477,6 +557,7 @@ export function SiteField() {
       window.addEventListener('pointermove', onMove, { passive: true })
       window.addEventListener('pointerdown', onPress, { passive: true })
       window.addEventListener('pointerleave', onLeave)
+      window.addEventListener('scroll', onScroll, { passive: true })
       document.addEventListener('visibilitychange', onVisibility)
       resize.observe(host)
       start()
@@ -493,6 +574,7 @@ export function SiteField() {
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerdown', onPress)
       window.removeEventListener('pointerleave', onLeave)
+      window.removeEventListener('scroll', onScroll)
       document.removeEventListener('visibilitychange', onVisibility)
       reduced.removeEventListener('change', onMotionChange)
     }
