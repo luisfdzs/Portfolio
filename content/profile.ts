@@ -160,8 +160,8 @@ export const education: EducationEntry[] = [
   {
     slug: 'grado-ingenieria-industrial',
     title: {
-      es: 'Grado en Ingeniería Industrial',
-      en: "Bachelor's degree in Industrial Engineering",
+      es: 'Grado en Ingeniería en Electrónica Industrial y Automática',
+      en: "Bachelor's degree in Industrial Electronics and Automation Engineering",
     },
     institution: { es: 'Universidad de Vigo', en: 'University of Vigo' },
     range: { start: '2020-09', end: '2025-06' },
