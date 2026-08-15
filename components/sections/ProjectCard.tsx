@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { projectClip } from '@/content/project-clips'
+import { projectMedia } from '@/content/project-shots'
 import type { ProjectEntry } from '@/content/types'
 import { cn } from '@/lib/cn'
 import type { Locale } from '@/lib/i18n/config'
@@ -7,6 +7,7 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { projectHref } from '@/lib/i18n/routes'
 import { Figure } from '@/components/ui/Figure'
 import { ProjectMedia } from './ProjectMedia'
+import { ProjectShot } from './ProjectShot'
 
 const statusStyles: Record<ProjectEntry['status'], string> = {
   live: 'text-signal',
@@ -16,9 +17,17 @@ const statusStyles: Record<ProjectEntry['status'], string> = {
 
 export function ProjectCard({ locale, project }: { locale: Locale; project: ProjectEntry }) {
   const t = getDictionary(locale)
-  const clip = projectClip(project.slug)
+  const media = projectMedia(project.slug)
 
-  const figure = (
+  const alt = project.image?.alt[locale] ?? `${project.name} — ${project.tagline[locale]}`
+
+  const figure = media ? (
+    <ProjectShot
+      media={media}
+      alt={alt}
+      className="transition-opacity duration-500 group-hover:opacity-85"
+    />
+  ) : (
     <Figure
       image={project.image}
       locale={locale}
@@ -30,8 +39,8 @@ export function ProjectCard({ locale, project }: { locale: Locale; project: Proj
 
   return (
     <article className="group relative flex h-full flex-col rounded-xl border border-line-strong bg-ink-raised p-3 text-center sm:p-4">
-      {clip ? (
-        <ProjectMedia src={clip} label={`${project.name} — ${t.projects.title}`}>
+      {media?.clip ? (
+        <ProjectMedia src={media.clip} label={`${project.name} — ${t.projects.title}`}>
           {figure}
         </ProjectMedia>
       ) : (

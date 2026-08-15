@@ -177,11 +177,19 @@ async function main() {
       if (el.classList.contains('sr-only')) continue
       const rect = el.getBoundingClientRect()
       if (rect.width === 0 || rect.height === 0) continue
+
+      // Lo que se puede tocar no siempre es la caja del enlace: en las tarjetas del
+      // carrusel el enlace del título lleva dentro una capa que cubre la tarjeta
+      // entera, y en 3D la caja del texto llega girada y encogida. Vale la mayor.
+      const boxes = [rect, ...[...el.querySelectorAll('*')].map((n) => n.getBoundingClientRect())]
+      const width = Math.max(...boxes.map((box) => box.width))
+      const height = Math.max(...boxes.map((box) => box.height))
+
       const grow = el.classList.contains('tap') ? 12 : 0
-      if (rect.width + grow < 24 || rect.height + grow < 24) {
+      if (width + grow < 24 || height + grow < 24) {
         offenders.push(
           `${el.tagName.toLowerCase()}«${(el.textContent ?? '').trim().slice(0, 24)}» ` +
-            `${Math.round(rect.width)}×${Math.round(rect.height)}`,
+            `${Math.round(width)}×${Math.round(height)}`,
         )
       }
     }

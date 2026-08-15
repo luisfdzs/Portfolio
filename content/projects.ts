@@ -53,8 +53,8 @@ const sheets: ProjectSheet[] = [
       width: 1280,
       height: 800,
       alt: {
-        es: 'Primera pantalla de CKM Combat Academy: el lema «Todo por la lucha» en letras enormes sobre el vídeo del gimnasio, con «Mos · Pontevedra» encima, la frase «El templo de los deportes de contacto» debajo y los botones «Primera clase gratis» y «Ver las clases».',
-        en: 'CKM Combat Academy first screen: the «Todo por la lucha» claim in huge type over the gym video, with «Mos · Pontevedra» above it, the «temple of contact sports» line below, and the «first class free» and «see the classes» buttons.',
+        es: 'Primera pantalla de CKM Combat Academy: el lema «Todo por la lucha» en letras enormes sobre un fondo negro con un halo rojo, con «Mos · Pontevedra» encima, la frase «El templo de los deportes de contacto» debajo, los botones «Primera clase gratis» y «Ver las clases», y el horario y la dirección del club al pie.',
+        en: 'CKM Combat Academy first screen: the «Todo por la lucha» claim in huge type over a black background with a red glow, with «Mos · Pontevedra» above it, the «temple of contact sports» line below, the «first class free» and «see the classes» buttons, and the club’s opening hours and address at the foot.',
       },
     },
   },

@@ -216,8 +216,9 @@
 }
 
 .cover-flow {
-  /* Móvil: tarjeta estrecha y vertical. */
-  --cover-flow-card: clamp(14rem, 72vw, 19rem);
+  /* Móvil: la tarjeta enseña una pantalla de teléfono entera, así que se estrecha
+     para que quepa de arriba abajo sin comerse el resto de la sección. */
+  --cover-flow-card: clamp(11rem, 52vw, 15rem);
   --cover-flow-ratio: 1;
   --cover-flow-step: calc(var(--cover-flow-card) * 0.4);
   --cover-flow-turn: 64deg;
@@ -262,6 +263,18 @@
 
 .cover-flow-figure {
   aspect-ratio: var(--cover-flow-ratio);
+}
+
+/* La captura manda: la tarjeta toma la proporción del aparato desde el que se mira,
+   así que se ve la primera pantalla entera de la web y no un recorte de ella. */
+.project-shot {
+  aspect-ratio: var(--shot-mobile);
+}
+
+@media (min-width: 48rem) {
+  .project-shot {
+    aspect-ratio: var(--shot-desktop);
+  }
 }
 
 .cover-flow-track {

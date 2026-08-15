@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import type { ProjectClip } from '@/content/project-clips'
+
+type ProjectClip = { desktop: string; mobile: string }
 
 // Por debajo de este ancho la tarjeta es vertical y toca la toma de móvil.
 const WIDE = '(min-width: 48rem)'
