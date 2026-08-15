@@ -6,7 +6,7 @@ import type { Locale } from '@/lib/i18n/config'
 type Props = {
   image: DescribedImage | null | undefined
   locale: Locale
-  ratio?: 'wide' | 'square'
+  ratio?: 'wide' | 'square' | 'fluid'
   priority?: boolean
   sizes?: string
   className?: string
@@ -20,7 +20,8 @@ export function Figure({
   sizes = '(min-width: 1024px) 50vw, 100vw',
   className,
 }: Props) {
-  const shape = ratio === 'square' ? 'aspect-square' : 'aspect-[2/1]'
+  const shape =
+    ratio === 'square' ? 'aspect-square' : ratio === 'fluid' ? undefined : 'aspect-[2/1]'
 
   if (!image) {
     return (

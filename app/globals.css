@@ -216,9 +216,13 @@
 }
 
 .cover-flow {
-  --cover-flow-card: clamp(15rem, 64vw, 28rem);
-  --cover-flow-step: calc(var(--cover-flow-card) * 0.6);
-  --cover-flow-turn: 52deg;
+  /* Móvil: tarjeta estrecha y vertical. */
+  --cover-flow-card: clamp(14rem, 72vw, 19rem);
+  --cover-flow-ratio: 1;
+  --cover-flow-step: calc(var(--cover-flow-card) * 0.4);
+  --cover-flow-turn: 64deg;
+  --cover-flow-depth: 5rem;
+  --cover-flow-dim: 0.3;
 
   max-width: calc(var(--cover-flow-card) + var(--cover-flow-step) * 2.6);
   margin-inline: auto;
@@ -232,6 +236,32 @@
 
 .cover-flow::-webkit-scrollbar {
   display: none;
+}
+
+/* Tablet: la tarjeta empieza a tumbarse. */
+@media (min-width: 48rem) {
+  .cover-flow {
+    --cover-flow-card: 26rem;
+    --cover-flow-ratio: 3 / 2;
+    --cover-flow-step: calc(var(--cover-flow-card) * 0.44);
+    --cover-flow-turn: 62deg;
+  }
+}
+
+/* Ordenador: tarjeta claramente horizontal. */
+@media (min-width: 64rem) {
+  .cover-flow {
+    --cover-flow-card: min(36rem, 44vw);
+    --cover-flow-ratio: 2.2;
+    --cover-flow-step: calc(var(--cover-flow-card) * 0.46);
+    --cover-flow-turn: 58deg;
+    --cover-flow-depth: 7rem;
+    --cover-flow-dim: 0.26;
+  }
+}
+
+.cover-flow-figure {
+  aspect-ratio: var(--cover-flow-ratio);
 }
 
 .cover-flow-track {
@@ -306,16 +336,17 @@
 
 @keyframes cover-flow-turn {
   0% {
-    opacity: 0.55;
-    transform: translateZ(-3rem) rotateY(calc(var(--cover-flow-turn) * -1));
+    opacity: var(--cover-flow-dim);
+    transform: translateZ(calc(var(--cover-flow-depth) * -1))
+      rotateY(calc(var(--cover-flow-turn) * -1));
   }
   50% {
     opacity: 1;
     transform: translateZ(1.5rem) rotateY(0deg);
   }
   100% {
-    opacity: 0.55;
-    transform: translateZ(-3rem) rotateY(var(--cover-flow-turn));
+    opacity: var(--cover-flow-dim);
+    transform: translateZ(calc(var(--cover-flow-depth) * -1)) rotateY(var(--cover-flow-turn));
   }
 }
 
