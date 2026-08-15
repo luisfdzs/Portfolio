@@ -6,8 +6,9 @@ import { sections } from '@/lib/i18n/routes'
 import { Action } from '@/components/ui/Action'
 import { GitHub, LinkedIn, Mail, MapPin } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
-import { SectionHeading } from '@/components/ui/SectionHeading'
 
+// Vive dentro de «Perfil»: quién soy y cómo se me escribe son la misma conversación.
+// Mantiene su propio id para que el menú y los enlaces a #contact sigan valiendo.
 export function Contact({ locale, profile }: { locale: Locale; profile: Profile }) {
   const t = getDictionary(locale)
 
@@ -29,15 +30,22 @@ export function Contact({ locale, profile }: { locale: Locale; profile: Profile 
   ]
 
   return (
-    <section
-      id={sections.contact}
-      className="page-gutter mx-auto max-w-7xl section-block text-center"
-    >
-      <SectionHeading index="05" title={t.contact.title} kicker={t.contact.kicker} icon={Mail}>
-        <p>{t.contact.lead}</p>
-      </SectionHeading>
-
+    <div id={sections.contact} className="mt-16 border-t border-line pt-14 lg:mt-20">
       <Reveal>
+        <div className="flex items-center justify-center gap-3 border-b border-line pb-4">
+          <Mail className="size-4 text-paper-faint" />
+          <span className="eyebrow">{t.contact.title}</span>
+        </div>
+      </Reveal>
+
+      <Reveal step={1}>
+        <h3 className="mt-6 mx-auto max-w-[24ch] text-title text-paper lg:mt-8 lg:max-w-[52ch]">
+          {t.contact.kicker}
+        </h3>
+        <p className="mt-5 mx-auto max-w-measure text-paper-soft">{t.contact.lead}</p>
+      </Reveal>
+
+      <Reveal step={2} className="mt-10">
         <Link
           href={`mailto:${profile.email}`}
           className="figure-num group inline-flex max-w-full items-center gap-3 text-title break-all text-paper transition-colors hover:text-signal"
@@ -77,6 +85,6 @@ export function Contact({ locale, profile }: { locale: Locale; profile: Profile 
           {t.hero.secondaryCta}
         </Action>
       </Reveal>
-    </section>
+    </div>
   )
 }

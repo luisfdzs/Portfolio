@@ -1,21 +1,13 @@
-import type { Profile, SkillGroup } from '@/content/types'
+import type { Profile } from '@/content/types'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { User } from '@/components/ui/Icons'
-import { Stack } from '@/components/sections/Stack'
+import { Contact } from '@/components/sections/Contact'
 
-export function About({
-  locale,
-  profile,
-  skills,
-}: {
-  locale: Locale
-  profile: Profile
-  skills: readonly SkillGroup[]
-}) {
+export function About({ locale, profile }: { locale: Locale; profile: Profile }) {
   const t = getDictionary(locale)
   const [lead, ...rest] = profile.bio[locale]
 
@@ -48,7 +40,7 @@ export function About({
         </div>
       ) : null}
 
-      <Stack locale={locale} groups={skills} />
+      <Contact locale={locale} profile={profile} />
     </section>
   )
 }

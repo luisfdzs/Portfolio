@@ -47,8 +47,8 @@ const es = {
     present: 'actualidad',
     forClient: '→',
     visitCompany: 'Sobre la empresa',
+    visitClient: 'Sobre el cliente',
     stackLabel: 'Tecnologías',
-    units: { year: 'año', years: 'años', month: 'mes', months: 'meses' },
   },
 
   projects: {
@@ -79,11 +79,6 @@ const es = {
   education: {
     title: 'Formación',
     ongoing: 'en curso',
-  },
-
-  stack: {
-    title: 'Stack',
-    kicker: 'Tecnologías que manejo',
   },
 
   contact: {
@@ -166,8 +161,8 @@ const en: Dictionary = {
     present: 'Present',
     forClient: '→',
     visitCompany: 'About the company',
+    visitClient: 'About the client',
     stackLabel: 'Technologies',
-    units: { year: 'year', years: 'years', month: 'month', months: 'months' },
   },
 
   projects: {
@@ -198,11 +193,6 @@ const en: Dictionary = {
   education: {
     title: 'Education',
     ongoing: 'ongoing',
-  },
-
-  stack: {
-    title: 'Stack',
-    kicker: 'Technologies I work with',
   },
 
   contact: {

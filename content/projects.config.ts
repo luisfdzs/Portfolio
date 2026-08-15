@@ -1,6 +1,7 @@
 export type ProjectListing = string | { title: string; featured?: boolean }
 
 export const projectList: ProjectListing[] = [
+  { title: 'CKM Combat Academy', featured: true },
   { title: 'Swiftmet', featured: true },
   { title: 'Mila Barber', featured: true },
   { title: 'Cedecé', featured: true },

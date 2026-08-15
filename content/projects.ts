@@ -5,11 +5,65 @@ type ProjectSheet = Omit<ProjectEntry, 'featured'>
 
 const sheets: ProjectSheet[] = [
   {
+    slug: 'ckm-combat-academy',
+    name: 'CKM Combat Academy',
+    tagline: {
+      es: 'Web para CKM Combat Academy, un club de deportes de contacto de Mos, con horario, tarifas y solicitud de clase de prueba',
+      en: 'Site for CKM Combat Academy, a combat sports club in Mos, with timetable, prices and a trial-class request',
+    },
+    year: '2026',
+    status: 'live',
+    role: {
+      es: 'Diseño, desarrollo, modelo de contenido y despliegue',
+      en: 'Design, development, content model and deployment',
+    },
+    summary: {
+      es: [
+        'Web del club CKM Combat Academy, en Mos (Pontevedra): boxeo, kickboxing, MMA y preparación física, con horario semanal, tarifas, entrenadores y galería. Antes del proyecto el club vivía en Instagram, y quien buscaba un gimnasio no encontraba ni el horario ni el precio sin escribir un mensaje.',
+        'Todo lo que se publica vive en el panel de Sanity y lo edita el propio club; las solicitudes de clase de prueba viajan por separado a MongoDB y no pasan por el CMS. La web decide qué es contenido y qué son datos de personas, y no los mezcla.',
+      ],
+      en: [
+        'Site for CKM Combat Academy, a club in Mos (Pontevedra): boxing, kickboxing, MMA and strength work, with a weekly timetable, prices, coaches and a gallery. Before the project the club lived on Instagram, and anyone looking for a gym could not find the timetable or the price without sending a message.',
+        'Everything published lives in the Sanity panel and the club edits it themselves; trial-class requests travel separately to MongoDB and never touch the CMS. The site decides what is content and what is people’s data, and keeps them apart.',
+      ],
+    },
+    highlights: [
+      {
+        es: 'Dos fuentes con una regla: el repositorio es el suelo y el panel manda cuando tiene documentos. Las dos validan contra el mismo esquema de zod, así que la web se clona y se levanta sin credenciales de nada.',
+        en: 'Two sources with one rule: the repository is the floor and the panel wins when it has documents. Both validate against the same zod schema, so the site can be cloned and run with no credentials at all.',
+      },
+      {
+        es: 'El horario no repite texto: cada franja apunta por referencia a su actividad, así que renombrar «Kickboxing» no obliga a repasar veinte casillas del calendario.',
+        en: 'The timetable never repeats text: each slot points to its activity by reference, so renaming “Kickboxing” does not mean going through twenty cells of the calendar.',
+      },
+      {
+        es: 'La solicitud de clase de prueba es una Server Action con validación de zod y un límite de cinco envíos cada diez minutos: un formulario público sin freno es una invitación al spam.',
+        en: 'The trial-class request is a Server Action with zod validation and a limit of five submissions every ten minutes: a public form with no brake is an invitation to spam.',
+      },
+      {
+        es: 'Una rama por entorno (dev, test y prod) y sólo la de producción se indexa, decidido por rama y no por `VERCEL_ENV`, porque en el proyecto de test esa rama también es «producción».',
+        en: 'One branch per environment (dev, test, prod) and only the production one is indexed, decided by branch rather than by `VERCEL_ENV`, because in the test project that branch is also “production”.',
+      },
+    ],
+    stack: ['Next.js 16', 'TypeScript', 'Tailwind CSS 4', 'Sanity', 'MongoDB', 'zod', 'Vercel'],
+    liveUrl: 'https://ckmcombatacademy.vercel.app',
+    repoUrl: 'https://github.com/luisfdzs/ckm-combat-academy',
+    image: {
+      src: '/projects/ckm-combat-academy.webp',
+      width: 1280,
+      height: 800,
+      alt: {
+        es: 'Primera pantalla de CKM Combat Academy: el lema «Todo por la lucha» en letras enormes sobre el vídeo del gimnasio, con «Mos · Pontevedra» encima, la frase «El templo de los deportes de contacto» debajo y los botones «Primera clase gratis» y «Ver las clases».',
+        en: 'CKM Combat Academy first screen: the «Todo por la lucha» claim in huge type over the gym video, with «Mos · Pontevedra» above it, the «temple of contact sports» line below, and the «first class free» and «see the classes» buttons.',
+      },
+    },
+  },
+  {
     slug: 'swiftmet',
     name: 'Swiftmet',
     tagline: {
-      es: 'Catálogo técnico trilingüe para un fabricante indio de hilo de aluminio',
-      en: 'Trilingual technical catalogue for an Indian aluminium wire manufacturer',
+      es: 'Catálogo técnico de bobinas de hilo de aluminio para Dilip Rawat, responsable comercial de Swiftmet, una empresa india',
+      en: 'Technical catalogue of aluminium wire spools for Dilip Rawat, sales manager at Swiftmet, an Indian manufacturer',
     },
     year: '2026',
     status: 'live',
@@ -62,8 +116,8 @@ const sheets: ProjectSheet[] = [
     slug: 'mila-barber',
     name: 'Mila Barber',
     tagline: {
-      es: 'Web y sistema de reserva de citas para una barbería de Pamplona',
-      en: 'Site and appointment booking system for a barber shop in Pamplona',
+      es: 'Sistema de reserva de citas automático para Hassan, que regenta una barbería en un barrio de Pamplona',
+      en: 'Automatic appointment booking system for Hassan, who runs a barber shop in a Pamplona neighbourhood',
     },
     year: '2026',
     status: 'live',
@@ -130,8 +184,8 @@ const sheets: ProjectSheet[] = [
     slug: 'cedece',
     name: 'Cedecé',
     tagline: {
-      es: 'Web de un rapero de Vigo: el catálogo, el directo y el material de sus redes',
-      en: 'Site for a rapper from Vigo: the catalogue, the live history and the material from his own channels',
+      es: 'Landing page para Cedecé, un rapero de Vigo, con todas sus plataformas vinculadas',
+      en: 'Landing page for Cedecé, a rapper from Vigo, with all his platforms linked',
     },
     year: '2026',
     status: 'live',
@@ -188,8 +242,8 @@ const sheets: ProjectSheet[] = [
     slug: 'sangil-studio',
     name: 'Sangil Studio',
     tagline: {
-      es: 'Portfolio de un estudio de arquitectura, donde la obra manda y la web desaparece',
-      en: 'Portfolio for an architecture studio, where the work leads and the site gets out of the way',
+      es: 'Portfolio profesional para Yago y Juan Luis, que han montado un estudio de arquitectura en Pamplona',
+      en: 'Professional portfolio for Yago and Juan Luis, who have set up an architecture studio in Pamplona',
     },
     year: '2026',
     status: 'live',
@@ -238,8 +292,8 @@ const sheets: ProjectSheet[] = [
     slug: 'bonsai-artesania',
     name: 'Bonsái Artesanía',
     tagline: {
-      es: 'Tienda de joyería artesanal en resina y flor natural',
-      en: 'Shop for handmade resin and dried-flower jewellery',
+      es: 'Tienda web con carrito de productos y envío a domicilio para Ana, una joyera artesana de Vigo',
+      en: 'Online shop with a product cart and home delivery for Ana, a handmade jeweller from Vigo',
     },
     year: '2026',
     status: 'live',
@@ -297,8 +351,8 @@ const sheets: ProjectSheet[] = [
     slug: 'blablatour',
     name: 'BlaBlaTour',
     tagline: {
-      es: 'Coche compartido para llegar al monte: como BlaBlaCar, pero para rutas',
-      en: 'Carpooling to the mountains: like BlaBlaCar, but for trailheads',
+      es: 'Web con diseño mobile para compartir viajes y planes con desconocidos',
+      en: 'Mobile-first site for sharing trips and plans with strangers',
     },
     year: '2026',
     status: 'prototype',
@@ -359,8 +413,8 @@ const sheets: ProjectSheet[] = [
     slug: 'almuerziko-san-fermin',
     name: 'Almuerziko San Fermín',
     tagline: {
-      es: 'Invitación con confirmación de asistencia para el almuerzo del 6 de julio',
-      en: 'Invitation with RSVP for the 6th of July lunch',
+      es: 'Web que creé cuando organicé el almuerziko sanferminero para mis amigos',
+      en: 'Site I built when I organised the San Fermín lunch for my friends',
     },
     year: '2026',
     status: 'live',
@@ -409,8 +463,8 @@ const sheets: ProjectSheet[] = [
     slug: 'portfolio',
     name: 'Portfolio',
     tagline: {
-      es: 'Esta misma web: CV, portfolio y carta de presentación en un sitio',
-      en: 'This very site: CV, portfolio and cover letter in one place',
+      es: 'Esta misma web, para que puedas ver el código y cómo está hecha',
+      en: 'This very site, so you can see the code and how it is built',
     },
     year: '2026',
     status: 'live',

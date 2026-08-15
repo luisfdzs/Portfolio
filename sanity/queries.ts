@@ -27,6 +27,7 @@ export const EXPERIENCE_QUERY = defineQuery(`
     "slug": slug.current,
     role ${localized},
     company,
+    "clients": clients[] { name, url },
     client,
     "range": { "start": startDate, "end": endDate },
     location ${localized},

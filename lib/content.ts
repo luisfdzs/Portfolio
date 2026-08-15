@@ -64,11 +64,18 @@ const dateRange = z
     message: 'la fecha de fin es anterior a la de inicio',
   })
 
+const experienceClient = z.object({
+  name: z.string().min(1),
+  url: z.url().nullish(),
+})
+
 const experienceSchema = z
   .object({
     slug: z.string().min(1),
     role: localizedString,
     company: z.string().min(1),
+    clients: z.array(experienceClient).nullish(),
+    // Formato anterior del panel: un único cliente final escrito a mano.
     client: z.string().nullish(),
     range: dateRange,
     location: localizedString,
@@ -77,7 +84,11 @@ const experienceSchema = z
     stack: z.array(z.string().min(1)).nullish(),
     url: z.url().nullish(),
   })
-  .transform((value) => ({ ...value, stack: value.stack ?? [] }))
+  .transform(({ client, clients, stack, ...rest }) => ({
+    ...rest,
+    stack: stack ?? [],
+    clients: clients?.length ? clients : client ? [{ name: client, url: null }] : [],
+  }))
 
 const educationSchema = z.object({
   slug: z.string().min(1),

@@ -31,11 +31,28 @@ export const experience = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: 'client',
-      title: 'Cliente final',
-      type: 'string',
+      name: 'clients',
+      title: 'Clientes finales',
+      type: 'array',
       description:
-        'Sólo en puestos de consultoría. La web pone una flecha delante: «Altia → INDRA & Kids&Us».',
+        'Sólo en puestos de consultoría: dónde se hacía el trabajo. La web los pone detrás de una flecha, cada uno enlazado a su web: «Altia → Indra · Kids&Us».',
+      of: [
+        defineField({
+          name: 'client',
+          title: 'Cliente',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'name',
+              title: 'Nombre',
+              type: 'string',
+              validation: (rule) => rule.required(),
+            }),
+            defineField({ name: 'url', title: 'Web del cliente', type: 'url' }),
+          ],
+          preview: { select: { title: 'name', subtitle: 'url' } },
+        }),
+      ],
     }),
     defineField({
       name: 'startDate',

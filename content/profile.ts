@@ -58,12 +58,16 @@ export const experience: ExperienceEntry[] = [
       ],
     },
     stack: ['C#', '.NET', 'SQL', 'JavaScript', 'TypeScript', 'React'],
+    url: 'https://www.mobilesmart.city/',
   },
   {
     slug: 'altia',
     role: { es: 'Desarrollador full stack', en: 'Full stack developer' },
     company: 'Altia',
-    client: 'INDRA & Kids&Us',
+    clients: [
+      { name: 'Indra', url: 'https://www.indragroup.com/' },
+      { name: 'Kids&Us', url: 'https://www.kidsandus.es/' },
+    ],
     range: { start: '2024-02', end: '2026-01' },
     location: {
       es: 'Madrid, España · En remoto',
@@ -97,7 +101,7 @@ export const experience: ExperienceEntry[] = [
     slug: 'exceltic',
     role: { es: 'Desarrollador full stack', en: 'Full stack developer' },
     company: 'Exceltic',
-    client: 'Ingeteam',
+    clients: [{ name: 'Ingeteam', url: 'https://www.ingeteam.com/' }],
     range: { start: '2023-02', end: '2024-02' },
     location: {
       es: 'Madrid, España · En remoto',
@@ -134,7 +138,13 @@ export const experience: ExperienceEntry[] = [
     slug: 'zemsania-asti-abb',
     role: { es: 'Programador de AGVs', en: 'AGV programmer' },
     company: 'Zemsania Global Group',
-    client: 'ASTI Mobile Robotics',
+    // ASTI la absorbió ABB: su web es hoy la de robots móviles autónomos de ABB Robotics.
+    clients: [
+      {
+        name: 'ASTI Mobile Robotics',
+        url: 'https://new.abb.com/products/robotics/autonomous-mobile-robots',
+      },
+    ],
     range: { start: '2021-08', end: '2022-12' },
     location: {
       es: 'Burgos, España',
@@ -152,7 +162,7 @@ export const experience: ExperienceEntry[] = [
       ],
     },
     stack: ['C#', '.NET', 'ASP.NET', 'ASP.NET Core', 'Visual Basic', 'SQL', 'JavaScript'],
-    url: 'https://new.abb.com/products/robotics/autonomous-mobile-robots',
+    url: 'https://www.zemsania.com/',
   },
 ]
 

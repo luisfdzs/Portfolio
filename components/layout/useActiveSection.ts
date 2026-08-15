@@ -27,10 +27,8 @@ export function useActiveSection(): SectionKey | null {
         const element = document.getElementById(sections[key])
         if (!element) continue
         const { top, bottom } = element.getBoundingClientRect()
-        if (top <= line && bottom > line) {
-          current = key
-          break
-        }
+        // Sin `break`: «contacto» vive dentro de «perfil», y gana el bloque más interior.
+        if (top <= line && bottom > line) current = key
       }
 
       setMeasured(current)

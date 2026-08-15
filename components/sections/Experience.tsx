@@ -1,6 +1,7 @@
+import { Fragment } from 'react'
 import Link from 'next/link'
 import type { ExperienceEntry } from '@/content/types'
-import { formatDuration, formatRange } from '@/lib/format'
+import { formatRange } from '@/lib/format'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
@@ -32,33 +33,23 @@ export function Experience({
         icon={Briefcase}
       />
 
-      <ol className="exp-timeline border-l border-transparent">
+      <ol className="exp-timeline mx-3 border-l border-transparent sm:mx-0">
         {timeline.map((entry, index) => (
           <Reveal
             as="li"
             key={entry.slug}
             step={index}
-            className="relative pb-14 pl-6 last:pb-0 xl:pl-10 xl:pr-72"
+            className="relative pb-14 pl-7 last:pb-0 xl:pl-10 xl:pr-72"
           >
             <span
               aria-hidden="true"
-              className={
-                index === timeline.length - 1
-                  ? 'absolute top-1.5 -left-[5px] size-[9px] rounded-full bg-signal'
-                  : 'absolute top-1.5 -left-[5px] size-[9px] rounded-full border border-line-strong bg-ink'
-              }
+              className="absolute top-1.5 -left-[5px] size-[9px] rounded-full bg-signal"
             />
 
             <div className="xl:grid xl:grid-cols-[13rem_1fr] xl:gap-10">
               <div className="xl:pt-0.5">
                 <p className="figure-num text-small text-signal">
                   {formatRange(entry.range, locale, t.experience.present)}
-                </p>
-                <p className="figure-num mt-1 text-small text-paper-faint">
-                  {formatDuration(entry.range, t.experience.units)}
-                </p>
-                <p className="figure-num mt-1 text-small text-paper-faint">
-                  {entry.location[locale]}
                 </p>
               </div>
 
@@ -82,10 +73,31 @@ export function Experience({
                   ) : (
                     entry.company
                   )}
-                  {entry.client ? (
+                  {entry.clients && entry.clients.length > 0 ? (
                     <span className="text-paper-faint">
                       {' '}
-                      {t.experience.forClient} {entry.client}
+                      {t.experience.forClient}{' '}
+                      {entry.clients.map((client, position) => (
+                        <Fragment key={client.name}>
+                          {position > 0 ? ' · ' : null}
+                          {client.url ? (
+                            <Link
+                              href={client.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="link-underline transition-colors hover:text-signal"
+                            >
+                              {client.name}
+                              <span className="sr-only">
+                                {' '}
+                                — {t.experience.visitClient} ({t.a11y.externalLink})
+                              </span>
+                            </Link>
+                          ) : (
+                            client.name
+                          )}
+                        </Fragment>
+                      ))}
                     </span>
                   ) : null}
                 </p>

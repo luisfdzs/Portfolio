@@ -12,7 +12,6 @@ import { totalYearsOfExperience } from '@/lib/format'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { About } from '@/components/sections/About'
-import { Contact } from '@/components/sections/Contact'
 import { Education } from '@/components/sections/Education'
 import { Experience } from '@/components/sections/Experience'
 import { Hero } from '@/components/sections/Hero'
@@ -46,7 +45,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       label: t.stats.projects,
     },
     {
-      value: `${new Set(experience.flatMap((entry) => [entry.company, ...(entry.client ? entry.client.split(' · ') : [])])).size}`,
+      value: `${new Set(experience.flatMap((entry) => [entry.company, ...(entry.clients ?? []).map((client) => client.name)])).size}`,
       label: t.stats.clients,
     },
     { value: `${technologies}`, label: t.stats.technologies },
@@ -82,8 +81,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <Projects locale={locale} projects={projects} />
       <Experience locale={locale} entries={experience} />
       <Education locale={locale} entries={education} />
-      <About locale={locale} profile={profile} skills={skills} />
-      <Contact locale={locale} profile={profile} />
+      <About locale={locale} profile={profile} />
     </>
   )
 }

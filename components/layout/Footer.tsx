@@ -4,17 +4,11 @@ import type { Profile } from '@/content/types'
 import { buildYear } from '@/lib/format'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { GitHub, LinkedIn, Mail } from '@/components/ui/Icons'
+import { SocialLinks } from '@/components/ui/SocialLinks'
 
 export function Footer({ locale, profile }: { locale: Locale; profile: Profile }) {
   const t = getDictionary(locale)
   const year = buildYear()
-
-  const links = [
-    { href: `mailto:${profile.email}`, label: profile.email, Icon: Mail, external: false },
-    { href: profile.linkedin, label: t.contact.linkedinLabel, Icon: LinkedIn, external: true },
-    { href: profile.github, label: t.contact.githubLabel, Icon: GitHub, external: true },
-  ]
 
   return (
     <footer className="border-t border-line bg-ink-sunken">
@@ -28,21 +22,7 @@ export function Footer({ locale, profile }: { locale: Locale; profile: Profile }
             </p>
           </div>
 
-          <ul className="flex flex-col gap-3">
-            {links.map(({ href: linkHref, label, Icon, external }) => (
-              <li key={linkHref}>
-                <Link
-                  href={linkHref}
-                  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  className="tap group inline-flex items-center gap-2.5 text-small text-paper-soft transition-colors hover:text-signal"
-                >
-                  <Icon className="size-4 shrink-0" />
-                  <span className="link-underline">{label}</span>
-                  {external ? <span className="sr-only">({t.a11y.externalLink})</span> : null}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <SocialLinks locale={locale} profile={profile} size="large" />
 
           <div>
             <Link

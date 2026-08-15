@@ -48,20 +48,6 @@ export function buildDate(): Date {
   return new Date(Date.UTC(Number(year), Number(month) - 1, 1))
 }
 
-export function formatDuration(
-  range: DateRange,
-  units: { year: string; years: string; month: string; months: string },
-): string {
-  const total = monthsBetween(range.start, range.end ?? currentYearMonth())
-  const years = Math.floor(total / 12)
-  const months = total % 12
-
-  const parts: string[] = []
-  if (years > 0) parts.push(`${years} ${years === 1 ? units.year : units.years}`)
-  if (months > 0) parts.push(`${months} ${months === 1 ? units.month : units.months}`)
-  return parts.length > 0 ? parts.join(' ') : `1 ${units.month}`
-}
-
 export function totalYearsOfExperience(ranges: readonly DateRange[]): number {
   const today = currentYearMonth()
   const months = ranges.reduce(

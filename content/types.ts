@@ -10,11 +10,17 @@ export type DescribedImage = {
   alt: Localized
 }
 
+/** Cliente final de un puesto de consultoría: la empresa donde se hace el trabajo. */
+export type ExperienceClient = {
+  name: string
+  url?: string | null
+}
+
 export type ExperienceEntry = {
   slug: string
   role: Localized
   company: string
-  client?: string | null
+  clients?: ExperienceClient[]
   range: DateRange
   location: Localized
   remote: boolean

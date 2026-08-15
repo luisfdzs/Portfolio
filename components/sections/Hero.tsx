@@ -5,7 +5,8 @@ import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href } from '@/lib/i18n/routes'
 import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
-import { ArrowDown, GitHub, LinkedIn, Mail, MapPin } from '@/components/ui/Icons'
+import { ArrowDown, MapPin } from '@/components/ui/Icons'
+import { SocialLinks } from '@/components/ui/SocialLinks'
 import { Typed } from '@/components/ui/Typed'
 import { HeroStage } from '@/components/sections/HeroStage'
 
@@ -23,12 +24,6 @@ export function Hero({ locale, profile, stats }: Props) {
   const greeting = t.hero.greeting
   const headline = profile.headline[locale]
   const location = profile.location[locale]
-
-  const socials = [
-    { href: profile.linkedin, label: t.contact.linkedinLabel, Icon: LinkedIn },
-    { href: profile.github, label: t.contact.githubLabel, Icon: GitHub },
-    { href: `mailto:${profile.email}`, label: t.contact.emailLabel, Icon: Mail, internal: true },
-  ]
 
   return (
     <section
@@ -78,28 +73,15 @@ export function Hero({ locale, profile, stats }: Props) {
             {location}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <SocialLinks locale={locale} profile={profile} className="mt-5" />
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <Action href={href(locale, 'projects')} variant="primary">
               {t.hero.primaryCta}
             </Action>
             <Action href={href(locale, 'contact')} variant="secondary">
               {t.hero.secondaryCta}
             </Action>
-
-            <ul className="ml-1 flex items-center gap-1" data-print="hide">
-              {socials.map(({ href: linkHref, label, Icon, internal }) => (
-                <li key={linkHref}>
-                  <a
-                    href={linkHref}
-                    {...(internal ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
-                    aria-label={label}
-                    className="flex size-10 items-center justify-center rounded-full text-paper-faint transition-colors hover:text-signal"
-                  >
-                    <Icon className="size-5" />
-                  </a>
-                </li>
-              ))}
-            </ul>
           </div>
 
           <dl className="mt-10 grid w-full grid-cols-4 gap-x-2 gap-y-7 border-t border-line pt-8 text-center lg:mt-12 lg:gap-x-8">
