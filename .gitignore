@@ -32,6 +32,7 @@ mcp.local.json
 
 .claude/
 SiguientesTareas.txt
+scripts/migration/
 
 node_modules/
 dist/

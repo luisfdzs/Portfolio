@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint && prettier --check .",
     "format": "prettier --write .",
-    "check:mobile": "node scripts/check-mobile.mjs"
+    "check:mobile": "node scripts/check-mobile.mjs",
+    "shots": "node scripts/record-project-heros.mjs",
+    "sync:sanity": "node scripts/sync-sanity.mjs"
   },
   "dependencies": {
     "@sanity/client": "^7.25.0",
