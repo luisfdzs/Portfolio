@@ -50,6 +50,7 @@ const TARGETS = [
   { slug: 'swiftmet', url: 'https://swiftmet.vercel.app' },
   { slug: 'mila-barber', url: 'https://milabarber.vercel.app' },
   { slug: 'cedece', url: 'https://cedece.vercel.app' },
+  { slug: 'sangil-studio-web', url: 'https://sangilstudiotest.vercel.app/es' },
   { slug: 'sangil-studio', url: 'https://sangilstudio.com' },
   { slug: 'bonsai-artesania', url: 'https://bonsaiartesania.com' },
   { slug: 'blablatour', url: 'https://blablatour.vercel.app' },
@@ -97,7 +98,7 @@ async function detect(target) {
     })
 
     const before = await page.screenshot({ type: 'jpeg', quality: 40 })
-    await page.waitForTimeout(2000)
+    await page.waitForTimeout(6000)
     const after = await page.screenshot({ type: 'jpeg', quality: 40 })
     const pixelsMove = Buffer.compare(before, after) !== 0
 

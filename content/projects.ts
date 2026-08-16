@@ -239,6 +239,71 @@ const sheets: ProjectSheet[] = [
     },
   },
   {
+    slug: 'sangil-studio-web',
+    name: 'Sangil Studio Web',
+    tagline: {
+      es: 'La web entera del estudio de arquitectura de Yago y Juan Luis: treinta y tres obras y concursos, bilingüe y publicable por ellos mismos',
+      en: 'The full site for Yago and Juan Luis’s architecture studio: thirty-three works and competitions, bilingual and published by themselves',
+    },
+    year: '2026',
+    status: 'prototype',
+    role: {
+      es: 'Diseño, desarrollo, modelo de contenido, migración y despliegue',
+      en: 'Design, development, content model, migration and deployment',
+    },
+    summary: {
+      es: [
+        'Mientras sangilstudio.com sigue enseñando el cartel de «en proceso», esta es la web del estudio terminada y a la espera de subir a producción: portada, proyectos, ficha de cada obra, estudio, aviso legal y contacto, en español y en inglés, con ochenta y siete rutas prerrenderizadas y treinta y una obras migradas con sus setenta y nueve fotografías.',
+        'La portada la pidió el cliente en su primera nota y son dos bloques y nada más: una fotografía a pantalla completa sin una sola palabra encima, con los proyectos fundiéndose unos en otros cada cinco segundos, y el contacto. El menú es un signo más en la esquina.',
+        'La regla que ordena el proyecto es qué puede tocar el cliente y qué no: los arquitectos publican obras, fotos y textos sin llamar a nadie, pero el diseño no se toca desde el panel. Los estados y los tipos son listas cerradas y las memorias son párrafos sin formato libre, para que un titular gigante no pueda romper la estética.',
+      ],
+      en: [
+        'While sangilstudio.com still shows the «work in progress» notice, this is the studio’s finished site waiting to be promoted to production: home, projects, a page per work, studio, legal notice and contact, in Spanish and English, with eighty-seven prerendered routes and thirty-one works migrated along with their seventy-nine photographs.',
+        'The home page was the client’s very first note and it is two blocks and nothing else: a full-screen photograph with not a single word on top, the projects cross-fading into one another every five seconds, and the contact details. The menu is a plus sign in the corner.',
+        'What orders the whole project is the line between what the client can touch and what they cannot: the architects publish works, photographs and copy without calling anyone, but the design is not editable from the panel. Statuses and types are closed lists and project notes are plain paragraphs, so a giant headline can never break the look.',
+      ],
+    },
+    highlights: [
+      {
+        es: 'El hero cambia de proyecto por opacidad y no por desplazamiento: un fundido de novecientos milisegundos cada cinco segundos, con dos selecciones de imagen distintas para móvil y para ordenador y sólo las dos siguientes montadas, para no descargar lo que nadie va a ver.',
+        en: 'The hero moves between projects by opacity, not by sliding: a nine-hundred-millisecond cross-fade every five seconds, with separate image selections for phone and desktop and only the next two mounted, so nothing is downloaded that nobody will see.',
+      },
+      {
+        es: 'Las flechas del hero son dos franjas invisibles en los bordes que sólo existen si hay ratón, con un galón de trazo de 1,25 que no engorda al escalar. En táctil no aparecen, porque ahí se pasa el dedo.',
+        en: 'The hero arrows are two invisible strips at the edges that only exist when there is a mouse, with a 1.25-weight chevron that never thickens when scaled. On touch they never appear, because there you swipe.',
+      },
+      {
+        es: 'Un laboratorio de tipografía interno y sin indexar que expone los dieciséis papeles de texto de la web y deja ajustar familia, cuerpo, grosor, interlineado y espaciado por separado en móvil y en ordenador, previsualizarlo sobre la web real y exportar el CSS. Los arquitectos afinan la letra ellos mismos.',
+        en: 'An internal, unindexed type lab that exposes the site’s sixteen text roles and lets you tune family, size, weight, leading and tracking separately for phone and desktop, preview it over the real site and export the CSS. The architects tune the type themselves.',
+      },
+      {
+        es: 'Obras y concursos viven en una sola lista, porque un concurso es un proyecto con otro estado; la ruta antigua de concursos redirige de forma permanente al listado único en lugar de devolver un 404.',
+        en: 'Works and competitions live in a single list, because a competition is just a project with a different status; the old competitions route redirects permanently to that single list instead of returning a 404.',
+      },
+    ],
+    stack: [
+      'Next.js 16',
+      'TypeScript',
+      'Tailwind CSS 4',
+      'Sanity',
+      'lexorank',
+      'zod',
+      'Playwright',
+      'Vercel',
+    ],
+    liveUrl: 'https://sangilstudiotest.vercel.app/es',
+    repoUrl: 'https://github.com/luisfdzs/sangilstudio/tree/test',
+    image: {
+      src: '/projects/shots/sangil-studio-web.webp',
+      width: 1280,
+      height: 800,
+      alt: {
+        es: 'Primera pantalla de la web de Sangil Studio: una fotografía de arquitectura a pantalla completa sin ningún texto encima, con el logotipo del estudio arriba a la izquierda y un signo más para abrir el menú arriba a la derecha, sobre fondo blanco.',
+        en: 'Sangil Studio site first screen: a full-screen architecture photograph with no text on top, the studio wordmark at the top left and a plus sign to open the menu at the top right, on a white background.',
+      },
+    },
+  },
+  {
     slug: 'sangil-studio',
     name: 'Sangil Studio',
     tagline: {

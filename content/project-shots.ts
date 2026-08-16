@@ -32,6 +32,14 @@ const media: Record<string, ProjectMediaSet> = {
     mobile: { src: '/projects/shots/cedece-mobile.webp', width: 430, height: 932 },
     clip: { desktop: '/projects/cedece.webm', mobile: '/projects/cedece-mobile.webm' },
   },
+  'sangil-studio-web': {
+    desktop: { src: '/projects/shots/sangil-studio-web.webp', width: 1280, height: 800 },
+    mobile: { src: '/projects/shots/sangil-studio-web-mobile.webp', width: 430, height: 932 },
+    clip: {
+      desktop: '/projects/sangil-studio-web.webm',
+      mobile: '/projects/sangil-studio-web-mobile.webm',
+    },
+  },
   'sangil-studio': {
     desktop: { src: '/projects/shots/sangil-studio.webp', width: 1280, height: 800 },
     mobile: { src: '/projects/shots/sangil-studio-mobile.webp', width: 430, height: 932 },
