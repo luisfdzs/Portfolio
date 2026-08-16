@@ -49,6 +49,8 @@ const coil = (
   >
     <path d="M4 2v20" />
     <path d="M20 2v20" />
+    <path className="pl-ghost" d="M4 8h16" />
+    <path className="pl-ghost" d="M4 16h16" />
     <path className="pl-draw" style={{ '--pl-length': 16 } as CSSProperties} d="M4 8h16" />
     <path
       className="pl-draw"
@@ -60,6 +62,7 @@ const coil = (
 
 const monogram = (
   <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth={3} className="pl-trace">
+    <circle className="pl-ghost" cx="20" cy="20" r="18" />
     <circle
       className="pl-draw"
       style={{ '--pl-length': 113 } as CSSProperties}

@@ -282,7 +282,7 @@
 }
 
 .project-loader {
-  --pl-size: clamp(2.5rem, 20cqi, 5.5rem);
+  --pl-size: clamp(2.75rem, 24cqi, 6rem);
 
   position: absolute;
   inset: 0;
@@ -434,6 +434,10 @@
 .pl-trace {
   height: var(--pl-size);
   width: auto;
+}
+
+.pl-trace .pl-ghost {
+  opacity: 0.16;
 }
 
 .pl-trace .pl-draw {
@@ -606,29 +610,29 @@
 .pl-fade {
   position: relative;
   display: block;
-  width: calc(var(--pl-size) * 1.15);
-  height: calc(var(--pl-size) * 0.78);
+  width: calc(var(--pl-size) * 1.3);
+  height: calc(var(--pl-size) * 0.88);
+  border: 1px solid currentColor;
 }
 
 .pl-fade span {
   position: absolute;
-  inset: 0;
-  border: 1px solid currentColor;
+  inset: calc(var(--pl-size) * 0.08);
   animation: pl-fade 2.7s cubic-bezier(0.65, 0, 0.35, 1) infinite both;
 }
 
 .pl-fade span:nth-child(1) {
-  background-color: color-mix(in srgb, currentColor 8%, transparent);
+  background-color: color-mix(in srgb, currentColor 14%, transparent);
 }
 
 .pl-fade span:nth-child(2) {
   animation-delay: 900ms;
-  background-color: color-mix(in srgb, currentColor 20%, transparent);
+  background-color: color-mix(in srgb, currentColor 34%, transparent);
 }
 
 .pl-fade span:nth-child(3) {
   animation-delay: 1800ms;
-  background-color: color-mix(in srgb, currentColor 32%, transparent);
+  background-color: color-mix(in srgb, currentColor 62%, transparent);
 }
 
 @keyframes pl-fade {
