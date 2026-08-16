@@ -239,8 +239,8 @@ const sheets: ProjectSheet[] = [
     },
   },
   {
-    slug: 'sangil-studio-web',
-    name: 'Sangil Studio Web',
+    slug: 'sangil-studio-test',
+    name: 'Sangil Studio Test',
     tagline: {
       es: 'La web entera del estudio de arquitectura de Yago y Juan Luis: treinta y tres obras y concursos, bilingüe y publicable por ellos mismos',
       en: 'The full site for Yago and Juan Luis’s architecture studio: thirty-three works and competitions, bilingual and published by themselves',
@@ -294,7 +294,7 @@ const sheets: ProjectSheet[] = [
     liveUrl: 'https://sangilstudiotest.vercel.app/es',
     repoUrl: 'https://github.com/luisfdzs/sangilstudio/tree/test',
     image: {
-      src: '/projects/shots/sangil-studio-web.webp',
+      src: '/projects/shots/sangil-studio-test.webp',
       width: 1280,
       height: 800,
       alt: {

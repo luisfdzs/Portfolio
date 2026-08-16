@@ -5,7 +5,7 @@ export const projectList: ProjectListing[] = [
   { title: 'Swiftmet', featured: true },
   { title: 'Mila Barber', featured: true },
   { title: 'Cedecé', featured: true },
-  { title: 'Sangil Studio Web', featured: true },
+  { title: 'Sangil Studio Test', featured: true },
   { title: 'Sangil Studio', featured: true },
   'Bonsái Artesanía',
   'BlaBlaTour',

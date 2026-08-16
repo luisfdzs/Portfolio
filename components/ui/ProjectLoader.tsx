@@ -120,7 +120,7 @@ const loaders: Record<string, Loader> = {
   'mila-barber': { background: '#0a0908', mark: '#e0a938', art: pole },
   'ckm-combat-academy': { background: '#0a0908', mark: '#c8102e', art: slam },
   'sangil-studio': { background: '#ffffff', mark: '#1a1a1a', art: bar },
-  'sangil-studio-web': { background: '#ffffff', mark: '#111111', art: crossFade },
+  'sangil-studio-test': { background: '#ffffff', mark: '#111111', art: crossFade },
   blablatour: { background: '#f7f6f2', mark: '#1f6f5c', ring: '#e4e2da', art: ring },
   'almuerziko-san-fermin': { background: '#fbf8f3', mark: '#d81e2c', art: kerchief },
   portfolio: { background: '#08090b', mark: '#e0a458', art: dots },

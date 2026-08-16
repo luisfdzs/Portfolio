@@ -50,7 +50,7 @@ const TARGETS = [
   { slug: 'swiftmet', url: 'https://swiftmet.vercel.app' },
   { slug: 'mila-barber', url: 'https://milabarber.vercel.app' },
   { slug: 'cedece', url: 'https://cedece.vercel.app' },
-  { slug: 'sangil-studio-web', url: 'https://sangilstudiotest.vercel.app/es' },
+  { slug: 'sangil-studio-test', url: 'https://sangilstudiotest.vercel.app/es' },
   { slug: 'sangil-studio', url: 'https://sangilstudio.com' },
   { slug: 'bonsai-artesania', url: 'https://bonsaiartesania.com' },
   { slug: 'blablatour', url: 'https://blablatour.vercel.app' },
