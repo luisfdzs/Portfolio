@@ -156,7 +156,7 @@ export function ProjectLoader({
       data-leaving={leaving || undefined}
       style={palette}
     >
-      {loader.art}
+      <span className="pl-mark">{loader.art}</span>
     </span>
   )
 }

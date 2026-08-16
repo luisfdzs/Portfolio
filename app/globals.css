@@ -292,6 +292,51 @@
   opacity: 0;
 }
 
+.pl-mark {
+  display: grid;
+  place-items: center;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .cover-flow .pl-mark {
+      animation: cover-flow-mark linear both;
+      animation-timeline: --cover-flow;
+      animation-range: contain;
+    }
+  }
+}
+
+@keyframes cover-flow-mark {
+  0% {
+    transform: translateX(10%);
+  }
+  12.5% {
+    transform: translateX(20%);
+  }
+  25% {
+    transform: translateX(30%);
+  }
+  37.5% {
+    transform: translateX(12%);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  62.5% {
+    transform: translateX(-12%);
+  }
+  75% {
+    transform: translateX(-30%);
+  }
+  87.5% {
+    transform: translateX(-20%);
+  }
+  100% {
+    transform: translateX(-10%);
+  }
+}
+
 .pl-flower {
   height: var(--pl-size);
   width: auto;
