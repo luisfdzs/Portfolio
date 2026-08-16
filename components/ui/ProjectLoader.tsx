@@ -131,7 +131,7 @@ const loaders: Record<string, Loader> = {
 
 const fallback: Loader = { mark: '#e0a458', art: dots }
 
-export function ProjectLoader({ slug }: { slug: string }) {
+export function ProjectLoader({ slug, leaving = false }: { slug: string; leaving?: boolean }) {
   const loader = loaders[slug] ?? fallback
 
   const palette = {
@@ -140,7 +140,12 @@ export function ProjectLoader({ slug }: { slug: string }) {
   } as CSSProperties
 
   return (
-    <span aria-hidden="true" className="project-loader" style={palette}>
+    <span
+      aria-hidden="true"
+      className="project-loader"
+      data-leaving={leaving || undefined}
+      style={palette}
+    >
       {loader.art}
     </span>
   )
