@@ -75,7 +75,6 @@ const experienceSchema = z
     role: localizedString,
     company: z.string().min(1),
     clients: z.array(experienceClient).nullish(),
-    // Formato anterior del panel: un único cliente final escrito a mano.
     client: z.string().nullish(),
     range: dateRange,
     location: localizedString,

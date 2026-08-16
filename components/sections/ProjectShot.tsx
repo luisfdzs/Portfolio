@@ -20,12 +20,10 @@ const useBeforePaint = typeof window === 'undefined' ? useEffect : useLayoutEffe
 export function ProjectShot({ media, slug, alt, priority = false, className }: Props) {
   const image = useRef<HTMLImageElement>(null)
   const [ready, setReady] = useState(false)
-  const [leaving, setLeaving] = useState(false)
   const [gone, setGone] = useState(false)
 
   useBeforePaint(() => {
     const node = image.current
-    // Una captura de caché ya está completa antes de que React llegue a enterarse del onLoad.
     if (node?.complete && node.naturalWidth > 0) {
       setReady(true)
       setGone(true)
@@ -35,7 +33,6 @@ export function ProjectShot({ media, slug, alt, priority = false, className }: P
   useEffect(() => {
     if (!ready || gone) return
 
-    setLeaving(true)
     const drop = window.setTimeout(() => setGone(true), FADE)
     return () => window.clearTimeout(drop)
   }, [ready, gone])
@@ -53,8 +50,7 @@ export function ProjectShot({ media, slug, alt, priority = false, className }: P
         className,
       )}
     >
-      {/* Sin onError no se retira: si la captura falla, se queda el loader y no un hueco vacío. */}
-      {gone ? null : <ProjectLoader slug={slug} leaving={leaving} />}
+      {gone ? null : <ProjectLoader slug={slug} leaving={ready} />}
 
       <picture className="relative block size-full">
         <source media="(min-width: 48rem)" srcSet={media.desktop.src} />

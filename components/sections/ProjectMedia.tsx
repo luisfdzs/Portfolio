@@ -6,7 +6,6 @@ import { ProjectLoader, loaderCycle } from '@/components/ui/ProjectLoader'
 
 type ProjectClip = { desktop: string; mobile: string }
 
-
 const WIDE = '(min-width: 48rem)'
 const BLANK_SD = 4
 const MAX_WARM = 2500
@@ -29,8 +28,6 @@ function frameSpread(pixels: Uint8ClampedArray) {
   return Math.sqrt(spread)
 }
 
-// Reproduce el hero animado del proyecto sólo cuando su tarjeta es la centrada en el
-// carrusel: el resto del tiempo se ve el póster, que es el mismo <Figure> del servidor.
 export function ProjectMedia({
   src,
   slug,
@@ -44,16 +41,9 @@ export function ProjectMedia({
 }) {
   const container = useRef<HTMLDivElement>(null)
   const video = useRef<HTMLVideoElement>(null)
-  // Segundo en el que la web del clip empieza a estar pintada. Se aprende en la primera
-  // pasada y a partir de ahí el bucle vuelve ahí, no al cero: dar la vuelta al cero era
-  // volver a meter el blanco cada vez, ya con la tarjeta bien puesta y a plena vista.
   const opening = useRef(0)
   const [playing, setPlaying] = useState(false)
-  // El clip ya enseña algo suyo, no el blanco con el que arranca.
   const [painted, setPainted] = useState(false)
-  // La tarjeta es la que manda y su captura ya no pinta nada: el loader la tapa. Va aparte
-  // de `playing` porque se pone en el mismo gesto que pide el clip, no cuando el clip
-  // arranca —esperar a que arrancara era ver la captura primero—.
   const [covering, setCovering] = useState(false)
 
   useEffect(() => {
@@ -81,7 +71,6 @@ export function ProjectMedia({
     let warmFrom = 0
     let coveredAt = 0
     let show = 0
-    // Si el clip se acaba justo cuando la tarjeta deja de ser la puesta, no toca redarlo.
     let wanted = false
 
     function reveal() {
@@ -108,8 +97,6 @@ export function ProjectMedia({
           return reveal()
         }
       } catch {
-        // Un clip de otro origen ensuciaría el lienzo y no se dejaría leer. Los de aquí son
-        // del mismo sitio, pero si alguna vez deja de serlo se pasa de largo y se enseña.
         return reveal()
       }
 
@@ -133,8 +120,6 @@ export function ProjectMedia({
           sample()
         },
         () => {
-          // Sin reproducción no hay hero que enseñar, así que el loader se quita y la
-          // tarjeta se queda con su captura.
           setPlaying(false)
           setCovering(false)
         },
@@ -154,8 +139,6 @@ export function ProjectMedia({
       if (!element) return
 
       element.pause()
-      // El rebobinado espera a que el clip se haya ido del todo. Si no, se le veía volver
-      // al blanco del arranque mientras aún estaba a la vista.
       window.clearTimeout(rewind)
       rewind = window.setTimeout(() => {
         const node = video.current
@@ -163,8 +146,6 @@ export function ProjectMedia({
       }, FADE_OUT)
     }
 
-    // Sin `loop`: el bucle se da a mano para volver al principio de lo pintado y no al
-    // blanco de la grabación.
     function again() {
       const element = video.current
       if (!element || !wanted) return
@@ -204,8 +185,6 @@ export function ProjectMedia({
 
     let frame = 0
     let active: boolean | null = null
-    // Momento del aviso de la flecha. Mientras corre, la tarjeta no se apaga aunque todavía
-    // no esté centrada: está de viaje hacia el centro.
     let armedAt = 0
     let expiry = 0
 
@@ -245,8 +224,6 @@ export function ProjectMedia({
       armedAt = performance.now()
       active = true
       start()
-      // El carrusel deja de moverse al llegar, así que sin este repaso la tarjeta que se
-      // quedó por el camino no volvería a mirarse nunca.
       window.clearTimeout(expiry)
       expiry = window.setTimeout(schedule, ARM_HOLD + 20)
     }
@@ -278,16 +255,6 @@ export function ProjectMedia({
     <div ref={container} className="relative">
       {children}
 
-      {/* El clip no se enseña hasta que pinta algo suyo: si no, lo que se veía era el blanco
-          con el que arranca la grabación.
-
-          Entra de golpe, sin fundido: el loader es opaco y va por encima, así que el cambio
-          ocurre a puerta cerrada y el único que se mueve es el loader al retirarse. Cuando
-          entraba en 700ms y el loader se iba en 320ms, en los 400ms de desfase ninguna de las
-          dos capas tapaba del todo y por debajo se colaba la captura.
-
-          A la salida sí hay fundido: ahí el loader ya no está y el clip tiene que devolverle
-          el sitio a la captura sin cortes. */}
       <video
         ref={video}
         aria-label={label}
@@ -300,7 +267,6 @@ export function ProjectMedia({
         }`}
       />
 
-      {/* Y ese hueco lo llena el loader del proyecto, que es lo que iba en lugar del blanco. */}
       {covering ? (
         <ProjectLoader slug={slug} leaving={painted} className="pointer-events-none rounded-lg" />
       ) : null}

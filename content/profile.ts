@@ -138,7 +138,6 @@ export const experience: ExperienceEntry[] = [
     slug: 'zemsania-asti-abb',
     role: { es: 'Programador de AGVs', en: 'AGV programmer' },
     company: 'Zemsania Global Group',
-    // ASTI la absorbió ABB: su web es hoy la de robots móviles autónomos de ABB Robotics.
     clients: [
       {
         name: 'ASTI Mobile Robotics',

@@ -216,8 +216,6 @@
 }
 
 .cover-flow {
-  /* Móvil: la tarjeta enseña una pantalla de teléfono entera, así que se estrecha
-     para que quepa de arriba abajo sin comerse el resto de la sección. */
   --cover-flow-card: clamp(9.5rem, 46vw, 13rem);
   --cover-flow-ratio: 1;
   --cover-flow-step: calc(var(--cover-flow-card) * 0.33);
@@ -240,7 +238,6 @@
   display: none;
 }
 
-/* Tablet: la tarjeta empieza a tumbarse. */
 @media (min-width: 48rem) {
   .cover-flow {
     --cover-flow-card: 20rem;
@@ -251,7 +248,6 @@
   }
 }
 
-/* Ordenador: tarjeta claramente horizontal. */
 @media (min-width: 64rem) {
   .cover-flow {
     --cover-flow-card: min(32rem, 38vw);
@@ -268,8 +264,6 @@
   aspect-ratio: var(--cover-flow-ratio);
 }
 
-/* La captura manda: la tarjeta toma la proporción del aparato desde el que se mira,
-   así que se ve la primera pantalla entera de la web y no un recorte de ella. */
 .project-shot {
   aspect-ratio: var(--shot-mobile);
   container-type: inline-size;
@@ -286,7 +280,6 @@
 
   position: absolute;
   inset: 0;
-  /* El <picture> que va detrás está posicionado, así que sin esto lo taparía. */
   z-index: 1;
   display: grid;
   place-items: center;
@@ -295,7 +288,6 @@
   transition: opacity 320ms var(--ease-out-soft);
 }
 
-/* La captura ya está lista: el loader se va con un fundido en vez de desaparecer de golpe. */
 .project-loader[data-leaving='true'] {
   opacity: 0;
 }

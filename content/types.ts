@@ -10,7 +10,6 @@ export type DescribedImage = {
   alt: Localized
 }
 
-/** Cliente final de un puesto de consultoría: la empresa donde se hace el trabajo. */
 export type ExperienceClient = {
   name: string
   url?: string | null

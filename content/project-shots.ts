@@ -1,9 +1,3 @@
-// Generado por `node scripts/record-project-heros.mjs`. No se edita a mano.
-//
-// De cada proyecto, la primera pantalla de su web tal y como se ve en un portátil y
-// en un móvil: la captura fija que enseña la tarjeta y, si la portada se mueve, el
-// clip que se reproduce cuando esa tarjeta queda centrada en el carrusel.
-
 export type ProjectShot = { src: string; width: number; height: number }
 
 export type ProjectMediaSet = {

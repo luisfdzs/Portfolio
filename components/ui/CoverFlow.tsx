@@ -82,8 +82,6 @@ export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) 
 
     if (!target) return
 
-    // Primero el aviso y después el viaje: la tarjeta que viene tapa su captura antes de
-    // arrancar, así que del proyecto siguiente sólo se llegan a ver loader y hero.
     armCoverFlowItem(target)
 
     element.scrollTo({

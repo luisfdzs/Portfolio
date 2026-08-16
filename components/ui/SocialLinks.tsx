@@ -7,13 +7,10 @@ import { GitHub, LinkedIn, Mail } from './Icons'
 type Props = {
   locale: Locale
   profile: Profile
-  /** «large» es la fila del pie, donde los iconos van solos y mandan ellos. */
   size?: 'default' | 'large'
   className?: string
 }
 
-// Los mismos tres accesos (LinkedIn, GitHub y correo) en la portada y en el pie:
-// un solo sitio donde cambiarlos y un solo aspecto que recordar.
 export function SocialLinks({ locale, profile, size = 'default', className }: Props) {
   const t = getDictionary(locale)
   const large = size === 'large'

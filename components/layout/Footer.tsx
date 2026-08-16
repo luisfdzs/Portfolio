@@ -12,7 +12,6 @@ export function Footer({ locale, profile }: { locale: Locale; profile: Profile }
 
   return (
     <footer className="border-t border-line bg-ink-sunken">
-      {/* El hueco de abajo es para el botón de volver arriba, que va centrado y flotando. */}
       <div className="page-gutter mx-auto max-w-7xl pt-12 pb-28 text-center lg:pt-16 lg:pb-24">
         <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-start lg:justify-between">
           <div>

@@ -7,8 +7,6 @@ import { Action } from '@/components/ui/Action'
 import { GitHub, LinkedIn, Mail, MapPin } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 
-// Vive dentro de «Perfil»: quién soy y cómo se me escribe son la misma conversación.
-// Mantiene su propio id para que el menú y los enlaces a #contact sigan valiendo.
 export function Contact({ locale, profile }: { locale: Locale; profile: Profile }) {
   const t = getDictionary(locale)
 

@@ -178,9 +178,6 @@ async function main() {
       const rect = el.getBoundingClientRect()
       if (rect.width === 0 || rect.height === 0) continue
 
-      // Lo que se puede tocar no siempre es la caja del enlace: en las tarjetas del
-      // carrusel el enlace del título lleva dentro una capa que cubre la tarjeta
-      // entera, y en 3D la caja del texto llega girada y encogida. Vale la mayor.
       const boxes = [rect, ...[...el.querySelectorAll('*')].map((n) => n.getBoundingClientRect())]
       const width = Math.max(...boxes.map((box) => box.width))
       const height = Math.max(...boxes.map((box) => box.height))

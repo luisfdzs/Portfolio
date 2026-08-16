@@ -1,15 +1,10 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 
-// El hueco de carga se queda en el fondo del portfolio: lo que cambia de un proyecto a
-// otro es el gesto y el color del trazo, no un panel claro que repita el destello blanco.
 type Loader = {
   mark: string
   ring?: string
   art: ReactNode
-  // Lo que dura una vuelta del bucle de su animación, en milisegundos. El loader sólo se
-  // retira al cerrar una vuelta, así que este número tiene que ir a la par que la duración
-  // que se le da a la animación en globals.css.
   cycle: number
 }
 
@@ -119,8 +114,6 @@ const crossFade = (
   </span>
 )
 
-// Los colores son los de cada web, aclarados lo justo para que se lean sobre el fondo
-// oscuro del portfolio: los originales de las webs claras eran casi invisibles aquí.
 const loaders: Record<string, Loader> = {
   'bonsai-artesania': { mark: '#9db38f', art: flower, cycle: 2800 },
   swiftmet: { mark: '#5fb3d4', art: coil, cycle: 2600 },

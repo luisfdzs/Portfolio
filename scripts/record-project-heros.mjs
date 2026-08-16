@@ -1,22 +1,5 @@
 #!/usr/bin/env node
 
-// Graba de cada proyecto lo que se ve al entrar en su web, a la proporción real de
-// cada dispositivo: una captura fija (el póster de la tarjeta) y, si la portada se
-// mueve, un clip corto que se reproduce cuando la tarjeta está centrada.
-//
-// Sale todo a public/projects:
-//   shots/<slug>.webp         escritorio, 1280×800
-//   shots/<slug>-mobile.webp  móvil, 430×932
-//   <slug>.webm / <slug>-mobile.webm
-//
-// y el índice content/project-shots.ts, que es de donde los componentes leen las
-// medidas: así ningún ancho se escribe a mano en un componente.
-//
-//   node scripts/record-project-heros.mjs --detect          sólo detección
-//   node scripts/record-project-heros.mjs                   detecta, captura y graba
-//   node scripts/record-project-heros.mjs --shots           sólo las capturas fijas
-//   node scripts/record-project-heros.mjs swiftmet cedece   sólo esos proyectos
-
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
@@ -30,8 +13,6 @@ const CHROME =
       ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
       : '/usr/bin/google-chrome')
 
-// Las dos tomas son el viewport de un portátil y el de un móvil corriente: lo que
-// enseña la tarjeta es exactamente el primer pantallazo de la web en ese aparato.
 const SHOTS = [
   { key: 'desktop', suffix: '', size: { width: 1280, height: 800 }, mobile: false },
   { key: 'mobile', suffix: '-mobile', size: { width: 430, height: 932 }, mobile: true },
@@ -110,7 +91,6 @@ async function detect(target) {
   }
 }
 
-// El webp lo codifica el propio Chrome: no hace falta ninguna dependencia de imagen.
 async function shoot(target, shot) {
   await mkdir(SHOT_DIR, { recursive: true })
 
@@ -219,13 +199,7 @@ async function writeIndex() {
     })
     .join('\n')
 
-  const file = `// Generado por \`node scripts/record-project-heros.mjs\`. No se edita a mano.
-//
-// De cada proyecto, la primera pantalla de su web tal y como se ve en un portátil y
-// en un móvil: la captura fija que enseña la tarjeta y, si la portada se mueve, el
-// clip que se reproduce cuando esa tarjeta queda centrada en el carrusel.
-
-export type ProjectShot = { src: string; width: number; height: number }
+  const file = `export type ProjectShot = { src: string; width: number; height: number }
 
 export type ProjectMediaSet = {
   desktop: ProjectShot
