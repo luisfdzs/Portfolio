@@ -38,7 +38,35 @@ export function ProjectMedia({
     wide.addEventListener('change', pickSource)
 
     const scroller = node.closest('.cover-flow')
-    if (!scroller) return
+
+    if (!scroller) {
+      const element = video.current
+      if (!element) return
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry) return
+          if (entry.isIntersecting) {
+            element.play().then(
+              () => setPlaying(true),
+              () => setPlaying(false),
+            )
+          } else {
+            element.pause()
+            element.currentTime = 0
+            setPlaying(false)
+          }
+        },
+        { threshold: 0.4 },
+      )
+      observer.observe(node)
+
+      return () => {
+        wide.removeEventListener('change', pickSource)
+        observer.disconnect()
+        element.pause()
+      }
+    }
 
     let frame = 0
     let active: boolean | null = null

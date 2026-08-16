@@ -15,7 +15,15 @@ const statusStyles: Record<ProjectEntry['status'], string> = {
   archived: 'text-paper-faint',
 }
 
-export function ProjectCard({ locale, project }: { locale: Locale; project: ProjectEntry }) {
+export function ProjectCard({
+  locale,
+  project,
+  animate = true,
+}: {
+  locale: Locale
+  project: ProjectEntry
+  animate?: boolean
+}) {
   const t = getDictionary(locale)
   const media = projectMedia(project.slug)
 
@@ -24,6 +32,7 @@ export function ProjectCard({ locale, project }: { locale: Locale; project: Proj
   const figure = media ? (
     <ProjectShot
       media={media}
+      slug={project.slug}
       alt={alt}
       className="transition-opacity duration-500 group-hover:opacity-85"
     />
@@ -39,7 +48,7 @@ export function ProjectCard({ locale, project }: { locale: Locale; project: Proj
 
   return (
     <article className="group relative flex h-full flex-col rounded-xl border border-line-strong bg-ink-raised p-3 text-center sm:p-4">
-      {media?.clip ? (
+      {animate && media?.clip ? (
         <ProjectMedia src={media.clip} label={`${project.name} — ${t.projects.title}`}>
           {figure}
         </ProjectMedia>

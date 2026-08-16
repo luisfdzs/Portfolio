@@ -32,6 +32,10 @@ export function projectHref(locale: Locale, slug: string): string {
   return `/${locale}/${PROJECT_SEGMENT}/${slug}`
 }
 
+export function projectsHref(locale: Locale): string {
+  return `/${locale}/${PROJECT_SEGMENT}`
+}
+
 export function isProjectPath(pathname: string): boolean {
   return new RegExp(`^/[^/]+/${PROJECT_SEGMENT}/.`).test(pathname)
 }

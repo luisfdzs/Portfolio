@@ -74,6 +74,14 @@ const es = {
     previous: 'Anterior',
     next: 'Siguiente',
     backToProjects: 'Volver a los proyectos',
+    seeAll: 'Ver todos los proyectos',
+    allTitle: 'Todos los proyectos',
+    allKicker: 'Cada web que he puesto en producción',
+    allIntro:
+      'La primera pantalla real de cada una, tal y como se ve desde el aparato con el que estás mirando esto.',
+    allDescription:
+      'Todas las webs de Luis Fernández Sangil en producción, con la primera pantalla real de cada una.',
+    backHome: 'Volver al inicio',
   },
 
   education: {
@@ -188,6 +196,14 @@ const en: Dictionary = {
     previous: 'Previous',
     next: 'Next',
     backToProjects: 'Back to projects',
+    seeAll: 'See every project',
+    allTitle: 'All projects',
+    allKicker: 'Every site I have shipped',
+    allIntro:
+      'The real first screen of each one, exactly as it looks on the device you are reading this from.',
+    allDescription:
+      'Every site by Luis Fernández Sangil in production, with the real first screen of each one.',
+    backHome: 'Back to home',
   },
 
   education: {

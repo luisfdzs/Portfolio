@@ -1,0 +1,142 @@
+import type { CSSProperties, ReactNode } from 'react'
+
+type Loader = {
+  background: string
+  mark: string
+  ring?: string
+  art: ReactNode
+}
+
+const PETALS = [0, 72, 144, 216, 288]
+
+const flower = (
+  <svg
+    viewBox="0 0 40 60"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="pl-flower"
+  >
+    <path className="pl-stem" d="M20 58 C20 47 18.5 37 20 28" />
+    <path className="pl-leaf" d="M20 47 C14 46 11 41.5 12 37.5 C17 38 19.5 42 20 47" />
+    <path className="pl-leaf" d="M20 42 C25.5 41 28 37 27 33.5 C22.5 34 20.5 37.5 20 42" />
+    {PETALS.map((angle, index) => (
+      <g key={angle} transform={`rotate(${angle} 20 21)`}>
+        <ellipse
+          className="pl-petal"
+          cx="20"
+          cy="15"
+          rx="3.1"
+          ry="5"
+          style={{ animationDelay: `${index * 70}ms` }}
+        />
+      </g>
+    ))}
+    <circle className="pl-heart" cx="20" cy="21" r="2.4" fill="currentColor" stroke="none" />
+  </svg>
+)
+
+const coil = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    className="pl-trace"
+  >
+    <path d="M4 2v20" />
+    <path d="M20 2v20" />
+    <path className="pl-draw" style={{ '--pl-length': 16 } as CSSProperties} d="M4 8h16" />
+    <path
+      className="pl-draw"
+      style={{ '--pl-length': 16, animationDelay: '280ms' } as CSSProperties}
+      d="M4 16h16"
+    />
+  </svg>
+)
+
+const monogram = (
+  <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth={3} className="pl-trace">
+    <circle
+      className="pl-draw"
+      style={{ '--pl-length': 113 } as CSSProperties}
+      cx="20"
+      cy="20"
+      r="18"
+    />
+    <rect className="pl-blink" x="14" y="6" width="3.4" height="28" fill="currentColor" />
+  </svg>
+)
+
+const kerchief = (
+  <svg viewBox="0 0 40 36" fill="none" className="pl-bob">
+    <path d="M4 7 H36 L20 33 Z" fill="currentColor" />
+    <circle cx="20" cy="6" r="3.4" fill="#e0a92e" />
+  </svg>
+)
+
+const pole = <span className="pl-pole" />
+
+const bar = <span className="pl-bar" />
+
+const ring = <span className="pl-ring" />
+
+const slam = (
+  <span className="pl-slam">
+    <span />
+    <span />
+    <span />
+  </span>
+)
+
+const dots = (
+  <span className="pl-dots">
+    <span />
+    <span />
+    <span />
+    <span />
+    <span />
+  </span>
+)
+
+const crossFade = (
+  <span className="pl-fade">
+    <span />
+    <span />
+    <span />
+  </span>
+)
+
+const loaders: Record<string, Loader> = {
+  'bonsai-artesania': { background: '#faf7f2', mark: '#6b7a62', art: flower },
+  swiftmet: { background: '#f2f3f4', mark: '#0d5c7a', art: coil },
+  cedece: { background: '#0b0b0d', mark: '#d81f36', art: monogram },
+  'mila-barber': { background: '#0a0908', mark: '#e0a938', art: pole },
+  'ckm-combat-academy': { background: '#0a0908', mark: '#c8102e', art: slam },
+  'sangil-studio': { background: '#ffffff', mark: '#1a1a1a', art: bar },
+  'sangil-studio-web': { background: '#ffffff', mark: '#111111', art: crossFade },
+  blablatour: { background: '#f7f6f2', mark: '#1f6f5c', ring: '#e4e2da', art: ring },
+  'almuerziko-san-fermin': { background: '#fbf8f3', mark: '#d81e2c', art: kerchief },
+  portfolio: { background: '#08090b', mark: '#e0a458', art: dots },
+}
+
+const fallback: Loader = { background: '#0f1116', mark: '#e0a458', art: dots }
+
+export function ProjectLoader({ slug }: { slug: string }) {
+  const loader = loaders[slug] ?? fallback
+
+  const palette = {
+    '--pl-bg': loader.background,
+    '--pl-mark': loader.mark,
+    '--pl-ring': loader.ring ?? loader.mark,
+  } as CSSProperties
+
+  return (
+    <span aria-hidden="true" className="project-loader" style={palette}>
+      {loader.art}
+    </span>
+  )
+}

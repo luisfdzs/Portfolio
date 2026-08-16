@@ -1,18 +1,26 @@
-import type { CSSProperties } from 'react'
+'use client'
+
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { ProjectMediaSet } from '@/content/project-shots'
 import { cn } from '@/lib/cn'
+import { ProjectLoader } from '@/components/ui/ProjectLoader'
 
 type Props = {
   media: ProjectMediaSet
+  slug: string
   alt: string
+  priority?: boolean
   className?: string
 }
 
-// La tarjeta enseña la primera pantalla de la web a la proporción del aparato desde el
-// que se mira: el pantallazo del móvil en el móvil y el del portátil a partir de 48rem.
-// Va con <picture> y no con next/image porque así el navegador se descarga una sola de
-// las dos capturas, y las proporciones salen del propio índice, no de un número a mano.
-export function ProjectShot({ media, alt, className }: Props) {
+export function ProjectShot({ media, slug, alt, priority = false, className }: Props) {
+  const image = useRef<HTMLImageElement>(null)
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    if (image.current?.complete) setLoaded(true)
+  }, [])
+
   const ratios = {
     '--shot-mobile': `${media.mobile.width} / ${media.mobile.height}`,
     '--shot-desktop': `${media.desktop.width} / ${media.desktop.height}`,
@@ -22,19 +30,25 @@ export function ProjectShot({ media, alt, className }: Props) {
     <div
       style={ratios}
       className={cn(
-        'project-shot w-full overflow-hidden rounded-lg border border-line bg-ink-raised',
+        'project-shot relative w-full overflow-hidden rounded-lg border border-line bg-ink-raised',
         className,
       )}
     >
-      <picture className="block size-full">
+      {loaded ? null : <ProjectLoader slug={slug} />}
+
+      <picture className="relative block size-full">
         <source media="(min-width: 48rem)" srcSet={media.desktop.src} />
         <img
+          ref={image}
           src={media.mobile.src}
           alt={alt}
           width={media.mobile.width}
           height={media.mobile.height}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
+          onLoad={() => setLoaded(true)}
+          onError={() => setLoaded(true)}
           className="size-full object-cover object-top"
         />
       </picture>

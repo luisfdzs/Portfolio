@@ -2,10 +2,13 @@ import type { Metadata } from 'next'
 import { cacheLife } from 'next/cache'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { projectMedia } from '@/content/project-shots'
 import { getProject, getProjectNeighbours, getProjectSlugs } from '@/lib/content'
 import { isLocale, type Locale, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href, projectHref } from '@/lib/i18n/routes'
+import { ProjectMedia } from '@/components/sections/ProjectMedia'
+import { ProjectShot } from '@/components/sections/ProjectShot'
 import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
 import { ArrowLeft, ArrowRight } from '@/components/ui/Icons'
@@ -61,6 +64,20 @@ export default async function ProjectPage({
 
   const neighbours = await getProjectNeighbours(slug)
 
+  const media = projectMedia(project.slug)
+  const alt = project.image?.alt[locale] ?? `${project.name} — ${project.tagline[locale]}`
+
+  const shot = media ? <ProjectShot media={media} slug={project.slug} alt={alt} priority /> : null
+
+  const framed =
+    media?.clip && shot ? (
+      <ProjectMedia src={media.clip} label={`${project.name} — ${t.projects.title}`}>
+        {shot}
+      </ProjectMedia>
+    ) : (
+      shot
+    )
+
   const facts = [
     { label: t.projects.role, value: project.role[locale] },
     { label: t.projects.year, value: project.year },
@@ -112,7 +129,9 @@ export default async function ProjectPage({
       </header>
 
       <Reveal step={2} className="mt-14">
-        <Figure image={project.image} locale={locale} sizes="(min-width: 1024px) 64rem, 100vw" />
+        {framed ?? (
+          <Figure image={project.image} locale={locale} sizes="(min-width: 1024px) 64rem, 100vw" />
+        )}
       </Reveal>
 
       <dl className="mt-12 grid gap-8 border-y border-line py-8 sm:grid-cols-3">
