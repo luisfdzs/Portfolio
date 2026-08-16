@@ -1,7 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react'
 
+// El hueco de carga se queda en el fondo del portfolio: lo que cambia de un proyecto a
+// otro es el gesto y el color del trazo, no un panel claro que repita el destello blanco.
 type Loader = {
-  background: string
   mark: string
   ring?: string
   art: ReactNode
@@ -14,7 +15,7 @@ const flower = (
     viewBox="0 0 40 60"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.5}
+    strokeWidth={2.4}
     strokeLinecap="round"
     strokeLinejoin="round"
     className="pl-flower"
@@ -113,26 +114,27 @@ const crossFade = (
   </span>
 )
 
+// Los colores son los de cada web, aclarados lo justo para que se lean sobre el fondo
+// oscuro del portfolio: los originales de las webs claras eran casi invisibles aquí.
 const loaders: Record<string, Loader> = {
-  'bonsai-artesania': { background: '#faf7f2', mark: '#6b7a62', art: flower },
-  swiftmet: { background: '#f2f3f4', mark: '#0d5c7a', art: coil },
-  cedece: { background: '#0b0b0d', mark: '#d81f36', art: monogram },
-  'mila-barber': { background: '#0a0908', mark: '#e0a938', art: pole },
-  'ckm-combat-academy': { background: '#0a0908', mark: '#c8102e', art: slam },
-  'sangil-studio': { background: '#ffffff', mark: '#1a1a1a', art: bar },
-  'sangil-studio-test': { background: '#ffffff', mark: '#111111', art: crossFade },
-  blablatour: { background: '#f7f6f2', mark: '#1f6f5c', ring: '#e4e2da', art: ring },
-  'almuerziko-san-fermin': { background: '#fbf8f3', mark: '#d81e2c', art: kerchief },
-  portfolio: { background: '#08090b', mark: '#e0a458', art: dots },
+  'bonsai-artesania': { mark: '#9db38f', art: flower },
+  swiftmet: { mark: '#5fb3d4', art: coil },
+  cedece: { mark: '#f0384f', art: monogram },
+  'mila-barber': { mark: '#e0a938', art: pole },
+  'ckm-combat-academy': { mark: '#e63b52', art: slam },
+  'sangil-studio': { mark: '#e9e6e1', art: bar },
+  'sangil-studio-test': { mark: '#d9d6d1', art: crossFade },
+  blablatour: { mark: '#4ec2a3', ring: '#2f4a43', art: ring },
+  'almuerziko-san-fermin': { mark: '#f04a56', art: kerchief },
+  portfolio: { mark: '#e0a458', art: dots },
 }
 
-const fallback: Loader = { background: '#0f1116', mark: '#e0a458', art: dots }
+const fallback: Loader = { mark: '#e0a458', art: dots }
 
 export function ProjectLoader({ slug }: { slug: string }) {
   const loader = loaders[slug] ?? fallback
 
   const palette = {
-    '--pl-bg': loader.background,
     '--pl-mark': loader.mark,
     '--pl-ring': loader.ring ?? loader.mark,
   } as CSSProperties

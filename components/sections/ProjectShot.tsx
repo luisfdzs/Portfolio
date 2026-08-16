@@ -34,6 +34,7 @@ export function ProjectShot({ media, slug, alt, priority = false, className }: P
         className,
       )}
     >
+      {/* Sin onLoad no se retira: si la captura falla, se queda el loader y no un hueco vacío. */}
       {loaded ? null : <ProjectLoader slug={slug} />}
 
       <picture className="relative block size-full">
@@ -48,7 +49,6 @@ export function ProjectShot({ media, slug, alt, priority = false, className }: P
           fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
           onLoad={() => setLoaded(true)}
-          onError={() => setLoaded(true)}
           className="size-full object-cover object-top"
         />
       </picture>

@@ -282,14 +282,16 @@
 }
 
 .project-loader {
-  --pl-size: clamp(2.75rem, 24cqi, 6rem);
+  --pl-size: clamp(4rem, 26cqi, 7rem);
 
   position: absolute;
   inset: 0;
+  /* El <picture> que va detrás está posicionado, así que sin esto lo taparía. */
+  z-index: 1;
   display: grid;
   place-items: center;
   color: var(--pl-mark);
-  background-color: var(--pl-bg);
+  background-color: var(--color-ink-raised);
   animation: pl-in 400ms var(--ease-out-soft) 140ms both;
 }
 
