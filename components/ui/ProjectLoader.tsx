@@ -7,6 +7,10 @@ type Loader = {
   mark: string
   ring?: string
   art: ReactNode
+  // Lo que dura una vuelta del bucle de su animación, en milisegundos. El loader sólo se
+  // retira al cerrar una vuelta, así que este número tiene que ir a la par que la duración
+  // que se le da a la animación en globals.css.
+  cycle: number
 }
 
 const PETALS = [0, 72, 144, 216, 288]
@@ -118,19 +122,23 @@ const crossFade = (
 // Los colores son los de cada web, aclarados lo justo para que se lean sobre el fondo
 // oscuro del portfolio: los originales de las webs claras eran casi invisibles aquí.
 const loaders: Record<string, Loader> = {
-  'bonsai-artesania': { mark: '#9db38f', art: flower },
-  swiftmet: { mark: '#5fb3d4', art: coil },
-  cedece: { mark: '#f0384f', art: monogram },
-  'mila-barber': { mark: '#e0a938', art: pole },
-  'ckm-combat-academy': { mark: '#e63b52', art: slam },
-  'sangil-studio': { mark: '#e9e6e1', art: bar },
-  'sangil-studio-test': { mark: '#d9d6d1', art: crossFade },
-  blablatour: { mark: '#4ec2a3', ring: '#2f4a43', art: ring },
-  'almuerziko-san-fermin': { mark: '#f04a56', art: kerchief },
-  portfolio: { mark: '#e0a458', art: dots },
+  'bonsai-artesania': { mark: '#9db38f', art: flower, cycle: 2800 },
+  swiftmet: { mark: '#5fb3d4', art: coil, cycle: 2600 },
+  cedece: { mark: '#f0384f', art: monogram, cycle: 2600 },
+  'mila-barber': { mark: '#e0a938', art: pole, cycle: 1500 },
+  'ckm-combat-academy': { mark: '#e63b52', art: slam, cycle: 1600 },
+  'sangil-studio': { mark: '#e9e6e1', art: bar, cycle: 2400 },
+  'sangil-studio-test': { mark: '#d9d6d1', art: crossFade, cycle: 2700 },
+  blablatour: { mark: '#4ec2a3', ring: '#2f4a43', art: ring, cycle: 1000 },
+  'almuerziko-san-fermin': { mark: '#f04a56', art: kerchief, cycle: 2400 },
+  portfolio: { mark: '#e0a458', art: dots, cycle: 1500 },
 }
 
-const fallback: Loader = { mark: '#e0a458', art: dots }
+const fallback: Loader = { mark: '#e0a458', art: dots, cycle: 1500 }
+
+export function loaderCycle(slug: string) {
+  return (loaders[slug] ?? fallback).cycle
+}
 
 export function ProjectLoader({
   slug,

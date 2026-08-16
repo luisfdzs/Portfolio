@@ -2,42 +2,19 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { COVER_FLOW_ARM, COVER_FLOW_ITEM } from '@/lib/cover-flow'
-import { ProjectLoader } from '@/components/ui/ProjectLoader'
+import { ProjectLoader, loaderCycle } from '@/components/ui/ProjectLoader'
 
 type ProjectClip = { desktop: string; mobile: string }
 
-// Por debajo de este ancho la tarjeta es vertical y toca la toma de móvil.
-const WIDE = '(min-width: 48rem)'
 
-// El clip se grabó arrancando la grabación antes de navegar, así que empieza por la página
-// en blanco del navegador y por la carga de la web: entre medio y un segundo de blanco puro
-// según el proyecto. Ese blanco es lo que se colaba al llegar a la tarjeta centrada.
-//
-// No se puede saber por metadatos dónde acaba, así que se mira el propio fotograma: mientras
-// sea un plano liso es que seguimos en el hueco de carga de la web, y ahí es donde va el
-// loader del proyecto en lugar del blanco.
+const WIDE = '(min-width: 48rem)'
 const BLANK_SD = 4
 const MAX_WARM = 2500
 const SAMPLE = { width: 32, height: 18 }
-
-// Lo que tarda el clip en desvanecerse (la duration-700 de su clase). Rebobinar antes de
-// que termine devolvía el vídeo a su primer fotograma —el blanco— con el clip todavía a la
-// vista: al salir de una tarjeta, el blanco entraba por ahí.
 const FADE_OUT = 700
-
-// Cuánto aguanta el loader de una tarjeta avisada por la flecha antes de que el carrusel la
-// centre. Si el viaje se queda a medias —dos flechazos seguidos, por ejemplo— la tarjeta que
-// se quedó por el camino se apaga sola en lugar de quedarse cargando para siempre.
 const ARM_HOLD = 1400
-
-// Lo mínimo que el loader se queda puesto. Una tarjeta ya visitada vuelve rebobinada a su
-// primer fotograma pintado, así que el clip está listo de inmediato y el loader se iba en un
-// parpadeo: la marca del proyecto no llegaba a leerse.
 const MIN_COVER = 520
 
-// Desviación típica de la luminancia del fotograma. Un plano liso —el blanco de la carga—
-// da casi cero; en cuanto la web pinta algo, se dispara. No vale mirar sólo el brillo: hay
-// webs, como la del estudio, que son blancas de por sí y nunca saldrían del hueco.
 function frameSpread(pixels: Uint8ClampedArray) {
   const light: number[] = []
   for (let i = 0; i < pixels.length; i += 4) {
@@ -107,9 +84,11 @@ export function ProjectMedia({
     // Si el clip se acaba justo cuando la tarjeta deja de ser la puesta, no toca redarlo.
     let wanted = false
 
-    // El clip ya se puede enseñar, pero no antes de que el loader haya cumplido su mínimo.
     function reveal() {
-      const left = Math.max(0, MIN_COVER - (performance.now() - coveredAt))
+      const now = performance.now()
+      const cycle = loaderCycle(slug)
+      const turns = Math.ceil((Math.max(now, coveredAt + MIN_COVER) - coveredAt) / cycle)
+      const left = Math.max(0, coveredAt + turns * cycle - now)
       if (!left) return setPainted(true)
       window.clearTimeout(show)
       show = window.setTimeout(() => setPainted(true), left)
@@ -293,14 +272,22 @@ export function ProjectMedia({
       window.removeEventListener('scroll', schedule)
       window.removeEventListener('resize', schedule)
     }
-  }, [src.desktop, src.mobile])
+  }, [slug, src.desktop, src.mobile])
 
   return (
     <div ref={container} className="relative">
       {children}
 
       {/* El clip no se enseña hasta que pinta algo suyo: si no, lo que se veía era el blanco
-          con el que arranca la grabación. */}
+          con el que arranca la grabación.
+
+          Entra de golpe, sin fundido: el loader es opaco y va por encima, así que el cambio
+          ocurre a puerta cerrada y el único que se mueve es el loader al retirarse. Cuando
+          entraba en 700ms y el loader se iba en 320ms, en los 400ms de desfase ninguna de las
+          dos capas tapaba del todo y por debajo se colaba la captura.
+
+          A la salida sí hay fundido: ahí el loader ya no está y el clip tiene que devolverle
+          el sitio a la captura sin cortes. */}
       <video
         ref={video}
         aria-label={label}
@@ -308,8 +295,8 @@ export function ProjectMedia({
         playsInline
         preload="none"
         tabIndex={-1}
-        className={`absolute inset-0 size-full rounded-lg object-cover object-top transition-opacity duration-700 md:object-center ${
-          playing && painted ? 'opacity-100' : 'opacity-0'
+        className={`absolute inset-0 size-full rounded-lg object-cover object-top transition-opacity md:object-center ${
+          playing && painted ? 'opacity-100 duration-0' : 'opacity-0 duration-700'
         }`}
       />
 

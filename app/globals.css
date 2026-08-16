@@ -292,25 +292,12 @@
   place-items: center;
   color: var(--pl-mark);
   background-color: var(--color-ink-raised);
-  /* Sin retardo: el loader es el relleno del hueco, no un aviso de que algo tarda. Con los
-     140ms de antes la captura de caché llegaba primero y no se llegaba a pintar nunca. */
-  /* Sin fill: al acabar, la opacidad vuelve a la cascada y el fundido de salida manda. */
-  animation: pl-in 180ms var(--ease-out-soft);
   transition: opacity 320ms var(--ease-out-soft);
 }
 
 /* La captura ya está lista: el loader se va con un fundido en vez de desaparecer de golpe. */
 .project-loader[data-leaving='true'] {
   opacity: 0;
-}
-
-@keyframes pl-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 .pl-flower {
