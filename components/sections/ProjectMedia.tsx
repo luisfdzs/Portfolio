@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { flushSync } from 'react-dom'
 import { COVER_FLOW_ARM, COVER_FLOW_ITEM } from '@/lib/cover-flow'
 import { ProjectLoader, loaderCycle } from '@/components/ui/ProjectLoader'
 
@@ -111,7 +112,7 @@ export function ProjectMedia({
       rewind = 0
       wanted = true
       if (!coveredAt) coveredAt = performance.now()
-      setCovering(true)
+      flushSync(() => setCovering(true))
 
       element.play().then(
         () => {
