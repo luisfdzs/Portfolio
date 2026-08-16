@@ -14,6 +14,8 @@ type Props = {
 const COPIES = 3
 const HOME = 1
 
+const STACK_TOP = 100000
+
 export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) {
   const scroller = useRef<HTMLDivElement>(null)
   const cards = Children.toArray(children)
@@ -67,6 +69,40 @@ export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) 
       window.removeEventListener('resize', schedule)
     }
   }, [loop])
+
+  useEffect(() => {
+    const element = scroller.current
+    if (!element) return
+
+    let frame = 0
+
+    function stack() {
+      frame = 0
+      const node = scroller.current
+      if (!node) return
+
+      const middle = node.scrollLeft + node.clientWidth / 2
+      for (const item of node.querySelectorAll<HTMLElement>(':scope > ul > li')) {
+        const offset = Math.abs(item.offsetLeft + item.offsetWidth / 2 - middle)
+        item.style.zIndex = String(Math.max(1, Math.round(STACK_TOP - offset)))
+      }
+    }
+
+    function schedule() {
+      if (frame) return
+      frame = requestAnimationFrame(stack)
+    }
+
+    stack()
+    element.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      element.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+    }
+  }, [])
 
   const go = useCallback((direction: -1 | 1) => {
     const element = scroller.current
