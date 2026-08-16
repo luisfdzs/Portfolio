@@ -295,6 +295,7 @@
 .pl-mark {
   display: grid;
   place-items: center;
+  max-width: 100%;
 }
 
 @supports (animation-timeline: view()) {
@@ -492,8 +493,7 @@
 
 .pl-bar {
   position: relative;
-  width: calc(var(--pl-size) * 2.2);
-  max-width: 70%;
+  width: clamp(2.5rem, 40cqi, 10.75rem);
   height: 2px;
   overflow: hidden;
   background-color: color-mix(in srgb, currentColor 22%, transparent);
