@@ -49,7 +49,11 @@ export function ProjectCard({
   return (
     <article className="group relative flex h-full flex-col rounded-xl border border-line-strong bg-ink-raised p-3 text-center sm:p-4">
       {animate && media?.clip ? (
-        <ProjectMedia src={media.clip} label={`${project.name} — ${t.projects.title}`}>
+        <ProjectMedia
+          src={media.clip}
+          slug={project.slug}
+          label={`${project.name} — ${t.projects.title}`}
+        >
           {figure}
         </ProjectMedia>
       ) : (

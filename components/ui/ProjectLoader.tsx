@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
+import { cn } from '@/lib/cn'
 
 // El hueco de carga se queda en el fondo del portfolio: lo que cambia de un proyecto a
 // otro es el gesto y el color del trazo, no un panel claro que repita el destello blanco.
@@ -131,7 +132,15 @@ const loaders: Record<string, Loader> = {
 
 const fallback: Loader = { mark: '#e0a458', art: dots }
 
-export function ProjectLoader({ slug, leaving = false }: { slug: string; leaving?: boolean }) {
+export function ProjectLoader({
+  slug,
+  leaving = false,
+  className,
+}: {
+  slug: string
+  leaving?: boolean
+  className?: string
+}) {
   const loader = loaders[slug] ?? fallback
 
   const palette = {
@@ -142,7 +151,7 @@ export function ProjectLoader({ slug, leaving = false }: { slug: string; leaving
   return (
     <span
       aria-hidden="true"
-      className="project-loader"
+      className={cn('project-loader', className)}
       data-leaving={leaving || undefined}
       style={palette}
     >

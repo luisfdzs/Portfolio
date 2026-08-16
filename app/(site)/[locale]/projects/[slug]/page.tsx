@@ -71,7 +71,11 @@ export default async function ProjectPage({
 
   const framed =
     media?.clip && shot ? (
-      <ProjectMedia src={media.clip} label={`${project.name} — ${t.projects.title}`}>
+      <ProjectMedia
+        src={media.clip}
+        slug={project.slug}
+        label={`${project.name} — ${t.projects.title}`}
+      >
         {shot}
       </ProjectMedia>
     ) : (
