@@ -1,6 +1,7 @@
 'use client'
 
 import { Children, useCallback, useEffect, useRef, type ReactNode } from 'react'
+import { armCoverFlowItem, COVER_FLOW_ITEM } from '@/lib/cover-flow'
 import { ArrowLeft, ArrowRight } from './Icons'
 
 type Props = {
@@ -71,19 +72,22 @@ export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) 
     const element = scroller.current
     if (!element) return
 
-    const centres = [...element.querySelectorAll<HTMLElement>(':scope > ul > li')].map(
-      (item) => item.offsetLeft + item.offsetWidth / 2,
-    )
+    const items = [...element.querySelectorAll<HTMLElement>(':scope > ul > li')]
+    const centre = (item: HTMLElement) => item.offsetLeft + item.offsetWidth / 2
     const middle = element.scrollLeft + element.clientWidth / 2
     const target =
       direction === 1
-        ? centres.find((centre) => centre > middle + 2)
-        : centres.reverse().find((centre) => centre < middle - 2)
+        ? items.find((item) => centre(item) > middle + 2)
+        : items.reverse().find((item) => centre(item) < middle - 2)
 
-    if (target === undefined) return
+    if (!target) return
+
+    // Primero el aviso y después el viaje: la tarjeta que viene tapa su captura antes de
+    // arrancar, así que del proyecto siguiente sólo se llegan a ver loader y hero.
+    armCoverFlowItem(target)
 
     element.scrollTo({
-      left: target - element.clientWidth / 2,
+      left: centre(target) - element.clientWidth / 2,
       behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
     })
   }, [])
@@ -96,7 +100,7 @@ export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) 
             cards.map((card, index) => (
               <li
                 key={`${copy}-${index}`}
-                className="cover-flow-item"
+                className={COVER_FLOW_ITEM}
                 data-clone={copy === HOME ? undefined : ''}
                 inert={copy !== HOME}
               >
