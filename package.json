@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "eslint . && node scripts/check-css-comments.mjs",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint && prettier --check .",
     "format": "prettier --write .",
