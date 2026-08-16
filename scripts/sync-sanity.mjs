@@ -123,10 +123,10 @@ console.log(`${docs.length} documentos escritos en ${path.relative(root, OUT)}`)
 if (dry) process.exit(0)
 
 console.log(`\nImportando en «${dataset}»…`)
+// Va por shell porque en Windows npx es un .cmd y sin shell no llega a arrancar.
 const result = spawnSync(
-  process.platform === 'win32' ? 'npx.cmd' : 'npx',
-  ['--no-install', 'sanity', 'dataset', 'import', OUT, dataset, '--replace'],
-  { stdio: 'inherit' },
+  `npx --no-install sanity dataset import "${OUT}" --dataset ${dataset} --replace`,
+  { stdio: 'inherit', shell: true },
 )
 
 process.exitCode = result.status ?? 1
