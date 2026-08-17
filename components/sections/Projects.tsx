@@ -31,17 +31,16 @@ export function Projects({
           label={t.projects.carousel}
           previousLabel={t.projects.carouselPrevious}
           nextLabel={t.projects.carouselNext}
+          action={
+            <Action href={projectsHref(locale)} variant="beacon">
+              {t.projects.seeAll}
+            </Action>
+          }
         >
           {projects.map((project) => (
             <ProjectCard key={project.slug} locale={locale} project={project} />
           ))}
         </CoverFlow>
-      </Reveal>
-
-      <Reveal step={1} className="page-gutter mx-auto mt-10 max-w-7xl lg:mt-12">
-        <Action href={projectsHref(locale)} variant="secondary">
-          {t.projects.seeAll}
-        </Action>
       </Reveal>
     </section>
   )

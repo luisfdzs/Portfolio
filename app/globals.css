@@ -215,7 +215,7 @@
   );
 }
 
-.cover-flow {
+.cover-flow-lane {
   --cover-flow-card: clamp(9.5rem, 46vw, 13rem);
   --cover-flow-ratio: 1;
   --cover-flow-step: calc(var(--cover-flow-card) * 0.33);
@@ -224,13 +224,25 @@
   --cover-flow-dim: 0.26;
   --cover-flow-span: 6;
   --cover-flow-slow: 3;
+  --cover-flow-inset: 0.75rem;
+  --cover-flow-shot: calc(932 / 430);
   --cover-flow-pitch: calc(var(--cover-flow-step) * var(--cover-flow-slow));
   --cover-flow-range: contain calc(50% - 50% * var(--cover-flow-slow)) contain
     calc(50% + 50% * var(--cover-flow-slow));
+  --cover-flow-shot-top: calc(1.5rem + 1px + var(--cover-flow-inset));
+  --cover-flow-shot-height: calc(
+    (var(--cover-flow-card) - 2 * var(--cover-flow-inset) - 2px) * var(--cover-flow-shot)
+  );
+  --cover-flow-seam: calc(var(--cover-flow-shot-top) + var(--cover-flow-shot-height));
 
+  position: relative;
+}
+
+.cover-flow {
   max-width: calc(var(--cover-flow-card) + var(--cover-flow-step) * var(--cover-flow-span));
   margin-inline: auto;
   position: relative;
+  isolation: isolate;
   container-type: inline-size;
   overflow-x: auto;
   overflow-y: hidden;
@@ -243,18 +255,25 @@
   display: none;
 }
 
+@media (min-width: 40rem) {
+  .cover-flow-lane {
+    --cover-flow-inset: 1rem;
+  }
+}
+
 @media (min-width: 48rem) {
-  .cover-flow {
+  .cover-flow-lane {
     --cover-flow-card: 20rem;
     --cover-flow-ratio: 3 / 2;
     --cover-flow-step: calc(var(--cover-flow-card) * 0.32);
     --cover-flow-turn: 64deg;
     --cover-flow-span: 7;
+    --cover-flow-shot: calc(800 / 1280);
   }
 }
 
 @media (min-width: 64rem) {
-  .cover-flow {
+  .cover-flow-lane {
     --cover-flow-card: min(32rem, 38vw);
     --cover-flow-ratio: 2.2;
     --cover-flow-step: calc(var(--cover-flow-card) * 0.3);
@@ -263,6 +282,29 @@
     --cover-flow-dim: 0.24;
     --cover-flow-span: 8;
   }
+}
+
+.cover-flow-arrow {
+  position: absolute;
+  top: calc(var(--cover-flow-shot-top) + var(--cover-flow-shot-height) / 2);
+  z-index: 1;
+  translate: 0 -50%;
+}
+
+.cover-flow-arrow[data-flow='previous'] {
+  left: var(--spacing-gutter);
+}
+
+.cover-flow-arrow[data-flow='next'] {
+  right: var(--spacing-gutter);
+}
+
+.cover-flow-action {
+  position: absolute;
+  top: var(--cover-flow-seam);
+  left: 50%;
+  z-index: 1;
+  translate: -50% -50%;
 }
 
 .cover-flow-figure {
@@ -2372,6 +2414,13 @@
     overflow: visible;
     max-width: none;
     padding: 0;
+  }
+
+  .cover-flow-action {
+    position: static;
+    translate: none;
+    margin-block-start: 1.5rem;
+    text-align: center;
   }
 
   .cover-flow-track {

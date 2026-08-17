@@ -1,6 +1,6 @@
 'use client'
 
-import { Children, useCallback, useEffect, useRef, type ReactNode } from 'react'
+import { Children, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { armCoverFlowItem, COVER_FLOW_ITEM } from '@/lib/cover-flow'
 import { ArrowLeft, ArrowRight } from './Icons'
 
@@ -9,6 +9,7 @@ type Props = {
   label: string
   previousLabel: string
   nextLabel: string
+  action?: ReactNode
 }
 
 const COPIES = 3
@@ -22,9 +23,11 @@ function soften(progress: number) {
   return progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2
 }
 
-export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) {
+export function CoverFlow({ children, label, previousLabel, nextLabel, action }: Props) {
   const scroller = useRef<HTMLDivElement>(null)
   const glide = useRef(0)
+  const gliding = useRef(false)
+  const [locked, setLocked] = useState(false)
   const cards = Children.toArray(children)
   const loop = cards.length > 1
   const copies = loop ? COPIES : 1
@@ -112,6 +115,8 @@ export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) 
   }, [])
 
   const go = useCallback((direction: -1 | 1) => {
+    if (gliding.current) return
+
     const element = scroller.current
     if (!element) return
 
@@ -139,21 +144,36 @@ export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) 
     const span = to - from
     const started = performance.now()
     element.style.scrollSnapType = 'none'
+    gliding.current = true
+    setLocked(true)
 
     const step = (now: number) => {
       const progress = Math.min((now - started) / GLIDE, 1)
       element.scrollLeft = from + span * soften(progress)
-      if (progress < 1) glide.current = requestAnimationFrame(step)
-      else element.style.scrollSnapType = ''
+
+      if (progress < 1) {
+        glide.current = requestAnimationFrame(step)
+        return
+      }
+
+      element.style.scrollSnapType = ''
+      gliding.current = false
+      setLocked(false)
     }
 
     glide.current = requestAnimationFrame(step)
   }, [])
 
-  useEffect(() => () => cancelAnimationFrame(glide.current), [])
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(glide.current)
+      gliding.current = false
+    },
+    [],
+  )
 
   return (
-    <div>
+    <div className="cover-flow-lane">
       <div ref={scroller} className="cover-flow">
         <ul aria-label={label} className="cover-flow-track">
           {Array.from({ length: copies }, (_, copy) =>
@@ -174,34 +194,48 @@ export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) 
       </div>
 
       {loop ? (
-        <div data-print="hide" className="mt-6 flex justify-center gap-2 lg:mt-8">
-          <CoverFlowButton label={previousLabel} onClick={() => go(-1)}>
-            <ArrowLeft className="size-4" />
+        <>
+          <CoverFlowButton
+            flow="previous"
+            label={previousLabel}
+            locked={locked}
+            onClick={() => go(-1)}
+          >
+            <ArrowLeft className="size-5 lg:size-6" />
           </CoverFlowButton>
-          <CoverFlowButton label={nextLabel} onClick={() => go(1)}>
-            <ArrowRight className="size-4" />
+          <CoverFlowButton flow="next" label={nextLabel} locked={locked} onClick={() => go(1)}>
+            <ArrowRight className="size-5 lg:size-6" />
           </CoverFlowButton>
-        </div>
+        </>
       ) : null}
+
+      {action ? <div className="cover-flow-action">{action}</div> : null}
     </div>
   )
 }
 
 function CoverFlowButton({
+  flow,
   label,
+  locked,
   onClick,
   children,
 }: {
+  flow: 'previous' | 'next'
   label: string
+  locked: boolean
   onClick: () => void
   children: ReactNode
 }) {
   return (
     <button
       type="button"
+      data-flow={flow}
+      data-print="hide"
       aria-label={label}
+      disabled={locked}
       onClick={onClick}
-      className="flex size-10 items-center justify-center rounded-full border border-line-strong text-paper transition-colors duration-300 hover:border-signal hover:text-signal"
+      className="cover-flow-arrow flex size-11 items-center justify-center rounded-full border border-signal bg-ink text-signal shadow-[0_0_0_1px_var(--color-ink),0_10px_30px_-8px_var(--color-ink)] transition-colors duration-300 hover:bg-signal hover:text-ink disabled:cursor-default disabled:border-signal-dim disabled:bg-ink disabled:text-signal-dim lg:size-14"
     >
       {children}
     </button>
