@@ -1,5 +1,9 @@
 # Portfolio
 
+## No memory
+
+Do not read from or write to the user's global or local memory — unless the user tells you otherwise in the conversation. This covers the global memory directory, any project-level `memory/` directory, and `MEMORY.md` indexes.
+
 ## No comments, no artifacts
 
 This repo holds working code and nothing else.
