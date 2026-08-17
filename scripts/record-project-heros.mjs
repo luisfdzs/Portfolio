@@ -34,11 +34,11 @@ const INDEX = path.resolve('content/project-shots.ts')
 
 const TARGETS = [
   { slug: 'ckm-combat-academy', url: 'https://ckmcombatacademy.vercel.app' },
-  { slug: 'swiftmet', url: 'https://swiftmet.vercel.app', cycle: 25 },
-  { slug: 'mila-barber', url: 'https://milabarber.vercel.app', cycle: 15.5 },
-  { slug: 'cedece', url: 'https://cedece.vercel.app', cycle: 6.5 },
-  { slug: 'sangil-studio-test', url: 'https://sangilstudiotest.vercel.app/es', cycle: 20.5 },
-  { slug: 'sangil-studio', url: 'https://sangilstudio.com', cycle: 25.5 },
+  { slug: 'swiftmet', url: 'https://swiftmet.vercel.app', cycle: 26 },
+  { slug: 'mila-barber', url: 'https://milabarber.vercel.app', cycle: 16.5 },
+  { slug: 'cedece', url: 'https://cedece.vercel.app', cycle: 7.5 },
+  { slug: 'sangil-studio-test', url: 'https://sangilstudiotest.vercel.app/es', cycle: 21 },
+  { slug: 'sangil-studio', url: 'https://sangilstudio.com', cycle: 26 },
   {
     slug: 'bonsai-artesania',
     url: 'https://bonsaiartesania.com',
@@ -46,7 +46,7 @@ const TARGETS = [
   },
   { slug: 'blablatour', url: 'https://blablatour.vercel.app' },
   { slug: 'almuerziko-san-fermin', url: 'https://almuerziko.vercel.app' },
-  { slug: 'portfolio', url: 'https://luisfernandezsangil.vercel.app' },
+  { slug: 'portfolio', url: 'https://luisfernandezsangil.vercel.app', cycle: 24 },
 ]
 
 const args = process.argv.slice(2)

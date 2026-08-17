@@ -57,10 +57,6 @@ const media: Record<string, ProjectMediaSet> = {
   'almuerziko-san-fermin': {
     desktop: { src: '/projects/shots/almuerziko-san-fermin.webp', width: 1280, height: 800 },
     mobile: { src: '/projects/shots/almuerziko-san-fermin-mobile.webp', width: 430, height: 932 },
-    clip: {
-      desktop: '/projects/almuerziko-san-fermin.webm',
-      mobile: '/projects/almuerziko-san-fermin-mobile.webm',
-    },
   },
   portfolio: {
     desktop: { src: '/projects/shots/portfolio.webp', width: 1280, height: 800 },
