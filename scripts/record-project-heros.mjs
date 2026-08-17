@@ -17,7 +17,13 @@ const SHOTS = [
   { key: 'desktop', suffix: '', size: { width: 1280, height: 800 }, mobile: false },
   { key: 'mobile', suffix: '-mobile', size: { width: 430, height: 932 }, mobile: true },
 ]
-const CLIP_SECONDS = 6
+const CLIP_MIN = 6
+const CLIP_MAX = 20
+const CLIP_TAIL = 1.2
+const PROBE_STEP = 400
+const PROBE_STILL = 4000
+const PROBE_FLOOR = 9000
+const MOTION_MIN = 2500
 const SETTLE_MS = 3500
 const WEBP_QUALITY = 0.82
 
@@ -28,12 +34,16 @@ const INDEX = path.resolve('content/project-shots.ts')
 
 const TARGETS = [
   { slug: 'ckm-combat-academy', url: 'https://ckmcombatacademy.vercel.app' },
-  { slug: 'swiftmet', url: 'https://swiftmet.vercel.app' },
-  { slug: 'mila-barber', url: 'https://milabarber.vercel.app' },
-  { slug: 'cedece', url: 'https://cedece.vercel.app' },
-  { slug: 'sangil-studio-test', url: 'https://sangilstudiotest.vercel.app/es' },
-  { slug: 'sangil-studio', url: 'https://sangilstudio.com' },
-  { slug: 'bonsai-artesania', url: 'https://bonsaiartesania.com' },
+  { slug: 'swiftmet', url: 'https://swiftmet.vercel.app', cycle: 25 },
+  { slug: 'mila-barber', url: 'https://milabarber.vercel.app', cycle: 15.5 },
+  { slug: 'cedece', url: 'https://cedece.vercel.app', cycle: 6.5 },
+  { slug: 'sangil-studio-test', url: 'https://sangilstudiotest.vercel.app/es', cycle: 20.5 },
+  { slug: 'sangil-studio', url: 'https://sangilstudio.com', cycle: 25.5 },
+  {
+    slug: 'bonsai-artesania',
+    url: 'https://bonsaiartesania.com',
+    cycle: { desktop: 27.5, mobile: 54.5 },
+  },
   { slug: 'blablatour', url: 'https://blablatour.vercel.app' },
   { slug: 'almuerziko-san-fermin', url: 'https://almuerziko.vercel.app' },
   { slug: 'portfolio', url: 'https://luisfernandezsangil.vercel.app' },
@@ -57,13 +67,12 @@ function context(shot, extra = {}) {
   })
 }
 
-async function detect(target) {
-  const ctx = await context(SHOTS[0])
+async function probe(target, shot) {
+  const ctx = await context(shot)
   const page = await ctx.newPage()
 
   try {
     await page.goto(target.url, { waitUntil: 'load', timeout: 45000 })
-    await page.waitForTimeout(2500)
 
     const media = await page.evaluate(() => {
       const inHero = (el) => el.getBoundingClientRect().top < window.innerHeight
@@ -78,12 +87,30 @@ async function detect(target) {
       return { videos, canvas, animated }
     })
 
-    const before = await page.screenshot({ type: 'jpeg', quality: 40 })
-    await page.waitForTimeout(6000)
-    const after = await page.screenshot({ type: 'jpeg', quality: 40 })
-    const pixelsMove = Buffer.compare(before, after) !== 0
+    const started = Date.now()
+    let previous = null
+    let lastChange = 0
+    let elapsed = 0
 
-    return { ...target, ...media, pixelsMove, ok: true }
+    while (elapsed < CLIP_MAX * 1000) {
+      const frame = await page.screenshot({ type: 'jpeg', quality: 40 })
+      elapsed = Date.now() - started
+      if (previous && Buffer.compare(previous, frame) !== 0) lastChange = elapsed
+      previous = frame
+      if (elapsed > PROBE_FLOOR && elapsed - lastChange > PROBE_STILL) break
+      await page.waitForTimeout(PROBE_STEP)
+    }
+
+    const seconds = Math.min(CLIP_MAX, Math.max(CLIP_MIN, lastChange / 1000 + CLIP_TAIL))
+
+    return {
+      ...target,
+      ...media,
+      lastChange,
+      seconds,
+      pixelsMove: lastChange > MOTION_MIN,
+      ok: true,
+    }
   } catch (error) {
     return { ...target, ok: false, error: error.message.split('\n')[0] }
   } finally {
@@ -126,7 +153,7 @@ async function shoot(target, shot) {
   }
 }
 
-async function record(target, shot) {
+async function record(target, shot, seconds) {
   await mkdir(TMP, { recursive: true })
   await mkdir(OUT, { recursive: true })
 
@@ -134,7 +161,7 @@ async function record(target, shot) {
   const page = await ctx.newPage()
 
   await page.goto(target.url, { waitUntil: 'load', timeout: 45000 })
-  await page.waitForTimeout(CLIP_SECONDS * 1000)
+  await page.waitForTimeout(seconds * 1000)
 
   const video = page.video()
   await page.close()
@@ -224,15 +251,43 @@ export function projectMedia(slug: string): ProjectMediaSet | null {
 
 const targets = only.length ? TARGETS.filter((t) => only.includes(t.slug)) : TARGETS
 
-console.log('Detectando heros animados…')
+console.log('Midiendo la duración real de cada hero…')
 const report = []
 for (const target of targets) {
-  const result = await detect(target)
-  report.push(result)
+  const passes = {}
+  let failed = null
+
+  for (const shot of SHOTS) {
+    const result = await probe(target, shot)
+    if (!result.ok) {
+      failed = result
+      break
+    }
+    passes[shot.key] = result
+  }
+
+  if (failed) {
+    report.push(failed)
+    console.log(`  ✗ ${failed.slug.padEnd(24)} ${failed.error}`)
+    continue
+  }
+
+  const lead = passes[SHOTS[0].key]
+  const moves = lead.pixelsMove || lead.videos > 0 || lead.canvas > 0
+  const cycle = (key) =>
+    typeof target.cycle === 'number' ? target.cycle : (target.cycle?.[key] ?? null)
+  const seconds = Object.fromEntries(
+    SHOTS.map((shot) => [shot.key, cycle(shot.key) ?? passes[shot.key].seconds]),
+  )
+
+  report.push({ ...target, ok: true, moves, seconds })
   console.log(
-    result.ok
-      ? `  ${result.pixelsMove ? '●' : '○'} ${result.slug.padEnd(24)} vídeo:${result.videos} canvas:${result.canvas} anim:${result.animated} movimiento:${result.pixelsMove}`
-      : `  ✗ ${result.slug.padEnd(24)} ${result.error}`,
+    `  ${moves ? '●' : '○'} ${target.slug.padEnd(24)} ` +
+      SHOTS.map((shot) =>
+        cycle(shot.key)
+          ? `${shot.key}:ciclo ${seconds[shot.key]}s`
+          : `${shot.key}:${passes[shot.key].lastChange}ms→${seconds[shot.key].toFixed(1)}s`,
+      ).join('  '),
   )
 }
 
@@ -253,13 +308,14 @@ if (wantShots) {
 }
 
 if (wantClips) {
-  const animated = reachable.filter((r) => r.pixelsMove || r.videos > 0 || r.canvas > 0)
-  console.log(`\nGrabando ${animated.length * SHOTS.length} clip(s) de ${CLIP_SECONDS}s…`)
+  const animated = reachable.filter((r) => r.moves)
+  console.log(`\nGrabando ${animated.length * SHOTS.length} clip(s)…`)
   for (const target of animated) {
     for (const shot of SHOTS) {
+      const seconds = target.seconds[shot.key]
       try {
-        const file = await record(target, shot)
-        console.log(`  ✓ ${path.relative(process.cwd(), file)}`)
+        const file = await record(target, shot, seconds)
+        console.log(`  ✓ ${path.relative(process.cwd(), file)} (${seconds.toFixed(1)}s)`)
       } catch (error) {
         console.log(`  ✗ ${target.slug}${shot.suffix}: ${error.message.split('\n')[0]}`)
       }

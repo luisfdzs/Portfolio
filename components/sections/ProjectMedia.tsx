@@ -43,9 +43,11 @@ export function ProjectMedia({
   const container = useRef<HTMLDivElement>(null)
   const video = useRef<HTMLVideoElement>(null)
   const opening = useRef(0)
+  const held = useRef(false)
   const [playing, setPlaying] = useState(false)
   const [painted, setPainted] = useState(false)
   const [covering, setCovering] = useState(false)
+  const [settled, setSettled] = useState(false)
 
   useEffect(() => {
     const node = container.current
@@ -74,14 +76,20 @@ export function ProjectMedia({
     let show = 0
     let wanted = false
 
+    function hold() {
+      held.current = true
+      setPainted(true)
+      setSettled(true)
+    }
+
     function reveal() {
       const now = performance.now()
       const cycle = loaderCycle(slug)
       const turns = Math.ceil((Math.max(now, coveredAt + MIN_COVER) - coveredAt) / cycle)
       const left = Math.max(0, coveredAt + turns * cycle - now)
-      if (!left) return setPainted(true)
+      if (!left) return hold()
       window.clearTimeout(show)
-      show = window.setTimeout(() => setPainted(true), left)
+      show = window.setTimeout(hold, left)
     }
 
     function sample() {
@@ -111,12 +119,16 @@ export function ProjectMedia({
       window.clearTimeout(rewind)
       rewind = 0
       wanted = true
-      if (!coveredAt) coveredAt = performance.now()
-      flushSync(() => setCovering(true))
+
+      if (!held.current) {
+        if (!coveredAt) coveredAt = performance.now()
+        flushSync(() => setCovering(true))
+      }
 
       element.play().then(
         () => {
           setPlaying(true)
+          if (held.current) return
           warmFrom = performance.now()
           sample()
         },
@@ -135,12 +147,14 @@ export function ProjectMedia({
       coveredAt = 0
       wanted = false
       setPlaying(false)
-      setPainted(false)
       setCovering(false)
+      if (!held.current) setPainted(false)
       if (!element) return
 
       element.pause()
       window.clearTimeout(rewind)
+      if (held.current) return
+
       rewind = window.setTimeout(() => {
         const node = video.current
         if (node) node.currentTime = opening.current
@@ -264,7 +278,7 @@ export function ProjectMedia({
         preload="none"
         tabIndex={-1}
         className={`absolute inset-0 size-full rounded-lg object-cover object-top transition-opacity md:object-center ${
-          playing && painted ? 'opacity-100 duration-0' : 'opacity-0 duration-700'
+          settled || (playing && painted) ? 'opacity-100 duration-0' : 'opacity-0 duration-700'
         }`}
       />
 

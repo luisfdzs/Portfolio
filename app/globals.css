@@ -301,10 +301,10 @@
 
 .cover-flow-action {
   position: absolute;
-  top: var(--cover-flow-seam);
+  top: calc(var(--cover-flow-seam) + 0.75rem);
   left: 50%;
   z-index: 1;
-  translate: -50% -50%;
+  translate: -50% 0;
 }
 
 .cover-flow-figure {
