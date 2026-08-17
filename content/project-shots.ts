@@ -17,9 +17,10 @@ const media: Record<string, ProjectMediaSet> = {
   'ckm-combat-academy': {
     desktop: { src: '/projects/shots/ckm-combat-academy.webp', width: 1280, height: 800 },
     mobile: { src: '/projects/shots/ckm-combat-academy-mobile.webp', width: 430, height: 932 },
-    clip: { mobile: '/projects/ckm-combat-academy-mobile.mp4' },
+    clip: { desktop: '/projects/ckm-combat-academy.mp4', mobile: '/projects/ckm-combat-academy-4.mp4' },
     chrome: {
-      mobile: { src: '/projects/ckm-combat-academy-chrome-mobile.webp', clips: [{ src: '/projects/ckm-combat-academy-mobile.mp4', frame: { top: 6.9742, left: 0, width: 100, height: 87.8923 } }] },
+      desktop: { src: '/projects/ckm-combat-academy-chrome.webp', clips: [{ src: '/projects/ckm-combat-academy.mp4', frame: { top: 8.0614, left: -49.2606, width: 37.2956, height: 106.3089 } }, { src: '/projects/ckm-combat-academy-2.webm', frame: { top: 6.065, left: -12.6319, width: 38.6964, height: 110.3016 } }, { src: '/projects/ckm-combat-academy-3.mp4', frame: { top: 8.0614, left: 25.3976, width: 37.2956, height: 106.3089 } }, { src: '/projects/ckm-combat-academy-4.mp4', frame: { top: 6.065, left: 62.0263, width: 38.6964, height: 110.3016 } }] },
+      mobile: { src: '/projects/ckm-combat-academy-chrome-mobile.webp', clips: [{ src: '/projects/ckm-combat-academy-4.mp4', frame: { top: 6.9742, left: 0, width: 100, height: 87.8923 } }] },
     },
   },
   'swiftmet': {
