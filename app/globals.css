@@ -223,8 +223,10 @@
   --cover-flow-depth: 4.5rem;
   --cover-flow-dim: 0.26;
   --cover-flow-span: 6;
-  --cover-flow-slow: 2;
+  --cover-flow-slow: 3;
   --cover-flow-pitch: calc(var(--cover-flow-step) * var(--cover-flow-slow));
+  --cover-flow-range: contain calc(50% - 50% * var(--cover-flow-slow)) contain
+    calc(50% + 50% * var(--cover-flow-slow));
 
   max-width: calc(var(--cover-flow-card) + var(--cover-flow-step) * var(--cover-flow-span));
   margin-inline: auto;
@@ -306,8 +308,7 @@
     .cover-flow .pl-mark {
       animation: cover-flow-mark linear both;
       animation-timeline: --cover-flow;
-      animation-range: contain calc(50% - 50% * var(--cover-flow-slow)) contain
-        calc(50% + 50% * var(--cover-flow-slow));
+      animation-range: var(--cover-flow-range);
     }
   }
 }
@@ -316,77 +317,152 @@
   0% {
     transform: translateX(10%);
   }
+  2% {
+    transform: translateX(12.7343%);
+  }
   4% {
     transform: translateX(15.417%);
+  }
+  6% {
+    transform: translateX(18.0022%);
   }
   8% {
     transform: translateX(20.444%);
   }
+  10% {
+    transform: translateX(22.6936%);
+  }
   12% {
     transform: translateX(24.714%);
+  }
+  14% {
+    transform: translateX(26.4611%);
   }
   16% {
     transform: translateX(27.908%);
   }
+  18% {
+    transform: translateX(29.0182%);
+  }
   20% {
     transform: translateX(29.776%);
+  }
+  22% {
+    transform: translateX(30.1549%);
   }
   24% {
     transform: translateX(30.151%);
   }
+  26% {
+    transform: translateX(29.7484%);
+  }
   28% {
     transform: translateX(28.957%);
+  }
+  30% {
+    transform: translateX(27.7743%);
   }
   32% {
     transform: translateX(26.221%);
   }
+  34% {
+    transform: translateX(24.3065%);
+  }
   36% {
     transform: translateX(22.063%);
+  }
+  38% {
+    transform: translateX(19.5124%);
   }
   40% {
     transform: translateX(16.695%);
   }
+  42% {
+    transform: translateX(13.6429%);
+  }
   44% {
     transform: translateX(10.403%);
+  }
+  46% {
+    transform: translateX(7.0164%);
   }
   48% {
     transform: translateX(3.533%);
   }
+  50% {
+    transform: translateX(0);
+  }
   52% {
     transform: translateX(-3.533%);
+  }
+  54% {
+    transform: translateX(-7.0164%);
   }
   56% {
     transform: translateX(-10.403%);
   }
+  58% {
+    transform: translateX(-13.6429%);
+  }
   60% {
     transform: translateX(-16.695%);
+  }
+  62% {
+    transform: translateX(-19.5124%);
   }
   64% {
     transform: translateX(-22.063%);
   }
+  66% {
+    transform: translateX(-24.3065%);
+  }
   68% {
     transform: translateX(-26.221%);
+  }
+  70% {
+    transform: translateX(-27.7743%);
   }
   72% {
     transform: translateX(-28.957%);
   }
+  74% {
+    transform: translateX(-29.7484%);
+  }
   76% {
     transform: translateX(-30.151%);
+  }
+  78% {
+    transform: translateX(-30.1549%);
   }
   80% {
     transform: translateX(-29.776%);
   }
+  82% {
+    transform: translateX(-29.0182%);
+  }
   84% {
     transform: translateX(-27.908%);
+  }
+  86% {
+    transform: translateX(-26.4611%);
   }
   88% {
     transform: translateX(-24.714%);
   }
+  90% {
+    transform: translateX(-22.6936%);
+  }
   92% {
     transform: translateX(-20.444%);
   }
+  94% {
+    transform: translateX(-18.0022%);
+  }
   96% {
     transform: translateX(-15.417%);
+  }
+  98% {
+    transform: translateX(-12.7343%);
   }
   100% {
     transform: translateX(-10%);
@@ -767,13 +843,19 @@
     }
 
     .cover-flow-stage {
+      --cover-flow-shift: calc(
+        (var(--cover-flow-slow) - 1) *
+          (100cqw - var(--cover-flow-step) * (var(--cover-flow-slow) + 1)) / 2
+      );
+
       position: relative;
       height: 100%;
       perspective: calc(var(--cover-flow-card) * 2.4);
-      animation: cover-flow-slide linear both;
-      animation-timeline: --cover-flow;
-      animation-range: contain calc(50% - 50% * var(--cover-flow-slow)) contain
-        calc(50% + 50% * var(--cover-flow-slow));
+      animation:
+        cover-flow-slide linear both,
+        cover-flow-drift linear both;
+      animation-timeline: --cover-flow, --cover-flow;
+      animation-range: var(--cover-flow-range), var(--cover-flow-range);
     }
 
     .cover-flow-card {
@@ -781,8 +863,7 @@
       height: 100%;
       animation: cover-flow-turn linear both;
       animation-timeline: --cover-flow;
-      animation-range: contain calc(50% - 50% * var(--cover-flow-slow)) contain
-        calc(50% + 50% * var(--cover-flow-slow));
+      animation-range: var(--cover-flow-range);
     }
 
     .cover-flow-card::after {
@@ -795,8 +876,7 @@
       pointer-events: none;
       animation: cover-flow-veil linear both;
       animation-timeline: --cover-flow;
-      animation-range: contain calc(50% - 50% * var(--cover-flow-slow)) contain
-        calc(50% + 50% * var(--cover-flow-slow));
+      animation-range: var(--cover-flow-range);
     }
   }
 }
@@ -804,377 +884,737 @@
 @keyframes cover-flow-slide {
   0% {
     z-index: 1;
-    transform: translateX(calc(26.0397% - 0.5 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(26.0397%);
+  }
+  1% {
+    transform: translateX(25.7887%);
   }
   2% {
-    transform: translateX(calc(25.5296% - 0.48 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(25.5296%);
+  }
+  3% {
+    transform: translateX(25.2646%);
   }
   4% {
-    transform: translateX(calc(24.996% - 0.46 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(24.996%);
+  }
+  5% {
+    transform: translateX(24.7255%);
   }
   6% {
-    transform: translateX(calc(24.4572% - 0.44 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(24.4572%);
+  }
+  7% {
+    transform: translateX(24.1937%);
   }
   8% {
-    transform: translateX(calc(23.9408% - 0.42 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(23.9408%);
+  }
+  9% {
+    transform: translateX(23.7024%);
   }
   10% {
     z-index: 2;
-    transform: translateX(calc(23.4861% - 0.4 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(23.4861%);
+  }
+  11% {
+    transform: translateX(23.2977%);
   }
   12% {
-    transform: translateX(calc(23.1467% - 0.38 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(23.1467%);
+  }
+  13% {
+    transform: translateX(23.0407%);
   }
   14% {
-    transform: translateX(calc(22.9909% - 0.36 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(22.9909%);
+  }
+  15% {
+    transform: translateX(23.0071%);
   }
   16% {
     z-index: 3;
-    transform: translateX(calc(23.1009% - 0.33999999999999997 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(23.1009%);
+  }
+  17% {
+    transform: translateX(23.2838%);
   }
   18% {
-    transform: translateX(calc(23.5664% - 0.32 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(23.5664%);
+  }
+  19% {
+    transform: translateX(23.9609%);
   }
   20% {
-    transform: translateX(calc(24.4746% - 0.3 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(24.4746%);
+  }
+  21% {
+    transform: translateX(25.1186%);
   }
   22% {
     z-index: 4;
-    transform: translateX(calc(25.8939% - 0.28 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(25.8939%);
+  }
+  23% {
+    transform: translateX(26.8079%);
   }
   24% {
-    transform: translateX(calc(27.852% - 0.26 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(27.852%);
+  }
+  25% {
+    transform: translateX(29.027%);
   }
   26% {
     z-index: 5;
-    transform: translateX(calc(30.312% - 0.24 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(30.312%);
+  }
+  27% {
+    transform: translateX(31.6978%);
   }
   28% {
-    transform: translateX(calc(33.1496% - 0.21999999999999997 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(33.1496%);
+  }
+  29% {
+    transform: translateX(34.6455%);
   }
   30% {
     z-index: 6;
-    transform: translateX(calc(36.1376% - 0.2 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(36.1376%);
+  }
+  31% {
+    transform: translateX(37.5897%);
   }
   32% {
-    transform: translateX(calc(38.9441% - 0.18 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(38.9441%);
+  }
+  33% {
+    transform: translateX(40.1514%);
   }
   34% {
-    transform: translateX(calc(41.1502% - 0.15999999999999998 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(41.1502%);
+  }
+  35% {
+    transform: translateX(41.8815%);
   }
   36% {
     z-index: 7;
-    transform: translateX(calc(42.2891% - 0.14 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(42.2891%);
+  }
+  37% {
+    transform: translateX(42.3109%);
   }
   38% {
-    transform: translateX(calc(41.9056% - 0.12 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(41.9056%);
+  }
+  39% {
+    transform: translateX(41.0169%);
   }
   40% {
-    transform: translateX(calc(39.6274% - 0.09999999999999998 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(39.6274%);
+  }
+  41% {
+    transform: translateX(37.6966%);
   }
   42% {
     z-index: 8;
-    transform: translateX(calc(35.2373% - 0.08000000000000002 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(35.2373%);
+  }
+  43% {
+    transform: translateX(32.2338%);
   }
   44% {
-    transform: translateX(calc(28.7308% - 0.06 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(28.7308%);
+  }
+  45% {
+    transform: translateX(24.7435%);
   }
   46% {
-    transform: translateX(calc(20.3451% - 0.03999999999999998 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(20.3451%);
+  }
+  47% {
+    transform: translateX(15.5829%);
   }
   48% {
-    transform: translateX(calc(10.5502% - 0.020000000000000018 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(10.5502%);
+  }
+  49% {
+    transform: translateX(5.3223%);
   }
   50% {
     transform: translateX(0);
   }
+  51% {
+    transform: translateX(-5.3223%);
+  }
   52% {
-    transform: translateX(calc(-10.5502% + 0.020000000000000018 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-10.5502%);
+  }
+  53% {
+    transform: translateX(-15.5829%);
   }
   54% {
-    transform: translateX(calc(-20.3451% + 0.040000000000000036 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-20.3451%);
+  }
+  55% {
+    transform: translateX(-24.7435%);
   }
   56% {
-    transform: translateX(calc(-28.7308% + 0.06000000000000005 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-28.7308%);
+  }
+  57% {
+    transform: translateX(-32.2338%);
   }
   58% {
-    transform: translateX(calc(-35.2373% + 0.07999999999999996 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-35.2373%);
+  }
+  59% {
+    transform: translateX(-37.6966%);
   }
   60% {
     z-index: 7;
-    transform: translateX(calc(-39.6274% + 0.09999999999999998 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-39.6274%);
+  }
+  61% {
+    transform: translateX(-41.0169%);
   }
   62% {
-    transform: translateX(calc(-41.9056% + 0.12 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-41.9056%);
+  }
+  63% {
+    transform: translateX(-42.3109%);
   }
   64% {
-    transform: translateX(calc(-42.2891% + 0.14 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-42.2891%);
+  }
+  65% {
+    transform: translateX(-41.8815%);
   }
   66% {
     z-index: 6;
-    transform: translateX(calc(-41.1502% + 0.16000000000000003 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-41.1502%);
+  }
+  67% {
+    transform: translateX(-40.1514%);
   }
   68% {
-    transform: translateX(calc(-38.9441% + 0.18000000000000005 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-38.9441%);
+  }
+  69% {
+    transform: translateX(-37.5897%);
   }
   70% {
-    transform: translateX(calc(-36.1376% + 0.19999999999999996 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-36.1376%);
+  }
+  71% {
+    transform: translateX(-34.6455%);
   }
   72% {
     z-index: 5;
-    transform: translateX(calc(-33.1496% + 0.21999999999999997 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-33.1496%);
+  }
+  73% {
+    transform: translateX(-31.6978%);
   }
   74% {
-    transform: translateX(calc(-30.312% + 0.24 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-30.312%);
+  }
+  75% {
+    transform: translateX(-29.027%);
   }
   76% {
     z-index: 4;
-    transform: translateX(calc(-27.852% + 0.26 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-27.852%);
+  }
+  77% {
+    transform: translateX(-26.8079%);
   }
   78% {
-    transform: translateX(calc(-25.8939% + 0.28 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-25.8939%);
+  }
+  79% {
+    transform: translateX(-25.1186%);
   }
   80% {
     z-index: 3;
-    transform: translateX(calc(-24.4746% + 0.30000000000000004 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-24.4746%);
+  }
+  81% {
+    transform: translateX(-23.9609%);
   }
   82% {
-    transform: translateX(calc(-23.5664% + 0.31999999999999995 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-23.5664%);
+  }
+  83% {
+    transform: translateX(-23.2838%);
   }
   84% {
-    transform: translateX(calc(-23.1009% + 0.33999999999999997 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-23.1009%);
+  }
+  85% {
+    transform: translateX(-23.0071%);
   }
   86% {
     z-index: 2;
-    transform: translateX(calc(-22.9909% + 0.36 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-22.9909%);
+  }
+  87% {
+    transform: translateX(-23.0407%);
   }
   88% {
-    transform: translateX(calc(-23.1467% + 0.38 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-23.1467%);
+  }
+  89% {
+    transform: translateX(-23.2977%);
   }
   90% {
-    transform: translateX(calc(-23.4861% + 0.4 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-23.4861%);
+  }
+  91% {
+    transform: translateX(-23.7024%);
   }
   92% {
     z-index: 1;
-    transform: translateX(calc(-23.9408% + 0.42000000000000004 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-23.9408%);
+  }
+  93% {
+    transform: translateX(-24.1937%);
   }
   94% {
-    transform: translateX(calc(-24.4572% + 0.43999999999999995 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-24.4572%);
+  }
+  95% {
+    transform: translateX(-24.7255%);
   }
   96% {
-    transform: translateX(calc(-24.996% + 0.45999999999999996 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-24.996%);
+  }
+  97% {
+    transform: translateX(-25.2646%);
   }
   98% {
-    transform: translateX(calc(-25.5296% + 0.48 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-25.5296%);
+  }
+  99% {
+    transform: translateX(-25.7887%);
   }
   100% {
     z-index: 1;
-    transform: translateX(calc(-26.0397% + 0.5 * (var(--cover-flow-slow) - 1) * (100cqw - var(--cover-flow-card))));
+    transform: translateX(-26.0397%);
+  }
+}
+
+@keyframes cover-flow-drift {
+  from {
+    translate: calc(var(--cover-flow-shift) * -1);
+  }
+  to {
+    translate: var(--cover-flow-shift);
   }
 }
 
 @keyframes cover-flow-turn {
   0% {
-    transform: translateZ(calc(var(--cover-flow-depth) * -2))
+    transform: translateZ(calc(1.5rem * 0 - var(--cover-flow-depth) * 2))
       rotateY(calc(var(--cover-flow-turn) * -1));
+  }
+  1% {
+    transform: translateZ(calc(1.5rem * 0.001 - var(--cover-flow-depth) * 1.998))
+      rotateY(calc(var(--cover-flow-turn) * -0.9995));
   }
   2% {
     transform: translateZ(calc(1.5rem * 0.0039 - var(--cover-flow-depth) * 1.9921))
       rotateY(calc(var(--cover-flow-turn) * -0.998));
   }
+  3% {
+    transform: translateZ(calc(1.5rem * 0.0089 - var(--cover-flow-depth) * 1.9823))
+      rotateY(calc(var(--cover-flow-turn) * -0.9956));
+  }
   4% {
     transform: translateZ(calc(1.5rem * 0.0157 - var(--cover-flow-depth) * 1.9686))
       rotateY(calc(var(--cover-flow-turn) * -0.9921));
+  }
+  5% {
+    transform: translateZ(calc(1.5rem * 0.0245 - var(--cover-flow-depth) * 1.9511))
+      rotateY(calc(var(--cover-flow-turn) * -0.9877));
   }
   6% {
     transform: translateZ(calc(1.5rem * 0.0351 - var(--cover-flow-depth) * 1.9298))
       rotateY(calc(var(--cover-flow-turn) * -0.9823));
   }
+  7% {
+    transform: translateZ(calc(1.5rem * 0.0476 - var(--cover-flow-depth) * 1.9048))
+      rotateY(calc(var(--cover-flow-turn) * -0.9759));
+  }
   8% {
     transform: translateZ(calc(1.5rem * 0.0618 - var(--cover-flow-depth) * 1.8763))
       rotateY(calc(var(--cover-flow-turn) * -0.9686));
+  }
+  9% {
+    transform: translateZ(calc(1.5rem * 0.0778 - var(--cover-flow-depth) * 1.8443))
+      rotateY(calc(var(--cover-flow-turn) * -0.9603));
   }
   10% {
     transform: translateZ(calc(1.5rem * 0.0955 - var(--cover-flow-depth) * 1.809))
       rotateY(calc(var(--cover-flow-turn) * -0.9511));
   }
+  11% {
+    transform: translateZ(calc(1.5rem * 0.1147 - var(--cover-flow-depth) * 1.7705))
+      rotateY(calc(var(--cover-flow-turn) * -0.9409));
+  }
   12% {
     transform: translateZ(calc(1.5rem * 0.1355 - var(--cover-flow-depth) * 1.729))
       rotateY(calc(var(--cover-flow-turn) * -0.9298));
+  }
+  13% {
+    transform: translateZ(calc(1.5rem * 0.1577 - var(--cover-flow-depth) * 1.6845))
+      rotateY(calc(var(--cover-flow-turn) * -0.9178));
   }
   14% {
     transform: translateZ(calc(1.5rem * 0.1813 - var(--cover-flow-depth) * 1.6374))
       rotateY(calc(var(--cover-flow-turn) * -0.9048));
   }
+  15% {
+    transform: translateZ(calc(1.5rem * 0.2061 - var(--cover-flow-depth) * 1.5878))
+      rotateY(calc(var(--cover-flow-turn) * -0.891));
+  }
   16% {
     transform: translateZ(calc(1.5rem * 0.2321 - var(--cover-flow-depth) * 1.5358))
       rotateY(calc(var(--cover-flow-turn) * -0.8763));
+  }
+  17% {
+    transform: translateZ(calc(1.5rem * 0.2591 - var(--cover-flow-depth) * 1.4818))
+      rotateY(calc(var(--cover-flow-turn) * -0.8607));
   }
   18% {
     transform: translateZ(calc(1.5rem * 0.2871 - var(--cover-flow-depth) * 1.4258))
       rotateY(calc(var(--cover-flow-turn) * -0.8443));
   }
+  19% {
+    transform: translateZ(calc(1.5rem * 0.3159 - var(--cover-flow-depth) * 1.3681))
+      rotateY(calc(var(--cover-flow-turn) * -0.8271));
+  }
   20% {
     transform: translateZ(calc(1.5rem * 0.3455 - var(--cover-flow-depth) * 1.309))
       rotateY(calc(var(--cover-flow-turn) * -0.809));
+  }
+  21% {
+    transform: translateZ(calc(1.5rem * 0.3757 - var(--cover-flow-depth) * 1.2487))
+      rotateY(calc(var(--cover-flow-turn) * -0.7902));
   }
   22% {
     transform: translateZ(calc(1.5rem * 0.4063 - var(--cover-flow-depth) * 1.1874))
       rotateY(calc(var(--cover-flow-turn) * -0.7705));
   }
+  23% {
+    transform: translateZ(calc(1.5rem * 0.4373 - var(--cover-flow-depth) * 1.1253))
+      rotateY(calc(var(--cover-flow-turn) * -0.7501));
+  }
   24% {
     transform: translateZ(calc(1.5rem * 0.4686 - var(--cover-flow-depth) * 1.0628))
       rotateY(calc(var(--cover-flow-turn) * -0.729));
+  }
+  25% {
+    transform: translateZ(calc(1.5rem * 0.5 - var(--cover-flow-depth) * 1))
+      rotateY(calc(var(--cover-flow-turn) * -0.7071));
   }
   26% {
     transform: translateZ(calc(1.5rem * 0.5314 - var(--cover-flow-depth) * 0.9372))
       rotateY(calc(var(--cover-flow-turn) * -0.6845));
   }
+  27% {
+    transform: translateZ(calc(1.5rem * 0.5627 - var(--cover-flow-depth) * 0.8747))
+      rotateY(calc(var(--cover-flow-turn) * -0.6613));
+  }
   28% {
     transform: translateZ(calc(1.5rem * 0.5937 - var(--cover-flow-depth) * 0.8126))
       rotateY(calc(var(--cover-flow-turn) * -0.6374));
+  }
+  29% {
+    transform: translateZ(calc(1.5rem * 0.6243 - var(--cover-flow-depth) * 0.7513))
+      rotateY(calc(var(--cover-flow-turn) * -0.6129));
   }
   30% {
     transform: translateZ(calc(1.5rem * 0.6545 - var(--cover-flow-depth) * 0.691))
       rotateY(calc(var(--cover-flow-turn) * -0.5878));
   }
+  31% {
+    transform: translateZ(calc(1.5rem * 0.6841 - var(--cover-flow-depth) * 0.6319))
+      rotateY(calc(var(--cover-flow-turn) * -0.5621));
+  }
   32% {
     transform: translateZ(calc(1.5rem * 0.7129 - var(--cover-flow-depth) * 0.5742))
       rotateY(calc(var(--cover-flow-turn) * -0.5358));
+  }
+  33% {
+    transform: translateZ(calc(1.5rem * 0.7409 - var(--cover-flow-depth) * 0.5182))
+      rotateY(calc(var(--cover-flow-turn) * -0.509));
   }
   34% {
     transform: translateZ(calc(1.5rem * 0.7679 - var(--cover-flow-depth) * 0.4642))
       rotateY(calc(var(--cover-flow-turn) * -0.4818));
   }
+  35% {
+    transform: translateZ(calc(1.5rem * 0.7939 - var(--cover-flow-depth) * 0.4122))
+      rotateY(calc(var(--cover-flow-turn) * -0.454));
+  }
   36% {
     transform: translateZ(calc(1.5rem * 0.8187 - var(--cover-flow-depth) * 0.3626))
       rotateY(calc(var(--cover-flow-turn) * -0.4258));
+  }
+  37% {
+    transform: translateZ(calc(1.5rem * 0.8423 - var(--cover-flow-depth) * 0.3155))
+      rotateY(calc(var(--cover-flow-turn) * -0.3971));
   }
   38% {
     transform: translateZ(calc(1.5rem * 0.8645 - var(--cover-flow-depth) * 0.271))
       rotateY(calc(var(--cover-flow-turn) * -0.3681));
   }
+  39% {
+    transform: translateZ(calc(1.5rem * 0.8853 - var(--cover-flow-depth) * 0.2295))
+      rotateY(calc(var(--cover-flow-turn) * -0.3387));
+  }
   40% {
     transform: translateZ(calc(1.5rem * 0.9045 - var(--cover-flow-depth) * 0.191))
       rotateY(calc(var(--cover-flow-turn) * -0.309));
+  }
+  41% {
+    transform: translateZ(calc(1.5rem * 0.9222 - var(--cover-flow-depth) * 0.1557))
+      rotateY(calc(var(--cover-flow-turn) * -0.279));
   }
   42% {
     transform: translateZ(calc(1.5rem * 0.9382 - var(--cover-flow-depth) * 0.1237))
       rotateY(calc(var(--cover-flow-turn) * -0.2487));
   }
+  43% {
+    transform: translateZ(calc(1.5rem * 0.9524 - var(--cover-flow-depth) * 0.0952))
+      rotateY(calc(var(--cover-flow-turn) * -0.2181));
+  }
   44% {
     transform: translateZ(calc(1.5rem * 0.9649 - var(--cover-flow-depth) * 0.0702))
       rotateY(calc(var(--cover-flow-turn) * -0.1874));
+  }
+  45% {
+    transform: translateZ(calc(1.5rem * 0.9755 - var(--cover-flow-depth) * 0.0489))
+      rotateY(calc(var(--cover-flow-turn) * -0.1564));
   }
   46% {
     transform: translateZ(calc(1.5rem * 0.9843 - var(--cover-flow-depth) * 0.0314))
       rotateY(calc(var(--cover-flow-turn) * -0.1253));
   }
+  47% {
+    transform: translateZ(calc(1.5rem * 0.9911 - var(--cover-flow-depth) * 0.0177))
+      rotateY(calc(var(--cover-flow-turn) * -0.0941));
+  }
   48% {
     transform: translateZ(calc(1.5rem * 0.9961 - var(--cover-flow-depth) * 0.0079))
       rotateY(calc(var(--cover-flow-turn) * -0.0628));
   }
+  49% {
+    transform: translateZ(calc(1.5rem * 0.999 - var(--cover-flow-depth) * 0.002))
+      rotateY(calc(var(--cover-flow-turn) * -0.0314));
+  }
   50% {
-    transform: translateZ(calc(1.5rem * 1)) rotateY(0deg);
+    transform: translateZ(calc(1.5rem * 1 - var(--cover-flow-depth) * 0))
+      rotateY(calc(var(--cover-flow-turn) * 0));
+  }
+  51% {
+    transform: translateZ(calc(1.5rem * 0.999 - var(--cover-flow-depth) * 0.002))
+      rotateY(calc(var(--cover-flow-turn) * 0.0314));
   }
   52% {
     transform: translateZ(calc(1.5rem * 0.9961 - var(--cover-flow-depth) * 0.0079))
       rotateY(calc(var(--cover-flow-turn) * 0.0628));
   }
+  53% {
+    transform: translateZ(calc(1.5rem * 0.9911 - var(--cover-flow-depth) * 0.0177))
+      rotateY(calc(var(--cover-flow-turn) * 0.0941));
+  }
   54% {
     transform: translateZ(calc(1.5rem * 0.9843 - var(--cover-flow-depth) * 0.0314))
       rotateY(calc(var(--cover-flow-turn) * 0.1253));
+  }
+  55% {
+    transform: translateZ(calc(1.5rem * 0.9755 - var(--cover-flow-depth) * 0.0489))
+      rotateY(calc(var(--cover-flow-turn) * 0.1564));
   }
   56% {
     transform: translateZ(calc(1.5rem * 0.9649 - var(--cover-flow-depth) * 0.0702))
       rotateY(calc(var(--cover-flow-turn) * 0.1874));
   }
+  57% {
+    transform: translateZ(calc(1.5rem * 0.9524 - var(--cover-flow-depth) * 0.0952))
+      rotateY(calc(var(--cover-flow-turn) * 0.2181));
+  }
   58% {
     transform: translateZ(calc(1.5rem * 0.9382 - var(--cover-flow-depth) * 0.1237))
       rotateY(calc(var(--cover-flow-turn) * 0.2487));
+  }
+  59% {
+    transform: translateZ(calc(1.5rem * 0.9222 - var(--cover-flow-depth) * 0.1557))
+      rotateY(calc(var(--cover-flow-turn) * 0.279));
   }
   60% {
     transform: translateZ(calc(1.5rem * 0.9045 - var(--cover-flow-depth) * 0.191))
       rotateY(calc(var(--cover-flow-turn) * 0.309));
   }
+  61% {
+    transform: translateZ(calc(1.5rem * 0.8853 - var(--cover-flow-depth) * 0.2295))
+      rotateY(calc(var(--cover-flow-turn) * 0.3387));
+  }
   62% {
     transform: translateZ(calc(1.5rem * 0.8645 - var(--cover-flow-depth) * 0.271))
       rotateY(calc(var(--cover-flow-turn) * 0.3681));
+  }
+  63% {
+    transform: translateZ(calc(1.5rem * 0.8423 - var(--cover-flow-depth) * 0.3155))
+      rotateY(calc(var(--cover-flow-turn) * 0.3971));
   }
   64% {
     transform: translateZ(calc(1.5rem * 0.8187 - var(--cover-flow-depth) * 0.3626))
       rotateY(calc(var(--cover-flow-turn) * 0.4258));
   }
+  65% {
+    transform: translateZ(calc(1.5rem * 0.7939 - var(--cover-flow-depth) * 0.4122))
+      rotateY(calc(var(--cover-flow-turn) * 0.454));
+  }
   66% {
     transform: translateZ(calc(1.5rem * 0.7679 - var(--cover-flow-depth) * 0.4642))
       rotateY(calc(var(--cover-flow-turn) * 0.4818));
+  }
+  67% {
+    transform: translateZ(calc(1.5rem * 0.7409 - var(--cover-flow-depth) * 0.5182))
+      rotateY(calc(var(--cover-flow-turn) * 0.509));
   }
   68% {
     transform: translateZ(calc(1.5rem * 0.7129 - var(--cover-flow-depth) * 0.5742))
       rotateY(calc(var(--cover-flow-turn) * 0.5358));
   }
+  69% {
+    transform: translateZ(calc(1.5rem * 0.6841 - var(--cover-flow-depth) * 0.6319))
+      rotateY(calc(var(--cover-flow-turn) * 0.5621));
+  }
   70% {
     transform: translateZ(calc(1.5rem * 0.6545 - var(--cover-flow-depth) * 0.691))
       rotateY(calc(var(--cover-flow-turn) * 0.5878));
+  }
+  71% {
+    transform: translateZ(calc(1.5rem * 0.6243 - var(--cover-flow-depth) * 0.7513))
+      rotateY(calc(var(--cover-flow-turn) * 0.6129));
   }
   72% {
     transform: translateZ(calc(1.5rem * 0.5937 - var(--cover-flow-depth) * 0.8126))
       rotateY(calc(var(--cover-flow-turn) * 0.6374));
   }
+  73% {
+    transform: translateZ(calc(1.5rem * 0.5627 - var(--cover-flow-depth) * 0.8747))
+      rotateY(calc(var(--cover-flow-turn) * 0.6613));
+  }
   74% {
     transform: translateZ(calc(1.5rem * 0.5314 - var(--cover-flow-depth) * 0.9372))
       rotateY(calc(var(--cover-flow-turn) * 0.6845));
+  }
+  75% {
+    transform: translateZ(calc(1.5rem * 0.5 - var(--cover-flow-depth) * 1))
+      rotateY(calc(var(--cover-flow-turn) * 0.7071));
   }
   76% {
     transform: translateZ(calc(1.5rem * 0.4686 - var(--cover-flow-depth) * 1.0628))
       rotateY(calc(var(--cover-flow-turn) * 0.729));
   }
+  77% {
+    transform: translateZ(calc(1.5rem * 0.4373 - var(--cover-flow-depth) * 1.1253))
+      rotateY(calc(var(--cover-flow-turn) * 0.7501));
+  }
   78% {
     transform: translateZ(calc(1.5rem * 0.4063 - var(--cover-flow-depth) * 1.1874))
       rotateY(calc(var(--cover-flow-turn) * 0.7705));
+  }
+  79% {
+    transform: translateZ(calc(1.5rem * 0.3757 - var(--cover-flow-depth) * 1.2487))
+      rotateY(calc(var(--cover-flow-turn) * 0.7902));
   }
   80% {
     transform: translateZ(calc(1.5rem * 0.3455 - var(--cover-flow-depth) * 1.309))
       rotateY(calc(var(--cover-flow-turn) * 0.809));
   }
+  81% {
+    transform: translateZ(calc(1.5rem * 0.3159 - var(--cover-flow-depth) * 1.3681))
+      rotateY(calc(var(--cover-flow-turn) * 0.8271));
+  }
   82% {
     transform: translateZ(calc(1.5rem * 0.2871 - var(--cover-flow-depth) * 1.4258))
       rotateY(calc(var(--cover-flow-turn) * 0.8443));
+  }
+  83% {
+    transform: translateZ(calc(1.5rem * 0.2591 - var(--cover-flow-depth) * 1.4818))
+      rotateY(calc(var(--cover-flow-turn) * 0.8607));
   }
   84% {
     transform: translateZ(calc(1.5rem * 0.2321 - var(--cover-flow-depth) * 1.5358))
       rotateY(calc(var(--cover-flow-turn) * 0.8763));
   }
+  85% {
+    transform: translateZ(calc(1.5rem * 0.2061 - var(--cover-flow-depth) * 1.5878))
+      rotateY(calc(var(--cover-flow-turn) * 0.891));
+  }
   86% {
     transform: translateZ(calc(1.5rem * 0.1813 - var(--cover-flow-depth) * 1.6374))
       rotateY(calc(var(--cover-flow-turn) * 0.9048));
+  }
+  87% {
+    transform: translateZ(calc(1.5rem * 0.1577 - var(--cover-flow-depth) * 1.6845))
+      rotateY(calc(var(--cover-flow-turn) * 0.9178));
   }
   88% {
     transform: translateZ(calc(1.5rem * 0.1355 - var(--cover-flow-depth) * 1.729))
       rotateY(calc(var(--cover-flow-turn) * 0.9298));
   }
+  89% {
+    transform: translateZ(calc(1.5rem * 0.1147 - var(--cover-flow-depth) * 1.7705))
+      rotateY(calc(var(--cover-flow-turn) * 0.9409));
+  }
   90% {
     transform: translateZ(calc(1.5rem * 0.0955 - var(--cover-flow-depth) * 1.809))
       rotateY(calc(var(--cover-flow-turn) * 0.9511));
+  }
+  91% {
+    transform: translateZ(calc(1.5rem * 0.0778 - var(--cover-flow-depth) * 1.8443))
+      rotateY(calc(var(--cover-flow-turn) * 0.9603));
   }
   92% {
     transform: translateZ(calc(1.5rem * 0.0618 - var(--cover-flow-depth) * 1.8763))
       rotateY(calc(var(--cover-flow-turn) * 0.9686));
   }
+  93% {
+    transform: translateZ(calc(1.5rem * 0.0476 - var(--cover-flow-depth) * 1.9048))
+      rotateY(calc(var(--cover-flow-turn) * 0.9759));
+  }
   94% {
     transform: translateZ(calc(1.5rem * 0.0351 - var(--cover-flow-depth) * 1.9298))
       rotateY(calc(var(--cover-flow-turn) * 0.9823));
+  }
+  95% {
+    transform: translateZ(calc(1.5rem * 0.0245 - var(--cover-flow-depth) * 1.9511))
+      rotateY(calc(var(--cover-flow-turn) * 0.9877));
   }
   96% {
     transform: translateZ(calc(1.5rem * 0.0157 - var(--cover-flow-depth) * 1.9686))
       rotateY(calc(var(--cover-flow-turn) * 0.9921));
   }
+  97% {
+    transform: translateZ(calc(1.5rem * 0.0089 - var(--cover-flow-depth) * 1.9823))
+      rotateY(calc(var(--cover-flow-turn) * 0.9956));
+  }
   98% {
     transform: translateZ(calc(1.5rem * 0.0039 - var(--cover-flow-depth) * 1.9921))
       rotateY(calc(var(--cover-flow-turn) * 0.998));
   }
+  99% {
+    transform: translateZ(calc(1.5rem * 0.001 - var(--cover-flow-depth) * 1.998))
+      rotateY(calc(var(--cover-flow-turn) * 0.9995));
+  }
   100% {
-    transform: translateZ(calc(var(--cover-flow-depth) * -2))
+    transform: translateZ(calc(1.5rem * 0 - var(--cover-flow-depth) * 2))
       rotateY(calc(var(--cover-flow-turn) * 1));
   }
 }
@@ -1183,38 +1623,74 @@
   0% {
     opacity: calc(1 - var(--cover-flow-dim) * 0.45);
   }
+  2% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.9961);
+  }
   4% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.9843);
+  }
+  6% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.9649);
   }
   8% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.9382);
   }
+  10% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.9045);
+  }
   12% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.8645);
+  }
+  14% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.8187);
   }
   16% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.7679);
   }
+  18% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.7129);
+  }
   20% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.6545);
+  }
+  22% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.5937);
   }
   24% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.5314);
   }
+  26% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.4686);
+  }
   28% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.4063);
+  }
+  30% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.3455);
   }
   32% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.2871);
   }
+  34% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.2321);
+  }
   36% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.1813);
+  }
+  38% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.1355);
   }
   40% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.0955);
   }
+  42% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.0618);
+  }
   44% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.0351);
+  }
+  46% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.0157);
   }
   48% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.0039);
@@ -1225,38 +1701,74 @@
   52% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.0039);
   }
+  54% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.0157);
+  }
   56% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.0351);
+  }
+  58% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.0618);
   }
   60% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.0955);
   }
+  62% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.1355);
+  }
   64% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.1813);
+  }
+  66% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.2321);
   }
   68% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.2871);
   }
+  70% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.3455);
+  }
   72% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.4063);
+  }
+  74% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.4686);
   }
   76% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.5314);
   }
+  78% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.5937);
+  }
   80% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.6545);
+  }
+  82% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.7129);
   }
   84% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.7679);
   }
+  86% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.8187);
+  }
   88% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.8645);
+  }
+  90% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.9045);
   }
   92% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.9382);
   }
+  94% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.9649);
+  }
   96% {
     opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.9843);
+  }
+  98% {
+    opacity: calc((1 - var(--cover-flow-dim) * 0.45) * 0.9961);
   }
   100% {
     opacity: calc(1 - var(--cover-flow-dim) * 0.45);

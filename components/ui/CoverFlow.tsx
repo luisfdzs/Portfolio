@@ -16,8 +16,15 @@ const HOME = 1
 
 const STACK_TOP = 100000
 
+const GLIDE = 1100
+
+function soften(progress: number) {
+  return progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2
+}
+
 export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) {
   const scroller = useRef<HTMLDivElement>(null)
+  const glide = useRef(0)
   const cards = Children.toArray(children)
   const loop = cards.length > 1
   const copies = loop ? COPIES : 1
@@ -120,11 +127,30 @@ export function CoverFlow({ children, label, previousLabel, nextLabel }: Props) 
 
     armCoverFlowItem(target)
 
-    element.scrollTo({
-      left: centre(target) - element.clientWidth / 2,
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-    })
+    const to = centre(target) - element.clientWidth / 2
+    cancelAnimationFrame(glide.current)
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      element.scrollLeft = to
+      return
+    }
+
+    const from = element.scrollLeft
+    const span = to - from
+    const started = performance.now()
+    element.style.scrollSnapType = 'none'
+
+    const step = (now: number) => {
+      const progress = Math.min((now - started) / GLIDE, 1)
+      element.scrollLeft = from + span * soften(progress)
+      if (progress < 1) glide.current = requestAnimationFrame(step)
+      else element.style.scrollSnapType = ''
+    }
+
+    glide.current = requestAnimationFrame(step)
   }, [])
+
+  useEffect(() => () => cancelAnimationFrame(glide.current), [])
 
   return (
     <div>
