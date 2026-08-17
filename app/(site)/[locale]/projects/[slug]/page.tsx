@@ -73,6 +73,7 @@ export default async function ProjectPage({
     media?.clip && shot ? (
       <ProjectMedia
         src={media.clip}
+        chrome={media.chrome}
         slug={project.slug}
         label={`${project.name} — ${t.projects.title}`}
       >

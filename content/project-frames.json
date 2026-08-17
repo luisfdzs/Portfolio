@@ -1,0 +1,147 @@
+{
+  "ckm-combat-academy": {
+    "mobile": {
+      "src": "/projects/ckm-combat-academy-chrome-mobile.webp",
+      "clips": [
+        {
+          "src": "/projects/ckm-combat-academy-mobile.mp4",
+          "frame": {
+            "top": 6.9742,
+            "left": 0,
+            "width": 100,
+            "height": 87.8923
+          }
+        }
+      ]
+    }
+  },
+  "swiftmet": {
+    "desktop": {
+      "src": "/projects/swiftmet-chrome.webp",
+      "clips": [
+        {
+          "src": "/projects/swiftmet.webm",
+          "frame": {
+            "top": 0,
+            "left": 0,
+            "width": 100,
+            "height": 100.3711
+          }
+        }
+      ]
+    },
+    "mobile": {
+      "src": "/projects/swiftmet-chrome-mobile.webp",
+      "clips": [
+        {
+          "src": "/projects/swiftmet-mobile.webm",
+          "frame": {
+            "top": 0,
+            "left": 0,
+            "width": 100,
+            "height": 100
+          }
+        }
+      ]
+    }
+  },
+  "mila-barber": {
+    "desktop": {
+      "src": "/projects/mila-barber-chrome.webp",
+      "clips": [
+        {
+          "src": "/projects/mila-barber.webm",
+          "frame": {
+            "top": 12,
+            "left": 0,
+            "width": 100,
+            "height": 100
+          }
+        }
+      ]
+    },
+    "mobile": {
+      "src": "/projects/mila-barber-chrome-mobile.webp",
+      "clips": [
+        {
+          "src": "/projects/mila-barber-mobile.webm",
+          "frame": {
+            "top": 8.5837,
+            "left": 0,
+            "width": 100,
+            "height": 100
+          }
+        }
+      ]
+    }
+  },
+  "cedece": {
+    "desktop": {
+      "src": "/projects/cedece-chrome.webp",
+      "clips": [
+        {
+          "src": "/projects/cedece.mp4",
+          "frame": {
+            "top": 0,
+            "left": 0,
+            "width": 100,
+            "height": 100
+          }
+        }
+      ]
+    },
+    "mobile": {
+      "src": "/projects/cedece-chrome-mobile.webp",
+      "clips": [
+        {
+          "src": "/projects/cedece.mp4",
+          "frame": {
+            "top": 0,
+            "left": 0,
+            "width": 100,
+            "height": 100
+          }
+        }
+      ]
+    }
+  },
+  "bonsai-artesania": {
+    "desktop": {
+      "src": "/projects/bonsai-artesania-chrome.webp",
+      "clips": [
+        {
+          "src": "/projects/bonsai-artesania.mp4",
+          "frame": {
+            "top": 0,
+            "left": 0,
+            "width": 49.9609,
+            "height": 100
+          }
+        },
+        {
+          "src": "/projects/bonsai-artesania-2.mp4",
+          "frame": {
+            "top": 0,
+            "left": 49.9609,
+            "width": 50.0391,
+            "height": 100
+          }
+        }
+      ]
+    },
+    "mobile": {
+      "src": "/projects/bonsai-artesania-chrome-mobile.webp",
+      "clips": [
+        {
+          "src": "/projects/bonsai-artesania.mp4",
+          "frame": {
+            "top": 0,
+            "left": 0,
+            "width": 100,
+            "height": 100
+          }
+        }
+      ]
+    }
+  }
+}

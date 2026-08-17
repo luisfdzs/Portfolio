@@ -5,7 +5,13 @@ import { flushSync } from 'react-dom'
 import { COVER_FLOW_ARM, COVER_FLOW_ITEM } from '@/lib/cover-flow'
 import { ProjectLoader, loaderCycle } from '@/components/ui/ProjectLoader'
 
-type ProjectClip = { desktop: string; mobile: string }
+type ProjectClip = { desktop?: string; mobile?: string }
+type ProjectFrame = { top: number; left: number; width: number; height: number }
+type ProjectLayer = { src: string; frame: ProjectFrame }
+type ProjectChrome = {
+  desktop?: { src: string; clips: ProjectLayer[] }
+  mobile?: { src: string; clips: ProjectLayer[] }
+}
 
 const WIDE = '(min-width: 48rem)'
 const BLANK_SD = 4
@@ -31,23 +37,32 @@ function frameSpread(pixels: Uint8ClampedArray) {
 
 export function ProjectMedia({
   src,
+  chrome,
   slug,
   label,
   children,
 }: {
   src: ProjectClip
+  chrome?: ProjectChrome
   slug: string
   label: string
   children: ReactNode
 }) {
   const container = useRef<HTMLDivElement>(null)
-  const video = useRef<HTMLVideoElement>(null)
+  const stack = useRef<(HTMLVideoElement | null)[]>([])
   const opening = useRef(0)
   const held = useRef(false)
   const [playing, setPlaying] = useState(false)
   const [painted, setPainted] = useState(false)
   const [covering, setCovering] = useState(false)
   const [settled, setSettled] = useState(false)
+  const [overlay, setOverlay] = useState<string | null>(null)
+
+  const depth = Math.max(
+    1,
+    chrome?.desktop?.clips.length ?? 0,
+    chrome?.mobile?.clips.length ?? 0,
+  )
 
   useEffect(() => {
     const node = container.current
@@ -55,11 +70,44 @@ export function ProjectMedia({
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const wide = window.matchMedia(WIDE)
+    const video = { current: null as HTMLVideoElement | null }
+
+    function live() {
+      return stack.current.filter((element): element is HTMLVideoElement => {
+        if (!element) return false
+        return element.style.display !== 'none'
+      })
+    }
+
     function pickSource() {
-      const element = video.current
-      if (!element) return
-      const next = wide.matches ? src.desktop : src.mobile
-      if (!element.src.endsWith(next)) element.src = next
+      const side = wide.matches ? chrome?.desktop : chrome?.mobile
+      const plain = wide.matches ? src.desktop : src.mobile
+      const layers = side?.clips ?? (plain ? [{ src: plain, frame: null }] : [])
+      setOverlay(side && layers.length ? side.src : null)
+
+      stack.current.forEach((element, index) => {
+        if (!element) return
+        const layer = layers[index]
+        if (!layer) {
+          element.style.display = 'none'
+          element.pause()
+          return
+        }
+
+        element.style.display = ''
+        if (!element.src.endsWith(layer.src)) element.src = layer.src
+        if (!layer.frame) return
+
+        element.style.top = `${layer.frame.top}%`
+        element.style.left = `${layer.frame.left}%`
+        element.style.width = `${layer.frame.width}%`
+        element.style.height = `${layer.frame.height}%`
+        element.style.right = 'auto'
+        element.style.bottom = 'auto'
+        element.style.objectPosition = 'center'
+      })
+
+      video.current = live()[0] ?? null
     }
     pickSource()
     wide.addEventListener('change', pickSource)
@@ -125,6 +173,8 @@ export function ProjectMedia({
         flushSync(() => setCovering(true))
       }
 
+      for (const other of live()) if (other !== element) void other.play().catch(() => {})
+
       element.play().then(
         () => {
           setPlaying(true)
@@ -151,21 +201,22 @@ export function ProjectMedia({
       if (!held.current) setPainted(false)
       if (!element) return
 
-      element.pause()
+      for (const other of live()) other.pause()
       window.clearTimeout(rewind)
       if (held.current) return
 
       rewind = window.setTimeout(() => {
-        const node = video.current
-        if (node) node.currentTime = opening.current
+        for (const other of live()) other.currentTime = opening.current
       }, FADE_OUT)
     }
 
     function again() {
       const element = video.current
       if (!element || !wanted) return
-      element.currentTime = opening.current
-      void element.play()
+      for (const other of live()) {
+        other.currentTime = opening.current
+        void other.play().catch(() => {})
+      }
     }
 
     const clip = video.current
@@ -264,23 +315,42 @@ export function ProjectMedia({
       window.removeEventListener('scroll', schedule)
       window.removeEventListener('resize', schedule)
     }
-  }, [slug, src.desktop, src.mobile])
+  }, [slug, src.desktop, src.mobile, chrome])
+
+  const visible =
+    settled || (playing && painted) ? 'opacity-100 duration-0' : 'opacity-0 duration-700'
+  const layer = 'absolute inset-0 size-full rounded-lg object-cover object-top md:object-center'
 
   return (
     <div ref={container} className="relative">
       {children}
 
-      <video
-        ref={video}
-        aria-label={label}
-        muted
-        playsInline
-        preload="none"
-        tabIndex={-1}
-        className={`absolute inset-0 size-full rounded-lg object-cover object-top transition-opacity md:object-center ${
-          settled || (playing && painted) ? 'opacity-100 duration-0' : 'opacity-0 duration-700'
-        }`}
-      />
+      {Array.from({ length: depth }, (_, index) => (
+        <video
+          key={index}
+          ref={(element) => {
+            stack.current[index] = element
+          }}
+          aria-label={index ? undefined : label}
+          aria-hidden={index ? true : undefined}
+          muted
+          playsInline
+          preload="none"
+          tabIndex={-1}
+          className={`${layer} transition-opacity ${visible}`}
+        />
+      ))}
+
+      {overlay ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={overlay}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          className={`${layer} transition-opacity ${visible}`}
+        />
+      ) : null}
 
       {covering ? (
         <ProjectLoader slug={slug} leaving={painted} className="pointer-events-none rounded-lg" />

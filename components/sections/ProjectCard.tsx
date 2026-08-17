@@ -51,6 +51,7 @@ export function ProjectCard({
       {animate && media?.clip ? (
         <ProjectMedia
           src={media.clip}
+          chrome={media.chrome}
           slug={project.slug}
           label={`${project.name} — ${t.projects.title}`}
         >
