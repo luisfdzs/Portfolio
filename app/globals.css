@@ -255,6 +255,17 @@
   display: none;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .cover-flow {
+    cursor: grab;
+  }
+
+  .cover-flow[data-dragging] {
+    cursor: grabbing;
+    user-select: none;
+  }
+}
+
 @media (min-width: 40rem) {
   .cover-flow-lane {
     --cover-flow-inset: 1rem;

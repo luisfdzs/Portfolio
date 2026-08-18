@@ -18,6 +18,9 @@ const HOME = 1
 const STACK_TOP = 100000
 
 const GLIDE = 1100
+const SETTLE = 520
+const DRAG_MIN = 4
+const FLICK = 160
 
 function soften(progress: number) {
   return progress < 0.5 ? 4 * progress ** 3 : 1 - (-2 * progress + 2) ** 3 / 2
@@ -114,42 +117,28 @@ export function CoverFlow({ children, label, previousLabel, nextLabel, action }:
     }
   }, [])
 
-  const go = useCallback((direction: -1 | 1) => {
-    if (gliding.current) return
-
+  const slide = useCallback((to: number, span: number) => {
     const element = scroller.current
     if (!element) return
 
-    const items = [...element.querySelectorAll<HTMLElement>(':scope > ul > li')]
-    const centre = (item: HTMLElement) => item.offsetLeft + item.offsetWidth / 2
-    const middle = element.scrollLeft + element.clientWidth / 2
-    const target =
-      direction === 1
-        ? items.find((item) => centre(item) > middle + 2)
-        : items.reverse().find((item) => centre(item) < middle - 2)
-
-    if (!target) return
-
-    armCoverFlowItem(target)
-
-    const to = centre(target) - element.clientWidth / 2
     cancelAnimationFrame(glide.current)
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      element.style.scrollSnapType = ''
       element.scrollLeft = to
       return
     }
 
     const from = element.scrollLeft
-    const span = to - from
+    const reach = to - from
     const started = performance.now()
     element.style.scrollSnapType = 'none'
     gliding.current = true
     setLocked(true)
 
     const step = (now: number) => {
-      const progress = Math.min((now - started) / GLIDE, 1)
-      element.scrollLeft = from + span * soften(progress)
+      const progress = Math.min((now - started) / span, 1)
+      element.scrollLeft = from + reach * soften(progress)
 
       if (progress < 1) {
         glide.current = requestAnimationFrame(step)
@@ -163,6 +152,139 @@ export function CoverFlow({ children, label, previousLabel, nextLabel, action }:
 
     glide.current = requestAnimationFrame(step)
   }, [])
+
+  const go = useCallback(
+    (direction: -1 | 1) => {
+      if (gliding.current) return
+
+      const element = scroller.current
+      if (!element) return
+
+      const items = [...element.querySelectorAll<HTMLElement>(':scope > ul > li')]
+      const centre = (item: HTMLElement) => item.offsetLeft + item.offsetWidth / 2
+      const middle = element.scrollLeft + element.clientWidth / 2
+      const target =
+        direction === 1
+          ? items.find((item) => centre(item) > middle + 2)
+          : items.reverse().find((item) => centre(item) < middle - 2)
+
+      if (!target) return
+
+      armCoverFlowItem(target)
+      slide(centre(target) - element.clientWidth / 2, GLIDE)
+    },
+    [slide],
+  )
+
+  useEffect(() => {
+    const element = scroller.current
+    if (!element) return
+
+    let pointer = 0
+    let originX = 0
+    let originScroll = 0
+    let lastX = 0
+    let lastAt = 0
+    let speed = 0
+    let dragging = false
+    let swallow = false
+
+    const nearest = (to: number) => {
+      const items = [...element.querySelectorAll<HTMLElement>(':scope > ul > li')]
+      const middle = to + element.clientWidth / 2
+      const gap = (item: HTMLElement) => Math.abs(item.offsetLeft + item.offsetWidth / 2 - middle)
+
+      return items.reduce<HTMLElement | null>(
+        (closest, item) => (!closest || gap(item) < gap(closest) ? item : closest),
+        null,
+      )
+    }
+
+    const down = (event: PointerEvent) => {
+      swallow = false
+      if (event.pointerType !== 'mouse' || event.button !== 0) return
+
+      cancelAnimationFrame(glide.current)
+      gliding.current = false
+      pointer = event.pointerId
+      originX = event.clientX
+      originScroll = element.scrollLeft
+      lastX = event.clientX
+      lastAt = event.timeStamp
+      speed = 0
+      dragging = false
+    }
+
+    const move = (event: PointerEvent) => {
+      if (!pointer || event.pointerId !== pointer) return
+
+      const shift = event.clientX - originX
+      if (!dragging) {
+        if (Math.abs(shift) < DRAG_MIN) return
+        dragging = true
+        element.setPointerCapture(pointer)
+        element.dataset.dragging = ''
+        element.style.scrollSnapType = 'none'
+        document.getSelection()?.removeAllRanges()
+      }
+
+      const gap = event.timeStamp - lastAt
+      if (gap > 0) speed = (event.clientX - lastX) / gap
+      lastX = event.clientX
+      lastAt = event.timeStamp
+      element.scrollLeft = originScroll - shift
+    }
+
+    const up = (event: PointerEvent) => {
+      if (!pointer || event.pointerId !== pointer) return
+
+      pointer = 0
+      if (!dragging) return
+
+      dragging = false
+      swallow = true
+      delete element.dataset.dragging
+      if (element.hasPointerCapture(event.pointerId)) {
+        element.releasePointerCapture(event.pointerId)
+      }
+
+      const target = nearest(element.scrollLeft - speed * FLICK)
+      if (!target) {
+        element.style.scrollSnapType = ''
+        return
+      }
+
+      armCoverFlowItem(target)
+      slide(target.offsetLeft + target.offsetWidth / 2 - element.clientWidth / 2, SETTLE)
+    }
+
+    const block = (event: Event) => {
+      if (!swallow) return
+      swallow = false
+      event.preventDefault()
+      event.stopPropagation()
+    }
+
+    const halt = (event: Event) => {
+      if (dragging) event.preventDefault()
+    }
+
+    element.addEventListener('pointerdown', down)
+    element.addEventListener('pointermove', move)
+    element.addEventListener('pointerup', up)
+    element.addEventListener('pointercancel', up)
+    element.addEventListener('click', block, true)
+    element.addEventListener('dragstart', halt)
+
+    return () => {
+      element.removeEventListener('pointerdown', down)
+      element.removeEventListener('pointermove', move)
+      element.removeEventListener('pointerup', up)
+      element.removeEventListener('pointercancel', up)
+      element.removeEventListener('click', block, true)
+      element.removeEventListener('dragstart', halt)
+    }
+  }, [slide])
 
   useEffect(
     () => () => {
