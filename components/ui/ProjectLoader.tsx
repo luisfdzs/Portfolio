@@ -96,6 +96,15 @@ const slam = (
   </span>
 )
 
+const terminal = (
+  <span className="pl-term">
+    <span className="pl-term__sign">$</span>
+    <span className="pl-term__line">
+      <span className="pl-term__caret" />
+    </span>
+  </span>
+)
+
 const dots = (
   <span className="pl-dots">
     <span />
@@ -115,6 +124,7 @@ const crossFade = (
 )
 
 const loaders: Record<string, Loader> = {
+  site: { mark: '#e0a458', art: terminal, cycle: 1600 },
   'bonsai-artesania': { mark: '#9db38f', art: flower, cycle: 2800 },
   swiftmet: { mark: '#5fb3d4', art: coil, cycle: 2600 },
   cedece: { mark: '#f0384f', art: monogram, cycle: 2600 },

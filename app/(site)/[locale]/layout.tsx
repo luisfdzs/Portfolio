@@ -6,6 +6,7 @@ import { site } from '@/content/site'
 import { getProfile } from '@/lib/content'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
+import { BootCurtain } from '@/components/layout/BootCurtain'
 import { Footer } from '@/components/layout/Footer'
 import { HashCleaner } from '@/components/layout/HashCleaner'
 import { Header } from '@/components/layout/Header'
@@ -109,9 +110,12 @@ export default async function SiteLayout({
   return (
     <html
       lang={localeHtmlLang[locale]}
+      data-boot="hold"
       className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`}
     >
       <body>
+        <BootCurtain />
+
         <SiteField />
 
         <a
