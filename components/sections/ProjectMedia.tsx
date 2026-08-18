@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { COVER_FLOW_ARM, COVER_FLOW_ITEM } from '@/lib/cover-flow'
+import { warmWhenIdle } from '@/lib/media-warmup'
 import { ProjectLoader, loaderCycle } from '@/components/ui/ProjectLoader'
 
 type ProjectClip = { desktop?: string; mobile?: string }
@@ -25,6 +26,8 @@ const SAMPLE = { width: 32, height: 18 }
 const FADE_OUT = 700
 const ARM_HOLD = 1400
 const MIN_COVER = 520
+const WARM_CAP = 8000
+const WARM_PROBE = 1500
 const GLITCH = 'project-glitch'
 const LAYER = 'project-layer'
 
@@ -60,6 +63,7 @@ export function ProjectMedia({
   const badge = useRef<HTMLImageElement>(null)
   const opening = useRef(0)
   const held = useRef(false)
+  const ready = useRef(false)
   const [playing, setPlaying] = useState(false)
   const [painted, setPainted] = useState(false)
   const [covering, setCovering] = useState(false)
@@ -179,6 +183,7 @@ export function ProjectMedia({
 
     function hold() {
       held.current = true
+      ready.current = true
       setPainted(true)
       setSettled(true)
     }
@@ -204,6 +209,7 @@ export function ProjectMedia({
         const frame = paint.getImageData(0, 0, SAMPLE.width, SAMPLE.height)
         if (frameSpread(frame.data) > BLANK_SD) {
           opening.current = element.currentTime
+          ready.current = true
           return reveal()
         }
       } catch {
@@ -221,7 +227,9 @@ export function ProjectMedia({
       rewind = 0
       wanted = true
 
-      if (!held.current) {
+      if (held.current || ready.current) {
+        flushSync(hold)
+      } else {
         if (!coveredAt) coveredAt = performance.now()
         flushSync(() => setCovering(true))
       }
@@ -278,6 +286,79 @@ export function ProjectMedia({
     const clip = video.current
     clip?.addEventListener('ended', again)
 
+    function settle(element: HTMLVideoElement, span: number) {
+      return new Promise<boolean>((done) => {
+        if (element.readyState >= 2) return done(true)
+
+        let cap = 0
+
+        function finish(gained: boolean) {
+          window.clearTimeout(cap)
+          element.removeEventListener('loadeddata', hit)
+          element.removeEventListener('error', miss)
+          done(gained)
+        }
+
+        function hit() {
+          finish(true)
+        }
+
+        function miss() {
+          finish(false)
+        }
+
+        element.addEventListener('loadeddata', hit)
+        element.addEventListener('error', miss)
+        cap = window.setTimeout(miss, span)
+      })
+    }
+
+    async function pull(url: string) {
+      if (!url) return
+      try {
+        const answer = await fetch(url, { credentials: 'same-origin' })
+        await answer.arrayBuffer()
+      } catch {
+        return
+      }
+    }
+
+    async function prime(element: HTMLVideoElement) {
+      element.preload = 'auto'
+      if (element.readyState === 0) element.load()
+
+      if (await settle(element, WARM_PROBE)) return
+      if (element.buffered.length) {
+        await settle(element, WARM_CAP)
+        return
+      }
+
+      await pull(element.currentSrc || element.src)
+    }
+
+    async function warm() {
+      if (wanted || held.current || ready.current) return
+
+      const targets = live()
+      for (const element of targets) {
+        if (wanted || held.current) return
+        await prime(element)
+      }
+
+      const element = targets[0]
+      if (!element || !paint || element.readyState < 2) return
+
+      try {
+        paint.drawImage(element, 0, 0, SAMPLE.width, SAMPLE.height)
+        const frame = paint.getImageData(0, 0, SAMPLE.width, SAMPLE.height)
+        if (frameSpread(frame.data) > BLANK_SD) ready.current = true
+      } catch {
+        return
+      }
+    }
+
+    const unwarm = node.closest('[data-clone]') ? null : warmWhenIdle(node, warm)
+
     const scroller = node.closest('.cover-flow')
 
     if (!scroller) {
@@ -295,6 +376,7 @@ export function ProjectMedia({
       observer.observe(node)
 
       return () => {
+        unwarm?.()
         wide.removeEventListener('change', pickSource)
         observer.disconnect()
         window.clearTimeout(look)
@@ -360,6 +442,7 @@ export function ProjectMedia({
     window.addEventListener('resize', schedule)
 
     return () => {
+      unwarm?.()
       cancelAnimationFrame(frame)
       window.clearTimeout(look)
       window.clearTimeout(show)

@@ -19,10 +19,12 @@ export function ProjectCard({
   locale,
   project,
   animate = true,
+  priority = false,
 }: {
   locale: Locale
   project: ProjectEntry
   animate?: boolean
+  priority?: boolean
 }) {
   const t = getDictionary(locale)
   const media = projectMedia(project.slug)
@@ -34,12 +36,14 @@ export function ProjectCard({
       media={media}
       slug={project.slug}
       alt={alt}
+      priority={priority}
       className="transition-opacity duration-500 group-hover:opacity-85"
     />
   ) : (
     <Figure
       image={project.image}
       locale={locale}
+      priority={priority}
       ratio="fluid"
       sizes="(min-width: 64rem) 36rem, (min-width: 48rem) 26rem, 72vw"
       className="cover-flow-figure transition-opacity duration-500 group-hover:opacity-85"

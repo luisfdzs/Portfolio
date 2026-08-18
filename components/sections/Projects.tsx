@@ -37,8 +37,13 @@ export function Projects({
             </Action>
           }
         >
-          {projects.map((project) => (
-            <ProjectCard key={project.slug} locale={locale} project={project} />
+          {projects.map((project, index) => (
+            <ProjectCard
+              key={project.slug}
+              locale={locale}
+              project={project}
+              priority={index === 0}
+            />
           ))}
         </CoverFlow>
       </Reveal>
