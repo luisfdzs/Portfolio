@@ -26,6 +26,8 @@ const PROBE_FLOOR = 9000
 const MOTION_MIN = 2500
 const SETTLE_MS = 3500
 const WEBP_QUALITY = 0.82
+const VEIL_MAX = 0.4
+const MARK_SPAN = [112, 0.13, 208]
 
 const OUT = path.resolve('public/projects')
 const SHOT_DIR = path.join(OUT, 'shots')
@@ -161,10 +163,29 @@ async function shoot(target, shot) {
   try {
     await page.goto(target.url, { waitUntil: 'load', timeout: 45000 })
     await page.waitForTimeout(SETTLE_MS)
+    await page.evaluate(() => {
+      for (const animation of document.getAnimations()) animation.cancel()
+    })
     const png = await page.screenshot({ type: 'png' })
     return await encode(page, png, shotFile(target, shot))
   } finally {
     await ctx.close()
+  }
+}
+
+async function badge(target, shot, page, found) {
+  const response = await page.request.get(found.src)
+  const extension = path.extname(new URL(found.src).pathname) || '.png'
+  const file = path.join(OUT, `${target.slug}-mark${shot.suffix}${extension}`)
+  await writeFile(file, await response.body())
+
+  const name = `mark-${target.slug}${shot.suffix}`
+  return {
+    src: `/projects/${path.basename(file)}`,
+    rect: found.rect,
+    box: found.box,
+    animation: found.animation.replace(found.name, name),
+    keyframes: found.keyframes.replace(`@keyframes ${found.name}`, `@keyframes ${name}`),
   }
 }
 
@@ -178,7 +199,53 @@ async function chrome(target, shot) {
     await page.goto(target.url, { waitUntil: 'load', timeout: 45000 })
     await page.waitForTimeout(SETTLE_MS)
 
-    const found = await page.evaluate(() => {
+    const found = await page.evaluate((ceiling) => {
+      const round = (value) => Math.round(value * 10000) / 10000
+
+      const badge = [...document.querySelectorAll('img')].find((element) => {
+        const style = getComputedStyle(element)
+        if (style.animationName === 'none') return false
+        if (style.animationIterationCount === 'infinite') return false
+        const rect = element.getBoundingClientRect()
+        if (rect.top >= window.innerHeight || rect.bottom <= 0) return false
+        return rect.width >= 40 && rect.width <= window.innerWidth * 0.6
+      })
+
+      const mark = badge
+        ? {
+            name: getComputedStyle(badge).animationName,
+            animation: getComputedStyle(badge).animation,
+            src: badge.currentSrc || badge.src,
+          }
+        : null
+
+      for (const animation of document.getAnimations()) animation.cancel()
+
+      if (mark) {
+        for (const sheet of document.styleSheets) {
+          let rules
+          try {
+            rules = sheet.cssRules
+          } catch {
+            continue
+          }
+          for (const rule of rules) {
+            if (rule.type !== CSSRule.KEYFRAMES_RULE || rule.name !== mark.name) continue
+            mark.keyframes = rule.cssText
+          }
+        }
+
+        const rect = badge.getBoundingClientRect()
+        mark.rect = {
+          top: round(rect.top),
+          left: round(rect.left),
+          width: round(rect.width),
+          height: round(rect.height),
+        }
+        mark.box = { width: window.innerWidth, height: window.innerHeight }
+        if (mark.keyframes) badge.style.visibility = 'hidden'
+      }
+
       const view = window.innerWidth * window.innerHeight
       const covers = (el) => {
         const rect = el.getBoundingClientRect()
@@ -190,12 +257,13 @@ async function chrome(target, shot) {
         )
       }
 
-      const round = (value) => Math.round(value * 10000) / 10000
       const videos = []
 
       for (const element of document.querySelectorAll('video, img')) {
         if (!covers(element)) continue
         if (element.tagName === 'VIDEO') {
+          element.style.animation = 'none'
+          element.style.transform = 'none'
           const rect = element.getBoundingClientRect()
           const source = element.currentSrc || element.src
           videos.push({
@@ -211,20 +279,42 @@ async function chrome(target, shot) {
         element.style.visibility = 'hidden'
       }
 
+      const soften = (paint) =>
+        paint
+          .replace(/rgba?\(([^()]*)\)/g, (whole, body) => {
+            const parts = body.split(',').map((piece) => piece.trim())
+            const alpha = Number.parseFloat(parts[3])
+            if (parts.length < 4 || !Number.isFinite(alpha)) return whole
+            return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${Math.min(alpha, ceiling)})`
+          })
+          .replace(/\/\s*([0-9.]+)\s*\)/g, (whole, alpha) => `/ ${Math.min(Number(alpha), ceiling)})`)
+
       for (const element of document.querySelectorAll('html, body, body *')) {
-        const paint = getComputedStyle(element).backgroundColor
-        if (paint === 'transparent' || paint === 'rgba(0, 0, 0, 0)') continue
-        element.style.backgroundColor = 'transparent'
+        const style = getComputedStyle(element)
+        const paint = style.backgroundColor
+        if (paint !== 'transparent' && paint !== 'rgba(0, 0, 0, 0)') {
+          element.style.backgroundColor = 'transparent'
+        }
+        if (style.backgroundImage.includes('url(') && covers(element)) {
+          element.style.backgroundImage = 'none'
+        } else if (style.backgroundImage.includes('gradient')) {
+          element.style.backgroundImage = soften(style.backgroundImage)
+        }
       }
 
-      return videos.filter((video) => video.name)
-    })
+      return {
+        videos: videos.filter((video) => video.name),
+        mark: mark?.keyframes ? mark : null,
+      }
+    }, VEIL_MAX)
 
-    if (!found.length) throw new Error('el hero no tiene vídeo en este tamaño')
+    if (!found.videos.length) throw new Error('el hero no tiene vídeo en este tamaño')
+
+    const mark = found.mark ? await badge(target, shot, page, found.mark) : null
 
     const png = await page.screenshot({ type: 'png', omitBackground: true })
     await encode(page, png, chromeFile(target, shot))
-    return { file: chromeFile(target, shot), videos: found }
+    return { file: chromeFile(target, shot), videos: found.videos, mark }
   } finally {
     await ctx.close()
   }
@@ -318,7 +408,8 @@ async function harvest(target, shot) {
     clips.push({ src, frame: video.frame })
   }
 
-  return { src: `/projects/${path.basename(layer.file)}`, clips }
+  const stack = { src: `/projects/${path.basename(layer.file)}`, clips }
+  return layer.mark ? { ...stack, mark: layer.mark } : stack
 }
 
 async function settled(target) {
@@ -353,7 +444,45 @@ const frames = await readFile(FRAMES, 'utf8')
   .then((raw) => JSON.parse(raw))
   .catch(() => ({}))
 
+function spread(mark, size) {
+  const [least, share, most] = MARK_SPAN
+  const round = (value) => Math.round(value * 10000) / 10000
+  const width = Math.min(Math.max(least, size.width * share), most)
+  const height = width * (mark.rect.height / mark.rect.width)
+
+  return {
+    ...mark,
+    rect: {
+      top: round((size.height - height) / 2),
+      left: round((size.width - width) / 2),
+      width: round(width),
+      height: round(height),
+    },
+    box: { width: size.width, height: size.height },
+  }
+}
+
+async function mirrorMarks() {
+  let touched = false
+
+  for (const sides of Object.values(frames)) {
+    const source = SHOTS.map((shot) => sides[shot.key]).find((side) => side?.mark)
+    if (!source) continue
+
+    for (const shot of SHOTS) {
+      const side = sides[shot.key]
+      if (!side || (side.mark && side.mark.src !== source.mark.src)) continue
+      if (side === source) continue
+      side.mark = spread(source.mark, shot.size)
+      touched = true
+    }
+  }
+
+  if (touched) await writeFile(FRAMES, `${JSON.stringify(frames, null, 2)}\n`, 'utf8')
+}
+
 async function writeIndex() {
+  await mirrorMarks()
   const entries = []
 
   for (const target of TARGETS) {
@@ -415,7 +544,10 @@ async function writeIndex() {
               `{ src: '${src}', frame: { top: ${frame.top}, left: ${frame.left}, width: ${frame.width}, height: ${frame.height} } }`,
           )
           .join(', ')
-        return `${key}: { src: '${layer.src}', clips: [${list}] }`
+        const mark = layer.mark
+          ? `, mark: { src: ${JSON.stringify(layer.mark.src)}, rect: { top: ${layer.mark.rect.top}, left: ${layer.mark.rect.left}, width: ${layer.mark.rect.width}, height: ${layer.mark.rect.height} }, box: { width: ${layer.mark.box.width}, height: ${layer.mark.box.height} }, animation: ${JSON.stringify(layer.mark.animation)}, keyframes: ${JSON.stringify(layer.mark.keyframes)} }`
+          : ''
+        return `${key}: { src: '${layer.src}', clips: [${list}]${mark} }`
       }
       const boxes = SHOTS.map((each) => stack(each.key)).filter(Boolean)
       const chrome = boxes.length
@@ -437,7 +569,15 @@ export type ProjectFrame = { top: number; left: number; width: number; height: n
 
 export type ProjectLayer = { src: string; frame: ProjectFrame }
 
-export type ProjectChrome = { src: string; clips: ProjectLayer[] }
+export type ProjectMark = {
+  src: string
+  rect: ProjectFrame
+  box: { width: number; height: number }
+  animation: string
+  keyframes: string
+}
+
+export type ProjectChrome = { src: string; clips: ProjectLayer[]; mark?: ProjectMark }
 
 export type ProjectMediaSet = {
   desktop: ProjectShot

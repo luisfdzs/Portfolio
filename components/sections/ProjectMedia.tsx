@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { COVER_FLOW_ARM, COVER_FLOW_ITEM } from '@/lib/cover-flow'
 import { ProjectLoader, loaderCycle } from '@/components/ui/ProjectLoader'
@@ -8,10 +8,15 @@ import { ProjectLoader, loaderCycle } from '@/components/ui/ProjectLoader'
 type ProjectClip = { desktop?: string; mobile?: string }
 type ProjectFrame = { top: number; left: number; width: number; height: number }
 type ProjectLayer = { src: string; frame: ProjectFrame }
-type ProjectChrome = {
-  desktop?: { src: string; clips: ProjectLayer[] }
-  mobile?: { src: string; clips: ProjectLayer[] }
+type ProjectMark = {
+  src: string
+  rect: ProjectFrame
+  box: { width: number; height: number }
+  animation: string
+  keyframes: string
 }
+type ProjectSide = { src: string; clips: ProjectLayer[]; mark?: ProjectMark }
+type ProjectChrome = { desktop?: ProjectSide; mobile?: ProjectSide }
 
 const WIDE = '(min-width: 48rem)'
 const BLANK_SD = 4
@@ -20,6 +25,8 @@ const SAMPLE = { width: 32, height: 18 }
 const FADE_OUT = 700
 const ARM_HOLD = 1400
 const MIN_COVER = 520
+const GLITCH = 'project-glitch'
+const LAYER = 'project-layer'
 
 function frameSpread(pixels: Uint8ClampedArray) {
   const light: number[] = []
@@ -50,6 +57,7 @@ export function ProjectMedia({
 }) {
   const container = useRef<HTMLDivElement>(null)
   const stack = useRef<(HTMLVideoElement | null)[]>([])
+  const badge = useRef<HTMLImageElement>(null)
   const opening = useRef(0)
   const held = useRef(false)
   const [playing, setPlaying] = useState(false)
@@ -57,6 +65,8 @@ export function ProjectMedia({
   const [covering, setCovering] = useState(false)
   const [settled, setSettled] = useState(false)
   const [overlay, setOverlay] = useState<string | null>(null)
+  const [mark, setMark] = useState<ProjectMark | null>(null)
+  const [band, setBand] = useState({ head: 0, foot: 0 })
 
   const depth = Math.max(
     1,
@@ -84,6 +94,14 @@ export function ProjectMedia({
       const plain = wide.matches ? src.desktop : src.mobile
       const layers = side?.clips ?? (plain ? [{ src: plain, frame: null }] : [])
       setOverlay(side && layers.length ? side.src : null)
+      setMark(side?.mark ?? null)
+      const edges = layers.map((item) => item.frame).filter((frame) => frame !== null)
+      setBand({
+        head: edges.length ? Math.max(0, Math.min(...edges.map((frame) => frame.top))) : 0,
+        foot: edges.length
+          ? Math.max(0, 100 - Math.max(...edges.map((frame) => frame.top + frame.height)))
+          : 0,
+      })
 
       stack.current.forEach((element, index) => {
         if (!element) return
@@ -123,6 +141,41 @@ export function ProjectMedia({
     let coveredAt = 0
     let show = 0
     let wanted = false
+
+    let glitch = 0
+
+    function span() {
+      const found = /(\d*\.?\d+)(ms|s)/.exec(badge.current?.dataset.glitch ?? '')
+      return found ? Number(found[1]) * (found[2] === 's' ? 1000 : 1) : 0
+    }
+
+    function flash() {
+      const element = badge.current
+      const shorthand = element?.dataset.glitch
+      const box = container.current
+      if (!element || !shorthand) return
+
+      if (box) {
+        box.classList.remove(GLITCH)
+        void box.offsetHeight
+        box.style.setProperty('--glitch-span', `${span()}ms`)
+        box.classList.add(GLITCH)
+      }
+
+      element.style.animation = 'none'
+      void element.offsetHeight
+      element.style.animation = shorthand
+    }
+
+    function queue() {
+      window.clearTimeout(glitch)
+
+      const element = video.current
+      if (!element || !span() || !Number.isFinite(element.duration)) return
+
+      const left = (element.duration - element.currentTime) * 1000 - span()
+      glitch = window.setTimeout(flash, Math.max(0, left))
+    }
 
     function hold() {
       held.current = true
@@ -178,6 +231,7 @@ export function ProjectMedia({
       element.play().then(
         () => {
           setPlaying(true)
+          queue()
           if (held.current) return
           warmFrom = performance.now()
           sample()
@@ -193,6 +247,7 @@ export function ProjectMedia({
       const element = video.current
       window.clearTimeout(look)
       window.clearTimeout(show)
+      window.clearTimeout(glitch)
       look = 0
       coveredAt = 0
       wanted = false
@@ -217,6 +272,7 @@ export function ProjectMedia({
         other.currentTime = opening.current
         void other.play().catch(() => {})
       }
+      queue()
     }
 
     const clip = video.current
@@ -244,6 +300,7 @@ export function ProjectMedia({
         window.clearTimeout(look)
         window.clearTimeout(show)
         window.clearTimeout(rewind)
+        window.clearTimeout(glitch)
         element.removeEventListener('ended', again)
         element.pause()
       }
@@ -308,6 +365,7 @@ export function ProjectMedia({
       window.clearTimeout(show)
       window.clearTimeout(rewind)
       window.clearTimeout(expiry)
+      window.clearTimeout(glitch)
       item?.removeEventListener(COVER_FLOW_ARM, arm)
       clip?.removeEventListener('ended', again)
       wide.removeEventListener('change', pickSource)
@@ -317,12 +375,33 @@ export function ProjectMedia({
     }
   }, [slug, src.desktop, src.mobile, chrome])
 
+  useEffect(() => {
+    const node = container.current
+    if (!node || !mark) return
+
+    function fit() {
+      if (!node || !mark) return
+      node.style.setProperty('--mark-scale', String(node.clientWidth / mark.box.width))
+    }
+
+    fit()
+    const observer = new ResizeObserver(fit)
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [mark])
+
   const visible =
     settled || (playing && painted) ? 'opacity-100 duration-0' : 'opacity-0 duration-700'
-  const layer = 'absolute inset-0 size-full rounded-lg object-cover object-top md:object-center'
+  const layer = 'absolute inset-0 size-full object-cover object-top md:object-center'
 
   return (
-    <div ref={container} className="relative">
+    <div
+      ref={container}
+      style={
+        { '--glitch-head': `${band.head}%`, '--glitch-foot': `${band.foot}%` } as CSSProperties
+      }
+      className="relative overflow-hidden"
+    >
       {children}
 
       {Array.from({ length: depth }, (_, index) => (
@@ -337,23 +416,91 @@ export function ProjectMedia({
           playsInline
           preload="none"
           tabIndex={-1}
-          className={`${layer} transition-opacity ${visible}`}
+          className={`${layer} ${LAYER} transition-opacity ${visible}`}
         />
       ))}
 
       {overlay ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={overlay}
-          alt=""
-          aria-hidden
-          loading="lazy"
-          className={`${layer} transition-opacity ${visible}`}
-        />
+        <>
+          <div
+            className="absolute inset-0"
+            style={{ clipPath: `inset(${band.head}% 0 ${band.foot}% 0)` }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={overlay}
+              alt=""
+              aria-hidden
+              loading="lazy"
+              className={`${layer} ${LAYER} transition-opacity ${visible}`}
+            />
+          </div>
+
+          {band.head ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={overlay}
+              alt=""
+              aria-hidden
+              loading="lazy"
+              style={{ clipPath: `inset(0 0 ${100 - band.head}% 0)` }}
+              className={`${layer} transition-opacity ${visible}`}
+            />
+          ) : null}
+
+          {band.foot ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={overlay}
+              alt=""
+              aria-hidden
+              loading="lazy"
+              style={{ clipPath: `inset(${100 - band.foot}% 0 0 0)` }}
+              className={`${layer} transition-opacity ${visible}`}
+            />
+          ) : null}
+        </>
+      ) : null}
+
+      {mark ? (
+        <>
+          <style>{mark.keyframes}</style>
+          <div
+            aria-hidden
+            className={`${LAYER} pointer-events-none absolute inset-0 overflow-hidden transition-opacity ${visible}`}
+          >
+            <div
+              className="relative"
+              style={{
+                width: mark.box.width,
+                height: mark.box.height,
+                transform: 'scale(var(--mark-scale, 1))',
+                transformOrigin: 'top left',
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                ref={badge}
+                src={mark.src}
+                alt=""
+                loading="lazy"
+                data-glitch={mark.animation}
+                className="absolute"
+                style={{
+                  top: mark.rect.top,
+                  left: mark.rect.left,
+                  width: mark.rect.width,
+                  height: mark.rect.height,
+                  opacity: 0,
+                }}
+              />
+            </div>
+          </div>
+        </>
       ) : null}
 
       {covering ? (
-        <ProjectLoader slug={slug} leaving={painted} className="pointer-events-none rounded-lg" />
+        <ProjectLoader slug={slug} leaving={painted} className="pointer-events-none" />
       ) : null}
     </div>
   )
