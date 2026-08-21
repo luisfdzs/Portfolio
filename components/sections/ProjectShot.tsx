@@ -60,8 +60,8 @@ export function ProjectShot({ media, slug, alt, priority = false, className }: P
           alt={alt}
           width={media.mobile.width}
           height={media.mobile.height}
-          loading={priority ? 'eager' : 'lazy'}
-          fetchPriority={priority ? 'high' : 'auto'}
+          loading="eager"
+          fetchPriority={priority ? 'high' : 'low'}
           decoding="async"
           onLoad={() => setReady(true)}
           className="size-full object-cover object-top"

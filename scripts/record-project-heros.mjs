@@ -26,6 +26,7 @@ const PROBE_FLOOR = 9000
 const MOTION_MIN = 2500
 const SETTLE_MS = 3500
 const WEBP_QUALITY = 0.82
+const MARK_QUALITY = 0.95
 const VEIL_MAX = 0.4
 const MARK_SPAN = [112, 0.13, 208]
 
@@ -134,7 +135,7 @@ async function probe(target, shot) {
   }
 }
 
-async function encode(page, png, destination) {
+async function encode(page, png, destination, quality = WEBP_QUALITY, mime = 'image/png') {
   const encoded = await page.evaluate(
     async ([source, quality]) => {
       const image = new Image()
@@ -146,7 +147,7 @@ async function encode(page, png, destination) {
       canvas.getContext('2d').drawImage(image, 0, 0)
       return canvas.toDataURL('image/webp', quality)
     },
-    [`data:image/png;base64,${png.toString('base64')}`, WEBP_QUALITY],
+    [`data:${mime};base64,${png.toString('base64')}`, quality],
   )
 
   if (!encoded.startsWith('data:image/webp')) throw new Error('Chrome no ha devuelto webp')
@@ -175,9 +176,9 @@ async function shoot(target, shot) {
 
 async function badge(target, shot, page, found) {
   const response = await page.request.get(found.src)
-  const extension = path.extname(new URL(found.src).pathname) || '.png'
-  const file = path.join(OUT, `${target.slug}-mark${shot.suffix}${extension}`)
-  await writeFile(file, await response.body())
+  const source = response.headers()['content-type']?.split(';')[0] || 'image/png'
+  const file = path.join(OUT, `${target.slug}-mark${shot.suffix}.webp`)
+  await encode(page, await response.body(), file, MARK_QUALITY, source)
 
   const name = `mark-${target.slug}${shot.suffix}`
   return {
