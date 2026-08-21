@@ -20,7 +20,7 @@ export function Projects({
   const t = getDictionary(locale)
 
   return (
-    <section id={sections.projects} className="section-block text-center">
+    <section id={sections.projects} className="pb-[calc(var(--spacing-section)/2)] text-center">
       <ProjectMediaHints projects={projects} />
       <div className="page-gutter mx-auto max-w-7xl">
         <SectionHeading index="01" title={t.projects.title} kicker={t.projects.kicker} icon={Code}>

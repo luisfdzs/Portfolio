@@ -1,9 +1,8 @@
-import type { CSSProperties } from 'react'
+import Link from 'next/link'
 import type { Profile } from '@/content/types'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href } from '@/lib/i18n/routes'
-import { Action } from '@/components/ui/Action'
 import { Figure } from '@/components/ui/Figure'
 import { ArrowDown, MapPin } from '@/components/ui/Icons'
 import { SocialLinks } from '@/components/ui/SocialLinks'
@@ -75,15 +74,6 @@ export function Hero({ locale, profile, stats }: Props) {
 
           <SocialLinks locale={locale} profile={profile} className="mt-5" />
 
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Action href={href(locale, 'projects')} variant="primary">
-              {t.hero.primaryCta}
-            </Action>
-            <Action href={href(locale, 'contact')} variant="secondary">
-              {t.hero.secondaryCta}
-            </Action>
-          </div>
-
           <dl className="mt-10 grid w-full grid-cols-4 gap-x-2 gap-y-7 border-t border-line pt-8 text-center lg:mt-12 lg:gap-x-8">
             {stats.map((stat) => (
               <div key={stat.label}>
@@ -95,13 +85,14 @@ export function Hero({ locale, profile, stats }: Props) {
             ))}
           </dl>
 
-          <p
+          <Link
+            href={href(locale, 'projects')}
             data-print="hide"
-            className="mt-12 hidden items-center justify-center gap-2 text-small text-paper-faint lg:flex"
+            className="mt-10 flex flex-col items-center gap-2 text-small text-paper-faint transition-colors duration-300 hover:text-signal lg:mt-12"
           >
-            {t.hero.scrollHint}
-            <ArrowDown className="hero-hint__arrow size-4" />
-          </p>
+            {t.hero.primaryCta}
+            <ArrowDown className="hero-hint__arrow size-5" />
+          </Link>
         </div>
       </div>
     </section>

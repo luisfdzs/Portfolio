@@ -26,7 +26,6 @@ const es = {
     availability: 'Analista programador senior en Mobile Smart City',
     primaryCta: 'Ver proyectos',
     secondaryCta: 'Hablemos',
-    scrollHint: 'Sigue bajando',
   },
 
   stats: {
@@ -148,7 +147,6 @@ const en: Dictionary = {
     availability: 'Senior developer/analyst at Mobile Smart City',
     primaryCta: 'See projects',
     secondaryCta: "Let's talk",
-    scrollHint: 'Keep scrolling',
   },
 
   stats: {
