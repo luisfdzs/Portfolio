@@ -1091,6 +1091,16 @@ html[data-boot='hold'] .typed__char {
     animation: none;
   }
 
+  .cover-flow-lane:has(.cover-flow[data-mode='stage']) .cover-flow-action {
+    position: relative;
+    inset: auto;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    margin-top: -3rem;
+    translate: none;
+  }
+
   .cover-flow[data-mode='stage'] .cover-flow-mirror {
     display: block;
     position: absolute;
