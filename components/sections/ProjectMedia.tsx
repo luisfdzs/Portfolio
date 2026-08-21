@@ -395,6 +395,7 @@ export function ProjectMedia({
       if (next) armedAt = 0
       if (next === active) return
       if (!next && armedAt && performance.now() - armedAt < ARM_HOLD) return
+      if (next && scroller?.hasAttribute('data-moving')) return
       active = next
 
       if (next) start()

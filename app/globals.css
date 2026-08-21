@@ -1101,6 +1101,11 @@ html[data-boot='hold'] .typed__char {
     translate: none;
   }
 
+  .cover-flow[data-mode='stage'][data-moving] .cover-flow-mirror {
+    visibility: hidden;
+    opacity: 0;
+  }
+
   .cover-flow[data-mode='stage'] .cover-flow-mirror {
     display: block;
     position: absolute;
@@ -1114,6 +1119,7 @@ html[data-boot='hold'] .typed__char {
     filter: blur(2px);
     pointer-events: none;
     opacity: var(--cover-flow-gleam, 0);
+    transition: opacity 220ms var(--ease-out-soft);
   }
 }
 

@@ -42,8 +42,10 @@ const HOLD_RETRY = 60
 const REST = 0.0008
 const CAST = 4
 const SWALLOW = 400
-const ARM_SPEED = 2.4
 const SAMPLES = 5
+
+const STIR = 0.3
+const CALM = 0.1
 
 const FOLLOW = 22
 const COAST_FRICTION = 5.5
@@ -78,6 +80,7 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
   const samples = useRef<{ at: number; spot: number }[]>([])
   const eaten = useRef(0)
   const armed = useRef(-1)
+  const moving = useRef(false)
 
   useEffect(() => {
     const query = window.matchMedia(COVER_FLOW_STAGE)
@@ -133,11 +136,21 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
 
     const index = ((Math.round(spot.current) % count) + count) % count
     if (index === armed.current) return
-    if (!settled && Math.abs(rate.current) > ARM_SPEED) return
+    if (!settled && moving.current) return
 
     armed.current = index
     const item = items[index]
     if (item) armCoverFlowItem(item)
+  }, [])
+
+  const stir = useCallback((node: HTMLElement, speed: number) => {
+    const pace = Math.abs(speed)
+    const stirred = moving.current ? pace > CALM : pace > STIR
+    if (stirred === moving.current) return
+
+    moving.current = stirred
+    if (stirred) node.dataset.moving = ''
+    else delete node.dataset.moving
   }, [])
 
   const advance = useCallback(
@@ -153,6 +166,7 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
         if (rate.current !== 0 || away > 0) {
           rate.current = 0
           spot.current = mark.current
+          stir(node, 0)
           draw()
           focus(items, true)
           announceCoverFlowMove(node)
@@ -177,11 +191,12 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
         spot.current += rate.current * step
       }
 
+      stir(node, rate.current)
       draw()
       focus(items, false)
       announceCoverFlowMove(node)
     },
-    [draw, focus, homes],
+    [draw, focus, homes, stir],
   )
 
   const stageLand = useCallback(() => {
@@ -250,6 +265,8 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
       grip.current = null
       grab.current = null
       armed.current = -1
+      moving.current = false
+      delete node.dataset.moving
 
       for (const item of homes()) {
         const board = item.firstElementChild as HTMLElement | null
@@ -291,7 +308,9 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
       if (!held.live) {
         if (Math.abs(event.clientX - held.fromX) < DRAG_MIN) return
         held.live = true
+        moving.current = true
         node.dataset.dragging = ''
+        node.dataset.moving = ''
         document.getSelection()?.removeAllRanges()
       }
 
