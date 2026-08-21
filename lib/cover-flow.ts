@@ -4,7 +4,9 @@ export const COVER_FLOW_MOVE = 'cover-flow-move'
 
 export const COVER_FLOW_ITEM = 'cover-flow-item'
 
-export const COVER_FLOW_STAGE = '(min-width: 64rem)'
+export const COVER_FLOW_CALM = '(prefers-reduced-motion: reduce)'
+
+export const COVER_FLOW_ROOMY = '(min-width: 64rem)'
 
 export const XMB = {
   pull: 100,
@@ -23,6 +25,20 @@ export const XMB = {
   dim: 0.34,
 }
 
+export const XMB_SNUG = {
+  ...XMB,
+  gap: 0.58,
+  pack: 0.12,
+  turn: 82,
+  depth: 0.3,
+  shrink: 0.46,
+  dim: 0.4,
+  visible: 8,
+  mirror: 0.46,
+}
+
+export type Tune = typeof XMB
+
 export type Placement = {
   x: number
   z: number
@@ -31,17 +47,17 @@ export type Placement = {
   shade: number
 }
 
-export function placeCard(gap: number): Placement {
+export function placeCard(gap: number, tune: Tune): Placement {
   const way = Math.sign(gap)
   const near = Math.min(Math.abs(gap), 1)
   const far = Math.max(0, Math.abs(gap) - 1)
 
   return {
-    x: way * (near * XMB.gap + far * XMB.pack),
-    z: -(near * XMB.depth + far * XMB.depth * 0.35),
-    turn: -way * XMB.turn * near,
-    scale: 1 - near * XMB.shrink - far * 0.03,
-    shade: Math.min(0.95, near * XMB.dim + far * XMB.dim * 0.4),
+    x: way * (near * tune.gap + far * tune.pack),
+    z: -(near * tune.depth + far * tune.depth * 0.35),
+    turn: -way * tune.turn * near,
+    scale: 1 - near * tune.shrink - far * 0.03,
+    shade: Math.min(0.95, near * tune.dim + far * tune.dim * 0.4),
   }
 }
 

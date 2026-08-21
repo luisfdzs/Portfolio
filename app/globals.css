@@ -217,7 +217,7 @@
 }
 
 .cover-flow-lane {
-  --cover-flow-card: clamp(9.5rem, 46vw, 13rem);
+  --cover-flow-card: 56vw;
   --cover-flow-ratio: 1;
   --cover-flow-step: calc(var(--cover-flow-card) * 0.33);
   --cover-flow-turn: 68deg;
@@ -225,6 +225,7 @@
   --cover-flow-dim: 0.26;
   --cover-flow-span: 6;
   --cover-flow-slow: 3;
+  --cover-flow-room: 12rem;
   --cover-flow-inset: 0.75rem;
   --cover-flow-shot: calc(932 / 430);
   --cover-flow-pitch: calc(var(--cover-flow-step) * var(--cover-flow-slow));
@@ -275,7 +276,7 @@
 
 @media (min-width: 48rem) {
   .cover-flow-lane {
-    --cover-flow-card: 20rem;
+    --cover-flow-card: min(56vw, 26rem);
     --cover-flow-ratio: 3 / 2;
     --cover-flow-step: calc(var(--cover-flow-card) * 0.32);
     --cover-flow-turn: 64deg;
@@ -293,6 +294,7 @@
     --cover-flow-depth: 8rem;
     --cover-flow-dim: 0.24;
     --cover-flow-span: 8;
+    --cover-flow-room: 5.5rem;
   }
 }
 
@@ -1032,94 +1034,107 @@ html[data-boot='hold'] .typed__char {
   display: none;
 }
 
-@media (min-width: 64rem) {
-  .cover-flow[data-mode='stage'] {
-    max-width: none;
-    overflow: clip;
-    padding-block: 1.5rem 5.5rem;
-    perspective: calc(var(--cover-flow-card) * 2.4);
-    scroll-snap-type: none;
-    touch-action: pan-y;
+.cover-flow[data-mode='stage'] {
+  max-width: none;
+  overflow: clip;
+  padding-block: 1.5rem var(--cover-flow-room);
+  perspective: calc(var(--cover-flow-card) * 2.4);
+  scroll-snap-type: none;
+  touch-action: pan-y;
+}
+
+.cover-flow[data-mode='stage'] .cover-flow-track {
+  gap: 0;
+  padding-inline: calc(50% - var(--cover-flow-card) / 2);
+  transform-style: preserve-3d;
+}
+
+.cover-flow[data-mode='stage'] .cover-flow-item {
+  margin-inline: 0;
+  scroll-snap-align: none;
+  view-timeline-name: none;
+  transform-style: preserve-3d;
+}
+
+.cover-flow[data-mode='stage'] .cover-flow-item[data-clone] {
+  display: none;
+}
+
+.cover-flow[data-mode='stage'] .cover-flow-stage {
+  position: relative;
+  height: 100%;
+  perspective: none;
+  transform-style: preserve-3d;
+  animation: none;
+  will-change: transform;
+}
+
+.cover-flow[data-mode='stage'] .cover-flow-card {
+  position: relative;
+  height: 100%;
+  transform: none;
+  animation: none;
+}
+
+.cover-flow[data-mode='stage'] .cover-flow-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 0.75rem;
+  background-color: var(--color-ink);
+  pointer-events: none;
+  animation: none;
+  opacity: var(--cover-flow-shade, 0);
+}
+
+.cover-flow[data-mode='stage'] .pl-mark {
+  animation: none;
+}
+
+.cover-flow-lane:has(.cover-flow[data-mode='stage']) .cover-flow-action {
+  position: relative;
+  inset: auto;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  margin-top: calc(2.5rem - var(--cover-flow-room));
+  translate: none;
+}
+
+.cover-flow[data-mode='stage'][data-moving] .cover-flow-mirror {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.cover-flow[data-mode='stage'] .cover-flow-mirror {
+  display: block;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  transform: scaleY(-1);
+  transform-origin: center;
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent 18%);
+  filter: blur(2px);
+  pointer-events: none;
+  opacity: var(--cover-flow-gleam, 0);
+  transition: opacity 220ms var(--ease-out-soft);
+}
+
+@media (max-width: 63.99rem) {
+  .cover-flow-card article {
+    padding: 0.5rem;
   }
 
-  .cover-flow[data-mode='stage'] .cover-flow-track {
-    gap: 0;
-    padding-inline: calc(50% - var(--cover-flow-card) / 2);
-    transform-style: preserve-3d;
+  .cover-flow-card article > h3 {
+    font-size: 1.5rem;
   }
 
-  .cover-flow[data-mode='stage'] .cover-flow-item {
-    margin-inline: 0;
-    scroll-snap-align: none;
-    view-timeline-name: none;
-    transform-style: preserve-3d;
-  }
-
-  .cover-flow[data-mode='stage'] .cover-flow-item[data-clone] {
+  .cover-flow-card article > p,
+  .cover-flow-card article > div:has(.eyebrow) {
     display: none;
-  }
-
-  .cover-flow[data-mode='stage'] .cover-flow-stage {
-    position: relative;
-    height: 100%;
-    perspective: none;
-    transform-style: preserve-3d;
-    animation: none;
-    will-change: transform;
-  }
-
-  .cover-flow[data-mode='stage'] .cover-flow-card {
-    position: relative;
-    height: 100%;
-    transform: none;
-    animation: none;
-  }
-
-  .cover-flow[data-mode='stage'] .cover-flow-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    border-radius: 0.75rem;
-    background-color: var(--color-ink);
-    pointer-events: none;
-    animation: none;
-    opacity: var(--cover-flow-shade, 0);
-  }
-
-  .cover-flow[data-mode='stage'] .pl-mark {
-    animation: none;
-  }
-
-  .cover-flow-lane:has(.cover-flow[data-mode='stage']) .cover-flow-action {
-    position: relative;
-    inset: auto;
-    z-index: 2;
-    display: flex;
-    justify-content: center;
-    margin-top: -3rem;
-    translate: none;
-  }
-
-  .cover-flow[data-mode='stage'][data-moving] .cover-flow-mirror {
-    visibility: hidden;
-    opacity: 0;
-  }
-
-  .cover-flow[data-mode='stage'] .cover-flow-mirror {
-    display: block;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1;
-    width: 100%;
-    transform: scaleY(-1);
-    transform-origin: center;
-    mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent 18%);
-    filter: blur(2px);
-    pointer-events: none;
-    opacity: var(--cover-flow-gleam, 0);
-    transition: opacity 220ms var(--ease-out-soft);
   }
 }
 

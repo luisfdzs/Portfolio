@@ -4,10 +4,12 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   announceCoverFlowMove,
   armCoverFlowItem,
+  COVER_FLOW_CALM,
   COVER_FLOW_ITEM,
-  COVER_FLOW_STAGE,
+  COVER_FLOW_ROOMY,
   placeCard,
   XMB,
+  XMB_SNUG,
 } from '@/lib/cover-flow'
 import { ArrowLeft, ArrowRight } from './Icons'
 
@@ -69,6 +71,7 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
   const waiter = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const [locked, setLocked] = useState(false)
   const [stage, setStage] = useState(false)
+  const [roomy, setRoomy] = useState(false)
   const loop = slides.length > 1
   const copies = loop ? COPIES : 1
 
@@ -83,14 +86,25 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
   const moving = useRef(false)
 
   useEffect(() => {
-    const query = window.matchMedia(COVER_FLOW_STAGE)
-    const sync = () => setStage(query.matches)
+    const calm = window.matchMedia(COVER_FLOW_CALM)
+    const wide = window.matchMedia(COVER_FLOW_ROOMY)
+
+    const sync = () => {
+      setStage(!calm.matches)
+      setRoomy(wide.matches)
+    }
 
     sync()
-    query.addEventListener('change', sync)
+    calm.addEventListener('change', sync)
+    wide.addEventListener('change', sync)
 
-    return () => query.removeEventListener('change', sync)
+    return () => {
+      calm.removeEventListener('change', sync)
+      wide.removeEventListener('change', sync)
+    }
   }, [])
+
+  const tune = roomy ? XMB : XMB_SNUG
 
   const homes = useCallback(() => {
     const node = scroller.current
@@ -109,7 +123,7 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
       const raw = index - spot.current
       const gap = ((((raw + count / 2) % count) + count) % count) - count / 2
       const away = Math.abs(gap)
-      const edge = XMB.visible + 1
+      const edge = tune.visible + 1
       const hidden = away > edge
 
       item.style.visibility = hidden ? 'hidden' : 'visible'
@@ -118,17 +132,17 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
       const board = item.firstElementChild as HTMLElement | null
       if (!board) return
 
-      const place = placeCard(gap)
+      const place = placeCard(gap, tune)
 
       board.style.transform = `translate3d(${((place.x - index) * width).toFixed(2)}px, 0, ${(place.z * width).toFixed(2)}px) rotateY(${place.turn.toFixed(2)}deg) scale(${place.scale.toFixed(4)})`
       item.style.zIndex = String(Math.round(2000 - away * 100))
       item.style.setProperty('--cover-flow-shade', place.shade.toFixed(3))
       item.style.setProperty(
         '--cover-flow-gleam',
-        Math.max(0, XMB.mirror * (1 - away / edge)).toFixed(3),
+        Math.max(0, tune.mirror * (1 - away / edge)).toFixed(3),
       )
     })
-  }, [homes])
+  }, [homes, tune])
 
   const focus = useCallback((items: HTMLElement[], settled: boolean) => {
     const count = items.length
@@ -175,34 +189,29 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
       }
 
       if (held) {
-        const age = (now - held.since) / 1000 - XMB.holdDelay
+        const age = (now - held.since) / 1000 - tune.holdDelay
         if (age > 0) {
-          const ramp = Math.min(1, age / XMB.holdRamp)
-          mark.current += held.way * (1 + (XMB.holdTop - 1) * ramp * ramp) * step
+          const ramp = Math.min(1, age / tune.holdRamp)
+          mark.current += held.way * (1 + (tune.holdTop - 1) * ramp * ramp) * step
         }
       }
 
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        spot.current = mark.current
-        rate.current = 0
-      } else {
-        const damp = 2 * Math.sqrt(XMB.pull) * XMB.settle
-        rate.current += ((mark.current - spot.current) * XMB.pull - rate.current * damp) * step
-        spot.current += rate.current * step
-      }
+      const damp = 2 * Math.sqrt(tune.pull) * tune.settle
+      rate.current += ((mark.current - spot.current) * tune.pull - rate.current * damp) * step
+      spot.current += rate.current * step
 
       stir(node, rate.current)
       draw()
       focus(items, false)
       announceCoverFlowMove(node)
     },
-    [draw, focus, homes, stir],
+    [draw, focus, homes, stir, tune],
   )
 
   const stageLand = useCallback(() => {
-    const cast = Math.max(-CAST, Math.min(CAST, rate.current * XMB.flick))
+    const cast = Math.max(-CAST, Math.min(CAST, rate.current * tune.flick))
     mark.current = Math.round(spot.current + cast)
-  }, [])
+  }, [tune])
 
   const stagePress = useCallback((way: -1 | 1) => {
     const running = grip.current
@@ -285,7 +294,7 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
     const node = scroller.current
     if (!stage || !node) return
 
-    const reach = () => XMB.gap * (homes()[0]?.offsetWidth || 1)
+    const reach = () => tune.gap * (homes()[0]?.offsetWidth || 1)
 
     const down = (event: PointerEvent) => {
       if (event.pointerType === 'mouse' && event.button !== 0) return
@@ -384,7 +393,7 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
       node.removeEventListener('click', block, true)
       node.removeEventListener('dragstart', halt)
     }
-  }, [draw, homes, stage, stageLand])
+  }, [draw, homes, stage, stageLand, tune])
 
   useEffect(() => {
     const element = scroller.current
