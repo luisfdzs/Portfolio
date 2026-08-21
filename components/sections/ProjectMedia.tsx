@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
-import { COVER_FLOW_ARM, COVER_FLOW_ITEM } from '@/lib/cover-flow'
+import { COVER_FLOW_ARM, COVER_FLOW_ITEM, COVER_FLOW_MOVE } from '@/lib/cover-flow'
 import { warmWhenIdle } from '@/lib/media-warmup'
 import { ProjectLoader, loaderCycle } from '@/components/ui/ProjectLoader'
 
@@ -72,11 +72,7 @@ export function ProjectMedia({
   const [mark, setMark] = useState<ProjectMark | null>(null)
   const [band, setBand] = useState({ head: 0, foot: 0 })
 
-  const depth = Math.max(
-    1,
-    chrome?.desktop?.clips.length ?? 0,
-    chrome?.mobile?.clips.length ?? 0,
-  )
+  const depth = Math.max(1, chrome?.desktop?.clips.length ?? 0, chrome?.mobile?.clips.length ?? 0)
 
   useEffect(() => {
     const node = container.current
@@ -313,27 +309,12 @@ export function ProjectMedia({
       })
     }
 
-    async function pull(url: string) {
-      if (!url) return
-      try {
-        const answer = await fetch(url, { credentials: 'same-origin' })
-        await answer.arrayBuffer()
-      } catch {
-        return
-      }
-    }
-
     async function prime(element: HTMLVideoElement) {
       element.preload = 'auto'
       if (element.readyState === 0) element.load()
 
       if (await settle(element, WARM_PROBE)) return
-      if (element.buffered.length) {
-        await settle(element, WARM_CAP)
-        return
-      }
-
-      await pull(element.currentSrc || element.src)
+      if (element.buffered.length) await settle(element, WARM_CAP)
     }
 
     async function warm() {
@@ -436,8 +417,9 @@ export function ProjectMedia({
     const item = node.closest(`.${COVER_FLOW_ITEM}`)
     item?.addEventListener(COVER_FLOW_ARM, arm)
 
-    sync()
+    schedule()
     scroller.addEventListener('scroll', schedule, { passive: true })
+    scroller.addEventListener(COVER_FLOW_MOVE, schedule)
     window.addEventListener('scroll', schedule, { passive: true })
     window.addEventListener('resize', schedule)
 
@@ -453,6 +435,7 @@ export function ProjectMedia({
       clip?.removeEventListener('ended', again)
       wide.removeEventListener('change', pickSource)
       scroller.removeEventListener('scroll', schedule)
+      scroller.removeEventListener(COVER_FLOW_MOVE, schedule)
       window.removeEventListener('scroll', schedule)
       window.removeEventListener('resize', schedule)
     }

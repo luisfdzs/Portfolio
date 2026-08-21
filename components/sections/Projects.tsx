@@ -8,6 +8,7 @@ import { Code } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { ProjectCard } from './ProjectCard'
+import { ProjectMediaHints } from './ProjectMediaHints'
 
 export function Projects({
   locale,
@@ -20,6 +21,7 @@ export function Projects({
 
   return (
     <section id={sections.projects} className="section-block text-center">
+      <ProjectMediaHints projects={projects} />
       <div className="page-gutter mx-auto max-w-7xl">
         <SectionHeading index="01" title={t.projects.title} kicker={t.projects.kicker} icon={Code}>
           <p>{t.projects.intro}</p>
@@ -36,16 +38,12 @@ export function Projects({
               {t.projects.seeAll}
             </Action>
           }
-        >
-          {projects.map((project, index) => (
-            <ProjectCard
-              key={project.slug}
-              locale={locale}
-              project={project}
-              priority={index === 0}
-            />
-          ))}
-        </CoverFlow>
+          slides={projects.map((project, index) => ({
+            key: project.slug,
+            front: <ProjectCard locale={locale} project={project} priority={index === 0} />,
+            reflection: <ProjectCard locale={locale} project={project} animate={false} />,
+          }))}
+        />
       </Reveal>
     </section>
   )
