@@ -133,7 +133,7 @@ export default async function SiteLayout({
         <Footer locale={locale} profile={profile} />
         <ChatDockProvider>
           <MobileNav locale={locale} />
-          <ChatWidget locale={locale} />
+          <ChatWidget locale={locale} photo={profile.photo} />
         </ChatDockProvider>
 
         <BackToTop locale={locale} />

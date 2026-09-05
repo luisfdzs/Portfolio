@@ -92,7 +92,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
         className={cn(
           'fixed inset-x-nav-mobile-air z-50 flex h-nav-mobile-bar items-stretch',
           'bottom-[calc(var(--spacing-nav-mobile-air)+env(safe-area-inset-bottom))]',
-          'rounded-full border border-line-strong bg-ink/95 shadow-lg shadow-ink/70',
+          'rounded-full border border-line-strong bg-ink-float/95 shadow-lg shadow-ink/70',
           'backdrop-blur-lg lg:hidden',
         )}
       >
