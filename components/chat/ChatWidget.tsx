@@ -22,7 +22,9 @@ export function ChatWidget({ locale }: { locale: Locale }) {
   }, [messages, pending, open, expanded])
 
   useEffect(() => {
-    if (open) inputRef.current?.focus()
+    if (!open) return
+    if (!window.matchMedia('(min-width: 64rem)').matches) return
+    inputRef.current?.focus()
   }, [open])
 
   useEffect(() => {
