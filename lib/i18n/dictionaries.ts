@@ -106,6 +106,20 @@ const es = {
     rights: 'Todos los derechos reservados.',
   },
 
+  chat: {
+    open: 'Abrir el chat',
+    close: 'Cerrar el chat',
+    title: 'Pregúntame',
+    subtitle: 'Chat del portfolio',
+    placeholder: 'Escribe un mensaje…',
+    send: 'Enviar',
+    intro: 'Hola, soy el asistente de Luis. Pregúntame lo que quieras.',
+    expand: 'Ampliar el chat',
+    collapse: 'Reducir el chat',
+    thinking: 'Pensando…',
+    error: 'No he podido responder. Inténtalo otra vez en un momento.',
+  },
+
   notFound: {
     title: 'Esta página no existe',
     lead: 'El enlace que has seguido apunta a algo que no está aquí. Puede que lo haya movido.',
@@ -225,6 +239,20 @@ const en: Dictionary = {
     builtWith: 'Built with Next.js, Sanity and Tailwind CSS. Deployed on Vercel.',
     sourceCode: 'Source of this site',
     rights: 'All rights reserved.',
+  },
+
+  chat: {
+    open: 'Open the chat',
+    close: 'Close the chat',
+    title: 'Ask me',
+    subtitle: 'Portfolio chat',
+    placeholder: 'Type a message…',
+    send: 'Send',
+    intro: "Hi, I'm Luis's assistant. Ask me anything.",
+    expand: 'Expand the chat',
+    collapse: 'Shrink the chat',
+    thinking: 'Thinking…',
+    error: 'I could not answer. Try again in a moment.',
   },
 
   notFound: {

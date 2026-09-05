@@ -12,6 +12,8 @@ import { HashCleaner } from '@/components/layout/HashCleaner'
 import { Header } from '@/components/layout/Header'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { SiteField } from '@/components/layout/SiteField'
+import { ChatDockProvider } from '@/components/chat/ChatDock'
+import { ChatWidget } from '@/components/chat/ChatWidget'
 import { BackToTop } from '@/components/ui/BackToTop'
 import '@/app/globals.css'
 
@@ -129,7 +131,10 @@ export default async function SiteLayout({
         <Header locale={locale} />
         <main id="main">{children}</main>
         <Footer locale={locale} profile={profile} />
-        <MobileNav locale={locale} />
+        <ChatDockProvider>
+          <MobileNav locale={locale} />
+          <ChatWidget locale={locale} />
+        </ChatDockProvider>
 
         <BackToTop locale={locale} />
 

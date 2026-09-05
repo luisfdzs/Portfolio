@@ -165,3 +165,42 @@ export function LinkedIn(props: IconProps) {
     </svg>
   )
 }
+
+export function Chat(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M20 15a3 3 0 0 1-3 3H8l-4 3V6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3z" />
+    </Icon>
+  )
+}
+
+export function Expand(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M9 20H4v-5" />
+      <path d="M15 4h5v5" />
+      <path d="m4 20 6-6" />
+      <path d="m20 4-6 6" />
+    </Icon>
+  )
+}
+
+export function Collapse(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 15h5v5" />
+      <path d="M20 9h-5V4" />
+      <path d="m9 15-5 5" />
+      <path d="m15 9 5-5" />
+    </Icon>
+  )
+}
+
+export function Send(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M5 12h13" />
+      <path d="m12 5 7 7-7 7" />
+    </Icon>
+  )
+}
