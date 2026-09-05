@@ -16,10 +16,13 @@
     "sync:sanity": "node scripts/sync-sanity.mjs"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.64",
+    "@ai-sdk/react": "^4.0.96",
     "@sanity/client": "^7.25.0",
     "@sanity/image-url": "^2.1.1",
     "@sanity/orderable-document-list": "^2.0.17",
     "@sanity/vision": "^6.6.0",
+    "ai": "^7.0.93",
     "next": "^16.2.11",
     "next-sanity": "^13.2.1",
     "react": "^19.2.8",
