@@ -54,5 +54,4 @@ export const mobileNavigation = [
   'projects',
   'experience',
   'about',
-  'contact',
 ] as const satisfies readonly NavKey[]

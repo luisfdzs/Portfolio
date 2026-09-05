@@ -6,7 +6,8 @@ import { cn } from '@/lib/cn'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href, mobileNavigation, navigation } from '@/lib/i18n/routes'
-import { Briefcase, Close, Code, Mail, Menu, User } from '@/components/ui/Icons'
+import { Briefcase, Chat, Close, Code, Menu, User } from '@/components/ui/Icons'
+import { useChatDock } from '@/components/chat/ChatDock'
 import { LocaleSwitch } from './LocaleSwitch'
 import { useActiveSection } from './useActiveSection'
 
@@ -14,15 +15,20 @@ const icons = {
   about: User,
   experience: Briefcase,
   projects: Code,
-  contact: Mail,
 } as const
 
 const PANEL_ID = 'mobile-menu'
+
+const slotClass =
+  'relative flex flex-1 items-center justify-center text-signal transition-opacity duration-500'
+
+const markClass = 'flex size-11 items-center justify-center rounded-full transition-colors duration-500'
 
 export function MobileNav({ locale }: { locale: Locale }) {
   const t = getDictionary(locale)
   const [open, setOpen] = useState(false)
   const active = useActiveSection()
+  const chat = useChatDock()
 
   useEffect(() => {
     if (!open) return
@@ -45,8 +51,12 @@ export function MobileNav({ locale }: { locale: Locale }) {
     <>
       <div
         id={PANEL_ID}
-        hidden={!open}
-        className="page-gutter fixed inset-x-0 top-0 bottom-nav-mobile z-50 overflow-y-auto bg-ink-raised lg:hidden"
+        inert={!open}
+        className={cn(
+          'page-gutter fixed inset-0 z-50 overflow-y-auto bg-ink-raised pb-nav-mobile',
+          'transition-opacity duration-300 ease-out-soft lg:hidden',
+          open ? 'opacity-100' : 'pointer-events-none opacity-0',
+        )}
       >
         <nav
           aria-label={t.a11y.menu}
@@ -79,53 +89,65 @@ export function MobileNav({ locale }: { locale: Locale }) {
       <nav
         data-print="hide"
         aria-label={t.a11y.mobileNavigation}
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-ink/95 backdrop-blur-lg lg:hidden"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className={cn(
+          'fixed inset-x-nav-mobile-air z-50 flex h-nav-mobile-bar items-stretch',
+          'bottom-[calc(var(--spacing-nav-mobile-air)+env(safe-area-inset-bottom))]',
+          'rounded-full border border-line-strong bg-ink/95 shadow-lg shadow-ink/70',
+          'backdrop-blur-lg lg:hidden',
+        )}
       >
-        <ul className="flex h-16 items-stretch">
-          {mobileNavigation.map((key) => {
-            const Icon = icons[key]
-            const current = key === active
-            return (
-              <li key={key} className="flex-1">
-                <Link
-                  href={href(locale, key)}
-                  onClick={() => setOpen(false)}
-                  aria-current={current ? 'location' : undefined}
-                  className={cn(
-                    'relative flex size-full flex-col items-center justify-center gap-1 transition-colors',
-                    current ? 'text-signal' : 'text-paper-faint hover:text-signal',
-                  )}
-                >
-                  <Icon className="size-5" />
-                  <span className="text-[0.625rem] leading-none">{t.nav[key]}</span>
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      'absolute inset-x-3 top-0 h-0.5 rounded-full bg-signal transition-opacity',
-                      current ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
-                </Link>
-              </li>
-            )
-          })}
-          <li className="flex-1">
-            <button
-              type="button"
-              onClick={() => setOpen((value) => !value)}
-              aria-expanded={open}
-              aria-controls={PANEL_ID}
-              className={cn(
-                'flex size-full flex-col items-center justify-center gap-1 transition-colors',
-                open ? 'text-signal' : 'text-paper-faint hover:text-signal',
-              )}
+        {mobileNavigation.map((key) => {
+          const Icon = icons[key]
+          const current = key === active && !open && !chat.open
+          return (
+            <Link
+              key={key}
+              href={href(locale, key)}
+              onClick={() => {
+                setOpen(false)
+                chat.close()
+              }}
+              aria-label={t.nav[key]}
+              aria-current={current ? 'location' : undefined}
+              className={cn(slotClass, current ? 'opacity-100' : 'opacity-55 hover:opacity-80')}
             >
-              {open ? <Close className="size-5" /> : <Menu className="size-5" />}
-              <span className="text-[0.625rem] leading-none">{t.a11y.menu}</span>
-            </button>
-          </li>
-        </ul>
+              <span className={cn(markClass, current && 'bg-signal/12')}>
+                <Icon className="size-5" />
+              </span>
+            </Link>
+          )
+        })}
+
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(false)
+            chat.toggle()
+          }}
+          aria-expanded={chat.open}
+          aria-label={chat.open ? t.chat.close : t.chat.open}
+          className={cn(slotClass, chat.open ? 'opacity-100' : 'opacity-55 hover:opacity-80')}
+        >
+          <span className={cn(markClass, chat.open && 'bg-signal/12')}>
+            {chat.open ? <Close className="size-5" /> : <Chat className="size-5" />}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            chat.close()
+            setOpen((value) => !value)
+          }}
+          aria-expanded={open}
+          aria-controls={PANEL_ID}
+          aria-label={open ? t.a11y.closeMenu : t.a11y.menu}
+          className={cn(slotClass, open ? 'opacity-100' : 'opacity-55 hover:opacity-80')}
+        >
+          <span className={cn(markClass, open && 'bg-signal/12')}>
+            {open ? <Close className="size-5" /> : <Menu className="size-5" />}
+          </span>
+        </button>
       </nav>
     </>
   )

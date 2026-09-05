@@ -39,7 +39,11 @@
   --spacing-gutter: clamp(1.25rem, 5vw, 4rem);
   --spacing-section: clamp(4.5rem, 10vw, 10rem);
 
-  --spacing-nav-mobile: calc(4rem + env(safe-area-inset-bottom));
+  --spacing-nav-mobile-air: 0.75rem;
+  --spacing-nav-mobile-bar: 3.75rem;
+  --spacing-nav-mobile: calc(
+    var(--spacing-nav-mobile-bar) + var(--spacing-nav-mobile-air) * 2 + env(safe-area-inset-bottom)
+  );
 
   --container-measure: 62ch;
 
