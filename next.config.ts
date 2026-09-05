@@ -5,6 +5,7 @@ const buildMonth = `${buildDate.getUTCFullYear()}-${String(buildDate.getUTCMonth
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  allowedDevOrigins: ['192.168.1.*'],
   env: {
     NEXT_PUBLIC_BUILD_MONTH: buildMonth,
   },
