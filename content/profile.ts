@@ -26,11 +26,11 @@ export const profile: Profile = {
   bio: {
     es: [
       'Como muchos otros desarrolladores, mi formación ha sido 100 % autodidacta, ya que a pesar de haber estudiado ingeniería industrial, me enfoqué en el desarrollo de software y dediqué un tiempo importante a realizar cursos y proyectos personales.',
-      'Fuera de la parte puramente técnica, soy muy consciente de que lo que realmente marca la diferencia es la parte humana, lo que llamamos «habilidades blandas». Esto significa ser sincero, humilde para pedir y prestar ayuda, honesto, puntual, agradable, comprometido con la compañía… ser un buen profesional. Ahí es donde se marca la diferencia, y por eso cada día intento mejorar en ese aspecto, en cómo me comporto y me comunico con mis compañeros y con mis superiores.',
+      'Trato de darles la importancia que se merecen a todas las habilidades no tan relacionadas con la programación y el desarrollo de software, sino más relacionadas con ser un buen profesional: lo que llamamos «habilidades blandas». La parte humana es cada vez más importante, y esto es algo en lo que no se puede mejorar simplemente usando IA.',
     ],
     en: [
       'Like many other developers, my training has been entirely self-taught: despite having studied industrial engineering, I focused on software development and put serious time into courses and personal projects.',
-      'Beyond the purely technical side, I am very aware that what really makes the difference is the human side — what we call “soft skills”. That means being sincere, humble enough to ask for help and to give it, honest, punctual, pleasant, committed to the company… being a good professional. That is where the difference is made, and that is why I try to get better at it every day, at how I behave and how I communicate with my colleagues and with the people I report to.',
+      'I try to give the attention they deserve to all the skills that have less to do with programming and software development, and more to do with being a good professional: what we call “soft skills”. The human side matters more and more, and it is not something you can get better at just by using AI.',
     ],
   },
   photo: portrait,
@@ -152,12 +152,12 @@ export const experience: ExperienceEntry[] = [
     remote: false,
     summary: {
       es: [
-        'Ahora forma parte de ABB Robotics, quien ha comprado la compañía. Cuando yo trabajaba en ASTI, la empresa diseñaba y fabricaba robots de transporte autónomos, técnicamente conocidos como AGVs (Automated Guided Vehicles / vehículos de guiado automático). Esto es: carretillas con uñas, elevadores, trenes de basuras… vehículos que se ven en una fábrica, entre las distintas cadenas de montaje, para optimizar la logística y la producción.',
-        'Este fue mi primer empleo como desarrollador de software, y tengo la impresión de que lo que destacaba en mi CV por aquel entonces fue haber ganado el concurso de robots que celebraba la Universidad de Vigo. Fui responsable junior en el departamento de IT, a cargo de la programación de vehículos de guiado automático (AGVs): definir el esquema funcional con el cliente, desarrollar la solución integral de automatización de la planta y hacer la puesta en marcha allí mismo.',
+        'Programación de vehículos de guiado automático o AGV (Automated Guided Vehicles). Mi primer empleo como desarrollador. Programación de carretillas con uñas, remolques, elevadores, trenes de basuras y cualquier vehículo que transporta producto final, utillaje, residuo, etc. en un espacio de fabricación industrial, para automatizar y optimizar la logística y la producción.',
+        'Mis tareas eran definir el esquema funcional con el cliente, desarrollar la solución integral de automatización de la planta y hacer la puesta en marcha. En una ocasión viajé a México para instalar 3 AGVs en el cliente Schneider Electric.',
       ],
       en: [
-        'It is now part of ABB Robotics, which bought the company. When I worked at ASTI, it designed and built autonomous transport robots, technically known as AGVs (Automated Guided Vehicles). That is: fork trucks, lifters, waste trains… the vehicles you see in a factory, moving between assembly lines to optimise logistics and production.',
-        'This was my first job as a software developer, and my impression is that what stood out in my CV back then was having won the robotics contest held by the University of Vigo. I was junior lead in the IT department, in charge of programming automated guided vehicles (AGVs): defining the functional design with the client, building the plant-wide automation solution, and commissioning it on site.',
+        'AGV programming. My first job as a developer. Programming fork trucks, trailers, lifters, waste trains and any vehicle that moves finished product, tooling, waste and so on around an industrial manufacturing floor, to automate and optimise logistics and production.',
+        'My tasks were defining the functional design with the client, building the plant-wide automation solution and commissioning it. On one occasion I travelled to Mexico to install 3 AGVs for the client Schneider Electric.',
       ],
     },
     stack: ['C#', '.NET', 'ASP.NET', 'ASP.NET Core', 'Visual Basic', 'SQL', 'JavaScript'],
