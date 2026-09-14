@@ -12,19 +12,13 @@
     "check": "npm run typecheck && npm run lint && prettier --check .",
     "format": "prettier --write .",
     "check:mobile": "node scripts/check-mobile.mjs",
-    "shots": "node scripts/record-project-heros.mjs",
-    "sync:sanity": "node scripts/sync-sanity.mjs"
+    "shots": "node scripts/record-project-heros.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.64",
     "@ai-sdk/react": "^4.0.96",
-    "@sanity/client": "^7.25.0",
-    "@sanity/image-url": "^2.1.1",
-    "@sanity/orderable-document-list": "^2.0.17",
-    "@sanity/vision": "^6.6.0",
     "ai": "^7.0.93",
     "next": "^16.2.11",
-    "next-sanity": "^13.2.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "styled-components": "^6.4.4",
@@ -39,7 +33,6 @@
     "eslint-config-next": "^16.2.11",
     "playwright-core": "^1.62.0",
     "prettier": "^3.9.6",
-    "sanity": "^6.6.0",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2"
   }

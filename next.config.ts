@@ -12,8 +12,6 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   poweredByHeader: false,
   images: {
-    loader: 'custom',
-    loaderFile: './sanity/imageLoader.ts',
     deviceSizes: [420, 640, 828, 1200, 1600, 2048],
     qualities: [75, 85],
   },

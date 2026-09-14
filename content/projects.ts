@@ -549,8 +549,8 @@ const sheets: ProjectSheet[] = [
     },
     highlights: [
       {
-        es: 'Contenido de doble fuente: el repositorio es el suelo y el panel de Sanity manda cuando tiene documentos, así que la web se clona y se despliega sin credenciales de nada y el CV sale completo. Un portfolio es el sitio donde uno no quiere depender de un servicio externo para existir.',
-        en: 'Two content sources with one rule: the repository is the floor and the Sanity panel wins when it has documents, so the site can be cloned and deployed with no credentials at all and the CV still comes out complete. A portfolio is the last place to depend on an external service to exist.',
+        es: 'Todo el contenido vive en el repositorio, tipado y validado en TypeScript: la web se clona y se despliega sin credenciales de nada y el CV sale completo. Un portfolio es el sitio donde uno no quiere depender de un servicio externo para existir.',
+        en: 'All the content lives in the repository, typed and validated in TypeScript: the site can be cloned and deployed with no credentials at all and the CV still comes out complete. A portfolio is the last place to depend on an external service to exist.',
       },
       {
         es: 'Los dos fondos están dibujados con código: un mosaico cinético en la primera pantalla y, en el resto del sitio, una retícula de hasta tres mil nodos en un canvas que se aparta y se enciende bajo el puntero. Sin una sola dependencia añadida.',
@@ -565,7 +565,7 @@ const sheets: ProjectSheet[] = [
         en: 'Mobile verification is part of the work rather than an eyeball check: 21 assertions in a real Chrome at 390×844 per language, covering horizontal overflow, 24 px touch targets and the two navigations not sharing an accessible name.',
       },
     ],
-    stack: ['Next.js 16', 'TypeScript', 'Tailwind CSS 4', 'Sanity', 'zod', 'Playwright', 'Vercel'],
+    stack: ['Next.js 16', 'TypeScript', 'Tailwind CSS 4', 'zod', 'Playwright', 'Vercel'],
     liveUrl: 'https://luisfernandezsangil.vercel.app',
     repoUrl: 'https://github.com/luisfdzs/Portfolio',
     image: {

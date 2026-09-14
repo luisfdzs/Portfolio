@@ -101,7 +101,7 @@ const es = {
   },
 
   footer: {
-    builtWith: 'Construido con Next.js, Sanity y Tailwind CSS. Desplegado en Vercel.',
+    builtWith: 'Construido con Next.js y Tailwind CSS. Desplegado en Vercel.',
     sourceCode: 'Código de esta web',
     rights: 'Todos los derechos reservados.',
   },
@@ -236,7 +236,7 @@ const en: Dictionary = {
   },
 
   footer: {
-    builtWith: 'Built with Next.js, Sanity and Tailwind CSS. Deployed on Vercel.',
+    builtWith: 'Built with Next.js and Tailwind CSS. Deployed on Vercel.',
     sourceCode: 'Source of this site',
     rights: 'All rights reserved.',
   },
