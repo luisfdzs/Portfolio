@@ -15,6 +15,7 @@ import { About } from '@/components/sections/About'
 import { Education } from '@/components/sections/Education'
 import { Experience } from '@/components/sections/Experience'
 import { Hero } from '@/components/sections/Hero'
+import { Lab } from '@/components/sections/Lab'
 import { Projects } from '@/components/sections/Projects'
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
@@ -82,6 +83,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <Experience locale={locale} entries={experience} />
       <Education locale={locale} entries={education} />
       <About locale={locale} profile={profile} />
+      <Lab locale={locale} />
     </>
   )
 }

@@ -113,6 +113,16 @@ export function Layers(props: IconProps) {
   )
 }
 
+export function Cube(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="m12 3 8 4.6v9.8l-8 4.6-8-4.6V7.6z" />
+      <path d="M4 7.6 12 12l8-4.4" />
+      <path d="M12 12v9" />
+    </Icon>
+  )
+}
+
 export function Mail(props: IconProps) {
   return (
     <Icon {...props}>

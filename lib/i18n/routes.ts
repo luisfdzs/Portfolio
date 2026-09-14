@@ -12,6 +12,7 @@ export const sections = {
   education: 'education',
   about: 'about',
   contact: 'contact',
+  lab: 'lab',
 } as const
 
 export type RouteKey = keyof typeof routes

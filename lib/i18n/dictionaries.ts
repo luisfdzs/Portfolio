@@ -100,6 +100,11 @@ const es = {
     copied: 'Copiado',
   },
 
+  lab: {
+    title: 'Laboratorio',
+    kicker: 'Un rincón para experimentar',
+  },
+
   footer: {
     builtWith: 'Construido con Next.js, Sanity y Tailwind CSS. Desplegado en Vercel.',
     sourceCode: 'Código de esta web',
@@ -233,6 +238,11 @@ const en: Dictionary = {
     locationLabel: 'Location',
     copyEmail: 'Copy email',
     copied: 'Copied',
+  },
+
+  lab: {
+    title: 'Lab',
+    kicker: 'A corner to experiment',
   },
 
   footer: {
