@@ -19,11 +19,6 @@ const icons = {
 
 const PANEL_ID = 'mobile-menu'
 
-const slotClass =
-  'relative flex flex-1 items-center justify-center text-signal transition-opacity duration-500'
-
-const markClass = 'flex size-11 items-center justify-center rounded-full transition-colors duration-500'
-
 export function MobileNav({ locale }: { locale: Locale }) {
   const t = getDictionary(locale)
   const [open, setOpen] = useState(false)
@@ -90,10 +85,8 @@ export function MobileNav({ locale }: { locale: Locale }) {
         data-print="hide"
         aria-label={t.a11y.mobileNavigation}
         className={cn(
-          'fixed inset-x-nav-mobile-air z-50 flex h-nav-mobile-bar items-stretch',
-          'bottom-[calc(var(--spacing-nav-mobile-air)+env(safe-area-inset-bottom))]',
-          'rounded-full border border-line-strong bg-ink-float/95 shadow-lg shadow-ink/70',
-          'backdrop-blur-lg lg:hidden',
+          'nav-slab fixed inset-x-nav-mobile-air z-50 h-nav-mobile-bar',
+          'bottom-[calc(var(--spacing-nav-mobile-air)+env(safe-area-inset-bottom))] lg:hidden',
         )}
       >
         {mobileNavigation.map((key) => {
@@ -109,10 +102,10 @@ export function MobileNav({ locale }: { locale: Locale }) {
               }}
               aria-label={t.nav[key]}
               aria-current={current ? 'location' : undefined}
-              className={cn(slotClass, current ? 'opacity-100' : 'opacity-55 hover:opacity-80')}
+              className="social-key nav-key"
             >
-              <span className={cn(markClass, current && 'bg-signal/12')}>
-                <Icon className="size-5" />
+              <span className="social-key__face">
+                <Icon className="social-key__icon" />
               </span>
             </Link>
           )
@@ -126,10 +119,14 @@ export function MobileNav({ locale }: { locale: Locale }) {
           }}
           aria-expanded={chat.open}
           aria-label={chat.open ? t.chat.close : t.chat.open}
-          className={cn(slotClass, chat.open ? 'opacity-100' : 'opacity-55 hover:opacity-80')}
+          className="social-key nav-key"
         >
-          <span className={cn(markClass, chat.open && 'bg-signal/12')}>
-            {chat.open ? <Close className="size-5" /> : <Chat className="size-5" />}
+          <span className="social-key__face">
+            {chat.open ? (
+              <Close className="social-key__icon" />
+            ) : (
+              <Chat className="social-key__icon" />
+            )}
           </span>
         </button>
 
@@ -142,10 +139,10 @@ export function MobileNav({ locale }: { locale: Locale }) {
           aria-expanded={open}
           aria-controls={PANEL_ID}
           aria-label={open ? t.a11y.closeMenu : t.a11y.menu}
-          className={cn(slotClass, open ? 'opacity-100' : 'opacity-55 hover:opacity-80')}
+          className="social-key nav-key"
         >
-          <span className={cn(markClass, open && 'bg-signal/12')}>
-            {open ? <Close className="size-5" /> : <Menu className="size-5" />}
+          <span className="social-key__face">
+            {open ? <Close className="social-key__icon" /> : <Menu className="social-key__icon" />}
           </span>
         </button>
       </nav>

@@ -20,6 +20,12 @@ vec3 rotateX(vec3 p, float a) {
   float s = sin(a);
   return vec3(p.x, c * p.y - s * p.z, s * p.y + c * p.z);
 }
+
+vec3 rotateZ(vec3 p, float a) {
+  float c = cos(a);
+  float s = sin(a);
+  return vec3(c * p.x - s * p.y, s * p.x + c * p.y, p.z);
+}
 `
 
 const CHOREOGRAPHY = `
@@ -36,13 +42,18 @@ uniform float uStreak;
 uniform float uIntro;
 uniform float uHover;
 uniform float uWall;
+uniform vec2 uPointer;
+uniform float uSpin;
 attribute vec3 aBeam;
 attribute vec3 aGlobe;
 attribute vec3 aName;
 attribute vec4 aSeed;
 attribute vec4 aTone;
+attribute vec4 aPart;
 varying vec3 vColor;
 varying float vAlpha;
+float gFacing;
+float gComet;
 
 const vec3 GOLD = vec3(0.878, 0.643, 0.345);
 const vec3 CREAM = vec3(0.953, 0.890, 0.765);
@@ -70,11 +81,36 @@ float phase(float t, float start, float span, float delay) {
   return clamp((t - start - delay * span * 0.55) / (span * 0.45), 0.0, 1.0);
 }
 
+vec3 sculpt(float t) {
+  vec3 p = position;
+  gFacing = 1.0;
+  gComet = 0.0;
+  if (aPart.x > 0.5) {
+    float first = step(aPart.x, 1.5);
+    float dir = mix(-1.0, 1.0, first);
+    float a = aPart.y + uSpin * mix(0.7, 1.0, first) * dir;
+    float r = aPart.z * (1.0 + 0.07 * uHover);
+    p = vec3(cos(a) * r, sin(a) * r, position.z);
+    p = first > 0.5 ? rotateX(p, 1.2) : rotateZ(rotateX(p, -1.3), 0.15);
+    gFacing = mix(0.25, 1.0, smoothstep(-r * 0.6, r * 0.6, p.z));
+    float head = uWall * mix(1.2, 1.7, first) * dir;
+    float behind = fract(dir * (head - a) / 6.28318);
+    gComet = exp(-behind * 9.0);
+  } else {
+    p.z += aPart.w * uHover;
+  }
+  float press = smoothstep(0.6, 0.7, t);
+  p.z *= 1.0 - 0.8 * press;
+  float rx = 0.12 - uPointer.y * 0.32 + sin(uWall * 0.41) * 0.05;
+  float ry = uPointer.x * 0.45 + sin(uWall * 0.53) * 0.12;
+  return rotateY(rotateX(p, rx), ry);
+}
+
 vec3 choreograph(float t, out float k1, out float k2, out float k3, out float speed) {
   float role = aTone.w;
   float along = -aBeam.z / uBeamLength;
 
-  vec3 button = position;
+  vec3 button = sculpt(t);
   float idle = 1.0 - step(0.6001, t);
   button.xy *= 1.0 + 0.045 * uHover * idle;
   button += vec3(sin(uWall * 1.7 + aSeed.x * 30.0), cos(uWall * 1.3 + aSeed.y * 30.0), 0.0)
@@ -150,7 +186,7 @@ vec3 tint(float k1, float k2, float k3, float speed) {
   float flash = exp(-pow((uTime - 0.88) / 0.07, 2.0));
   float ember = (1.0 - clamp((uTime - 0.88) / 0.6, 0.0, 1.0)) * step(0.88, uTime);
   vec3 code = mix(GOLD, CREAM, aTone.x)
-    + HOT * (shimmer * 0.6 + uHover * idle * 0.3 + flash * 0.9 + ember * 0.35);
+    + HOT * (shimmer * 0.6 + uHover * idle * 0.35 + flash * 0.9 + ember * 0.35 + gComet * idle * 0.9);
   float core = 1.0 - clamp(length(aBeam.xy) / 1.1, 0.0, 1.0);
   vec3 beam = mix(GOLD, HOT, core * core * 0.7);
   float arc = step(0.0, aTone.y);
@@ -169,8 +205,10 @@ float opacity(float k1, float k2, float k3, float speed, float depth) {
   float role = aTone.w;
   float arc = step(0.0, aTone.y);
   float squeeze = clamp((uTime - 0.6) / 0.28, 0.0, 1.0) * (1.0 - step(0.88, uTime));
-  float code = (0.07 + 0.03 * uHover * (1.0 - step(0.6001, uTime))) * (1.0 - 0.93 * squeeze * squeeze)
-    + 0.3 * smoothstep(0.88, 1.3, uTime);
+  float idle = 1.0 - step(0.6001, uTime);
+  float breath = mix(1.0, 0.86 + 0.14 * sin(uWall * 2.1), idle);
+  float glow = (0.03 + 0.075 * aTone.x) * gFacing * breath + (0.03 * uHover + 0.2 * gComet * gFacing) * idle;
+  float code = glow * (1.0 - 0.93 * squeeze * squeeze) + 0.3 * smoothstep(0.88, 1.3, uTime);
   float beam = 0.3;
   float sea = step(aTone.y, -1.5);
   float surface = mix(mix(0.62, 0.16, sea), 0.8, arc);

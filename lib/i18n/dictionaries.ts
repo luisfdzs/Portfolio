@@ -25,7 +25,6 @@ const es = {
     launch: {
       start: 'Ejecutar git push y empezar la animación',
       hint: 'Pulsa para desplegar',
-      replay: 'Volver a reproducir',
       projects: 'Ver proyectos',
     },
   },
@@ -154,7 +153,6 @@ const en: Dictionary = {
     launch: {
       start: 'Run git push and start the animation',
       hint: 'Press to deploy',
-      replay: 'Play again',
       projects: 'See projects',
     },
   },

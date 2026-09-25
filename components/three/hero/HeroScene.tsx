@@ -149,6 +149,8 @@ function makeUniforms() {
     uHover: { value: 0 },
     uHold: { value: 0 },
     uWall: { value: 0 },
+    uPointer: { value: new Vector2() },
+    uSpin: { value: 0 },
     uSize: { value: 15 },
     uPixelRatio: { value: 1 },
   }
@@ -221,12 +223,16 @@ function drive(
   aberration: ChromaticAberrationEffect | null,
   wall: number,
   hover: boolean,
+  pointer: Vector2,
+  delta: number,
 ) {
   const speed = placeCamera(camera, t)
   const u = scene.uniforms
   u.uTime.value = t
   u.uWall.value = wall
   u.uHover.value += ((hover ? 1 : 0) - u.uHover.value) * 0.12
+  u.uPointer.value.lerp(pointer, 0.06)
+  u.uSpin.value += Math.min(delta, 1 / 20) * (0.35 + 1.6 * u.uHover.value)
   u.uGlobeRot.value = -1.25 + t * 0.07
   u.uCamVel.value.copy(speed)
   scene.streaks.visible = speed.length() > 2
@@ -244,7 +250,8 @@ function drive(
   scene.atmosphere.visible = halo > 0.001
   if (aberration) {
     const rush = Math.min(1, speed.length() / 40)
-    aberration.offset.set(0.0022 * rush, 0.0012 * rush)
+    const charge = u.uHover.value * (t < 0.61 ? 1 : 0)
+    aberration.offset.set(0.0022 * rush + 0.0014 * charge, 0.0012 * rush + 0.0006 * charge)
   }
 }
 
@@ -278,6 +285,8 @@ function Particles({
       aberration.current,
       state.clock.elapsedTime,
       clock.current.hover,
+      state.pointer,
+      delta,
     )
   })
 

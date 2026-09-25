@@ -78,77 +78,200 @@ function sampleText(lines: Line[], width: number, count: number) {
   return { points, tones }
 }
 
-function sampleButton(count: number) {
+const BUTTON_DEPTH = 0.07
+const TAU = Math.PI * 2
+
+function rimPoint(w: number, h: number, r: number): [number, number] {
+  const sx = w - 2 * r
+  const sy = h - 2 * r
+  const arc = (Math.PI / 2) * r
+  let d = Math.random() * (2 * sx + 2 * sy + 4 * arc)
+  if (d < sx) return [-sx / 2 + d, h / 2]
+  d -= sx
+  if (d < sx) return [-sx / 2 + d, -h / 2]
+  d -= sx
+  if (d < sy) return [w / 2, -sy / 2 + d]
+  d -= sy
+  if (d < sy) return [-w / 2, -sy / 2 + d]
+  d -= sy
+  const corner = Math.min(3, Math.floor(d / arc))
+  const angle = ((d - corner * arc) / arc + corner) * (Math.PI / 2)
+  const cx = corner === 0 || corner === 3 ? sx / 2 : -sx / 2
+  const cy = corner < 2 ? sy / 2 : -sy / 2
+  return [cx + Math.cos(angle) * r, cy + Math.sin(angle) * r]
+}
+
+function facePoint(w: number, h: number, r: number): [number, number] {
+  for (;;) {
+    const x = (Math.random() - 0.5) * w
+    const y = Math.round(((Math.random() - 0.5) * h) / 0.03) * 0.03
+    const dx = Math.max(0, Math.abs(x) - (w / 2 - r))
+    const dy = Math.max(0, Math.abs(y) - (h / 2 - r))
+    if (Math.abs(y) < h / 2 && dx * dx + dy * dy <= r * r) return [x, y]
+  }
+}
+
+function bracketPoint(w: number, h: number, arm: number): [number, number] {
+  const sx = Math.random() < 0.5 ? -1 : 1
+  const sy = Math.random() < 0.5 ? -1 : 1
+  const along = Math.random() * arm
+  return Math.random() < 0.5
+    ? [sx * (w / 2 - along), sy * (h / 2)]
+    : [sx * (w / 2), sy * (h / 2 - along)]
+}
+
+function dashedAngle(dashes: number, fill: number) {
+  for (;;) {
+    const angle = Math.random() * TAU
+    if (((angle / TAU) * dashes) % 1 < fill) return angle
+  }
+}
+
+function glyphHits(draw: (context: CanvasRenderingContext2D) => void) {
   const canvasWidth = 2400
   const canvasHeight = 900
   const canvas = document.createElement('canvas')
   canvas.width = canvasWidth
   canvas.height = canvasHeight
   const context = canvas.getContext('2d', { willReadFrequently: true })
-  const points = new Float32Array(count * 3)
-  const tones = new Float32Array(count)
-  if (!context) return { points, tones }
-  const family = monoFamily()
-  const layers: { tone: number; draw: () => void }[] = [
-    {
-      tone: 0.15,
-      draw: () => {
-        context.lineWidth = 14
-        context.beginPath()
-        context.roundRect(300, 250, 1800, 400, 110)
-        context.stroke()
-        context.lineWidth = 9
-        context.beginPath()
-        context.roundRect(1640, 335, 290, 230, 44)
-        context.stroke()
-      },
-    },
-    {
-      tone: 1,
-      draw: () => {
-        context.font = `500 190px ${family}`
-        context.textAlign = 'center'
-        context.textBaseline = 'middle'
-        context.fillText('git push', 1000, 455)
-      },
-    },
-    {
-      tone: 0.55,
-      draw: () => {
-        context.font = `500 170px ${family}`
-        context.textAlign = 'center'
-        context.textBaseline = 'middle'
-        context.fillText('↵', 1785, 460)
-      },
-    },
-  ]
   const hits: number[] = []
-  const hitTones: number[] = []
-  for (const layer of layers) {
-    context.clearRect(0, 0, canvasWidth, canvasHeight)
-    context.fillStyle = '#fff'
-    context.strokeStyle = '#fff'
-    layer.draw()
-    const { data } = context.getImageData(0, 0, canvasWidth, canvasHeight)
-    for (let y = 0; y < canvasHeight; y += 2) {
-      for (let x = 0; x < canvasWidth; x += 2) {
-        if ((data[(y * canvasWidth + x) * 4 + 3] ?? 0) > 120) {
-          hits.push(x - canvasWidth / 2, canvasHeight / 2 - y)
-          hitTones.push(layer.tone)
-        }
+  if (!context) return hits
+  const scale = BUTTON_WIDTH / 1800
+  context.fillStyle = '#fff'
+  context.textAlign = 'center'
+  context.textBaseline = 'middle'
+  draw(context)
+  const { data } = context.getImageData(0, 0, canvasWidth, canvasHeight)
+  for (let y = 0; y < canvasHeight; y += 2) {
+    for (let x = 0; x < canvasWidth; x += 2) {
+      if ((data[(y * canvasWidth + x) * 4 + 3] ?? 0) > 120) {
+        hits.push((x - canvasWidth / 2) * scale, (canvasHeight / 2 - y) * scale)
       }
     }
   }
-  const scale = BUTTON_WIDTH / 1800
-  const total = hits.length / 2
-  for (let i = 0; i < count; i++) {
-    const pick = Math.floor(Math.random() * total)
-    points[i * 3] = ((hits[pick * 2] ?? 0) + (Math.random() - 0.5) * 2) * scale
-    points[i * 3 + 1] = ((hits[pick * 2 + 1] ?? 0) + (Math.random() - 0.5) * 2) * scale
-    points[i * 3 + 2] = (Math.random() - 0.5) * 0.02
-    tones[i] = hitTones[pick] ?? 0
+  return hits
+}
+
+function pickHit(hits: number[]): [number, number] {
+  const pick = Math.floor(Math.random() * (hits.length / 2))
+  const jitter = BUTTON_WIDTH / 1800
+  return [
+    (hits[pick * 2] ?? 0) + (Math.random() - 0.5) * 2 * jitter,
+    (hits[pick * 2 + 1] ?? 0) + (Math.random() - 0.5) * 2 * jitter,
+  ]
+}
+
+type ButtonPart = {
+  share: number
+  tone: number
+  push: number
+  ring?: 1 | 2
+  point: () => [number, number, number]
+}
+
+function sampleButton(count: number, portrait: boolean) {
+  const points = new Float32Array(count * 3)
+  const tones = new Float32Array(count)
+  const parts = new Float32Array(count * 4)
+  const family = monoFamily()
+  const fit = portrait ? 0.85 : 1
+  const w = BUTTON_WIDTH
+  const h = w * (400 / 1800)
+  const r = w * (110 / 1800)
+  const d = BUTTON_DEPTH
+  const lift = 0.035
+  const key = { x: w * (585 / 1800), w: w * (290 / 1800), h: w * (230 / 1800), r: w * (44 / 1800) }
+  const keyTop = d + 0.06
+  const text = glyphHits((context) => {
+    context.font = `500 190px ${family}`
+    context.fillText('git push', 1000, 455)
+  })
+  const glyph = glyphHits((context) => {
+    context.font = `500 170px ${family}`
+    context.fillText('↵', 1785, 460)
+  })
+  const between = (from: number, to: number) => from + Math.random() * (to - from)
+  const on = (xy: [number, number], z: number): [number, number, number] => [xy[0], xy[1], z]
+  const keyRim = () => {
+    const [x, y] = rimPoint(key.w, key.h, key.r)
+    return [x + key.x, y] as [number, number]
   }
-  return { points, tones }
+
+  const layout: ButtonPart[] = [
+    { share: 0.26, tone: 1, push: 0.07, point: () => on(pickHit(text), d + lift) },
+    { share: 0.09, tone: 0.45, push: 0.07, point: () => on(pickHit(text), between(d, d + lift)) },
+    { share: 0.04, tone: 0.85, push: 0.1, point: () => on(pickHit(glyph), keyTop) },
+    { share: 0.035, tone: 0.6, push: 0.1, point: () => on(keyRim(), keyTop) },
+    { share: 0.025, tone: 0.3, push: 0.1, point: () => on(keyRim(), between(d, keyTop)) },
+    { share: 0.11, tone: 0.55, push: 0, point: () => on(rimPoint(w, h, r), d) },
+    { share: 0.05, tone: 0.25, push: 0, point: () => on(rimPoint(w, h, r), -d) },
+    { share: 0.07, tone: 0.2, push: 0, point: () => on(rimPoint(w, h, r), between(-d, d)) },
+    { share: 0.05, tone: 0.08, push: 0, point: () => on(facePoint(w, h, r), d - 0.002) },
+    {
+      share: 0.04,
+      tone: 0.18,
+      push: -0.22,
+      point: () => on(rimPoint(w * 1.05, h * 1.12, r * 1.1), -d - 0.16),
+    },
+    {
+      share: 0.03,
+      tone: 0.1,
+      push: -0.5,
+      point: () => on(rimPoint(w * 1.1, h * 1.26, r * 1.2), -d - 0.34),
+    },
+    {
+      share: 0.025,
+      tone: 0.5,
+      push: 0.28,
+      point: () => on(bracketPoint(w + 0.16, h + 0.16, 0.12), d + 0.22),
+    },
+    {
+      share: 0.1,
+      tone: 0.4,
+      push: 0,
+      ring: 1,
+      point: () => [
+        dashedAngle(36, 0.62),
+        1.06 + (Math.random() - 0.5) * 0.014,
+        (Math.random() - 0.5) * 0.01,
+      ],
+    },
+    {
+      share: 0.06,
+      tone: 0.3,
+      push: 0,
+      ring: 2,
+      point: () => [
+        Math.random() * TAU,
+        1.15 + (Math.random() - 0.5) * 0.006,
+        (Math.random() - 0.5) * 0.006,
+      ],
+    },
+  ]
+  const total = layout.reduce((sum, part) => sum + part.share, 0)
+
+  for (let i = 0; i < count; i++) {
+    let roll = Math.random() * total
+    let part = layout[layout.length - 1]
+    for (const candidate of layout) {
+      roll -= candidate.share
+      if (roll <= 0) {
+        part = candidate
+        break
+      }
+    }
+    if (!part) continue
+    const [a, b, c] = part.point()
+    if (part.ring) {
+      points.set([Math.cos(a) * b * fit, Math.sin(a) * b * fit, c * fit], i * 3)
+      parts.set([part.ring, a, b * fit, 0], i * 4)
+    } else {
+      points.set([a * fit, b * fit, c * fit], i * 3)
+      parts.set([0, 0, 0, part.push * fit], i * 4)
+    }
+    tones[i] = part.tone
+  }
+  return { points, tones, parts }
 }
 
 function shuffled(points: Float32Array) {
@@ -194,7 +317,7 @@ export function buildGeometry(count: number, portrait: boolean) {
   const display =
     getComputedStyle(document.body).getPropertyValue('--font-display').trim() || 'serif'
 
-  const code = sampleButton(count)
+  const code = sampleButton(count, portrait)
 
   const nameLines: Line[] = portrait
     ? [
@@ -274,6 +397,7 @@ export function buildGeometry(count: number, portrait: boolean) {
   geometry.setAttribute('aName', new BufferAttribute(name.points, 3))
   geometry.setAttribute('aSeed', new BufferAttribute(seed, 4))
   geometry.setAttribute('aTone', new BufferAttribute(tone, 4))
+  geometry.setAttribute('aPart', new BufferAttribute(code.parts, 4))
   return geometry
 }
 
@@ -281,7 +405,7 @@ export function streakGeometry(source: BufferGeometry, share: number) {
   const total = source.getAttribute('position').count
   const count = Math.floor(total * share)
   const geometry = new BufferGeometry()
-  for (const name of ['position', 'aBeam', 'aGlobe', 'aName', 'aSeed', 'aTone']) {
+  for (const name of ['position', 'aBeam', 'aGlobe', 'aName', 'aSeed', 'aTone', 'aPart']) {
     const attribute = source.getAttribute(name) as BufferAttribute
     const size = attribute.itemSize
     const doubled = new Float32Array(count * 2 * size)

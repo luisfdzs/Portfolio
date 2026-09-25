@@ -14,14 +14,13 @@ const HeroScene = dynamic(
   { ssr: false },
 )
 
-const SETTLED = 10
+const SETTLED = 8.5
 const FIELD_FROM = 2
 const FIELD_TO = 3.6
 
 export type HeroLaunchCopy = {
   start: string
   hint: string
-  replay: string
   projects: string
 }
 
@@ -57,12 +56,6 @@ export function HeroLaunch({ copy, locale }: { copy: HeroLaunchCopy; locale: Loc
     setSettled(false)
   }
 
-  const reset = () => {
-    clock.current = { t: IDLE_AT, playing: false, hover: false }
-    setStarted(false)
-    setSettled(false)
-  }
-
   const hover = (value: boolean) => {
     clock.current.hover = value
   }
@@ -90,21 +83,21 @@ export function HeroLaunch({ copy, locale }: { copy: HeroLaunchCopy; locale: Loc
           aria-label={copy.start}
           className="h-[10vh] w-[40vh] cursor-pointer rounded-[2.5vh] outline-none focus-visible:ring-1 focus-visible:ring-signal/60 focus-visible:ring-offset-8 focus-visible:ring-offset-transparent"
         />
-        <p className="absolute top-[calc(50%+8vh)] font-mono text-[0.6875rem] tracking-[0.12em] text-paper-faint uppercase">
+        <p className="absolute top-[calc(50%+13vh)] font-mono text-[0.6875rem] tracking-[0.12em] text-paper-faint uppercase">
           {copy.hint}
         </p>
       </div>
       <div
         inert={!settled}
         className={cn(
-          'absolute inset-x-0 bottom-[max(2rem,5vh)] flex justify-center px-4',
+          'absolute inset-x-0 bottom-[max(4.5rem,13vh)] flex justify-center px-4 sm:bottom-[max(2rem,5vh)]',
           !settled && 'pointer-events-none',
         )}
       >
         <div
           className={cn(
             'flex items-center gap-6 font-mono text-small transition-opacity duration-1000',
-            settled ? 'opacity-100 delay-700' : 'opacity-0',
+            settled ? 'opacity-100 delay-100' : 'opacity-0',
           )}
         >
           <Link
@@ -114,14 +107,6 @@ export function HeroLaunch({ copy, locale }: { copy: HeroLaunchCopy; locale: Loc
             {copy.projects}
             <ArrowDown className="size-4" />
           </Link>
-          <button
-            type="button"
-            onClick={reset}
-            aria-label={copy.replay}
-            className="flex size-9 items-center justify-center rounded-full border border-line-strong text-paper-faint transition-colors hover:text-signal"
-          >
-            ↺
-          </button>
         </div>
       </div>
     </>
