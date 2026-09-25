@@ -216,7 +216,7 @@ export function buildGeometry(count: number, portrait: boolean) {
           y: -13,
         },
       ]
-  const name = sampleText(nameLines, portrait ? 5.2 : 10.5, count)
+  const name = sampleText(nameLines, portrait ? 5.2 * 0.75 : 10.5, count)
 
   const arcShare = 0
   const oceanShare = 0.12

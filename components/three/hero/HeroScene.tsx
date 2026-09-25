@@ -156,7 +156,9 @@ function makeUniforms() {
 
 function buildScene(count: number, portrait: boolean) {
   const geometry = buildGeometry(count, portrait)
+  const globeRadius = portrait ? GLOBE_RADIUS * 0.75 : GLOBE_RADIUS
   const uniforms = makeUniforms()
+  uniforms.uGlobeR.value = globeRadius
   const points = new Points(
     geometry,
     new ShaderMaterial({
@@ -193,11 +195,11 @@ function buildScene(count: number, portrait: boolean) {
   hold.frustumCulled = false
   hold.visible = false
   const occluder = new Mesh(
-    new SphereGeometry(GLOBE_RADIUS * 0.985, 64, 48),
+    new SphereGeometry(globeRadius * 0.985, 64, 48),
     new MeshBasicMaterial({ color: '#050506' }),
   )
   const atmosphere = new Mesh(
-    new SphereGeometry(GLOBE_RADIUS * 1.08, 64, 48),
+    new SphereGeometry(globeRadius * 1.08, 64, 48),
     atmosphereMaterial('#e0a458'),
   )
   occluder.position.copy(GLOBE_CENTER)
