@@ -22,17 +22,12 @@ const es = {
   },
 
   hero: {
-    greeting: 'Hola, soy',
-    availability: 'Analista programador senior en Mobile Smart City',
-    primaryCta: 'Ver proyectos',
-    secondaryCta: 'Hablemos',
-  },
-
-  stats: {
-    experience: 'Años de experiencia',
-    projects: 'Proyectos en producción',
-    clients: 'Empresas y clientes',
-    technologies: 'Tecnologías',
+    launch: {
+      start: 'Ejecutar git push y empezar la animación',
+      hint: 'Pulsa para desplegar',
+      replay: 'Volver a reproducir',
+      projects: 'Ver proyectos',
+    },
   },
 
   about: {
@@ -95,7 +90,6 @@ const es = {
     emailLabel: 'Correo',
     linkedinLabel: 'LinkedIn',
     githubLabel: 'GitHub',
-    locationLabel: 'Ubicación',
     copyEmail: 'Copiar el correo',
     copied: 'Copiado',
   },
@@ -157,17 +151,12 @@ const en: Dictionary = {
   },
 
   hero: {
-    greeting: "Hi, I'm",
-    availability: 'Senior developer/analyst at Mobile Smart City',
-    primaryCta: 'See projects',
-    secondaryCta: "Let's talk",
-  },
-
-  stats: {
-    experience: 'Years of experience',
-    projects: 'Projects in production',
-    clients: 'Companies and clients',
-    technologies: 'Technologies',
+    launch: {
+      start: 'Run git push and start the animation',
+      hint: 'Press to deploy',
+      replay: 'Play again',
+      projects: 'See projects',
+    },
   },
 
   about: {
@@ -230,7 +219,6 @@ const en: Dictionary = {
     emailLabel: 'Email',
     linkedinLabel: 'LinkedIn',
     githubLabel: 'GitHub',
-    locationLabel: 'Location',
     copyEmail: 'Copy email',
     copied: 'Copied',
   },

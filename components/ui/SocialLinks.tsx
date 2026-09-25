@@ -11,27 +11,34 @@ type Props = {
   className?: string
 }
 
-export function SocialLinks({ locale, profile, size = 'default', className }: Props) {
+export function socialLinks(locale: Locale, profile: Profile) {
   const t = getDictionary(locale)
-  const large = size === 'large'
 
-  const links = [
+  return [
     { href: profile.linkedin, label: t.contact.linkedinLabel, Icon: LinkedIn, external: true },
     { href: profile.github, label: t.contact.githubLabel, Icon: GitHub, external: true },
     { href: `mailto:${profile.email}`, label: t.contact.emailLabel, Icon: Mail, external: false },
-  ]
+  ].map((link) => ({
+    ...link,
+    ariaLabel: link.external ? `${link.label} (${t.a11y.externalLink})` : link.label,
+    attrs: link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {},
+  }))
+}
+
+export function SocialLinks({ locale, profile, size = 'default', className }: Props) {
+  const large = size === 'large'
 
   return (
     <ul
       data-print="hide"
       className={cn('flex items-center justify-center', large ? 'gap-3' : 'gap-1', className)}
     >
-      {links.map(({ href, label, Icon, external }) => (
+      {socialLinks(locale, profile).map(({ href, label, ariaLabel, attrs, Icon }) => (
         <li key={href}>
           <a
             href={href}
-            {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-            aria-label={external ? `${label} (${t.a11y.externalLink})` : label}
+            {...attrs}
+            aria-label={ariaLabel}
             title={label}
             className={cn(
               'flex items-center justify-center rounded-full text-paper-faint transition-colors duration-300 hover:text-signal',

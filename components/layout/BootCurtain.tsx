@@ -9,11 +9,9 @@ const FADE = 420
 
 const useBeforePaint = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
-const NO_SCRIPT = [
-  "html[data-boot='hold']{overflow:visible}",
-  '.boot-curtain{display:none}',
-  "html[data-boot='hold'] .hero-name,html[data-boot='hold'] .typed__char{animation-play-state:running}",
-].join('')
+const NO_SCRIPT = ["html[data-boot='hold']{overflow:visible}", '.boot-curtain{display:none}'].join(
+  '',
+)
 
 function paintedAbove() {
   const limit = window.innerHeight

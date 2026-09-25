@@ -13,7 +13,7 @@ export const portrait: DescribedImage = {
 export const profile: Profile = {
   name: 'Luis Fernández Sangil',
   headline: {
-    es: 'Ingeniero industrial y desarrollador web',
+    es: 'Ingeniero de software y sistemas',
     en: 'Industrial engineer and web developer',
   },
   location: {
@@ -49,12 +49,12 @@ export const experience: ExperienceEntry[] = [
     remote: true,
     summary: {
       es: [
-        'Mobile Smart City es «el Telpark de Estados Unidos». Es la empresa más grande para gestión de parkings, permisos anuales para zonas de aparcamiento, reservas de plaza en el aeropuerto, etc.',
-        'Dentro de la empresa, formando parte de la plantilla interna y sin la intermediación de consultoras externas, me ocupo del mantenimiento de proyectos legacy, añadir funcionalidades nuevas, realizar migraciones completas, resolver incidencias… un poco de todo.',
+        'Mobile Smart City es «el Telpark de Estados Unidos»: la empresa líder en gestión de parkings, permisos anuales para zonas de aparcamiento y reservas de plaza, entre otros servicios.',
+        'Desarrollo nuevas aplicaciones web para la gestión de aparcamiento, además de mantener proyectos legacy, resolver incidencias y realizar migraciones a tecnologías web más actuales.',
       ],
       en: [
-        'Mobile Smart City is “the Telpark of the United States”. It is the largest company for parking management, annual permits for parking zones, airport space reservations, and so on.',
-        'Inside the company, as part of the in-house team and with no external consultancy in between, I maintain legacy projects, add new features, run full migrations, resolve incidents… a bit of everything.',
+        'Mobile Smart City is “the Telpark of the United States”: the leading company for parking management, annual permits for parking zones and space reservations, among other services.',
+        'I develop new web applications for parking management, as well as maintaining legacy projects, resolving incidents and carrying out migrations to more current web technologies.',
       ],
     },
     stack: ['C#', '.NET', 'SQL', 'JavaScript', 'TypeScript', 'React'],
@@ -77,11 +77,11 @@ export const experience: ExperienceEntry[] = [
     summary: {
       es: [
         'Una consultora informática, dos clientes finales.',
-        'Mi trabajo era (la mayor parte del tiempo) resolver incidencias. Fui full-stack porque las incidencias eran a veces un problema de base de datos, otras veces del backend de la aplicación, de un servicio externo, del propio frontend, etc. Quien abría la incidencia no discriminaba el tipo de error, simplemente la reportaba al equipo de incidental.',
+        'Resolución de incidencias como labor principal, con un enfoque full-stack: el origen del problema podía estar en la base de datos, el backend de la aplicación, un servicio externo, el frontend, la configuración del entorno o, simplemente, en una duda de uso por parte del usuario.',
       ],
       en: [
         'An IT consultancy, two end clients.',
-        'My job was (most of the time) resolving incidents. I was full-stack because an incident could be a database problem, or the application backend, or an external service, or the frontend itself. Whoever opened the incident did not sort it by type of error, they simply reported it to the incident team.',
+        'Incident resolution as the main task, with a full-stack approach: the root cause could be the database, the application backend, an external service, the frontend, the environment configuration or, simply, a usage question from the user.',
       ],
     },
     stack: [
@@ -110,12 +110,12 @@ export const experience: ExperienceEntry[] = [
     remote: true,
     summary: {
       es: [
-        'Grupo de empresas especializado en ingeniería eléctrica, electrónica de potencia, automatización y energías renovables, con presencia internacional en numerosos sectores industriales.',
-        'Formé parte del equipo de desarrollo que mantenía los ERPs y las aplicaciones web de todo el grupo Ingeteam: incidencias, desarrollos nuevos y migraciones de proyectos legacy a tecnologías actuales.',
+        'Grupo de empresas especializado en ingeniería eléctrica, electrónica de potencia, automatización y energías renovables, con presencia internacional en múltiples sectores industriales.',
+        'Mantenimiento y evolución de los ERPs y aplicaciones web del grupo Ingeteam: resolución de incidencias, desarrollo de nuevas funcionalidades y migración de proyectos legacy a tecnologías actuales.',
       ],
       en: [
-        'A group of companies specialising in electrical engineering, power electronics, automation and renewable energy, with an international presence across many industrial sectors.',
-        'I was part of the development team that maintained the ERPs and web applications of the whole Ingeteam group: incidents, new development, and migrating legacy projects to current technologies.',
+        'A group of companies specialising in electrical engineering, power electronics, automation and renewable energy, with an international presence across multiple industrial sectors.',
+        'Maintenance and evolution of the ERPs and web applications of the Ingeteam group: incident resolution, development of new features and migration of legacy projects to current technologies.',
       ],
     },
     stack: [
@@ -152,12 +152,12 @@ export const experience: ExperienceEntry[] = [
     remote: false,
     summary: {
       es: [
-        'Programación de vehículos de guiado automático o AGV (Automated Guided Vehicles). Mi primer empleo como desarrollador. Programación de carretillas con uñas, remolques, elevadores, trenes de basuras y cualquier vehículo que transporta producto final, utillaje, residuo, etc. en un espacio de fabricación industrial, para automatizar y optimizar la logística y la producción.',
-        'Mis tareas eran definir el esquema funcional con el cliente, desarrollar la solución integral de automatización de la planta y hacer la puesta en marcha. En una ocasión viajé a México para instalar 3 AGVs en el cliente Schneider Electric.',
+        'Diseño y programación de sistemas de control para vehículos autónomos —carretillas, remolques, elevadores, etc.— destinados a transportar materiales, utillaje y residuos sin intervención humana en plantas de fabricación industrial, optimizando los sistemas de logística y producción.',
+        'Análisis funcional con el cliente, desarrollo de la solución de automatización y puesta en marcha en planta.',
       ],
       en: [
-        'AGV programming. My first job as a developer. Programming fork trucks, trailers, lifters, waste trains and any vehicle that moves finished product, tooling, waste and so on around an industrial manufacturing floor, to automate and optimise logistics and production.',
-        'My tasks were defining the functional design with the client, building the plant-wide automation solution and commissioning it. On one occasion I travelled to Mexico to install 3 AGVs for the client Schneider Electric.',
+        'Design and programming of control systems for autonomous vehicles —forklifts, trailers, lifts, etc.— intended to transport materials, tooling and waste without human intervention across industrial manufacturing plants, optimizing logistics and production systems.',
+        'Functional analysis with the client, development of the automation solution, and on-site commissioning.',
       ],
     },
     stack: ['C#', '.NET', 'ASP.NET', 'ASP.NET Core', 'Visual Basic', 'SQL', 'JavaScript'],
