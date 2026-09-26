@@ -2,18 +2,31 @@
 
 import { memo, useEffect, useRef, useState, type RefObject } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { AdditiveBlending, BufferAttribute, BufferGeometry, Points, ShaderMaterial } from 'three'
-import type { AgvModelKey } from './models'
+import {
+  AdditiveBlending,
+  BufferAttribute,
+  BufferGeometry,
+  Points,
+  ShaderMaterial,
+  Vector2,
+} from 'three'
+import type { ShowcaseModelKey } from './models'
 import type { AgvWorkerRequest, AgvWorkerResult } from './agv.worker'
+import { occluder } from './occluder'
 import { agvFragment, agvMorphVertex } from './shaders'
 
 type Shape = {
-  key: AgvModelKey
   shape: Float32Array
   normalGlow: Float32Array
+  endShape: Float32Array
+  endNormalGlow: Float32Array
   delay: Float32Array
   move: Float32Array
   lift: number
+  pivot: [number, number]
+  turn: number
+  spin: boolean
+  hold: boolean
 }
 
 type MorphState = { t: number; index: number; cycle: number }
@@ -30,6 +43,9 @@ const smooth = (t: number) => t * t * (3 - 2 * t)
 
 function toShape(data: AgvWorkerResult, count: number): Shape {
   const n = data.tone.length
+  const [px, py] = data.pivot
+  const c = Math.cos(data.turn)
+  const s = Math.sin(data.turn)
   let minX = Infinity
   let minY = Infinity
   let minZ = Infinity
@@ -46,8 +62,17 @@ function toShape(data: AgvWorkerResult, count: number): Shape {
     maxY = Math.max(maxY, y)
     minZ = Math.min(minZ, z)
     maxZ = Math.max(maxZ, z)
+    if ((data.move[i] ?? 0) > 3.5) {
+      const tx = px + c * (x - px) - s * (y - py)
+      const ty = py + s * (x - px) + c * (y - py)
+      minX = Math.min(minX, tx)
+      maxX = Math.max(maxX, tx)
+      minY = Math.min(minY, ty)
+      maxY = Math.max(maxY, ty)
+    }
   }
-  const size = FIT / Math.max(Math.hypot(maxX - minX, maxZ - minZ), (maxY - minY) * 1.2)
+  const size =
+    (FIT * data.fit) / Math.max(Math.hypot(maxX - minX, maxZ - minZ), (maxY - minY) * 1.2)
   const cx = (minX + maxX) / 2
   const cy = (minY + maxY) / 2
   const cz = (minZ + maxZ) / 2
@@ -85,7 +110,35 @@ function toShape(data: AgvWorkerResult, count: number): Shape {
     move[i] = data.move[j] ?? 0
     delay[i] = Math.min(1, ((y - minY) / (maxY - minY || 1)) * 0.75 + Math.random() * 0.2)
   }
-  return { key: data.key, shape, normalGlow, delay, move, lift: data.lift * size }
+  const pivot: [number, number] = [(px - cx) * size, (py - cy) * size]
+  const endShape = shape.slice()
+  const endNormalGlow = normalGlow.slice()
+  if (data.hold) {
+    for (let i = 0; i < count; i++) {
+      if ((move[i] ?? 0) < 3.5) continue
+      const x = (shape[i * 4] ?? 0) - pivot[0]
+      const y = (shape[i * 4 + 1] ?? 0) - pivot[1]
+      endShape[i * 4] = pivot[0] + c * x - s * y
+      endShape[i * 4 + 1] = pivot[1] + s * x + c * y
+      const nx = normalGlow[i * 4] ?? 0
+      const ny = normalGlow[i * 4 + 1] ?? 0
+      endNormalGlow[i * 4] = c * nx - s * ny
+      endNormalGlow[i * 4 + 1] = s * nx + c * ny
+    }
+  }
+  return {
+    shape,
+    normalGlow,
+    endShape,
+    endNormalGlow,
+    delay,
+    move,
+    lift: data.lift * size,
+    pivot,
+    turn: data.turn,
+    spin: data.spin,
+    hold: data.hold,
+  }
 }
 
 function buildMorph(count: number) {
@@ -127,9 +180,13 @@ function buildMorph(count: number) {
       uMorph: { value: 1 },
       uLift: { value: 0 },
       uLiftRatio: { value: 0 },
+      uPivot: { value: new Vector2() },
+      uTurn: { value: 0 },
       uTime: { value: 0 },
       uSize: { value: 7 },
       uPixelRatio: { value: 1 },
+      uBias: { value: 0.035 },
+      uOcclude: { value: count < 40000 ? 4 : 3 },
     },
     vertexShader: agvMorphVertex,
     fragmentShader: agvFragment,
@@ -139,7 +196,9 @@ function buildMorph(count: number) {
   })
   const points = new Points(geometry, material)
   points.frustumCulled = false
-  return { points, geometry, material }
+  const depth = occluder(geometry, material)
+  points.add(depth.points)
+  return { points, geometry, material, depth: depth.material }
 }
 
 type Morph = ReturnType<typeof buildMorph>
@@ -152,8 +211,8 @@ function write(morph: Morph, name: string, values: Float32Array) {
 }
 
 function show(morph: Morph, from: Shape, to: Shape) {
-  write(morph, 'aFrom', from.shape)
-  write(morph, 'aFromNormalGlow', from.normalGlow)
+  write(morph, 'aFrom', from.endShape)
+  write(morph, 'aFromNormalGlow', from.endNormalGlow)
   write(morph, 'aShape', to.shape)
   write(morph, 'aNormalGlow', to.normalGlow)
   write(morph, 'aDelay', to.delay)
@@ -168,7 +227,6 @@ function advance(
   delta: number,
   pixelRatio: number,
   still: boolean,
-  onShow: (key: AgvModelKey) => void,
 ) {
   const step = Math.min(delta, 1 / 20)
   const u = morph.material.uniforms
@@ -183,7 +241,6 @@ function advance(
     show(morph, first, first)
     state.index = 0
     state.t = still ? FORM_TO : 0
-    onShow(first.key)
   }
 
   if (!still) {
@@ -201,7 +258,6 @@ function advance(
     if (current && next && target !== state.index) {
       state.index = target
       show(morph, current, next)
-      onShow(next.key)
       state.cycle = -MORPH
     } else {
       state.cycle = 0
@@ -214,9 +270,14 @@ function advance(
   if (u.uForm) u.uForm.value = ramp(t, FORM_FROM, FORM_TO)
   if (u.uMorph) u.uMorph.value = state.cycle < 0 ? 1 + state.cycle / MORPH : 1
   if (u.uLift) {
-    const raise = smooth(ramp(state.cycle, 0.5, 1.7)) * (1 - smooth(ramp(state.cycle, 3.1, 4.3)))
-    u.uLift.value = (shapes[state.index]?.lift ?? 0) * raise
+    const shape = shapes[state.index]
+    const lower = shape?.hold ? 0 : smooth(ramp(state.cycle, 3.1, 4.3))
+    const raise = state.cycle < 0 ? 0 : smooth(ramp(state.cycle, 0.5, 1.7)) * (1 - lower)
+    u.uLift.value = (shape?.lift ?? 0) * raise
     if (u.uLiftRatio) u.uLiftRatio.value = raise
+    const sweep = shape?.spin ? smooth(ramp(state.cycle, 0.2, HOLD - 0.2)) : raise
+    if (u.uTurn) u.uTurn.value = (shape?.turn ?? 0) * sweep
+    if (shape && u.uPivot?.value instanceof Vector2) u.uPivot.value.set(...shape.pivot)
   }
 }
 
@@ -225,13 +286,11 @@ function Scene({
   shapes,
   total,
   still,
-  onShow,
 }: {
   count: number
   shapes: RefObject<Shape[]>
   total: number
   still: boolean
-  onShow: (key: AgvModelKey) => void
 }) {
   const [morph] = useState(() => buildMorph(count))
   const state = useRef<MorphState>({ t: 0, index: -1, cycle: 0 })
@@ -240,12 +299,13 @@ function Scene({
     () => () => {
       morph.geometry.dispose()
       morph.material.dispose()
+      morph.depth.dispose()
     },
     [morph],
   )
 
   useFrame((frame, delta) =>
-    advance(morph, state.current, shapes.current, total, delta, frame.viewport.dpr, still, onShow),
+    advance(morph, state.current, shapes.current, total, delta, frame.viewport.dpr, still),
   )
 
   return <primitive object={morph.points} />
@@ -255,15 +315,13 @@ export const AgvMorph = memo(function AgvMorph({
   keys,
   active,
   still,
-  onShow,
 }: {
-  keys: AgvModelKey[]
+  keys: ShowcaseModelKey[]
   active: boolean
   still: boolean
-  onShow: (key: AgvModelKey) => void
 }) {
   const shapes = useRef<Shape[]>([])
-  const [count] = useState(() => (window.innerWidth < 1280 ? 22000 : 60000))
+  const [count] = useState(() => (window.innerWidth < 1280 ? 32000 : 90000))
 
   useEffect(() => {
     const worker = new Worker(new URL('./agv.worker.ts', import.meta.url), { type: 'module' })
@@ -271,7 +329,7 @@ export const AgvMorph = memo(function AgvMorph({
     worker.onmessage = (event: MessageEvent<AgvWorkerResult>) => {
       list.push(toShape(event.data, count))
     }
-    const request: AgvWorkerRequest = { keys, scale: count < 30000 ? 0.3 : 0.75 }
+    const request: AgvWorkerRequest = { keys, scale: count < 40000 ? 0.35 : 0.9 }
     worker.postMessage(request)
     return () => {
       worker.terminate()
@@ -286,7 +344,7 @@ export const AgvMorph = memo(function AgvMorph({
       dpr={[1, 2]}
       gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
     >
-      <Scene count={count} shapes={shapes} total={keys.length} still={still} onShow={onShow} />
+      <Scene count={count} shapes={shapes} total={keys.length} still={still} />
     </Canvas>
   )
 })

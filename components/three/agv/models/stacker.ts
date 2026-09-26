@@ -1,4 +1,13 @@
-import { SpecBuilder, band, cyl, rbox, tube, withEdges, type AgvSpec } from '../geometry'
+import {
+  SpecBuilder,
+  band,
+  cyl,
+  rbox,
+  tube,
+  withEdges,
+  showcaseSpec,
+  type AgvSpec,
+} from '../geometry'
 
 export function stacker(): AgvSpec {
   const b = new SpecBuilder()
@@ -63,9 +72,6 @@ export function stacker(): AgvSpec {
     b.add(shank, 300, withEdges(shank, 1.1, 1.5), { move: 2 })
     const blade = rbox(0.74, 0.14, z, 0.575, 0.025, 0.05, 0.008)
     b.add(blade, 900, withEdges(blade, 1.05, 1.5), { move: 2 })
-    const leg = rbox(0.72, 0.05, z, 0.56, 0.042, 0.065, 0.012)
-    b.add(leg, 1000, (x, y, pz) => (x > 1.24 ? 1.6 : withEdges(leg, 0.6, 1.8)(x, y, pz)))
-    b.add(cyl(1.18, 0.04, z, 0.038, 0.03, 'z'), 140, 1.2)
   }
 
   const cabinet = rbox(-0.05, 1.3, -0.45, 0.09, 0.16, 0.05, 0.01)
@@ -84,15 +90,5 @@ export function stacker(): AgvSpec {
   b.label('ASTI', -0.5, 0.36, 0.09, 0.405, 700)
   b.label('ASTI', -0.5, 0.36, 0.09, -0.405, 700)
 
-  return {
-    parts: b.parts,
-    labels: b.labels,
-    core: { x: 0.2, y: 1.1 },
-    spread: 0.9,
-    target: [0.15, 1.2, 0],
-    distance: 6.3,
-    portraitDistance: 10.4,
-    drive: 0.8,
-    lift: 0.85,
-  }
+  return showcaseSpec(b, { lift: 0.85 })
 }

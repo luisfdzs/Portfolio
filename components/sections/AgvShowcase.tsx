@@ -1,17 +1,15 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
 import { cn } from '@/lib/cn'
-import type { AgvModelKey } from '@/components/three/agv/models'
+import type { ShowcaseSet } from '@/content/types'
+import { showcaseSets } from '@/components/sections/showcases'
 
 const AgvMorph = dynamic(
   () => import('@/components/three/agv/AgvMorph').then((mod) => mod.AgvMorph),
   { ssr: false },
 )
-
-export type AgvShowcaseItem = { key: AgvModelKey; title: string; href: string }
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)'
 
@@ -24,24 +22,21 @@ function subscribe(callback: () => void) {
 const reducedMotion = () => window.matchMedia(REDUCED_MOTION).matches
 
 export function AgvShowcase({
-  items,
+  set,
   label,
-  openLabel,
   className,
   stageClassName,
 }: {
-  items: AgvShowcaseItem[]
+  set: ShowcaseSet
   label: string
-  openLabel: string
   className?: string
   stageClassName?: string
 }) {
   const root = useRef<HTMLDivElement>(null)
   const [near, setNear] = useState(false)
   const [active, setActive] = useState(false)
-  const [current, setCurrent] = useState<AgvModelKey | null>(null)
   const still = useSyncExternalStore(subscribe, reducedMotion, () => false)
-  const [keys] = useState(() => items.map((item) => item.key))
+  const keys = showcaseSets[set]
 
   useEffect(() => {
     const element = root.current
@@ -61,11 +56,13 @@ export function AgvShowcase({
     }
   }, [])
 
-  const onShow = useCallback((key: AgvModelKey) => setCurrent(key), [])
-  const shown = items.find((item) => item.key === current)
-
   return (
-    <figure ref={root} className={cn('flex flex-col items-center', className)}>
+    <div
+      ref={root}
+      role="img"
+      aria-label={label}
+      className={cn('flex flex-col items-center', className)}
+    >
       <div
         className={cn(
           'relative w-full [mask-image:radial-gradient(closest-side,black_86%,transparent)]',
@@ -73,18 +70,8 @@ export function AgvShowcase({
         )}
         aria-hidden="true"
       >
-        {near ? <AgvMorph keys={keys} active={active} still={still} onShow={onShow} /> : null}
+        {near ? <AgvMorph keys={keys} active={active} still={still} /> : null}
       </div>
-      <figcaption className="mt-2 min-h-5 text-center font-mono text-micro text-paper-faint">
-        <span className="sr-only">{label}: </span>
-        {shown ? (
-          <Link href={shown.href} className="transition-colors hover:text-signal">
-            {shown.title}
-            <span className="sr-only"> — {openLabel}</span>
-            <span aria-hidden="true"> ↗</span>
-          </Link>
-        ) : null}
-      </figcaption>
-    </figure>
+    </div>
   )
 }

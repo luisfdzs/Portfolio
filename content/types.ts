@@ -10,6 +10,8 @@ export type DescribedImage = {
   alt: Localized
 }
 
+export type ShowcaseSet = 'agv' | 'power' | 'devices' | 'parking' | 'campus'
+
 export type ExperienceClient = {
   name: string
   url?: string | null
@@ -26,7 +28,7 @@ export type ExperienceEntry = {
   summary: Localized<string[]>
   stack: string[]
   url?: string | null
-  showcase?: 'agv'
+  showcase?: ShowcaseSet
 }
 
 export type EducationEntry = {
@@ -37,6 +39,7 @@ export type EducationEntry = {
   location?: Localized | null
   note?: Localized<string[]> | null
   url?: string | null
+  showcase?: ShowcaseSet
 }
 
 export type SkillGroup = {

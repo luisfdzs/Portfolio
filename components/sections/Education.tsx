@@ -3,6 +3,7 @@ import type { EducationEntry } from '@/content/types'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
+import { AgvShowcase } from '@/components/sections/AgvShowcase'
 import { GraduationCap } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
@@ -52,6 +53,15 @@ export function Education({
                   </p>
                 ))}
               </div>
+            ) : null}
+
+            {entry.showcase ? (
+              <AgvShowcase
+                set={entry.showcase}
+                label={t.showcase.sets[entry.showcase]}
+                className="mt-8"
+                stageClassName="mx-auto h-72 max-w-2xl sm:h-96"
+              />
             ) : null}
           </Reveal>
         ))}

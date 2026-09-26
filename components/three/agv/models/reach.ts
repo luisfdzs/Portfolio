@@ -1,4 +1,14 @@
-import { SpecBuilder, band, bezier, cyl, rbox, tube, withEdges, type AgvSpec } from '../geometry'
+import {
+  SpecBuilder,
+  band,
+  bezier,
+  cyl,
+  rbox,
+  tube,
+  withEdges,
+  showcaseSpec,
+  type AgvSpec,
+} from '../geometry'
 
 export function reach(): AgvSpec {
   const b = new SpecBuilder()
@@ -94,15 +104,5 @@ export function reach(): AgvSpec {
   b.label('ASTI', -0.72, 0.85, 0.08, W + 0.004, 600)
   b.label('ASTI', -0.38, 0.85, 0.08, -W - 0.004, 600)
 
-  return {
-    parts: b.parts,
-    labels: b.labels,
-    core: { x: 0.1, y: 1.5 },
-    spread: 1.1,
-    target: [0.1, 1.75, 0],
-    distance: 9.4,
-    portraitDistance: 15,
-    drive: 0.8,
-    lift: 1.3,
-  }
+  return showcaseSpec(b, { lift: 1.3 })
 }

@@ -42,8 +42,16 @@ const es = {
     visitCompany: 'Sobre la empresa',
     visitClient: 'Sobre el cliente',
     stackLabel: 'Tecnologías',
-    agvShowcase: 'Modelos de AGV en partículas',
-    agvOpen: 'ver a pantalla completa',
+  },
+
+  showcase: {
+    sets: {
+      agv: 'Modelos de AGV en partículas',
+      power: 'Máquinas con electrónica de potencia en partículas',
+      devices: 'Dispositivos y servidores en partículas',
+      parking: 'Coche y barrera de parking en partículas',
+      campus: 'La Escola de Enxeñaría Industrial en partículas',
+    },
   },
 
   projects: {
@@ -115,42 +123,6 @@ const es = {
     error: 'No he podido responder. Inténtalo otra vez en un momento.',
   },
 
-  experiments: {
-    phases: {
-      core: 'Núcleo',
-      explode: 'Explosión',
-      assemble: 'Ensamblaje',
-    },
-    replay: 'Repetir',
-    pause: 'Pausa',
-    play: 'Reproducir',
-    scrub: 'Posición en la animación',
-    particles: '{count} partículas en el vehículo',
-    models: {
-      agv2: {
-        title: 'AGV de plataforma',
-        lead: 'Plataforma de carga pesada con mesa elevadora, escáneres de seguridad y parachoques.',
-        description:
-          'Experimento con three.js: un núcleo de partículas doradas estalla y ensambla un AGV de plataforma.',
-        work: 'Elevación',
-      },
-      agv4: {
-        title: 'Apilador autónomo',
-        lead: 'Apilador con mástil dúplex que avanza y eleva sus horquillas.',
-        description:
-          'Experimento con three.js: un núcleo de partículas doradas estalla y ensambla un apilador autónomo.',
-        work: 'Elevación',
-      },
-      agv5: {
-        title: 'Carretilla retráctil autónoma',
-        lead: 'Carretilla de mástil triple con brazo de sensores que eleva sus horquillas en altura.',
-        description:
-          'Experimento con three.js: un núcleo de partículas doradas estalla y ensambla una carretilla autónoma de mástil alto.',
-        work: 'Elevación',
-      },
-    },
-  },
-
   notFound: {
     title: 'Esta página no existe',
     lead: 'El enlace que has seguido apunta a algo que no está aquí. Puede que lo haya movido.',
@@ -208,8 +180,16 @@ const en: Dictionary = {
     visitCompany: 'About the company',
     visitClient: 'About the client',
     stackLabel: 'Technologies',
-    agvShowcase: 'AGV models in particles',
-    agvOpen: 'view full screen',
+  },
+
+  showcase: {
+    sets: {
+      agv: 'AGV models in particles',
+      power: 'Power electronics machines in particles',
+      devices: 'Devices and servers in particles',
+      parking: 'A car and a parking barrier in particles',
+      campus: 'The School of Industrial Engineering in particles',
+    },
   },
 
   projects: {
@@ -279,42 +259,6 @@ const en: Dictionary = {
     collapse: 'Shrink the chat',
     thinking: 'Thinking…',
     error: 'I could not answer. Try again in a moment.',
-  },
-
-  experiments: {
-    phases: {
-      core: 'Core',
-      explode: 'Burst',
-      assemble: 'Assembly',
-    },
-    replay: 'Replay',
-    pause: 'Pause',
-    play: 'Play',
-    scrub: 'Animation position',
-    particles: '{count} particles in the vehicle',
-    models: {
-      agv2: {
-        title: 'Platform AGV',
-        lead: 'A heavy-load platform with a lift table, safety scanners and bumpers.',
-        description:
-          'A three.js experiment: a core of golden particles bursts and assembles a platform AGV.',
-        work: 'Lifting',
-      },
-      agv4: {
-        title: 'Autonomous stacker',
-        lead: 'A duplex-mast stacker that drives forward and raises its forks.',
-        description:
-          'A three.js experiment: a core of golden particles bursts and assembles an autonomous stacker.',
-        work: 'Lifting',
-      },
-      agv5: {
-        title: 'Autonomous reach truck',
-        lead: 'A triplex-mast truck with a sensor arm that raises its forks to height.',
-        description:
-          'A three.js experiment: a core of golden particles bursts and assembles a high-mast autonomous truck.',
-        work: 'Lifting',
-      },
-    },
   },
 
   notFound: {

@@ -5,14 +5,11 @@ import { formatRange } from '@/lib/format'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
-import type { AgvModelKey } from '@/components/three/agv/models'
-import { AgvShowcase, type AgvShowcaseItem } from '@/components/sections/AgvShowcase'
+import { AgvShowcase } from '@/components/sections/AgvShowcase'
 import { Briefcase } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { TagList } from '@/components/ui/Tag'
-
-const SHOWCASE: AgvModelKey[] = ['agv4', 'agv2', 'agv5']
 
 export function Experience({
   locale,
@@ -24,12 +21,6 @@ export function Experience({
   const t = getDictionary(locale)
 
   const timeline = [...entries].reverse()
-
-  const showcase: AgvShowcaseItem[] = SHOWCASE.map((key) => ({
-    key,
-    title: t.experiments.models[key].title,
-    href: `/${locale}/experiments/${key}`,
-  }))
 
   return (
     <section
@@ -56,12 +47,11 @@ export function Experience({
               className="absolute top-1.5 -left-[5px] size-[9px] rounded-full bg-signal"
             />
 
-            {entry.showcase === 'agv' ? (
+            {entry.showcase ? (
               <div className="absolute inset-y-0 -right-14 hidden w-76 xl:block">
                 <AgvShowcase
-                  items={showcase}
-                  label={t.experience.agvShowcase}
-                  openLabel={t.experience.agvOpen}
+                  set={entry.showcase}
+                  label={t.showcase.sets[entry.showcase]}
                   className="sticky top-24"
                   stageClassName="h-96"
                 />
@@ -141,11 +131,10 @@ export function Experience({
                   </div>
                 ) : null}
 
-                {entry.showcase === 'agv' ? (
+                {entry.showcase ? (
                   <AgvShowcase
-                    items={showcase}
-                    label={t.experience.agvShowcase}
-                    openLabel={t.experience.agvOpen}
+                    set={entry.showcase}
+                    label={t.showcase.sets[entry.showcase]}
                     className="mt-8 xl:hidden"
                     stageClassName="mx-auto h-60 max-w-sm"
                   />

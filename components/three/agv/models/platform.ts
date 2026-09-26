@@ -1,4 +1,4 @@
-import { SpecBuilder, band, cut, cyl, hazardX, rbox, type AgvSpec } from '../geometry'
+import { SpecBuilder, band, cut, cyl, hazardX, rbox, showcaseSpec, type AgvSpec } from '../geometry'
 
 export function platform(): AgvSpec {
   const b = new SpecBuilder()
@@ -86,15 +86,5 @@ export function platform(): AgvSpec {
   b.label('ASTI', -0.45, 0.25, 0.1, W + 0.004, 900)
   b.label('ASTI', 0.45, 0.25, 0.1, -W - 0.004, 900)
 
-  return {
-    parts: b.parts,
-    labels: b.labels,
-    core: { x: 0.2, y: 0.8 },
-    spread: 0.95,
-    target: [0.1, 0.32, 0],
-    distance: 4.9,
-    portraitDistance: 8.2,
-    drive: 1.1,
-    lift,
-  }
+  return showcaseSpec(b, { lift })
 }

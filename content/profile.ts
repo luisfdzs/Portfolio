@@ -59,6 +59,7 @@ export const experience: ExperienceEntry[] = [
     },
     stack: ['C#', '.NET', 'SQL', 'JavaScript', 'TypeScript', 'React'],
     url: 'https://www.mobilesmart.city/',
+    showcase: 'parking',
   },
   {
     slug: 'altia',
@@ -96,6 +97,7 @@ export const experience: ExperienceEntry[] = [
       'MongoDB',
     ],
     url: 'https://www.altiacompany.com/',
+    showcase: 'devices',
   },
   {
     slug: 'exceltic',
@@ -133,6 +135,7 @@ export const experience: ExperienceEntry[] = [
       'log4net',
     ],
     url: 'https://exceltic.com/',
+    showcase: 'power',
   },
   {
     slug: 'zemsania-asti-abb',
@@ -187,6 +190,7 @@ export const education: EducationEntry[] = [
       ],
     },
     url: 'https://www.uvigo.gal/',
+    showcase: 'campus',
   },
 ]
 

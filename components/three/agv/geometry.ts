@@ -5,7 +5,7 @@ export type Box = [number, number, number, number, number, number]
 export type Field = (x: number, y: number, z: number) => number
 export type Shape = { f: Field; box: Box }
 export type RoundBox = Shape & { edge: (x: number, y: number, z: number) => boolean }
-export type MoveCode = 0 | 1 | 2 | 3
+export type MoveCode = 0 | 1 | 2 | 3 | 4
 
 type Part = {
   f: Field
@@ -29,26 +29,20 @@ type Label = {
 export type AgvSpec = {
   parts: Part[]
   labels: Label[]
-  core: { x: number; y: number }
-  spread: number
-  target: Vec3
-  distance: number
-  portraitDistance: number
-  drive: number
   lift: number
+  pivot?: Vec3
+  turn?: number
+  spin?: boolean
+  hold?: boolean
+  fit?: number
 }
 
 export type AgvGeometry = {
   position: Float32Array
-  start: Float32Array
-  core: Float32Array
   tone: Float32Array
-  delay: Float32Array
-  seed: Float32Array
   glow: Float32Array
   move: Float32Array
   normal: Float32Array
-  vehicleCount: number
 }
 
 export function rbox(
@@ -110,6 +104,98 @@ export function cyl(
   const ey = axis === 'y' ? half : radius
   const ez = axis === 'z' ? half : radius
   return { f, box: [cx - ex, cy - ey, cz - ez, cx + ex, cy + ey, cz + ez] }
+}
+
+export function cone(
+  cx: number,
+  cy: number,
+  cz: number,
+  bottom: number,
+  top: number,
+  half: number,
+  axis: 'x' | 'y' | 'z',
+): Shape {
+  const f: Field = (x, y, z) => {
+    let r: number
+    let h: number
+    if (axis === 'y') {
+      r = Math.hypot(x - cx, z - cz)
+      h = y - cy
+    } else if (axis === 'z') {
+      r = Math.hypot(x - cx, y - cy)
+      h = z - cz
+    } else {
+      r = Math.hypot(y - cy, z - cz)
+      h = x - cx
+    }
+    const k2x = top - bottom
+    const k2y = 2 * half
+    const cax = r - Math.max(0, Math.min(r, h < 0 ? bottom : top))
+    const cay = Math.abs(h) - half
+    const t = Math.min(
+      1,
+      Math.max(0, ((top - r) * k2x + (half - h) * k2y) / (k2x * k2x + k2y * k2y)),
+    )
+    const cbx = r - top + k2x * t
+    const cby = h - half + k2y * t
+    const sign = cbx < 0 && cay < 0 ? -1 : 1
+    return sign * Math.sqrt(Math.min(cax * cax + cay * cay, cbx * cbx + cby * cby))
+  }
+  const radius = Math.max(bottom, top)
+  const ex = axis === 'x' ? half : radius
+  const ey = axis === 'y' ? half : radius
+  const ez = axis === 'z' ? half : radius
+  return { f, box: [cx - ex, cy - ey, cz - ez, cx + ex, cy + ey, cz + ez] }
+}
+
+function rotate(axis: 'x' | 'y' | 'z', angle: number, x: number, y: number, z: number): Vec3 {
+  const c = Math.cos(angle)
+  const s = Math.sin(angle)
+  if (axis === 'x') return [x, c * y - s * z, s * y + c * z]
+  if (axis === 'y') return [c * x + s * z, y, -s * x + c * z]
+  return [c * x - s * y, s * x + c * y, z]
+}
+
+export function turned(shape: Shape, axis: 'x' | 'y' | 'z', angle: number, pivot: Vec3): Shape {
+  const [px, py, pz] = pivot
+  const f: Field = (x, y, z) => {
+    const [qx, qy, qz] = rotate(axis, -angle, x - px, y - py, z - pz)
+    return shape.f(qx + px, qy + py, qz + pz)
+  }
+  const [x0, y0, z0, x1, y1, z1] = shape.box
+  const box: Box = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity]
+  for (const x of [x0, x1]) {
+    for (const y of [y0, y1]) {
+      for (const z of [z0, z1]) {
+        const [qx, qy, qz] = rotate(axis, angle, x - px, y - py, z - pz)
+        box[0] = Math.min(box[0], qx + px)
+        box[1] = Math.min(box[1], qy + py)
+        box[2] = Math.min(box[2], qz + pz)
+        box[3] = Math.max(box[3], qx + px)
+        box[4] = Math.max(box[4], qy + py)
+        box[5] = Math.max(box[5], qz + pz)
+      }
+    }
+  }
+  return { f, box }
+}
+
+export function union(...shapes: Shape[]): Shape {
+  const box: Box = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity]
+  for (const shape of shapes) {
+    for (let i = 0; i < 3; i++) {
+      box[i] = Math.min(box[i] ?? Infinity, shape.box[i] ?? Infinity)
+      box[i + 3] = Math.max(box[i + 3] ?? -Infinity, shape.box[i + 3] ?? -Infinity)
+    }
+  }
+  return {
+    f: (x, y, z) => {
+      let d = Infinity
+      for (const shape of shapes) d = Math.min(d, shape.f(x, y, z))
+      return d
+    },
+    box,
+  }
 }
 
 function segmentDistance(x: number, y: number, z: number, a: Vec3, b: Vec3) {
@@ -234,13 +320,19 @@ export class SpecBuilder {
   }
 }
 
+export function showcaseSpec(
+  b: SpecBuilder,
+  options: Omit<AgvSpec, 'parts' | 'labels' | 'lift'> & { lift?: number } = {},
+): AgvSpec {
+  return { ...options, parts: b.parts, labels: b.labels, lift: options.lift ?? 0 }
+}
+
 class Cloud {
   position: number[] = []
   normal: number[] = []
   tone: number[] = []
   glow: number[] = []
   move: number[] = []
-  delay: number[] = []
 
   push(
     x: number,
@@ -394,49 +486,11 @@ export function buildAgvGeometry(spec: AgvSpec, scale: number): AgvGeometry {
   const cloud = new Cloud()
   sampleParts(cloud, spec.parts, scale)
   for (const label of spec.labels) sampleLabel(cloud, label, scale)
-
-  const vehicleCount = cloud.size
-  let highest = 0
-  for (let i = 1; i < cloud.position.length; i += 3)
-    highest = Math.max(highest, cloud.position[i] ?? 0)
-  for (let i = 0; i < vehicleCount; i++) {
-    const y = cloud.position[i * 3 + 1] ?? 0
-    cloud.delay.push(Math.min(1, (y / highest) * 0.78 + Math.random() * 0.2))
-  }
-
-  const { core } = spec
-  const count = cloud.size
-  const start = new Float32Array(count * 3)
-  const coreOut = new Float32Array(count * 3)
-  const seed = new Float32Array(count)
-  for (let i = 0; i < count; i++) {
-    const u = Math.random() * 2 - 1
-    const a = Math.random() * Math.PI * 2
-    const s = Math.sqrt(1 - u * u)
-    const r = (2.4 + Math.pow(Math.random(), 0.7) * 4.2) * spec.spread
-    start[i * 3] = core.x + s * Math.cos(a) * r
-    start[i * 3 + 1] = core.y + u * r * 0.6
-    start[i * 3 + 2] = s * Math.sin(a) * r
-    const u2 = Math.random() * 2 - 1
-    const a2 = Math.random() * Math.PI * 2
-    const s2 = Math.sqrt(1 - u2 * u2)
-    const r2 = 0.38 * Math.cbrt(Math.random())
-    coreOut[i * 3] = core.x + s2 * Math.cos(a2) * r2
-    coreOut[i * 3 + 1] = core.y + u2 * r2
-    coreOut[i * 3 + 2] = s2 * Math.sin(a2) * r2
-    seed[i] = Math.random()
-  }
-
   return {
     position: new Float32Array(cloud.position),
-    start,
-    core: coreOut,
     tone: new Float32Array(cloud.tone),
-    delay: new Float32Array(cloud.delay),
-    seed,
     glow: new Float32Array(cloud.glow),
     move: new Float32Array(cloud.move),
     normal: new Float32Array(cloud.normal),
-    vehicleCount,
   }
 }
