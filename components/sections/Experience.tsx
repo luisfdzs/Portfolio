@@ -5,10 +5,14 @@ import { formatRange } from '@/lib/format'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
+import type { AgvModelKey } from '@/components/three/agv/models'
+import { AgvShowcase, type AgvShowcaseItem } from '@/components/sections/AgvShowcase'
 import { Briefcase } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { TagList } from '@/components/ui/Tag'
+
+const SHOWCASE: AgvModelKey[] = ['agv4', 'agv2', 'agv5']
 
 export function Experience({
   locale,
@@ -20,6 +24,12 @@ export function Experience({
   const t = getDictionary(locale)
 
   const timeline = [...entries].reverse()
+
+  const showcase: AgvShowcaseItem[] = SHOWCASE.map((key) => ({
+    key,
+    title: t.experiments.models[key].title,
+    href: `/${locale}/experiments/${key}`,
+  }))
 
   return (
     <section
@@ -45,6 +55,18 @@ export function Experience({
               aria-hidden="true"
               className="absolute top-1.5 -left-[5px] size-[9px] rounded-full bg-signal"
             />
+
+            {entry.showcase === 'agv' ? (
+              <div className="absolute inset-y-0 -right-14 hidden w-76 xl:block">
+                <AgvShowcase
+                  items={showcase}
+                  label={t.experience.agvShowcase}
+                  openLabel={t.experience.agvOpen}
+                  className="sticky top-24"
+                  stageClassName="h-96"
+                />
+              </div>
+            ) : null}
 
             <div className="xl:grid xl:grid-cols-[13rem_1fr] xl:gap-10">
               <div className="xl:pt-0.5">
@@ -117,6 +139,16 @@ export function Experience({
                       label={`${t.experience.stackLabel} — ${entry.role[locale]}, ${entry.company}`}
                     />
                   </div>
+                ) : null}
+
+                {entry.showcase === 'agv' ? (
+                  <AgvShowcase
+                    items={showcase}
+                    label={t.experience.agvShowcase}
+                    openLabel={t.experience.agvOpen}
+                    className="mt-8 xl:hidden"
+                    stageClassName="mx-auto h-60 max-w-sm"
+                  />
                 ) : null}
               </div>
             </div>

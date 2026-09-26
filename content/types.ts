@@ -26,6 +26,7 @@ export type ExperienceEntry = {
   summary: Localized<string[]>
   stack: string[]
   url?: string | null
+  showcase?: 'agv'
 }
 
 export type EducationEntry = {

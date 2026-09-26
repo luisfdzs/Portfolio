@@ -162,6 +162,7 @@ export const experience: ExperienceEntry[] = [
     },
     stack: ['C#', '.NET', 'ASP.NET', 'ASP.NET Core', 'Visual Basic', 'SQL', 'JavaScript'],
     url: 'https://www.zemsania.com/',
+    showcase: 'agv',
   },
 ]
 
