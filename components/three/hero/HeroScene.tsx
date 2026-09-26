@@ -1,7 +1,7 @@
 'use client'
 
-import { memo, useRef, useState, useSyncExternalStore, type RefObject } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { memo, useEffect, useRef, useState, type RefObject } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Bloom, ChromaticAberration, EffectComposer, Vignette } from '@react-three/postprocessing'
 import type { ChromaticAberrationEffect } from 'postprocessing'
 import {
@@ -16,8 +16,11 @@ import {
   SphereGeometry,
   Vector2,
   Vector3,
+  type BufferGeometry,
   type Camera,
 } from 'three'
+import { useReducedMotion } from '@/lib/use-reduced-motion'
+import { swarmLink } from '@/components/three/swarm/registry'
 import {
   BEAM_LENGTH,
   GLOBE_CENTER,
@@ -125,6 +128,61 @@ function placeCamera(camera: Camera, t: number) {
     camera.updateProjectionMatrix()
   }
   return velocity
+}
+
+const projector = new PerspectiveCamera()
+const projected = new Vector3()
+const X_AXIS = new Vector3(1, 0, 0)
+const Z_AXIS = new Vector3(0, 0, 1)
+
+function aim(t: number, aspect: number) {
+  projector.fov = sample(t, cameraPosition, cameraTarget)
+  projector.aspect = aspect
+  projector.position.copy(cameraPosition)
+  projector.lookAt(cameraTarget)
+  projector.updateProjectionMatrix()
+  projector.updateMatrixWorld()
+}
+
+function publishHandoff(geometry: BufferGeometry, aspect: number) {
+  const position = geometry.getAttribute('position')
+  const part = geometry.getAttribute('aPart')
+  const name = geometry.getAttribute('aName')
+  const tone = geometry.getAttribute('aTone')
+  const total = position.count
+  const button: number[] = []
+  const title: number[] = []
+  const push = (list: number[], shade: number) => {
+    projected.project(projector)
+    list.push(projected.x * 0.5, projected.y * 0.5, shade)
+  }
+
+  aim(IDLE_AT, aspect)
+  for (let i = 0; i < total; i++) {
+    const ring = part.getX(i)
+    if (ring > 0.5) {
+      const angle = part.getY(i)
+      const radius = part.getZ(i)
+      projected.set(Math.cos(angle) * radius, Math.sin(angle) * radius, position.getZ(i))
+      if (ring < 1.5) projected.applyAxisAngle(X_AXIS, 1.2)
+      else projected.applyAxisAngle(X_AXIS, -1.3).applyAxisAngle(Z_AXIS, 0.15)
+    } else {
+      projected.set(position.getX(i), position.getY(i), position.getZ(i))
+    }
+    projected.applyAxisAngle(X_AXIS, 0.12)
+    push(button, tone.getX(i))
+  }
+
+  aim(DURATION, aspect)
+  for (let i = 0; i < total; i++) {
+    if (tone.getW(i) < 0.5) continue
+    projected.set(name.getX(i), name.getY(i) + 0.35, name.getZ(i) + NAME_Z)
+    push(title, tone.getZ(i))
+  }
+
+  swarmLink.hero.button = new Float32Array(button)
+  swarmLink.hero.name = new Float32Array(title)
+  swarmLink.hero.version++
 }
 
 function particleBudget() {
@@ -274,6 +332,11 @@ function Particles({
   const [scene] = useState(() =>
     buildScene(particleBudget(), window.innerWidth / window.innerHeight < 0.8),
   )
+  const size = useThree((state) => state.size)
+
+  useEffect(() => {
+    if (size.height > 0) publishHandoff(scene.points.geometry, size.width / size.height)
+  }, [scene, size.width, size.height])
 
   useFrame((state, delta) => {
     const t = advance(clock.current, delta, still)
@@ -301,24 +364,19 @@ function Particles({
   )
 }
 
-const REDUCED_MOTION = '(prefers-reduced-motion: reduce)'
-
-function subscribe(callback: () => void) {
-  const query = window.matchMedia(REDUCED_MOTION)
-  query.addEventListener('change', callback)
-  return () => query.removeEventListener('change', callback)
-}
-
-export const HeroScene = memo(function HeroScene({ clock }: { clock: RefObject<HeroClock> }) {
-  const reduced = useSyncExternalStore(
-    subscribe,
-    () => window.matchMedia(REDUCED_MOTION).matches,
-    () => false,
-  )
+export const HeroScene = memo(function HeroScene({
+  clock,
+  paused,
+}: {
+  clock: RefObject<HeroClock>
+  paused: boolean
+}) {
+  const reduced = useReducedMotion()
   const aberration = useRef<ChromaticAberrationEffect | null>(null)
 
   return (
     <Canvas
+      frameloop={paused ? 'never' : 'always'}
       camera={{ position: [0, 0, 6.9], fov: 37, near: 0.1, far: 300 }}
       dpr={1}
       gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}

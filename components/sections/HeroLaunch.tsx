@@ -7,6 +7,8 @@ import { cn } from '@/lib/cn'
 import type { Locale } from '@/lib/i18n/config'
 import { href } from '@/lib/i18n/routes'
 import { IDLE_AT, type HeroClock } from '@/components/three/hero/HeroScene'
+import { swarmLink } from '@/components/three/swarm/registry'
+import { SwarmMark } from '@/components/sections/SwarmAnchor'
 import { ArrowDown } from '@/components/ui/Icons'
 
 const HeroScene = dynamic(
@@ -28,7 +30,9 @@ export function HeroLaunch({ copy, locale }: { copy: HeroLaunchCopy; locale: Loc
   const clock = useRef<HeroClock>({ t: IDLE_AT, playing: false, hover: false })
   const [started, setStarted] = useState(false)
   const [settled, setSettled] = useState(false)
+  const [away, setAway] = useState(false)
   const backdrop = useRef<HTMLDivElement>(null)
+  const scene = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let frame = 0
@@ -38,12 +42,19 @@ export function HeroLaunch({ copy, locale }: { copy: HeroLaunchCopy; locale: Loc
         Math.max(0, (clock.current.t - FIELD_FROM) / (FIELD_TO - FIELD_FROM)),
       )
       const eased = progress * progress * (3 - 2 * progress)
-      if (backdrop.current) backdrop.current.style.opacity = String(1 - eased)
+      const stay = 1 - swarmLink.handoff
+      if (backdrop.current) backdrop.current.style.opacity = String((1 - eased) * stay)
+      if (scene.current) scene.current.style.opacity = String(stay)
+      setAway(stay < 0.001)
       frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frame)
   }, [])
+
+  useEffect(() => {
+    swarmLink.hero.pose = started ? 'name' : 'button'
+  }, [started])
 
   useEffect(() => {
     const id = window.setInterval(() => setSettled(clock.current.t >= SETTLED), 200)
@@ -63,8 +74,9 @@ export function HeroLaunch({ copy, locale }: { copy: HeroLaunchCopy; locale: Loc
   return (
     <>
       <div ref={backdrop} className="absolute inset-0 bg-[#050506]" aria-hidden="true" />
-      <div className="absolute inset-0" aria-hidden="true">
-        <HeroScene clock={clock} />
+      <SwarmMark kind="hero" />
+      <div ref={scene} className="absolute inset-0" aria-hidden="true">
+        <HeroScene clock={clock} paused={away} />
       </div>
       <div
         inert={started}

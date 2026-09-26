@@ -3,7 +3,7 @@ import type { EducationEntry } from '@/content/types'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
-import { AgvShowcase } from '@/components/sections/AgvShowcase'
+import { SwarmAnchor } from '@/components/sections/SwarmAnchor'
 import { GraduationCap } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
@@ -56,7 +56,7 @@ export function Education({
             ) : null}
 
             {entry.showcase ? (
-              <AgvShowcase
+              <SwarmAnchor
                 set={entry.showcase}
                 label={t.showcase.sets[entry.showcase]}
                 className="mt-8"

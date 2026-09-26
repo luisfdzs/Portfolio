@@ -14,6 +14,7 @@ import { Education } from '@/components/sections/Education'
 import { Experience } from '@/components/sections/Experience'
 import { Hero } from '@/components/sections/Hero'
 import { Projects } from '@/components/sections/Projects'
+import { Swarm } from '@/components/sections/Swarm'
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   'use cache'
@@ -57,6 +58,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      <Swarm />
       <Hero locale={locale} profile={profile} />
       <Projects locale={locale} projects={projects} />
       <Experience locale={locale} entries={experience} />

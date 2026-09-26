@@ -9,6 +9,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { ProjectCard } from './ProjectCard'
 import { ProjectMediaHints } from './ProjectMediaHints'
+import { SwarmMark } from './SwarmAnchor'
 
 export function Projects({
   locale,
@@ -20,7 +21,11 @@ export function Projects({
   const t = getDictionary(locale)
 
   return (
-    <section id={sections.projects} className="py-[calc(var(--spacing-section)/2)] text-center">
+    <section
+      id={sections.projects}
+      className="relative py-[calc(var(--spacing-section)/2)] text-center"
+    >
+      <SwarmMark kind="frame" />
       <ProjectMediaHints projects={projects} />
       <div className="page-gutter mx-auto max-w-7xl">
         <SectionHeading index="01" title={t.projects.title} kicker={t.projects.kicker} icon={Code}>

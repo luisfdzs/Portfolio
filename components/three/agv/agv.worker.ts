@@ -4,6 +4,7 @@ import { showcaseModels, type ShowcaseModelKey } from './models'
 export type AgvWorkerRequest = { keys: ShowcaseModelKey[]; scale: number }
 
 export type AgvWorkerResult = {
+  key: ShowcaseModelKey
   position: Float32Array
   tone: Float32Array
   normal: Float32Array
@@ -30,6 +31,7 @@ scope.onmessage = (event) => {
     const spec = showcaseModels[key]()
     const data = buildAgvGeometry(spec, scale)
     const result: AgvWorkerResult = {
+      key,
       position: data.position,
       tone: data.tone,
       normal: data.normal,

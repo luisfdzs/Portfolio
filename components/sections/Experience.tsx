@@ -5,7 +5,7 @@ import { formatRange } from '@/lib/format'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
-import { AgvShowcase } from '@/components/sections/AgvShowcase'
+import { SwarmAnchor } from '@/components/sections/SwarmAnchor'
 import { Briefcase } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
@@ -49,7 +49,7 @@ export function Experience({
 
             {entry.showcase ? (
               <div className="absolute inset-y-0 -right-14 hidden w-76 xl:block">
-                <AgvShowcase
+                <SwarmAnchor
                   set={entry.showcase}
                   label={t.showcase.sets[entry.showcase]}
                   className="sticky top-24"
@@ -132,7 +132,7 @@ export function Experience({
                 ) : null}
 
                 {entry.showcase ? (
-                  <AgvShowcase
+                  <SwarmAnchor
                     set={entry.showcase}
                     label={t.showcase.sets[entry.showcase]}
                     className="mt-8 xl:hidden"
