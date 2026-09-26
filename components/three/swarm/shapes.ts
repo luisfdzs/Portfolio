@@ -4,15 +4,14 @@ import type { AgvWorkerResult } from '@/components/three/agv/agv.worker'
 export const MODEL = 0
 export const FRAME = 1
 export const HERO = 2
-export const PRINT = 3
-export const SOCIAL = 4
+export const SOCIAL = 3
 
 export const HOLD = 5
 
 const FIT = 2.2
 
 export type Shape = {
-  kind: typeof MODEL | typeof FRAME | typeof HERO | typeof PRINT | typeof SOCIAL
+  kind: typeof MODEL | typeof FRAME | typeof HERO | typeof SOCIAL
   position: BufferAttribute
   normal: BufferAttribute
   meta: BufferAttribute
@@ -69,7 +68,8 @@ export function modelShape(data: AgvWorkerResult, count: number): Shape {
     maxY = Math.max(maxY, y)
     minZ = Math.min(minZ, z)
     maxZ = Math.max(maxZ, z)
-    if ((data.move[i] ?? 0) > 3.5) {
+    const code = data.move[i] ?? 0
+    if (code > 3.5 && code < 4.5) {
       const tx = px + c * (x - px) - s * (y - py)
       const ty = py + s * (x - px) + c * (y - py)
       minX = Math.min(minX, tx)
@@ -223,71 +223,6 @@ export function frameShape(count: number): Shape {
     }
     position[i * 4 + 3] = Math.random()
     meta[i * 2 + 1] = Math.random() * 0.95
-  }
-  return shape
-}
-
-function ridgeField(x: number, y: number) {
-  const dx = x - 0.015
-  const dy = y - 0.07
-  const r = Math.hypot(dx, dy * 0.74)
-  const a = Math.atan2(dy, dx)
-  const settle = smooth(ramp(r, 0.02, 0.14))
-  const loop = r + settle * (0.022 * Math.sin(3 * a + r * 9) + 0.012 * Math.sin(7 * a + 1.3))
-  const below = smooth(ramp(-dy, 0.12, 0.34))
-  const flat = -dy * 0.9 + 0.035 * Math.sin(dx * 7 + 0.6) + 0.1
-  return (loop * (1 - below) + flat * below) * 42
-}
-
-export function printShape(count: number): Shape {
-  const shape = emptyShape(PRINT, count)
-  const position = shape.position.array as Float32Array
-  const normal = shape.normal.array as Float32Array
-  const meta = shape.meta.array as Float32Array
-  const inside = (x: number, y: number) => {
-    const ex = x / 0.34
-    const ey = y > 0 ? y / 0.47 : y / 0.4
-    return ex * ex + ey * ey
-  }
-  for (let i = 0; i < count; i++) {
-    const roll = Math.random()
-    let x = 0
-    let y = 0
-    let role = 0
-    let tone = 1
-    if (roll < 0.05) {
-      x = (Math.random() - 0.5) * 0.86
-      y = 0
-      role = 1
-      tone = 0.6 + Math.random() * 0.4
-    } else if (roll < 0.22) {
-      do {
-        x = (Math.random() - 0.5) * 0.7
-        y = (Math.random() - 0.5) * 0.95
-      } while (inside(x, y) > 1)
-      role = 2
-      tone = Math.random() * 0.5
-    } else {
-      for (let tries = 0; tries < 200; tries++) {
-        x = (Math.random() - 0.5) * 0.7
-        y = (Math.random() - 0.5) * 0.95
-        const edge = inside(x, y)
-        if (edge > 1 || Math.random() > 1 - smooth(ramp(edge, 0.7, 1))) continue
-        const v = ridgeField(x, y)
-        if (Math.abs((((v % 1) + 1) % 1) - 0.5) > 0.11) continue
-        const band = Math.floor(v)
-        const gap = Math.sin(band * 7.13 + Math.atan2(y - 0.07, x) * (3 + (band % 3)))
-        if (gap > 0.93) continue
-        break
-      }
-      tone = 0.55 + Math.random() * 0.45
-    }
-    position[i * 4] = x
-    position[i * 4 + 1] = y
-    position[i * 4 + 2] = (Math.random() - 0.5) * 0.02
-    position[i * 4 + 3] = tone
-    normal[i * 4] = role
-    meta[i * 2 + 1] = Math.min(1, Math.hypot(x, y) * 1.4 + Math.random() * 0.15)
   }
   return shape
 }

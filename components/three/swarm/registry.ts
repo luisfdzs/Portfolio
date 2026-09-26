@@ -1,11 +1,10 @@
 import type { ShowcaseModelKey } from '@/components/three/agv/models'
 
-export type SwarmMarkKind = 'hero' | 'frame' | 'print' | 'social'
+export type SwarmMarkKind = 'hero' | 'frame' | 'social'
 
 export type SwarmSource =
   | { kind: 'hero' }
   | { kind: 'frame' }
-  | { kind: 'print' }
   | { kind: 'social' }
   | { kind: 'models'; keys: readonly ShowcaseModelKey[] }
 

@@ -10,7 +10,7 @@ export type DescribedImage = {
   alt: Localized
 }
 
-export type ShowcaseSet = 'agv' | 'power' | 'devices' | 'parking' | 'campus'
+export type ShowcaseSet = 'agv' | 'power' | 'devices' | 'parking' | 'campus' | 'setup'
 
 export type ExperienceClient = {
   name: string

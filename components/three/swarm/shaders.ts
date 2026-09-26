@@ -34,6 +34,7 @@ uniform float uStream;
 uniform float uCalm;
 uniform float uTime;
 uniform float uPixelRatio;
+uniform float uPixel;
 uniform float uSize;
 uniform float uViewH;
 uniform float uPulse;
@@ -95,7 +96,7 @@ vec3 flow(vec3 q) {
 Side place(vec4 shape, vec4 nrm, float move, vec3 center, vec2 scale, float kind, float spin, vec3 pose, vec2 pivot, float seed) {
   Side s;
   s.solid = 0.0;
-  if (kind > 3.5) {
+  if (kind > 2.5) {
     float role = nrm.x;
     float formed = step(0.0, uFormed);
     float flash = formed * exp(-uFormed * 2.5);
@@ -112,30 +113,6 @@ Side place(vec4 shape, vec4 nrm, float move, vec3 center, vec2 scale, float kind
     float after = keep * (0.05 + 0.4 * comet);
     s.alpha = (mix(before, after, fade) + 0.35 * flash) * uDensity * 0.22;
     s.size = 1.0 + 0.8 * flash + 0.9 * comet;
-    return s;
-  }
-  if (kind > 2.5) {
-    float role = nrm.x;
-    float sweep = fract(uTime * 0.16);
-    float line = mix(0.56, -0.56, smoothstep(0.0, 0.8, sweep));
-    float live = 1.0 - smoothstep(0.8, 1.0, sweep);
-    float d = shape.y - line;
-    float band = exp(-d * d * 500.0) * live;
-    float trail = step(0.0, d) * exp(-d * 7.0) * live;
-    vec2 local = shape.xy * (1.0 + 0.012 * sin(uTime * 1.1));
-    if (role > 0.5 && role < 1.5) {
-      local = vec2(shape.x * (0.9 + 0.1 * sin(uTime * 3.0 + seed * 20.0)), line);
-      s.p = center + vec3(local * scale, 0.0);
-      s.color = mix(GOLD, HOT, shape.w);
-      s.alpha = (0.1 + 0.08 * shape.w) * live * uDensity;
-      s.size = 1.1;
-      return s;
-    }
-    float pore = step(1.5, role);
-    s.p = center + vec3(local * scale, shape.z * scale.x);
-    s.color = mix(GOLD, CREAM, shape.w) + HOT * band * (1.0 - pore);
-    s.alpha = mix(0.05 + 0.3 * band + 0.05 * trail, 0.02 + 0.1 * band, pore) * uDensity;
-    s.size = 1.0 + 0.7 * band;
     return s;
   }
   if (kind > 1.5) {
@@ -169,8 +146,8 @@ Side place(vec4 shape, vec4 nrm, float move, vec3 center, vec2 scale, float kind
     s.size = 0.9;
     return s;
   }
-  float turns = step(3.5, move);
-  float lifts = turns > 0.5 ? 0.0 : move > 2.5 ? 0.5 : step(1.5, move);
+  float turns = step(3.5, move) * step(move, 4.5);
+  float lifts = move > 4.5 ? move - 5.0 : turns > 0.5 ? 0.0 : move > 2.5 ? 0.5 : step(1.5, move);
   vec3 q = turns > 0.5 ? vec3(pivot + swing(shape.xy - pivot, pose.z), shape.z) : shape.xyz;
   q.y += pose.x * lifts;
   vec3 n = turns > 0.5 ? vec3(swing(nrm.xy, pose.z), nrm.z) : nrm.xyz;
@@ -191,10 +168,12 @@ Side place(vec4 shape, vec4 nrm, float move, vec3 center, vec2 scale, float kind
   float reveal = glow > 2.5 ? smoothstep(0.04, 0.3, pose.y) : 1.0;
   vec3 col = seed < 0.5 ? mix(DEEP, AMBER, seed * 2.0) : mix(AMBER, PALE, seed * 2.0 - 1.0);
   col = mix(col, vec3(1.0, 0.8, 0.42), 0.7);
-  s.color = col * shape.w * (1.0 + 2.2 * blink);
-  s.alpha = 0.62 * side * reveal;
-  s.size = persp * (1.0 + 0.6 * blink) * mix(0.75 + seed * 0.5, 1.0, 0.75);
-  s.solid = step(0.9, reveal);
+  float tone = mix(shape.w, 0.35 + 0.75 * shape.w, oriented);
+  float boost = oriented * (uDensity - 1.0);
+  s.color = col * tone * (1.0 + 2.2 * blink);
+  s.alpha = (0.62 + 0.2 * boost) * side * reveal;
+  s.size = persp * (1.0 + 0.6 * blink) * mix(0.75 + seed * 0.5, 1.0, 0.75) * (1.0 + 0.35 * boost);
+  s.solid = step(0.9, reveal) * oriented * max(facing, 0.0);
   return s;
 }
 
@@ -236,10 +215,13 @@ void main() {
 #ifdef OCCLUDE
   float settledA = (1.0 - step(0.001, t)) * step(uFromKind, 0.5) * a.solid;
   float settledB = step(0.999, t) * step(uToKind, 0.5) * b.solid;
-  float bias = 0.035 * mix(uFromScale.x, uToScale.x, step(0.5, t));
-  gl_Position = projectionMatrix * vec4(mv.xyz + normalize(mv.xyz) * bias, 1.0);
+  float facing = max(settledA, settledB);
   gl_PointSize *= uOcclude;
-  if (max(settledA, settledB) < 0.5) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+  float radius = 0.6 * gl_PointSize / uPixelRatio * uPixel;
+  float slope = sqrt(1.0 - facing * facing) / max(facing, 0.2);
+  float bias = 0.035 * mix(uFromScale.x, uToScale.x, step(0.5, t)) + radius * slope;
+  gl_Position = projectionMatrix * vec4(mv.xyz + normalize(mv.xyz) * bias, 1.0);
+  if (facing < 0.2) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
 #endif
 }
 `

@@ -13,8 +13,9 @@ type Part = {
   n: number
   tone: Field
   glow: number
-  move: MoveCode
+  move: Field
   reveal: boolean
+  nested: boolean
 }
 type Label = {
   text: string
@@ -294,8 +295,15 @@ export class SpecBuilder {
     shape: Shape,
     n: number,
     tone: Field | number,
-    options: { glow?: number; move?: MoveCode; reveal?: boolean } = {},
+    options: {
+      glow?: number
+      move?: MoveCode
+      rise?: number | Field
+      reveal?: boolean
+      nested?: boolean
+    } = {},
   ) {
+    const rise = options.rise
     this.parts.push({
       f: shape.f,
       box: shape.box,
@@ -303,7 +311,13 @@ export class SpecBuilder {
       tone: typeof tone === 'number' ? flat(tone) : tone,
       glow: options.reveal ? 3 : (options.glow ?? 0),
       reveal: options.reveal ?? false,
-      move: options.move ?? 1,
+      nested: options.nested ?? false,
+      move:
+        rise === undefined
+          ? flat(options.move ?? 1)
+          : typeof rise === 'number'
+            ? flat(5 + rise)
+            : (x, y, z) => 5 + rise(x, y, z),
     })
   }
 
@@ -362,7 +376,7 @@ function sampleParts(cloud: Cloud, parts: Part[], scale: number) {
   const scene = (x: number, y: number, z: number) => {
     let d = Infinity
     for (const part of parts) {
-      if (part.reveal) continue
+      if (part.reveal || part.nested) continue
       const [x0, y0, z0, x1, y1, z1] = part.box
       if (
         x < x0 - pad ||
@@ -400,14 +414,14 @@ function sampleParts(cloud: Cloud, parts: Part[], scale: number) {
       y -= (gy / length) * d
       z -= (gz / length) * d
       if (Math.abs(part.f(x, y, z)) > 0.002) continue
-      if (!part.reveal && scene(x, y, z) < -0.003) continue
+      if (!part.reveal && !part.nested && scene(x, y, z) < -0.003) continue
       cloud.push(
         x,
         y,
         z,
         part.tone(x, y, z),
         part.glow,
-        part.move,
+        part.move(x, y, z),
         gx / length,
         gy / length,
         gz / length,

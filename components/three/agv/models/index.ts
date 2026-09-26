@@ -5,6 +5,7 @@ import { barrier, car, parkingSign } from './parking'
 import { platform } from './platform'
 import { converter, turbofan, windTurbine } from './power'
 import { reach } from './reach'
+import { setup } from './setup'
 import { stacker } from './stacker'
 
 export const showcaseModels = {
@@ -21,6 +22,7 @@ export const showcaseModels = {
   barrier,
   parkingSign,
   eei,
+  setup,
 } as const satisfies Record<string, () => AgvSpec>
 
 export type ShowcaseModelKey = keyof typeof showcaseModels

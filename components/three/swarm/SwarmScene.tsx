@@ -25,7 +25,6 @@ import {
   HERO,
   HOLD,
   MODEL,
-  PRINT,
   SOCIAL,
   emptyShape,
   fillFlat,
@@ -34,7 +33,6 @@ import {
   modelShape,
   nebulaShape,
   poseOf,
-  printShape,
   type Shape,
 } from './shapes'
 import { swarmFragment, swarmVertex } from './shaders'
@@ -71,7 +69,6 @@ type Library = {
   button: Shape
   name: Shape
   hero: number
-  print: Shape
   social: Shape
   socialVersion: number
   socialReady: boolean
@@ -129,6 +126,7 @@ function buildSwarm(count: number) {
     uCalm: { value: 0 },
     uTime: { value: 0 },
     uPixelRatio: { value: 1 },
+    uPixel: { value: 1 },
     uSize: { value: 1.5 },
     uViewH: { value: 1 },
     uPulse: { value: 0 },
@@ -214,7 +212,6 @@ function current(station: Station, library: Library) {
   const source = station.anchor.source
   if (source.kind === 'hero') return swarmLink.hero.pose === 'name' ? library.name : library.button
   if (source.kind === 'frame') return library.frame
-  if (source.kind === 'print') return library.print
   if (source.kind === 'social') return library.socialReady ? library.social : library.nebula
   const key = source.keys[station.index]
   return (key && library.models.get(key)) || library.nebula
@@ -241,9 +238,6 @@ function applySide(
   )
   if (end.shape.kind === MODEL) {
     const unit = Math.min(rect.h / 2.9, rect.w / 2.3) * wpp
-    side.scale.value.set(unit, unit)
-  } else if (end.shape.kind === PRINT) {
-    const unit = Math.min(rect.w, rect.h) * wpp
     side.scale.value.set(unit, unit)
   } else {
     side.scale.value.set(rect.w * wpp, rect.h * wpp)
@@ -290,7 +284,6 @@ function createDirector(count: number): Director {
       button: emptyShape(HERO, count),
       name: emptyShape(HERO, count),
       hero: -1,
-      print: printShape(count),
       social: emptyShape(SOCIAL, count),
       socialVersion: -1,
       socialReady: false,
@@ -453,6 +446,7 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
   u.uCalm.value = calm ? 1 : 0
   if (!calm) u.uTime.value += dt
   u.uPixelRatio.value = state.viewport.dpr
+  u.uPixel.value = wpp
   u.uViewH.value = height * wpp
   u.uPulse.value = calm ? 0 : director.pulse
   u.uFormed.value = director.formed
@@ -495,10 +489,17 @@ function Scene({ count, calm }: { count: number; calm: boolean }) {
       library.models.set(event.data.key, modelShape(event.data, count))
       invalidate()
     }
+    const distance = (element: HTMLElement) => {
+      const box = element.getBoundingClientRect()
+      if (box.width === 0 && box.height === 0) return Infinity
+      return Math.max(0, box.top - window.innerHeight, -box.bottom)
+    }
     const request = () => {
-      const anchors = [...listAnchors()].sort((a, b) =>
-        a.element.compareDocumentPosition(b.element) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
-      )
+      const anchors = [...listAnchors()]
+        .sort((a, b) =>
+          a.element.compareDocumentPosition(b.element) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
+        )
+        .sort((a, b) => distance(a.element) - distance(b.element))
       for (const anchor of anchors) {
         if (anchor.source.kind !== 'models') continue
         const keys = anchor.source.keys.filter((key) => !requested.has(key))

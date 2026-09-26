@@ -7,4 +7,5 @@ export const showcaseSets: Record<ShowcaseSet, ShowcaseModelKey[]> = {
   devices: ['database', 'laptop', 'server'],
   parking: ['car', 'barrier', 'parkingSign'],
   campus: ['eei'],
+  setup: ['setup'],
 }

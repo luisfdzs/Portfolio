@@ -1,8 +1,10 @@
 # Portfolio
 
-## No memory
+## Memory
 
-Do not read from or write to the user's global or local memory — unless the user tells you otherwise in the conversation. This covers the global memory directory, any project-level `memory/` directory, and `MEMORY.md` indexes.
+Use only the project-local memory in `.claude/memory/`. It is gitignored and indexed by `.claude/memory/MEMORY.md`, which `.claude/CLAUDE.md` imports. Read it at the start of every session. When it holds pending reminders for the user, bring them up in your first reply. Write to it only when the user asks you to remember something.
+
+Do not read from or write to the global memory directory (`~/.claude/projects/.../memory/`).
 
 ## No comments, no artifacts
 

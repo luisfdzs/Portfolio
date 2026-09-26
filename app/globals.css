@@ -2385,6 +2385,7 @@ html[data-boot='hold'] {
   .social-card__float {
     transform-style: preserve-3d;
     transform: rotateX(16deg) rotateY(-5deg);
+    pointer-events: none;
   }
 
   .social-card[data-popped] .social-card__float {
@@ -2393,10 +2394,13 @@ html[data-boot='hold'] {
 
   .social-card__slab,
   .nav-slab {
+    --slab-gap: clamp(0.875rem, 2.5vw, 1.25rem);
+    --slab-pad-y: clamp(1rem, 3vw, 1.375rem);
+    --slab-pad-x: clamp(1.125rem, 3.5vw, 1.625rem);
     position: relative;
     display: flex;
-    gap: clamp(0.875rem, 2.5vw, 1.25rem);
-    padding: clamp(1rem, 3vw, 1.375rem) clamp(1.125rem, 3.5vw, 1.625rem);
+    gap: var(--slab-gap);
+    padding: var(--slab-pad-y) var(--slab-pad-x);
     border-radius: 1.75rem;
     background:
       radial-gradient(ellipse 80% 70% at 30% 0%, #fff4cf 0%, transparent 60%),
@@ -2487,6 +2491,24 @@ html[data-boot='hold'] {
       transform 0.18s var(--ease-out-soft),
       box-shadow 0.18s var(--ease-out-soft);
     outline: none;
+  }
+
+  .social-card .social-key {
+    pointer-events: auto;
+  }
+
+  .social-card .social-key::after {
+    content: '';
+    position: absolute;
+    inset: calc(var(--slab-pad-y) * -1) calc(var(--slab-gap) * -0.5);
+  }
+
+  .social-card__slot:first-child .social-key::after {
+    left: calc(var(--slab-pad-x) * -1);
+  }
+
+  .social-card__slot:last-child .social-key::after {
+    right: calc(var(--slab-pad-x) * -1);
   }
 
   .social-key__face {

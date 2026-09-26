@@ -51,6 +51,7 @@ const es = {
       devices: 'Dispositivos y servidores en partículas',
       parking: 'Coche y barrera de parking en partículas',
       campus: 'La Escola de Enxeñaría Industrial en partículas',
+      setup: 'Puesto de trabajo en partículas con mesa elevable, tres pantallas y silla gaming',
     },
   },
 
@@ -189,6 +190,7 @@ const en: Dictionary = {
       devices: 'Devices and servers in particles',
       parking: 'A car and a parking barrier in particles',
       campus: 'The School of Industrial Engineering in particles',
+      setup: 'Particle workstation with a standing desk, three monitors and a gaming chair',
     },
   },
 
