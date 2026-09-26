@@ -19,6 +19,8 @@
     "@ai-sdk/react": "^4.0.96",
     "@react-three/fiber": "^9.7.0",
     "@react-three/postprocessing": "^3.1.2",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "ai": "^7.0.93",
     "next": "^16.2.11",
     "postprocessing": "^6.39.5",

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { site } from '@/content/site'
 import { getCarouselProjects } from '@/lib/content'
-import { isLocale, type Locale, localeHtmlLang, locales } from '@/lib/i18n/config'
+import { defaultLocale, isLocale, type Locale, localeHtmlLang, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { href, projectsHref } from '@/lib/i18n/routes'
 import { ProjectCard } from '@/components/sections/ProjectCard'
@@ -33,12 +33,14 @@ export async function generateMetadata({
       canonical: projectsHref(locale),
       languages: {
         ...Object.fromEntries(locales.map((entry) => [localeHtmlLang[entry], projectsHref(entry)])),
-        'x-default': projectsHref('es'),
+        'x-default': projectsHref(defaultLocale),
       },
     },
     openGraph: {
       type: 'website',
       url: `${site.url}${projectsHref(locale)}`,
+      siteName: site.name,
+      locale: localeHtmlLang[locale],
       title: t.projects.allTitle,
       description: t.projects.allDescription,
     },

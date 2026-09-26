@@ -30,5 +30,7 @@ function negotiateLocale(request: NextRequest): string {
 }
 
 export const config = {
-  matcher: ['/((?!api|admin|_next|media|favicon|robots.txt|sitemap.xml|.*\\.[\\w]+$).*)'],
+  matcher: [
+    '/((?!api|admin|_next|media|favicon|icon|apple-icon|robots.txt|sitemap.xml|.*\\.[\\w]+$).*)',
+  ],
 }

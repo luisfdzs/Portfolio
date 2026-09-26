@@ -566,7 +566,7 @@ const sheets: ProjectSheet[] = [
       },
     ],
     stack: ['Next.js 16', 'TypeScript', 'Tailwind CSS 4', 'zod', 'Playwright', 'Vercel'],
-    liveUrl: 'https://luisfernandezsangil.vercel.app',
+    liveUrl: 'https://luisfernandezsangil.com',
     repoUrl: 'https://github.com/luisfdzs/Portfolio',
     image: {
       src: '/projects/portfolio.webp',

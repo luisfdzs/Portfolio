@@ -5,7 +5,7 @@ import { isLocale, locales, type Locale } from '@/lib/i18n/config'
 
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
-export const alt = 'Luis Fernández Sangil — Ingeniero industrial y desarrollador web'
+export const alt = site.name
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))

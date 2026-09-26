@@ -14,7 +14,7 @@ export const profile: Profile = {
   name: 'Luis Fernández Sangil',
   headline: {
     es: 'Ingeniero de software y sistemas',
-    en: 'Industrial engineer and web developer',
+    en: 'Software and systems engineer',
   },
   location: {
     es: 'Vigo, Galicia · En remoto',
@@ -25,10 +25,12 @@ export const profile: Profile = {
   github: 'https://github.com/luisfdzs',
   bio: {
     es: [
+      'Soy ingeniero de software y sistemas en Vigo (Galicia) y trabajo en remoto. Desarrollo aplicaciones web y software a medida con .NET, React y Next.js, desde el backend hasta la interfaz.',
       'Como muchos otros desarrolladores, mi formación ha sido 100 % autodidacta, ya que a pesar de haber estudiado ingeniería industrial, me enfoqué en el desarrollo de software y dediqué un tiempo importante a realizar cursos y proyectos personales.',
       'Trato de darles la importancia que se merecen a todas las habilidades no tan relacionadas con la programación y el desarrollo de software, sino más relacionadas con ser un buen profesional: lo que llamamos «habilidades blandas». La parte humana es cada vez más importante, y esto es algo en lo que no se puede mejorar simplemente usando IA.',
     ],
     en: [
+      'I am a software and systems engineer based in Vigo, Spain, working remotely. I build web applications and custom software with .NET, React and Next.js, from the backend to the interface.',
       'Like many other developers, my training has been entirely self-taught: despite having studied industrial engineering, I focused on software development and put serious time into courses and personal projects.',
       'I try to give the attention they deserve to all the skills that have less to do with programming and software development, and more to do with being a good professional: what we call “soft skills”. The human side matters more and more, and it is not something you can get better at just by using AI.',
     ],

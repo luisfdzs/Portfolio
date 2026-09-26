@@ -25,12 +25,16 @@ import {
   HERO,
   HOLD,
   MODEL,
+  PRINT,
+  SOCIAL,
   emptyShape,
   fillFlat,
+  fillSocial,
   frameShape,
   modelShape,
   nebulaShape,
   poseOf,
+  printShape,
   type Shape,
 } from './shapes'
 import { swarmFragment, swarmVertex } from './shaders'
@@ -42,6 +46,7 @@ const TRAVEL = 0.7
 const FOLLOW = 7
 const SPIN = 0.35
 const REST = 0.0005
+const DOMINANT = 0.6
 const FRAME_INSET = 14
 
 type Rect = { x: number; y: number; w: number; h: number }
@@ -66,6 +71,10 @@ type Library = {
   button: Shape
   name: Shape
   hero: number
+  print: Shape
+  social: Shape
+  socialVersion: number
+  socialReady: boolean
   models: Map<ShowcaseModelKey, Shape>
 }
 
@@ -126,6 +135,7 @@ function buildSwarm(count: number) {
     uVisible: { value: 0 },
     uOcclude: { value: count < 40000 ? 4 : 3 },
     uDensity: { value: count < 40000 ? 1.8 : 1 },
+    uFormed: { value: -1 },
   }
   const material = new ShaderMaterial({
     uniforms,
@@ -204,6 +214,8 @@ function current(station: Station, library: Library) {
   const source = station.anchor.source
   if (source.kind === 'hero') return swarmLink.hero.pose === 'name' ? library.name : library.button
   if (source.kind === 'frame') return library.frame
+  if (source.kind === 'print') return library.print
+  if (source.kind === 'social') return library.socialReady ? library.social : library.nebula
   const key = source.keys[station.index]
   return (key && library.models.get(key)) || library.nebula
 }
@@ -229,6 +241,9 @@ function applySide(
   )
   if (end.shape.kind === MODEL) {
     const unit = Math.min(rect.h / 2.9, rect.w / 2.3) * wpp
+    side.scale.value.set(unit, unit)
+  } else if (end.shape.kind === PRINT) {
+    const unit = Math.min(rect.w, rect.h) * wpp
     side.scale.value.set(unit, unit)
   } else {
     side.scale.value.set(rect.w * wpp, rect.h * wpp)
@@ -263,6 +278,7 @@ type Director = {
   synced: number
   flow: Flow | null
   pulse: number
+  formed: number
 }
 
 function createDirector(count: number): Director {
@@ -274,6 +290,10 @@ function createDirector(count: number): Director {
       button: emptyShape(HERO, count),
       name: emptyShape(HERO, count),
       hero: -1,
+      print: printShape(count),
+      social: emptyShape(SOCIAL, count),
+      socialVersion: -1,
+      socialReady: false,
       models: new Map(),
     },
     stations: new Map(),
@@ -281,6 +301,7 @@ function createDirector(count: number): Director {
     synced: -1,
     flow: null,
     pulse: 0,
+    formed: -1,
   }
 }
 
@@ -322,6 +343,11 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
     library.hero = swarmLink.hero.version
   }
 
+  if (library.socialVersion !== swarmLink.social.version) {
+    if (fillSocial(library.social, swarmLink.social.points)) library.socialReady = true
+    library.socialVersion = swarmLink.social.version
+  }
+
   const shown: Station[] = []
   for (const station of director.order) {
     if (measure(station)) director.pulse = 1
@@ -333,7 +359,8 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
     return
   }
 
-  const reference = height * 0.5
+  const remaining = document.documentElement.scrollHeight - window.scrollY - window.innerHeight
+  const reference = height * (0.5 + 0.4 * (1 - smooth(ramp(remaining, 0, height * 0.6))))
   const middle = (station: Station) => station.rect.y + station.rect.h / 2
   let i = 0
   while (i < shown.length - 1 && middle(shown[i + 1] ?? first) <= reference) i++
@@ -363,7 +390,7 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
     f.d = calm ? p : f.d + (p - f.d) * (1 - Math.exp(-dt * FOLLOW))
     if (Math.abs(p - f.d) < REST) f.d = p
   } else {
-    const at = f.d <= REST ? f.from : f.d >= 1 - REST ? f.to : null
+    const at = f.d <= REST && !f.bridge ? f.from : f.d >= 1 - REST ? f.to : null
     if (at && same(at, want.from)) {
       Object.assign(f, { from: want.from, to: want.to, bridge: false, d: 0 })
     } else if (at && same(at, want.to)) {
@@ -386,23 +413,30 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
 
   const resting = !f.bridge && (f.d <= REST || f.d >= 1 - REST)
   const home = resting ? (f.d <= REST ? f.from : f.to) : null
-  if (home && !calm) {
-    const station = home.station
+  const lead = f.bridge ? null : f.d <= 1 - DOMINANT ? f.from : f.d >= DOMINANT ? f.to : null
+  if (lead && !calm) {
+    const station = lead.station
     const source = station.anchor.source
-    if (source.kind === 'models' && home.shape === current(station, library)) {
+    if (source.kind === 'models' && lead.shape === current(station, library)) {
       station.cycle += dt
       if (station.cycle >= HOLD) {
         const next = (station.index + 1) % source.keys.length
         const key = source.keys[next]
-        if (next !== station.index && key && library.models.has(key)) {
+        if (lead === home && next !== station.index && key && library.models.has(key)) {
           station.index = next
           station.cycle = 0
         } else {
-          station.cycle = home.shape.hold ? HOLD : 0
+          station.cycle = lead.shape.hold ? HOLD : 0
         }
       }
     }
   }
+
+  if (home && home.shape === library.social && director.formed < 0) {
+    director.formed = 0
+    swarmLink.social.formed = true
+  }
+  if (director.formed >= 0) director.formed += calm ? 10 : dt
 
   for (const station of shown) {
     if (!calm && station.anchor.source.kind === 'models' && inView(station.rect, width, height))
@@ -410,6 +444,7 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
   }
   director.pulse = Math.max(0, director.pulse - dt * 1.4)
 
+  document.body.dataset.swarm = JSON.stringify({ from: f.from.station.anchor.source.kind, to: f.to.station.anchor.source.kind, d: +f.d.toFixed(3), p: +p.toFixed(3), bridge: f.bridge, lead: lead ? (lead === f.to ? 'to' : 'from') : null, home: home ? (home === f.to ? 'to' : 'from') : null, cycle: lead ? +lead.station.cycle.toFixed(2) : null, index: lead ? lead.station.index : null, fromTop: Math.round(f.from.station.rect.y), toTop: Math.round(f.to.station.rect.y) })
   bind(swarm, f)
   applySide(swarm.from, f.from, library, wpp, width, height)
   applySide(swarm.to, f.to, library, wpp, width, height)
@@ -420,6 +455,7 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
   u.uPixelRatio.value = state.viewport.dpr
   u.uViewH.value = height * wpp
   u.uPulse.value = calm ? 0 : director.pulse
+  u.uFormed.value = director.formed
   u.uVisible.value = Math.min(1, u.uVisible.value + dt / 0.8)
 
   const heroFrom = f.from.shape.kind === HERO
@@ -438,7 +474,8 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
     (heroTo && !f.bridge && f.d >= 1 - REST)
   swarm.points.visible = !hidden
 
-  const busy = !resting || !matches || director.pulse > 0
+  const settling = director.formed >= 0 && director.formed < 2
+  const busy = !resting || !matches || director.pulse > 0 || settling
   const seen =
     inView(f.from.station.rect, width, height) || inView(f.to.station.rect, width, height)
   if (busy || (!hidden && seen)) state.invalidate()
@@ -487,7 +524,10 @@ function Scene({ count, calm }: { count: number; calm: boolean }) {
     window.addEventListener('scroll', wake, { passive: true })
     window.addEventListener('resize', wake)
     window.addEventListener('pointerup', wake)
+    swarmLink.social.live = true
+    swarmLink.social.formed = false
     return () => {
+      swarmLink.social.live = false
       window.removeEventListener('scroll', wake)
       window.removeEventListener('resize', wake)
       window.removeEventListener('pointerup', wake)

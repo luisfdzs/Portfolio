@@ -2,10 +2,14 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import type { ReactNode } from 'react'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { site } from '@/content/site'
-import { getProfile } from '@/lib/content'
+import { getExperience, getProfile } from '@/lib/content'
+import { totalYearsOfExperience } from '@/lib/format'
 import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
-import { getDictionary } from '@/lib/i18n/dictionaries'
+import { getDictionary, interpolate } from '@/lib/i18n/dictionaries'
+import { isIndexable } from '@/lib/site-env'
 import { BootCurtain } from '@/components/layout/BootCurtain'
 import { Footer } from '@/components/layout/Footer'
 import { HashCleaner } from '@/components/layout/HashCleaner'
@@ -55,7 +59,11 @@ export async function generateMetadata({
   const locale: Locale = raw
 
   const t = getDictionary(locale)
-  const profile = await getProfile()
+  const [profile, experience] = await Promise.all([getProfile(), getExperience()])
+  const description = interpolate(t.meta.description, {
+    years: totalYearsOfExperience(experience.map((entry) => entry.range)),
+  })
+  const indexable = isIndexable()
 
   return {
     metadataBase: new URL(site.url),
@@ -63,10 +71,20 @@ export async function generateMetadata({
       default: t.meta.title,
       template: `%s · ${site.shortName}`,
     },
-    description: t.meta.description,
+    description,
     applicationName: site.name,
     authors: [{ name: profile.name, url: site.url }],
     creator: profile.name,
+    robots: {
+      index: indexable,
+      follow: indexable,
+      googleBot: {
+        index: indexable,
+        follow: indexable,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
     alternates: {
       canonical: `${site.url}/${locale}`,
       languages: {
@@ -82,15 +100,18 @@ export async function generateMetadata({
       lastName: 'Fernández Sangil',
       username: 'luisfdzs',
       locale: localeHtmlLang[locale],
+      alternateLocale: locales
+        .filter((entry) => entry !== locale)
+        .map((entry) => localeHtmlLang[entry]),
       url: `${site.url}/${locale}`,
       siteName: site.name,
       title: t.meta.title,
-      description: t.meta.description,
+      description,
     },
     twitter: {
       card: 'summary_large_image',
       title: t.meta.title,
-      description: t.meta.description,
+      description,
     },
   }
 }
@@ -137,6 +158,8 @@ export default async function SiteLayout({
         </ChatDockProvider>
 
         <BackToTop locale={locale} />
+        <Analytics />
+        <SpeedInsights />
 
         <HashCleaner />
       </body>

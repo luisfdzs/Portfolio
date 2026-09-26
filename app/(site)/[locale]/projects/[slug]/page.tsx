@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { projectMedia } from '@/content/project-shots'
 import { getProject, getProjectNeighbours, getProjectSlugs } from '@/lib/content'
-import { isLocale, type Locale, locales } from '@/lib/i18n/config'
+import { site } from '@/content/site'
+import { defaultLocale, isLocale, type Locale, localeHtmlLang, locales } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { href, projectHref } from '@/lib/i18n/routes'
+import { href, projectHref, projectsHref } from '@/lib/i18n/routes'
 import { ProjectMedia } from '@/components/sections/ProjectMedia'
 import { ProjectShot } from '@/components/sections/ProjectShot'
 import { Action } from '@/components/ui/Action'
@@ -36,12 +37,32 @@ export async function generateMetadata({
     description: project.tagline[raw],
     alternates: {
       canonical: projectHref(raw, slug),
-      languages: Object.fromEntries(locales.map((entry) => [entry, projectHref(entry, slug)])),
+      languages: {
+        ...Object.fromEntries(
+          locales.map((entry) => [localeHtmlLang[entry], projectHref(entry, slug)]),
+        ),
+        'x-default': projectHref(defaultLocale, slug),
+      },
     },
     openGraph: {
       type: 'article',
+      url: `${site.url}${projectHref(raw, slug)}`,
+      siteName: site.name,
+      locale: localeHtmlLang[raw],
       title: project.name,
       description: project.tagline[raw],
+      ...(project.image
+        ? {
+            images: [
+              {
+                url: project.image.src,
+                width: project.image.width,
+                height: project.image.height,
+                alt: project.image.alt[raw],
+              },
+            ],
+          }
+        : {}),
     },
   }
 }
@@ -89,8 +110,47 @@ export default async function ProjectPage({
     { label: t.projects.statusLabel, value: t.projects.status[project.status] },
   ]
 
+  const pageUrl = `${site.url}${projectHref(locale, project.slug)}`
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CreativeWork',
+        '@id': `${pageUrl}#work`,
+        name: project.name,
+        headline: project.tagline[locale],
+        description: project.summary[locale][0] ?? project.tagline[locale],
+        url: pageUrl,
+        inLanguage: localeHtmlLang[locale],
+        dateCreated: project.year,
+        keywords: project.stack.join(', '),
+        author: { '@id': `${site.url}/#person` },
+        isPartOf: { '@id': `${site.url}/#website` },
+        ...(project.image ? { image: `${site.url}${project.image.src}` } : {}),
+        ...(project.liveUrl ? { sameAs: project.liveUrl } : {}),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: site.name, item: `${site.url}/${locale}` },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: t.projects.allTitle,
+            item: `${site.url}${projectsHref(locale)}`,
+          },
+          { '@type': 'ListItem', position: 3, name: project.name, item: pageUrl },
+        ],
+      },
+    ],
+  }
+
   return (
     <article className="page-gutter mx-auto max-w-5xl pt-28 pb-section text-center lg:pt-40">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Reveal>
         <Link
           href={href(locale, 'projects')}

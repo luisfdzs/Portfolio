@@ -40,6 +40,7 @@ uniform float uPulse;
 uniform float uVisible;
 uniform float uOcclude;
 uniform float uDensity;
+uniform float uFormed;
 varying vec3 vColor;
 varying float vAlpha;
 
@@ -94,6 +95,49 @@ vec3 flow(vec3 q) {
 Side place(vec4 shape, vec4 nrm, float move, vec3 center, vec2 scale, float kind, float spin, vec3 pose, vec2 pivot, float seed) {
   Side s;
   s.solid = 0.0;
+  if (kind > 3.5) {
+    float role = nrm.x;
+    float formed = step(0.0, uFormed);
+    float flash = formed * exp(-uFormed * 2.5);
+    float fade = formed * smoothstep(0.15, 1.6, uFormed);
+    float keep = 1.0 - step(0.5, role);
+    float head = uTime * 0.07;
+    float comet = keep * fade * max(exp(-fract(nrm.y - head) * 10.0), exp(-fract(nrm.y + 0.5 - head) * 10.0));
+    vec2 drift = (1.0 - keep) * fade * vec2(sin(seed * 40.0) * 0.05, 0.12 + 0.2 * seed);
+    vec2 local = shape.xy * (1.0 + 0.04 * keep * fade) + drift;
+    local += vec2(sin(uTime * 0.9 + seed * 40.0), cos(uTime * 0.7 + seed * 30.0)) * 0.002;
+    s.p = center + vec3(local * scale, 0.0);
+    s.color = mix(GOLD, CREAM, shape.w) + HOT * (flash * 0.8 + comet * 0.8);
+    float before = role > 2.5 ? 0.12 : role > 1.5 ? 0.5 : role > 0.5 ? 0.3 : 0.26;
+    float after = keep * (0.05 + 0.4 * comet);
+    s.alpha = (mix(before, after, fade) + 0.35 * flash) * uDensity * 0.22;
+    s.size = 1.0 + 0.8 * flash + 0.9 * comet;
+    return s;
+  }
+  if (kind > 2.5) {
+    float role = nrm.x;
+    float sweep = fract(uTime * 0.16);
+    float line = mix(0.56, -0.56, smoothstep(0.0, 0.8, sweep));
+    float live = 1.0 - smoothstep(0.8, 1.0, sweep);
+    float d = shape.y - line;
+    float band = exp(-d * d * 500.0) * live;
+    float trail = step(0.0, d) * exp(-d * 7.0) * live;
+    vec2 local = shape.xy * (1.0 + 0.012 * sin(uTime * 1.1));
+    if (role > 0.5 && role < 1.5) {
+      local = vec2(shape.x * (0.9 + 0.1 * sin(uTime * 3.0 + seed * 20.0)), line);
+      s.p = center + vec3(local * scale, 0.0);
+      s.color = mix(GOLD, HOT, shape.w);
+      s.alpha = (0.1 + 0.08 * shape.w) * live * uDensity;
+      s.size = 1.1;
+      return s;
+    }
+    float pore = step(1.5, role);
+    s.p = center + vec3(local * scale, shape.z * scale.x);
+    s.color = mix(GOLD, CREAM, shape.w) + HOT * band * (1.0 - pore);
+    s.alpha = mix(0.05 + 0.3 * band + 0.05 * trail, 0.02 + 0.1 * band, pore) * uDensity;
+    s.size = 1.0 + 0.7 * band;
+    return s;
+  }
   if (kind > 1.5) {
     s.p = center + vec3(shape.xy * scale, 0.0);
     s.color = mix(GOLD, CREAM, shape.w);
@@ -102,14 +146,27 @@ Side place(vec4 shape, vec4 nrm, float move, vec3 center, vec2 scale, float kind
     return s;
   }
   if (kind > 0.5) {
-    float head = uTime * 0.06;
-    float comet = max(exp(-fract(nrm.x - head) * 9.0), exp(-fract(nrm.x + 0.5 - head) * 9.0));
-    vec2 local = shape.xy * (1.0 + 0.025 * uPulse * (0.5 + seed));
-    local += vec2(sin(uTime * 0.9 + seed * 40.0), cos(uTime * 0.7 + seed * 30.0)) * 0.0025;
-    s.p = center + vec3(local * scale, shape.z * scale.y);
-    s.color = mix(GOLD, CREAM, shape.w) + HOT * (comet * 0.9 + uPulse * 0.7);
-    s.alpha = 0.16 + 0.62 * comet + 0.45 * uPulse;
-    s.size = 1.0 + 1.1 * comet;
+    float role = nrm.x;
+    float m = min(scale.x, scale.y);
+    if (role < 1.5) {
+      vec2 inward = -sign(shape.xy);
+      vec2 along = role < 0.5 ? vec2(inward.x, 0.0) : vec2(0.0, inward.y);
+      vec2 across = role < 0.5 ? vec2(0.0, 1.0) : vec2(1.0, 0.0);
+      float arm = m * (0.09 + 0.05 * uPulse);
+      float glint = exp(-abs(nrm.y - fract(uTime * 0.2 + nrm.z)) * 12.0);
+      vec2 corner = shape.xy * scale * (1.0 + 0.05 * uPulse);
+      s.p = center + vec3(corner + along * nrm.y * arm + across * shape.z * m, 0.0);
+      s.color = mix(GOLD, CREAM, shape.w) + HOT * (0.6 * glint + 0.5 * uPulse);
+      s.alpha = (0.05 + 0.1 * glint + 0.12 * uPulse) * uDensity;
+      s.size = 1.0 + 0.5 * glint;
+      return s;
+    }
+    float rise = fract(nrm.y + uTime * 0.025);
+    vec2 local = shape.xy + vec2(sin(uTime * 0.4 + seed * 40.0) * 0.004, rise * 0.05);
+    s.p = center + vec3(local * scale, shape.z * m);
+    s.color = mix(GOLD, CREAM, shape.w);
+    s.alpha = 0.03 * sin(PI * rise) * uDensity;
+    s.size = 0.9;
     return s;
   }
   float turns = step(3.5, move);
@@ -164,8 +221,8 @@ void main() {
   p.y += churn * (0.08 + 0.1 * seed) * uToScale.x;
   p += churn * flow(position * 3.0 + uTime * 0.3) * 0.05 * uToScale.x;
 
-  float heroA = uFromKind > 1.5 ? smoothstep(0.0, 0.22, t) : 1.0;
-  float heroB = uToKind > 1.5 ? smoothstep(0.0, 0.22, 1.0 - t) : 1.0;
+  float heroA = abs(uFromKind - 2.0) < 0.5 ? smoothstep(0.0, 0.22, t) : 1.0;
+  float heroB = abs(uToKind - 2.0) < 0.5 ? smoothstep(0.0, 0.22, 1.0 - t) : 1.0;
   float alpha = mix(a.alpha, b.alpha, e);
   alpha = mix(alpha, (0.1 + 0.08 * seed) * uDensity, pinch);
   alpha *= uCalm > 0.5 ? abs(1.0 - 2.0 * e) : 1.0;

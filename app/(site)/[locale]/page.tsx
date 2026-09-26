@@ -8,7 +8,9 @@ import {
   getProfile,
   getSkills,
 } from '@/lib/content'
-import { isLocale, type Locale } from '@/lib/i18n/config'
+import { buildDate } from '@/lib/format'
+import { isLocale, localeHtmlLang, locales, type Locale } from '@/lib/i18n/config'
+import { getDictionary } from '@/lib/i18n/dictionaries'
 import { About } from '@/components/sections/About'
 import { Education } from '@/components/sections/Education'
 import { Experience } from '@/components/sections/Experience'
@@ -23,6 +25,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale: raw } = await params
   if (!isLocale(raw)) notFound()
   const locale: Locale = raw
+  const t = getDictionary(locale)
 
   const [profile, experience, education, skills, projects] = await Promise.all([
     getProfile(),
@@ -33,22 +36,60 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   ])
 
   const currentJob = experience.find((entry) => entry.range.end === null) ?? experience[0]
+  const personId = `${site.url}/#person`
+  const websiteId = `${site.url}/#website`
+  const pageUrl = `${site.url}/${locale}`
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: profile.name,
-    url: `${site.url}/${locale}`,
-    jobTitle: profile.headline[locale],
-    email: `mailto:${profile.email}`,
-    description: profile.bio[locale][0],
-    sameAs: [profile.linkedin, profile.github],
-    ...(currentJob ? { worksFor: { '@type': 'Organization', name: currentJob.company } } : {}),
-    alumniOf: education.map((entry) => ({
-      '@type': 'EducationalOrganization',
-      name: entry.institution[locale],
-      ...(entry.url ? { url: entry.url } : {}),
-    })),
-    knowsAbout: skills.flatMap((group) => group.items),
+    '@graph': [
+      {
+        '@type': 'Person',
+        '@id': personId,
+        name: profile.name,
+        givenName: 'Luis',
+        familyName: 'Fernández Sangil',
+        alternateName: site.alternateNames,
+        url: site.url,
+        image: `${site.url}${profile.photo.src}`,
+        jobTitle: profile.headline[locale],
+        email: `mailto:${profile.email}`,
+        description: profile.bio[locale][0],
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Vigo',
+          addressRegion: 'Galicia',
+          addressCountry: 'ES',
+        },
+        knowsLanguage: ['es', 'en'],
+        sameAs: [profile.linkedin, profile.github],
+        ...(currentJob ? { worksFor: { '@type': 'Organization', name: currentJob.company } } : {}),
+        alumniOf: education.map((entry) => ({
+          '@type': 'EducationalOrganization',
+          name: entry.institution[locale],
+          ...(entry.url ? { url: entry.url } : {}),
+        })),
+        knowsAbout: skills.flatMap((group) => group.items),
+      },
+      {
+        '@type': 'WebSite',
+        '@id': websiteId,
+        name: site.name,
+        alternateName: site.alternateNames,
+        url: site.url,
+        inLanguage: locales.map((entry) => localeHtmlLang[entry]),
+        publisher: { '@id': personId },
+      },
+      {
+        '@type': 'ProfilePage',
+        '@id': `${pageUrl}#page`,
+        url: pageUrl,
+        name: t.meta.title,
+        inLanguage: localeHtmlLang[locale],
+        isPartOf: { '@id': websiteId },
+        mainEntity: { '@id': personId },
+        dateModified: buildDate().toISOString(),
+      },
+    ],
   }
 
   return (

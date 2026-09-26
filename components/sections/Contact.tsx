@@ -14,6 +14,9 @@ export function Contact({ locale, profile }: { locale: Locale; profile: Profile 
     <div id={sections.contact} className="mt-16 border-t border-line pt-14 lg:mt-20">
       <Reveal>
         <div className="flex items-center justify-center gap-3 border-b border-line pb-4">
+          <span className="figure-num text-small text-signal" aria-hidden="true">
+            05
+          </span>
           <Mail className="size-4 text-paper-faint" />
           <span className="eyebrow">{t.contact.title}</span>
         </div>

@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { cn } from '@/lib/cn'
 import type { ShowcaseSet } from '@/content/types'
 import { showcaseSets } from '@/components/sections/showcases'
-import { registerAnchor } from '@/components/three/swarm/registry'
+import { registerAnchor, type SwarmMarkKind } from '@/components/three/swarm/registry'
 
 export function SwarmAnchor({
   set,
@@ -32,7 +32,7 @@ export function SwarmAnchor({
   )
 }
 
-export function SwarmMark({ kind }: { kind: 'hero' | 'frame' }) {
+export function SwarmMark({ kind }: { kind: SwarmMarkKind }) {
   const mark = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import { SectionHeading } from '@/components/ui/SectionHeading'
 import { User } from '@/components/ui/Icons'
 import { Contact } from '@/components/sections/Contact'
+import { SwarmMark } from '@/components/sections/SwarmAnchor'
 
 export function About({ locale, profile }: { locale: Locale; profile: Profile }) {
   const t = getDictionary(locale)
@@ -17,6 +18,10 @@ export function About({ locale, profile }: { locale: Locale; profile: Profile })
       className="page-gutter mx-auto max-w-7xl section-block text-center"
     >
       <SectionHeading index="04" title={t.about.title} kicker={t.about.kicker} icon={User} />
+
+      <div className="relative mx-auto -mt-4 mb-10 size-44 sm:size-56 lg:-mt-6 lg:mb-12">
+        <SwarmMark kind="print" />
+      </div>
 
       {lead ? (
         <Reveal>

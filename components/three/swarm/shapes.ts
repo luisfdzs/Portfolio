@@ -4,13 +4,15 @@ import type { AgvWorkerResult } from '@/components/three/agv/agv.worker'
 export const MODEL = 0
 export const FRAME = 1
 export const HERO = 2
+export const PRINT = 3
+export const SOCIAL = 4
 
 export const HOLD = 5
 
 const FIT = 2.2
 
 export type Shape = {
-  kind: typeof MODEL | typeof FRAME | typeof HERO
+  kind: typeof MODEL | typeof FRAME | typeof HERO | typeof PRINT | typeof SOCIAL
   position: BufferAttribute
   normal: BufferAttribute
   meta: BufferAttribute
@@ -202,16 +204,115 @@ export function frameShape(count: number): Shape {
   const normal = shape.normal.array as Float32Array
   const meta = shape.meta.array as Float32Array
   for (let i = 0; i < count; i++) {
-    const u = Math.random()
-    const [x, y, nx, ny] = roundedRect(u, 0.06)
-    const spark = Math.random() < 0.18 ? Math.pow(Math.random(), 3) * 0.07 : 0
-    const offset = (Math.random() - 0.5) * 0.008 + spark
-    position[i * 4] = (x ?? 0) + (nx ?? 0) * offset
-    position[i * 4 + 1] = (y ?? 0) + (ny ?? 0) * offset
-    position[i * 4 + 2] = (Math.random() - 0.5) * 0.01
+    if (Math.random() < 0.1) {
+      const corner = Math.floor(Math.random() * 4)
+      position[i * 4] = corner % 2 === 0 ? 0.5 : -0.5
+      position[i * 4 + 1] = corner < 2 ? 0.5 : -0.5
+      position[i * 4 + 2] = (Math.random() - 0.5) * 0.006
+      normal[i * 4] = Math.random() < 0.5 ? 0 : 1
+      normal[i * 4 + 1] = Math.pow(Math.random(), 1.3)
+      normal[i * 4 + 2] = corner * 0.25
+    } else {
+      const [x, y, nx, ny] = roundedRect(Math.random(), 0.06)
+      const offset = 0.01 + Math.pow(Math.random(), 2.4) * 0.16
+      position[i * 4] = (x ?? 0) + (nx ?? 0) * offset
+      position[i * 4 + 1] = (y ?? 0) + (ny ?? 0) * offset
+      position[i * 4 + 2] = (Math.random() - 0.5) * 0.05
+      normal[i * 4] = 2
+      normal[i * 4 + 1] = Math.random()
+    }
     position[i * 4 + 3] = Math.random()
-    normal[i * 4] = u
     meta[i * 2 + 1] = Math.random() * 0.95
   }
   return shape
+}
+
+function ridgeField(x: number, y: number) {
+  const dx = x - 0.015
+  const dy = y - 0.07
+  const r = Math.hypot(dx, dy * 0.74)
+  const a = Math.atan2(dy, dx)
+  const settle = smooth(ramp(r, 0.02, 0.14))
+  const loop = r + settle * (0.022 * Math.sin(3 * a + r * 9) + 0.012 * Math.sin(7 * a + 1.3))
+  const below = smooth(ramp(-dy, 0.12, 0.34))
+  const flat = -dy * 0.9 + 0.035 * Math.sin(dx * 7 + 0.6) + 0.1
+  return (loop * (1 - below) + flat * below) * 42
+}
+
+export function printShape(count: number): Shape {
+  const shape = emptyShape(PRINT, count)
+  const position = shape.position.array as Float32Array
+  const normal = shape.normal.array as Float32Array
+  const meta = shape.meta.array as Float32Array
+  const inside = (x: number, y: number) => {
+    const ex = x / 0.34
+    const ey = y > 0 ? y / 0.47 : y / 0.4
+    return ex * ex + ey * ey
+  }
+  for (let i = 0; i < count; i++) {
+    const roll = Math.random()
+    let x = 0
+    let y = 0
+    let role = 0
+    let tone = 1
+    if (roll < 0.05) {
+      x = (Math.random() - 0.5) * 0.86
+      y = 0
+      role = 1
+      tone = 0.6 + Math.random() * 0.4
+    } else if (roll < 0.22) {
+      do {
+        x = (Math.random() - 0.5) * 0.7
+        y = (Math.random() - 0.5) * 0.95
+      } while (inside(x, y) > 1)
+      role = 2
+      tone = Math.random() * 0.5
+    } else {
+      for (let tries = 0; tries < 200; tries++) {
+        x = (Math.random() - 0.5) * 0.7
+        y = (Math.random() - 0.5) * 0.95
+        const edge = inside(x, y)
+        if (edge > 1 || Math.random() > 1 - smooth(ramp(edge, 0.7, 1))) continue
+        const v = ridgeField(x, y)
+        if (Math.abs((((v % 1) + 1) % 1) - 0.5) > 0.11) continue
+        const band = Math.floor(v)
+        const gap = Math.sin(band * 7.13 + Math.atan2(y - 0.07, x) * (3 + (band % 3)))
+        if (gap > 0.93) continue
+        break
+      }
+      tone = 0.55 + Math.random() * 0.45
+    }
+    position[i * 4] = x
+    position[i * 4 + 1] = y
+    position[i * 4 + 2] = (Math.random() - 0.5) * 0.02
+    position[i * 4 + 3] = tone
+    normal[i * 4] = role
+    meta[i * 2 + 1] = Math.min(1, Math.hypot(x, y) * 1.4 + Math.random() * 0.15)
+  }
+  return shape
+}
+
+export function fillSocial(shape: Shape, source: Float32Array | null) {
+  const total = source ? source.length / 4 : 0
+  if (!source || total === 0) return false
+  const position = shape.position.array as Float32Array
+  const normal = shape.normal.array as Float32Array
+  const meta = shape.meta.array as Float32Array
+  const count = meta.length / 2
+  for (let i = 0; i < count; i++) {
+    const pick = Math.floor(Math.random() * total)
+    const x = source[pick * 4] ?? 0
+    const role = source[pick * 4 + 2] ?? 0
+    position[i * 4] = x
+    position[i * 4 + 1] = source[pick * 4 + 1] ?? 0
+    position[i * 4 + 2] = 0
+    position[i * 4 + 3] = role > 1.5 && role < 2.5 ? 1 : 0.3 + Math.random() * 0.5
+    normal[i * 4] = role
+    normal[i * 4 + 1] = source[pick * 4 + 3] ?? 0
+    meta[i * 2 + 1] = Math.min(1, Math.max(0, x + 0.5) * 0.75 + Math.random() * 0.2)
+  }
+  shape.position.needsUpdate = true
+  shape.normal.needsUpdate = true
+  shape.meta.needsUpdate = true
+  return true
 }

@@ -2,13 +2,18 @@ import type { MetadataRoute } from 'next'
 import { site } from '@/content/site'
 import { getProjectSlugs } from '@/lib/content'
 import { buildDate } from '@/lib/format'
-import { locales } from '@/lib/i18n/config'
+import { type Locale, localeHtmlLang, locales } from '@/lib/i18n/config'
 import { projectHref, projectsHref } from '@/lib/i18n/routes'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = []
   const slugs = await getProjectSlugs()
   const lastModified = buildDate()
+  const alternates = (path: (locale: Locale) => string) => ({
+    languages: Object.fromEntries(
+      locales.map((entry) => [localeHtmlLang[entry], `${site.url}${path(entry)}`]),
+    ),
+  })
 
   for (const locale of locales) {
     entries.push({
@@ -16,6 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified,
       changeFrequency: 'monthly',
       priority: 1,
+      alternates: alternates((entry) => `/${entry}`),
     })
 
     entries.push({
@@ -23,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified,
       changeFrequency: 'monthly',
       priority: 0.8,
+      alternates: alternates(projectsHref),
     })
 
     for (const slug of slugs) {
@@ -31,6 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified,
         changeFrequency: 'yearly',
         priority: 0.6,
+        alternates: alternates((entry) => projectHref(entry, slug)),
       })
     }
   }

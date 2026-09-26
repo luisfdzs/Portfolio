@@ -130,10 +130,10 @@ const es = {
   },
 
   meta: {
-    title: 'Luis Fernández Sangil · Ingeniero industrial y desarrollador web',
+    title: 'Luis Fernández Sangil · Ingeniero de software y sistemas',
     description:
-      'Portfolio y CV de Luis Fernández Sangil. Ingeniero industrial y desarrollador web con {years} años de experiencia en .NET, React y Next.js. Proyectos, experiencia y formación.',
-    ogAlt: 'Luis Fernández Sangil — Ingeniero industrial y desarrollador web',
+      'Luis Fernández Sangil, ingeniero de software y sistemas en Vigo (Galicia) y en remoto. {years} años con .NET, React y Next.js. Proyectos, experiencia y CV.',
+    ogAlt: 'Luis Fernández Sangil — Ingeniero de software y sistemas',
   },
 }
 
@@ -268,10 +268,10 @@ const en: Dictionary = {
   },
 
   meta: {
-    title: 'Luis Fernández Sangil · Industrial engineer and web developer',
+    title: 'Luis Fernández Sangil · Software and systems engineer',
     description:
-      'Portfolio and CV of Luis Fernández Sangil. Industrial engineer and web developer with {years} years of experience in .NET, React and Next.js. Projects, experience and education.',
-    ogAlt: 'Luis Fernández Sangil — Industrial engineer and web developer',
+      'Luis Fernández Sangil, software and systems engineer based in Vigo, Spain, working remotely. {years} years with .NET, React and Next.js. Projects, experience and CV.',
+    ogAlt: 'Luis Fernández Sangil — Software and systems engineer',
   },
 }
 

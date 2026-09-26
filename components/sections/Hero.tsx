@@ -11,8 +11,8 @@ export function Hero({ locale, profile }: { locale: Locale; profile: Profile }) 
       aria-labelledby="hero-name"
       className="hero-section relative h-svh min-h-[560px] overflow-hidden"
     >
-      <h1 id="hero-name" className="sr-only print:not-sr-only print:text-title" lang="es">
-        {profile.name} · {profile.headline[locale]}
+      <h1 id="hero-name" className="sr-only print:not-sr-only print:text-title">
+        {profile.name} · {profile.headline[locale]} · {profile.location[locale]}
       </h1>
       <HeroLaunch copy={t.hero.launch} locale={locale} />
     </section>
