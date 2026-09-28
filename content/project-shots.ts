@@ -58,11 +58,6 @@ const media: Record<string, ProjectMediaSet> = {
       mobile: { src: '/projects/cedece-chrome-mobile.webp', clips: [{ src: '/projects/cedece.mp4', frame: { top: 0, left: 0, width: 100, height: 100 } }] },
     },
   },
-  'sangil-studio-test': {
-    desktop: { src: '/projects/shots/sangil-studio-test.webp', width: 1280, height: 800 },
-    mobile: { src: '/projects/shots/sangil-studio-test-mobile.webp', width: 430, height: 932 },
-    clip: { desktop: '/projects/sangil-studio-test.webm', mobile: '/projects/sangil-studio-test-mobile.webm' },
-  },
   'sangil-studio': {
     desktop: { src: '/projects/shots/sangil-studio.webp', width: 1280, height: 800 },
     mobile: { src: '/projects/shots/sangil-studio-mobile.webp', width: 430, height: 932 },

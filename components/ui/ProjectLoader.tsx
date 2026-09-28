@@ -115,14 +115,6 @@ const dots = (
   </span>
 )
 
-const crossFade = (
-  <span className="pl-fade">
-    <span />
-    <span />
-    <span />
-  </span>
-)
-
 const loaders: Record<string, Loader> = {
   site: { mark: '#e0a458', art: terminal, cycle: 1600 },
   'bonsai-artesania': { mark: '#9db38f', art: flower, cycle: 2800 },
@@ -131,7 +123,6 @@ const loaders: Record<string, Loader> = {
   'mila-barber': { mark: '#e0a938', art: pole, cycle: 1500 },
   'ckm-combat-academy': { mark: '#e63b52', art: slam, cycle: 1600 },
   'sangil-studio': { mark: '#e9e6e1', art: bar, cycle: 2400 },
-  'sangil-studio-test': { mark: '#d9d6d1', art: crossFade, cycle: 2700 },
   blablatour: { mark: '#4ec2a3', ring: '#2f4a43', art: ring, cycle: 1000 },
   'almuerziko-san-fermin': { mark: '#f04a56', art: kerchief, cycle: 2400 },
   portfolio: { mark: '#e0a458', art: dots, cycle: 1500 },
