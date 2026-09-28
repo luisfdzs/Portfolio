@@ -164,9 +164,7 @@ type Swarm = ReturnType<typeof buildSwarm>
 
 function frontCard(section: Element | null) {
   if (!section) return null
-  const cards = section.querySelectorAll<HTMLElement>(
-    '.cover-flow-track > li:not([data-clone]) .cover-flow-card',
-  )
+  const cards = section.querySelectorAll<HTMLElement>('.cover-flow-track > li .cover-flow-card')
   const middle = window.innerWidth / 2
   let best: HTMLElement | null = null
   let distance = Infinity

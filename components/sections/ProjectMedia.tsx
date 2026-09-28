@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
-import { COVER_FLOW_ARM, COVER_FLOW_ITEM, COVER_FLOW_MOVE } from '@/lib/cover-flow'
+import { COVER_FLOW_FRONT, COVER_FLOW_FRONT_MARK, COVER_FLOW_ITEM } from '@/lib/cover-flow'
 import { warmWhenIdle } from '@/lib/media-warmup'
 import { ProjectLoader, loaderCycle } from '@/components/ui/ProjectLoader'
 
@@ -24,7 +24,6 @@ const BLANK_SD = 4
 const MAX_WARM = 2500
 const SAMPLE = { width: 32, height: 18 }
 const FADE_OUT = 700
-const ARM_HOLD = 1400
 const MIN_COVER = 520
 const WARM_CAP = 8000
 const WARM_PROBE = 1500
@@ -338,107 +337,49 @@ export function ProjectMedia({
       }
     }
 
-    const unwarm = node.closest('[data-clone]') ? null : warmWhenIdle(node, warm)
+    const unwarm = warmWhenIdle(node, warm)
+    const item = node.closest(`.${COVER_FLOW_ITEM}`)
 
-    const scroller = node.closest('.cover-flow')
-
-    if (!scroller) {
-      const element = video.current
-      if (!element) return
-
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (!entry) return
-          if (entry.isIntersecting) start()
-          else stop()
-        },
-        { threshold: 0.4 },
-      )
-      observer.observe(node)
-
-      return () => {
-        unwarm?.()
-        wide.removeEventListener('change', pickSource)
-        observer.disconnect()
-        window.clearTimeout(look)
-        window.clearTimeout(show)
-        window.clearTimeout(rewind)
-        window.clearTimeout(glitch)
-        element.removeEventListener('ended', again)
-        element.pause()
-      }
-    }
-
-    let frame = 0
-    let active: boolean | null = null
-    let armedAt = 0
-    let expiry = 0
-
-    function centred() {
-      const node = container.current
-      if (!node || !scroller) return false
-
-      const card = node.getBoundingClientRect()
-      const view = scroller.getBoundingClientRect()
-      if (card.width === 0) return false
-
-      const offset = Math.abs(card.left + card.width / 2 - (view.left + view.width / 2))
-      return offset < card.width * 0.2 && card.bottom > 0 && card.top < window.innerHeight
-    }
+    let seen = false
+    let fronted = !item || item.hasAttribute(COVER_FLOW_FRONT_MARK)
+    let active = false
 
     function sync() {
-      frame = 0
-      const element = video.current
-      if (!element) return
-
-      const next = centred()
-      if (next) armedAt = 0
+      const next = seen && fronted
       if (next === active) return
-      if (!next && armedAt && performance.now() - armedAt < ARM_HOLD) return
-      if (next && scroller?.hasAttribute('data-moving')) return
       active = next
 
       if (next) start()
       else stop()
     }
 
-    function schedule() {
-      if (frame) return
-      frame = requestAnimationFrame(sync)
+    function lead(event: Event) {
+      fronted = (event as CustomEvent<boolean>).detail
+      sync()
     }
 
-    function arm() {
-      armedAt = performance.now()
-      active = true
-      start()
-      window.clearTimeout(expiry)
-      expiry = window.setTimeout(schedule, ARM_HOLD + 20)
-    }
-
-    const item = node.closest(`.${COVER_FLOW_ITEM}`)
-    item?.addEventListener(COVER_FLOW_ARM, arm)
-
-    schedule()
-    scroller.addEventListener('scroll', schedule, { passive: true })
-    scroller.addEventListener(COVER_FLOW_MOVE, schedule)
-    window.addEventListener('scroll', schedule, { passive: true })
-    window.addEventListener('resize', schedule)
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) return
+        seen = entry.isIntersecting
+        sync()
+      },
+      { threshold: 0.4 },
+    )
+    observer.observe(node)
+    item?.addEventListener(COVER_FLOW_FRONT, lead)
 
     return () => {
-      unwarm?.()
-      cancelAnimationFrame(frame)
+      unwarm()
+      observer.disconnect()
+      item?.removeEventListener(COVER_FLOW_FRONT, lead)
+      clip?.removeEventListener('ended', again)
+      wide.removeEventListener('change', pickSource)
       window.clearTimeout(look)
       window.clearTimeout(show)
       window.clearTimeout(rewind)
-      window.clearTimeout(expiry)
       window.clearTimeout(glitch)
-      item?.removeEventListener(COVER_FLOW_ARM, arm)
-      clip?.removeEventListener('ended', again)
-      wide.removeEventListener('change', pickSource)
-      scroller.removeEventListener('scroll', schedule)
-      scroller.removeEventListener(COVER_FLOW_MOVE, schedule)
-      window.removeEventListener('scroll', schedule)
-      window.removeEventListener('resize', schedule)
+      for (const element of live()) element.pause()
     }
   }, [slug, src.desktop, src.mobile, chrome])
 

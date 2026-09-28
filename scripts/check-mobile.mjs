@@ -225,7 +225,7 @@ async function main() {
     `/${LOCALE}/projects redirige a la portada (${new URL(page.url()).pathname})`,
   )
 
-  const firstCard = page.locator('li:not([data-clone]) article h3 a').first()
+  const firstCard = page.locator('.cover-flow-item article h3 a').first()
   const cardHref = await firstCard.getAttribute('href')
   check(Boolean(cardHref?.startsWith('/')), `los enlaces de tarjeta son absolutos (${cardHref})`)
 

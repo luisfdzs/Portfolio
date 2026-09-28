@@ -1,10 +1,10 @@
-export const COVER_FLOW_ARM = 'cover-flow-arm'
+export const COVER_FLOW_FRONT = 'cover-flow-front'
 
-export const COVER_FLOW_MOVE = 'cover-flow-move'
+export const COVER_FLOW_FRONT_MARK = 'data-front'
 
 export const COVER_FLOW_ITEM = 'cover-flow-item'
 
-export const COVER_FLOW_CALM = '(prefers-reduced-motion: reduce)'
+export const COVER_FLOW_STILL = '(prefers-reduced-motion: reduce)'
 
 export const COVER_FLOW_ROOMY = '(min-width: 64rem)'
 
@@ -61,10 +61,11 @@ export function placeCard(gap: number, tune: Tune): Placement {
   }
 }
 
-export function armCoverFlowItem(item: Element) {
-  item.dispatchEvent(new CustomEvent(COVER_FLOW_ARM))
+export function wrapGap(raw: number, count: number) {
+  return ((((raw + count / 2) % count) + count) % count) - count / 2
 }
 
-export function announceCoverFlowMove(scroller: Element) {
-  scroller.dispatchEvent(new CustomEvent(COVER_FLOW_MOVE))
+export function frontCoverFlowItem(item: Element, front: boolean) {
+  item.toggleAttribute(COVER_FLOW_FRONT_MARK, front)
+  item.dispatchEvent(new CustomEvent<boolean>(COVER_FLOW_FRONT, { detail: front }))
 }
