@@ -102,6 +102,30 @@ const es = {
     githubLabel: 'GitHub',
     copyEmail: 'Copiar el correo',
     copied: 'Copiado',
+    downloadCv: 'Descargar el CV en PDF',
+  },
+
+  cv: {
+    documentTitle: 'Currículum',
+    eyebrow: 'Currículum vítae',
+    experience: 'Experiencia',
+    projects: 'Proyectos',
+    projectsIntro:
+      'Webs que he diseñado, desarrollado y puesto en producción de principio a fin, la mayoría para clientes reales.',
+    skills: 'Stack técnico',
+    education: 'Formación',
+    languages: 'Idiomas',
+    about: 'Sobre mí',
+    figures: {
+      years: 'años de experiencia',
+      live: 'proyectos en producción',
+      technologies: 'tecnologías implementadas',
+    },
+    caseStudy: 'Caso completo',
+    source: 'Código',
+    portfolioButton: 'Visita',
+    updated: 'Actualizado en {date}',
+    duration: { year: 'año', years: 'años', month: 'mes', months: 'meses' },
   },
 
   footer: {
@@ -241,6 +265,30 @@ const en: Dictionary = {
     githubLabel: 'GitHub',
     copyEmail: 'Copy email',
     copied: 'Copied',
+    downloadCv: 'Download the CV as PDF',
+  },
+
+  cv: {
+    documentTitle: 'Résumé',
+    eyebrow: 'Curriculum vitae',
+    experience: 'Experience',
+    projects: 'Projects',
+    projectsIntro:
+      'Websites I have designed, built and shipped to production end to end, most of them for real clients.',
+    skills: 'Tech stack',
+    education: 'Education',
+    languages: 'Languages',
+    about: 'About me',
+    figures: {
+      years: 'years of experience',
+      live: 'projects in production',
+      technologies: 'technologies',
+    },
+    caseStudy: 'Case study',
+    source: 'Source',
+    portfolioButton: 'Visit',
+    updated: 'Updated {date}',
+    duration: { year: 'year', years: 'years', month: 'month', months: 'months' },
   },
 
   footer: {

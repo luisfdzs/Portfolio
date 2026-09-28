@@ -13,8 +13,8 @@ export const portrait: DescribedImage = {
 export const profile: Profile = {
   name: 'Luis Fernández Sangil',
   headline: {
-    es: 'Ingeniero de software y sistemas',
-    en: 'Software and systems engineer',
+    es: 'Ingeniero de software',
+    en: 'Software engineer',
   },
   location: {
     es: 'Vigo, Galicia · En remoto',
@@ -25,14 +25,46 @@ export const profile: Profile = {
   github: 'https://github.com/luisfdzs',
   bio: {
     es: [
-      'Como muchos otros desarrolladores, mi formación ha sido 100 % autodidacta, ya que a pesar de haber estudiado ingeniería industrial, me enfoqué en el desarrollo de software y dediqué un tiempo importante a realizar cursos y proyectos personales.',
-      'Trato de darles la importancia que se merecen a todas las habilidades no tan relacionadas con la programación y el desarrollo de software, sino más relacionadas con ser un buen profesional: lo que llamamos «habilidades blandas». La parte humana es cada vez más importante, y esto es algo en lo que no se puede mejorar simplemente usando IA.',
+      'Como muchos otros desarrolladores, mi formación ha sido 100\u00a0% autodidacta, ya que a pesar de haber estudiado ingeniería industrial, me enfoqué en el desarrollo de software y dediqué un tiempo importante a realizar cursos y proyectos personales.',
+      'Trato de darles la importancia que se merecen a todas las habilidades no tan relacionadas con la programación y el desarrollo de software, sino más relacionadas con ser un buen profesional: lo que llamamos habilidades blandas. La parte humana es cada vez más importante, y esto es algo en lo que no se puede mejorar simplemente usando IA.',
     ],
     en: [
       'Like many other developers, my training has been entirely self-taught: despite having studied industrial engineering, I focused on software development and put serious time into courses and personal projects.',
       'I try to give the attention they deserve to all the skills that have less to do with programming and software development, and more to do with being a good professional: what we call “soft skills”. The human side matters more and more, and it is not something you can get better at just by using AI.',
     ],
   },
+  summary: {
+    es: [
+      {
+        text: 'Graduado en Ingeniería Industrial Electrónica y Automática por la Escuela de Ingenieros Industriales de la Universidad de Vigo, EEI.',
+      },
+      {
+        text: 'Desarrollador de software con +{years} años de experiencia en distintos sectores.',
+      },
+      {
+        text: 'Desarrollo y mantengo en producción actualmente webs, apps y soluciones digitales reales para distintas empresas.',
+      },
+    ],
+    en: [
+      {
+        text: "Bachelor's degree in Industrial Electronics and Automation Engineering from the University of Vigo, EEI (School of Industrial Engineers).",
+      },
+      {
+        text: 'Software developer with {years}+ years of experience across different sectors.',
+      },
+      {
+        text: 'I currently develop and maintain websites, apps and real digital solutions in production for different companies.',
+      },
+    ],
+  },
+  languages: [
+    { name: { es: 'Español', en: 'Spanish' }, level: { es: 'Nativo', en: 'Native' } },
+    { name: { es: 'Gallego', en: 'Galician' }, level: { es: 'Nativo', en: 'Native' } },
+    {
+      name: { es: 'Inglés', en: 'English' },
+      level: { es: 'Intermedio · B1', en: 'Intermediate · B1' },
+    },
+  ],
   photo: portrait,
 }
 
@@ -49,7 +81,7 @@ export const experience: ExperienceEntry[] = [
     remote: true,
     summary: {
       es: [
-        'Mobile Smart City es «el Telpark de Estados Unidos»: la empresa líder en gestión de parkings, permisos anuales para zonas de aparcamiento y reservas de plaza, entre otros servicios.',
+        'Mobile Smart City es "el Telpark de Estados Unidos": la empresa líder en gestión de parkings, permisos anuales para zonas de aparcamiento y reservas de plaza, entre otros servicios.',
         'Desarrollo nuevas aplicaciones web para la gestión de aparcamiento, además de mantener proyectos legacy, resolver incidencias y realizar migraciones a tecnologías web más actuales.',
       ],
       en: [
@@ -177,7 +209,7 @@ export const education: EducationEntry[] = [
       en: "Bachelor's degree in Industrial Electronics and Automation Engineering",
     },
     institution: { es: 'Universidad de Vigo', en: 'University of Vigo' },
-    range: { start: '2020-09', end: '2025-06' },
+    range: { start: '2016-09', end: '2021-06' },
     location: { es: 'Vigo, Galicia', en: 'Vigo, Spain' },
     note: {
       es: [

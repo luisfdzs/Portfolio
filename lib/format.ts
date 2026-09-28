@@ -25,6 +25,11 @@ export function formatRange(range: DateRange, locale: Locale, presentLabel: stri
   return `${start} — ${end}`
 }
 
+export function formatYearRange(range: DateRange, presentLabel: string): string {
+  const end = range.end ? range.end.slice(0, 4) : presentLabel
+  return `${range.start.slice(0, 4)} — ${end}`
+}
+
 function monthsBetween(start: YearMonth, end: YearMonth): number {
   const a = parse(start)
   const b = parse(end)

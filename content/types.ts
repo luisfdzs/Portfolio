@@ -65,6 +65,16 @@ export type ProjectEntry = {
   featured?: boolean
 }
 
+export type LanguageEntry = {
+  name: Localized
+  level: Localized
+}
+
+export type SummaryPoint = {
+  text: string
+  items?: string[]
+}
+
 export type Profile = {
   name: string
   headline: Localized
@@ -73,5 +83,7 @@ export type Profile = {
   linkedin: string
   github: string
   bio: Localized<string[]>
+  summary: Localized<SummaryPoint[]>
+  languages: LanguageEntry[]
   photo: DescribedImage
 }

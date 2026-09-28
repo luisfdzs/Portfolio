@@ -12,7 +12,8 @@
     "check": "npm run typecheck && npm run lint && prettier --check .",
     "format": "prettier --write .",
     "check:mobile": "node scripts/check-mobile.mjs",
-    "shots": "node scripts/record-project-heros.mjs"
+    "shots": "node scripts/record-project-heros.mjs",
+    "cv": "node scripts/build-cv.mjs"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.64",
