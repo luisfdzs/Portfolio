@@ -435,7 +435,6 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
   }
   director.pulse = Math.max(0, director.pulse - dt * 1.4)
 
-  document.body.dataset.swarm = JSON.stringify({ from: f.from.station.anchor.source.kind, to: f.to.station.anchor.source.kind, d: +f.d.toFixed(3), p: +p.toFixed(3), bridge: f.bridge, lead: lead ? (lead === f.to ? 'to' : 'from') : null, home: home ? (home === f.to ? 'to' : 'from') : null, cycle: lead ? +lead.station.cycle.toFixed(2) : null, index: lead ? lead.station.index : null, fromTop: Math.round(f.from.station.rect.y), toTop: Math.round(f.to.station.rect.y) })
   bind(swarm, f)
   applySide(swarm.from, f.from, library, wpp, width, height)
   applySide(swarm.to, f.to, library, wpp, width, height)
