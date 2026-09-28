@@ -36,24 +36,24 @@ export const profile: Profile = {
   summary: {
     es: [
       {
-        text: 'Graduado en Ingeniería Industrial Electrónica y Automática por la Escuela de Ingenieros Industriales de la Universidad de Vigo, EEI.',
+        text: 'Desarrollo y mantengo actualmente **+10 webs en producción** para empresas reales.',
       },
       {
-        text: 'Desarrollador de software con +{years} años de experiencia en distintos sectores.',
+        text: 'Desarrollador de software con **+{years} años de experiencia** en distintos sectores.',
       },
       {
-        text: 'Desarrollo y mantengo en producción actualmente webs, apps y soluciones digitales reales para distintas empresas.',
+        text: 'Graduado en **Ingeniería Industrial Electrónica y Automática** por la Escuela de Ingenieros Industriales de la Universidad de Vigo, EEI.',
       },
     ],
     en: [
       {
-        text: "Bachelor's degree in Industrial Electronics and Automation Engineering from the University of Vigo, EEI (School of Industrial Engineers).",
+        text: 'I currently develop and maintain **10+ websites in production** for real companies.',
       },
       {
-        text: 'Software developer with {years}+ years of experience across different sectors.',
+        text: 'Software developer with **{years}+ years of experience** across different sectors.',
       },
       {
-        text: 'I currently develop and maintain websites, apps and real digital solutions in production for different companies.',
+        text: "Bachelor's degree in **Industrial Electronics and Automation Engineering** from the University of Vigo, EEI (School of Industrial Engineers).",
       },
     ],
   },
@@ -81,11 +81,11 @@ export const experience: ExperienceEntry[] = [
     remote: true,
     summary: {
       es: [
-        'Mobile Smart City es "el Telpark de Estados Unidos": la empresa líder en gestión de parkings, permisos anuales para zonas de aparcamiento y reservas de plaza, entre otros servicios.',
+        'Mobile Smart City es “el Telpark de Estados Unidos”: la empresa líder en gestión de parkings, permisos anuales para zonas de aparcamiento y reservas de plaza, entre otros servicios.',
         'Desarrollo nuevas aplicaciones web para la gestión de aparcamiento, además de mantener proyectos legacy, resolver incidencias y realizar migraciones a tecnologías web más actuales.',
       ],
       en: [
-        'Mobile Smart City is “the Telpark of the United States”: the leading company for parking management, annual permits for parking zones and space reservations, among other services.',
+        'Mobile Smart City is a leading US parking-management company, handling annual permits for parking zones, space reservations and other parking services.',
         'I develop new web applications for parking management, as well as maintaining legacy projects, resolving incidents and carrying out migrations to more current web technologies.',
       ],
     },
@@ -205,7 +205,7 @@ export const education: EducationEntry[] = [
   {
     slug: 'grado-ingenieria-industrial',
     title: {
-      es: 'Grado en Ingeniería en Electrónica Industrial y Automática',
+      es: 'Grado en Ingeniería Industrial Electrónica y Automática',
       en: "Bachelor's degree in Industrial Electronics and Automation Engineering",
     },
     institution: { es: 'Universidad de Vigo', en: 'University of Vigo' },
@@ -213,7 +213,7 @@ export const education: EducationEntry[] = [
     location: { es: 'Vigo, Galicia', en: 'Vigo, Spain' },
     note: {
       es: [
-        'Quizás lo mejor que me ha aportado este grado es una forma de pensar bien estructurada: «todos los problemas pueden resolverse, siempre y cuando se dividan primero en partes más sencillas y manejables».',
+        'Quizás lo mejor que me ha aportado este grado es una forma de pensar bien estructurada: “todos los problemas pueden resolverse, siempre y cuando se dividan primero en partes más sencillas y manejables”.',
         'Pensar de forma global en el problema, tener perspectiva antes de picar código, redactar buenos prompts cuando uso IA, ser específico y concreto, implementar métricas de calidad, tests… son cosas para las que siento que me ha ayudado muchísimo estudiar una ingeniería.',
       ],
       en: [

@@ -116,11 +116,6 @@ const es = {
     education: 'Formación',
     languages: 'Idiomas',
     about: 'Sobre mí',
-    figures: {
-      years: 'años de experiencia',
-      live: 'proyectos en producción',
-      technologies: 'tecnologías implementadas',
-    },
     caseStudy: 'Caso completo',
     source: 'Código',
     portfolioButton: 'Visita',
@@ -279,11 +274,6 @@ const en: Dictionary = {
     education: 'Education',
     languages: 'Languages',
     about: 'About me',
-    figures: {
-      years: 'years of experience',
-      live: 'projects in production',
-      technologies: 'technologies',
-    },
     caseStudy: 'Case study',
     source: 'Source',
     portfolioButton: 'Visit',

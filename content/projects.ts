@@ -33,7 +33,7 @@ const sheets: ProjectSheet[] = [
         en: 'Two sources with one rule: the repository is the floor and the panel wins when it has documents. Both validate against the same zod schema, so the site can be cloned and run with no credentials at all.',
       },
       {
-        es: 'El horario no repite texto: cada franja apunta por referencia a su actividad, así que renombrar «Kickboxing» no obliga a repasar veinte casillas del calendario.',
+        es: 'El horario no repite texto: cada franja apunta por referencia a su actividad, así que renombrar “Kickboxing” no obliga a repasar veinte casillas del calendario.',
         en: 'The timetable never repeats text: each slot points to its activity by reference, so renaming “Kickboxing” does not mean going through twenty cells of the calendar.',
       },
       {
@@ -41,7 +41,7 @@ const sheets: ProjectSheet[] = [
         en: 'The trial-class request is a Server Action with zod validation and a limit of five submissions every ten minutes: a public form with no brake is an invitation to spam.',
       },
       {
-        es: 'Una rama por entorno (dev, test y prod) y sólo la de producción se indexa, decidido por rama y no por `VERCEL_ENV`, porque en el proyecto de test esa rama también es «producción».',
+        es: 'Una rama por entorno (dev, test y prod) y sólo la de producción se indexa, decidido por rama y no por `VERCEL_ENV`, porque en el proyecto de test esa rama también es “producción”.',
         en: 'One branch per environment (dev, test, prod) and only the production one is indexed, decided by branch rather than by `VERCEL_ENV`, because in the test project that branch is also “production”.',
       },
     ],
@@ -53,7 +53,7 @@ const sheets: ProjectSheet[] = [
       width: 1280,
       height: 800,
       alt: {
-        es: 'Primera pantalla de CKM Combat Academy: el lema «Todo por la lucha» en letras enormes sobre un fondo negro con un halo rojo, con «Mos · Pontevedra» encima, la frase «El templo de los deportes de contacto» debajo, los botones «Primera clase gratis» y «Ver las clases», y el horario y la dirección del club al pie.',
+        es: 'Primera pantalla de CKM Combat Academy: el lema “Todo por la lucha” en letras enormes sobre un fondo negro con un halo rojo, con “Mos · Pontevedra” encima, la frase “El templo de los deportes de contacto” debajo, los botones “Primera clase gratis” y “Ver las clases”, y el horario y la dirección del club al pie.',
         en: 'CKM Combat Academy first screen: the «Todo por la lucha» claim in huge type over a black background with a red glow, with «Mos · Pontevedra» above it, the «temple of contact sports» line below, the «first class free» and «see the classes» buttons, and the club’s opening hours and address at the foot.',
       },
     },
@@ -107,7 +107,7 @@ const sheets: ProjectSheet[] = [
       width: 1400,
       height: 700,
       alt: {
-        es: 'Primera pantalla de Swiftmet: el titular «Hilo de aluminio de alta pureza, bobinado sin empalmes en catorce formatos» sobre un vídeo oscuro de bobinas, con la línea «Palwal, Haryana — para transformadores de film y fabricantes de condensadores» debajo.',
+        es: 'Primera pantalla de Swiftmet: el titular “Hilo de aluminio de alta pureza, bobinado sin empalmes en catorce formatos” sobre un vídeo oscuro de bobinas, con la línea “Palwal, Haryana — para transformadores de film y fabricantes de condensadores” debajo.',
         en: 'Swiftmet first screen: the headline about high-purity aluminium wire jointlessly wound in fourteen formats over a dark video of spools, with the line «Palwal, Haryana — for film converters and capacitor manufacturers» below.',
       },
     },
@@ -171,7 +171,7 @@ const sheets: ProjectSheet[] = [
       width: 1400,
       height: 700,
       alt: {
-        es: 'Primera pantalla de Mila Barber: el rótulo «MILA BARBER» en negro y dorado con el lema «Tu estilo, nuestra pasión», los botones «Reservar cita» y «Ver servicios y precios», y el horario con la dirección de la barbería debajo.',
+        es: 'Primera pantalla de Mila Barber: el rótulo “MILA BARBER” en negro y dorado con el lema “Tu estilo, nuestra pasión”, los botones “Reservar cita” y “Ver servicios y precios”, y el horario con la dirección de la barbería debajo.',
         en: 'Mila Barber first screen: the «MILA BARBER» wordmark in black and gold with the «your style, our passion» line, the «book an appointment» and «services and prices» buttons, and the opening hours and address below.',
       },
     },
@@ -195,7 +195,7 @@ const sheets: ProjectSheet[] = [
     },
     summary: {
       es: [
-        'Web de Cedecé, rapero de Vigo en activo desde 2008, autor de «Hipersensible» y de la serie de temas «Quemaduras». Tiene dos lectores con dos prisas distintas: quien entra a ver quién es y acaba escuchando, y el programador de una sala que busca un dato concreto para decidir si le da una fecha.',
+        'Web de Cedecé, rapero de Vigo en activo desde 2008, autor de “Hipersensible” y de la serie de temas “Quemaduras”. Tiene dos lectores con dos prisas distintas: quien entra a ver quién es y acaba escuchando, y el programador de una sala que busca un dato concreto para decidir si le da una fecha.',
         'El contenido no está escrito: está extraído de las propias redes del artista y contrastado entre ellas. Ese trabajo marcó el resultado más que ninguna decisión de código — la cuenta está parada desde 2024, así que no hay fechas futuras que anunciar y la web tuvo que resolver qué hacer con ese vacío.',
       ],
       en: [
@@ -229,7 +229,7 @@ const sheets: ProjectSheet[] = [
       width: 1400,
       height: 700,
       alt: {
-        es: 'Primera pantalla de Cedecé: el nombre en letras enormes sobre una fotografía en blanco y negro del artista con el micrófono en la calle, la frase «Rap de Vigo. Letras que cuentan algo y directos en acústico» y los botones de Spotify y YouTube.',
+        es: 'Primera pantalla de Cedecé: el nombre en letras enormes sobre una fotografía en blanco y negro del artista con el micrófono en la calle, la frase “Rap de Vigo. Letras que cuentan algo y directos en acústico” y los botones de Spotify y YouTube.',
         en: 'Cedecé first screen: the name in huge type over a black-and-white photograph of the artist with a microphone in the street, the line «Rap from Vigo. Lyrics that say something and acoustic gigs», and the Spotify and YouTube buttons.',
       },
     },
@@ -283,7 +283,7 @@ const sheets: ProjectSheet[] = [
       width: 1400,
       height: 700,
       alt: {
-        es: 'Primera pantalla de Sangil Studio: fotografía a sangre del pórtico de hormigón de una promoción de vivienda social en Pamplona, con el titular en serif «Arquitectura con una razón detrás de cada decisión» y el pie de obra debajo.',
+        es: 'Primera pantalla de Sangil Studio: fotografía a sangre del pórtico de hormigón de una promoción de vivienda social en Pamplona, con el titular en serif “Arquitectura con una razón detrás de cada decisión” y el pie de obra debajo.',
         en: 'Sangil Studio first screen: a full-bleed photograph of the concrete portico of a social housing development in Pamplona, with the serif headline «Architecture with a reason behind every decision» and the project caption below.',
       },
     },
@@ -342,7 +342,7 @@ const sheets: ProjectSheet[] = [
       width: 1400,
       height: 700,
       alt: {
-        es: 'Primera pantalla de Bonsái Artesanía: sobre fondo crema, el titular en serif «Flores que no se marchitan» a la izquierda y, dentro de un arco, la fotografía de dos pendientes de resina con pétalos naranjas colgando de una rama.',
+        es: 'Primera pantalla de Bonsái Artesanía: sobre fondo crema, el titular en serif “Flores que no se marchitan” a la izquierda y, dentro de un arco, la fotografía de dos pendientes de resina con pétalos naranjas colgando de una rama.',
         en: 'Bonsái Artesanía first screen: on a cream background, the serif headline «Flowers that never wilt» on the left and, inside an arch, a photograph of two resin earrings with orange petals hanging from a branch.',
       },
     },
@@ -400,7 +400,7 @@ const sheets: ProjectSheet[] = [
       width: 1400,
       height: 700,
       alt: {
-        es: 'BlaBlaTour en un navegador de escritorio: la interfaz se mantiene en una columna estrecha centrada, con el panel verde «Comparte coche hasta tu próxima ruta», el buscador «¿A qué monte quieres ir?», los filtros por actividad y las próximas salidas.',
+        es: 'BlaBlaTour en un navegador de escritorio: la interfaz se mantiene en una columna estrecha centrada, con el panel verde “Comparte coche hasta tu próxima ruta”, el buscador “¿A qué monte quieres ir?”, los filtros por actividad y las próximas salidas.',
         en: 'BlaBlaTour in a desktop browser: the interface stays in a narrow centred column, with the green «share a car to your next route» panel, the “which mountain are you heading to?” search box, the activity filters and the upcoming trips.',
       },
     },
@@ -454,7 +454,7 @@ const sheets: ProjectSheet[] = [
       width: 1400,
       height: 700,
       alt: {
-        es: 'Primera pantalla del Almuerziko: cartel rojo con el título «Almuerziko de San Fermín, edición 2026», la fecha «lunes 6 de julio a las 10:00», la cuenta atrás a ceros y el arranque del bloque «¿Te vienes?» abajo.',
+        es: 'Primera pantalla del Almuerziko: cartel rojo con el título “Almuerziko de San Fermín, edición 2026”, la fecha “lunes 6 de julio a las 10:00”, la cuenta atrás a ceros y el arranque del bloque “¿Te vienes?” abajo.',
         en: 'Almuerziko first screen: a red poster with the «Almuerziko de San Fermín, 2026 edition» title, the «Monday 6 July at 10:00» date, the countdown at zeros and the start of the RSVP block below.',
       },
     },
@@ -474,7 +474,7 @@ const sheets: ProjectSheet[] = [
     },
     summary: {
       es: [
-        'La web que estás leyendo. Sustituye a un portfolio anterior en Astro cuyos datos se habían quedado atrás —decía «+4 años de experiencia» cuando ya eran cinco—, y de ese fallo sale su decisión central.',
+        'La web que estás leyendo. Sustituye a un portfolio anterior en Astro cuyos datos se habían quedado atrás —decía “+4 años de experiencia” cuando ya eran cinco—, y de ese fallo sale su decisión central.',
         'Ninguna cifra del CV está escrita a mano: los años de experiencia, los proyectos en producción, las empresas y las tecnologías se calculan del contenido, así que no pueden envejecer mal. Es también el proyecto del que salen el stack y la metodología de los últimos de esta lista.',
       ],
       en: [
@@ -492,7 +492,7 @@ const sheets: ProjectSheet[] = [
         en: 'Both backgrounds are drawn in code: a kinetic mosaic on the first screen and, everywhere else, a grid of up to three thousand nodes on a canvas that parts and lights up under the pointer. Without a single added dependency.',
       },
       {
-        es: 'Los proyectos giran en un carrusel «cover flow» infinito dirigido por el scroll con CSS (`animation-timeline`): el giro entero es CSS y de JavaScript sólo hay los dos botones y el salto que devuelve el bucle a su sitio. En papel se deshace en una retícula de dos columnas.',
+        es: 'Los proyectos giran en un carrusel “cover flow” infinito dirigido por el scroll con CSS (`animation-timeline`): el giro entero es CSS y de JavaScript sólo hay los dos botones y el salto que devuelve el bucle a su sitio. En papel se deshace en una retícula de dos columnas.',
         en: 'The projects turn in an endless «cover flow» carousel driven by scroll in CSS (`animation-timeline`): the whole 3D effect is CSS, and the only JavaScript is the two buttons and the jump that keeps the loop seamless. In print it unfolds into a two-column grid.',
       },
       {
@@ -508,7 +508,7 @@ const sheets: ProjectSheet[] = [
       width: 1400,
       height: 700,
       alt: {
-        es: 'Primera pantalla de esta web: «Hola, soy Luis Fernández Sangil · Ingeniero industrial y desarrollador web» sobre el mosaico cinético de fotografías de código y equipos, con el rótulo del puesto actual, la ubicación y los botones «Ver proyectos» y «Hablemos».',
+        es: 'Primera pantalla de esta web: “Hola, soy Luis Fernández Sangil · Ingeniero industrial y desarrollador web” sobre el mosaico cinético de fotografías de código y equipos, con el rótulo del puesto actual, la ubicación y los botones “Ver proyectos” y “Hablemos”.',
         en: 'This site\u2019s first screen: \u00abHi, I am Luis Fern\u00e1ndez Sangil \u00b7 Industrial engineer and web developer\u00bb over the kinetic mosaic of code and hardware photographs, with the current-role chip, the location and the \u00absee projects\u00bb and \u00ablet\u2019s talk\u00bb buttons.',
       },
     },
@@ -529,7 +529,7 @@ export const projects: ProjectEntry[] = projectList.flatMap((entry) => {
 
   if (!sheet) {
     console.warn(
-      `[proyectos] «${title}» está en content/projects.config.ts pero no tiene ficha: ` +
+      `[proyectos] “${title}” está en content/projects.config.ts pero no tiene ficha: ` +
         'escríbela en content/projects.ts con ese mismo `name`. Hasta entonces no se publica.',
     )
     return []

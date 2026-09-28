@@ -137,7 +137,7 @@ svg {
 }
 
 .name em {
-  color: var(--signal);
+  color: var(--paper);
 }
 
 .identity {
@@ -275,6 +275,12 @@ svg {
   background: var(--signal);
 }
 
+.summary-list strong {
+  font-size: 1.12em;
+  font-weight: 600;
+  color: var(--signal);
+}
+
 .summary-sub {
   display: flex;
   flex-direction: column;
@@ -347,47 +353,6 @@ svg {
   width: 3.1mm;
   height: 3.1mm;
   border-radius: 0.6mm;
-}
-
-.figures {
-  display: flex;
-  align-items: center;
-  margin: 0 var(--gutter);
-  padding: 2.4mm 0 2.2mm;
-  border-bottom: 0.6pt solid var(--rule);
-}
-
-.figure {
-  display: flex;
-  align-items: center;
-  gap: 1.6mm;
-}
-
-.figure + .figure::before {
-  content: '';
-  align-self: center;
-  width: 1mm;
-  height: 1mm;
-  margin: 0 4mm;
-  border-radius: 50%;
-  background: var(--signal);
-  opacity: 0.7;
-}
-
-.figure strong {
-  font-family: var(--display);
-  font-size: 14pt;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -0.01em;
-  color: var(--signal-deep);
-}
-
-.figure span {
-  font-size: 7.6pt;
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--text-soft);
 }
 
 .columns {

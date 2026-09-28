@@ -91,7 +91,10 @@ const fontFaces = FACES.map(
 ).join('')
 
 const escape = (text) => String(text).replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`)
-const rich = (text) => escape(text).replace(/`([^`]+)`/g, '<code>$1</code>')
+const rich = (text) =>
+  escape(text)
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
 const link = (href, body) => `<a href="${escape(href)}">${body}</a>`
 const list = (items) => items.map((item) => `<span>${escape(item)}</span>`).join(' ')
 
@@ -146,28 +149,6 @@ function signature() {
   const words = profile.name.split(' ')
   const surname = words.pop()
   return `${escape(words.join(' '))} <em>${escape(surname)}</em>`
-}
-
-function figures(t, locale) {
-  const names = [
-    ...experience.flatMap((entry) => entry.stack),
-    ...skills.flatMap((group) => group.items),
-    ...projects.flatMap((entry) => entry.stack),
-  ]
-  const technologies = new Set(names.map((name) => name.replace(/\s+\d+$/, ''))).size
-  const tens = Math.floor(technologies / 10) * 10
-  const plus = (value) => (locale === 'en' ? `${value}+` : `+${value}`)
-
-  return [
-    [plus(totalYearsOfExperience(experience.map((entry) => entry.range))), t.cv.figures.years],
-    [plus(10), t.cv.figures.live],
-    [technologies > tens ? plus(tens) : technologies, t.cv.figures.technologies],
-  ]
-    .map(
-      ([value, label]) =>
-        `<p class="figure"><strong>${value}</strong><span>${escape(label)}</span></p>`,
-    )
-    .join('')
 }
 
 function contacts(locale, favicon) {
@@ -303,7 +284,6 @@ function documentFor(locale, css, photo, favicon) {
       </div>
       <ul class="contact">${contacts(locale, favicon)}</ul>
     </header>
-    <div class="figures">${figures(t, locale)}</div>
     <div class="columns">
       <section>
         <h2 class="section-title" data-index="01">${escape(t.cv.experience)}</h2>
