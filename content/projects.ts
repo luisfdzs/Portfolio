@@ -459,60 +459,6 @@ const sheets: ProjectSheet[] = [
       },
     },
   },
-  {
-    slug: 'portfolio',
-    name: 'Portfolio',
-    tagline: {
-      es: 'Esta misma web, para que puedas ver el código y cómo está hecha',
-      en: 'This very site, so you can see the code and how it is built',
-    },
-    year: '2026',
-    status: 'live',
-    role: {
-      es: 'Idea, diseño, desarrollo y despliegue',
-      en: 'Concept, design, development and deployment',
-    },
-    summary: {
-      es: [
-        'La web que estás leyendo. Sustituye a un portfolio anterior en Astro cuyos datos se habían quedado atrás —decía “+4 años de experiencia” cuando ya eran cinco—, y de ese fallo sale su decisión central.',
-        'Ninguna cifra del CV está escrita a mano: los años de experiencia, los proyectos en producción, las empresas y las tecnologías se calculan del contenido, así que no pueden envejecer mal. Es también el proyecto del que salen el stack y la metodología de los últimos de esta lista.',
-      ],
-      en: [
-        'The site you are reading. It replaces an earlier Astro portfolio whose data had fallen behind — it claimed «4+ years of experience» when it was already five — and that failure is where its central decision comes from.',
-        'Not a single figure in the CV is hand-written: years of experience, projects in production, companies and technologies are all computed from the content, so they cannot age badly. It is also the project the stack and methodology of the latest ones here come from.',
-      ],
-    },
-    highlights: [
-      {
-        es: 'Todo el contenido vive en el repositorio, tipado y validado en TypeScript: la web se clona y se despliega sin credenciales de nada y el CV sale completo. Un portfolio es el sitio donde uno no quiere depender de un servicio externo para existir.',
-        en: 'All the content lives in the repository, typed and validated in TypeScript: the site can be cloned and deployed with no credentials at all and the CV still comes out complete. A portfolio is the last place to depend on an external service to exist.',
-      },
-      {
-        es: 'Los dos fondos están dibujados con código: un mosaico cinético en la primera pantalla y, en el resto del sitio, una retícula de hasta tres mil nodos en un canvas que se aparta y se enciende bajo el puntero. Sin una sola dependencia añadida.',
-        en: 'Both backgrounds are drawn in code: a kinetic mosaic on the first screen and, everywhere else, a grid of up to three thousand nodes on a canvas that parts and lights up under the pointer. Without a single added dependency.',
-      },
-      {
-        es: 'Los proyectos giran en un carrusel “cover flow” infinito dirigido por el scroll con CSS (`animation-timeline`): el giro entero es CSS y de JavaScript sólo hay los dos botones y el salto que devuelve el bucle a su sitio. En papel se deshace en una retícula de dos columnas.',
-        en: 'The projects turn in an endless «cover flow» carousel driven by scroll in CSS (`animation-timeline`): the whole 3D effect is CSS, and the only JavaScript is the two buttons and the jump that keeps the loop seamless. In print it unfolds into a two-column grid.',
-      },
-      {
-        es: 'La verificación en móvil es parte del trabajo, no una revisión a ojo: 21 comprobaciones en un Chrome real a 390×844 y por idioma, incluidos desbordamiento horizontal, áreas pulsables de 24 px y que las dos navegaciones no compartan nombre accesible.',
-        en: 'Mobile verification is part of the work rather than an eyeball check: 21 assertions in a real Chrome at 390×844 per language, covering horizontal overflow, 24 px touch targets and the two navigations not sharing an accessible name.',
-      },
-    ],
-    stack: ['Next.js 16', 'TypeScript', 'Tailwind CSS 4', 'zod', 'Playwright', 'Vercel'],
-    liveUrl: 'https://luisfernandezsangil.com',
-    repoUrl: 'https://github.com/luisfdzs/Portfolio',
-    image: {
-      src: '/projects/portfolio.webp',
-      width: 1400,
-      height: 700,
-      alt: {
-        es: 'Primera pantalla de esta web: “Hola, soy Luis Fernández Sangil · Ingeniero industrial y desarrollador web” sobre el mosaico cinético de fotografías de código y equipos, con el rótulo del puesto actual, la ubicación y los botones “Ver proyectos” y “Hablemos”.',
-        en: 'This site\u2019s first screen: \u00abHi, I am Luis Fern\u00e1ndez Sangil \u00b7 Industrial engineer and web developer\u00bb over the kinetic mosaic of code and hardware photographs, with the current-role chip, the location and the \u00absee projects\u00bb and \u00ablet\u2019s talk\u00bb buttons.',
-      },
-    },
-  },
 ]
 
 function listing(entry: ProjectListing): { title: string; featured: boolean } {

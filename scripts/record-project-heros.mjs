@@ -51,7 +51,6 @@ const TARGETS = [
   },
   { slug: 'blablatour', url: 'https://blablatour.vercel.app' },
   { slug: 'almuerziko-san-fermin', url: 'https://almuerziko.vercel.app' },
-  { slug: 'portfolio', url: 'https://luisfernandezsangil.com', cycle: 24 },
 ]
 
 const args = process.argv.slice(2)

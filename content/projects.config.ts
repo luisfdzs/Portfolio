@@ -10,5 +10,4 @@ export const projectList: ProjectListing[] = [
   'Bonsái Artesanía',
   'BlaBlaTour',
   'Almuerziko San Fermín',
-  'Portfolio',
 ]

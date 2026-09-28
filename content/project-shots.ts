@@ -80,11 +80,6 @@ const media: Record<string, ProjectMediaSet> = {
     desktop: { src: '/projects/shots/almuerziko-san-fermin.webp', width: 1280, height: 800 },
     mobile: { src: '/projects/shots/almuerziko-san-fermin-mobile.webp', width: 430, height: 932 },
   },
-  'portfolio': {
-    desktop: { src: '/projects/shots/portfolio.webp', width: 1280, height: 800 },
-    mobile: { src: '/projects/shots/portfolio-mobile.webp', width: 430, height: 932 },
-    clip: { desktop: '/projects/portfolio.webm', mobile: '/projects/portfolio-mobile.webm' },
-  },
 }
 
 export function projectMedia(slug: string): ProjectMediaSet | null {
