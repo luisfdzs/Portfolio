@@ -311,6 +311,8 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
       if (event.pointerType === 'mouse' && event.button !== 0) return
 
       grip.current = null
+      mark.current = spot.current
+      rate.current = 0
       grab.current = {
         id: event.pointerId,
         fromX: event.clientX,
@@ -350,7 +352,10 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
       if (!held || held.id !== event.pointerId) return
 
       grab.current = null
-      if (!held.live) return
+      if (!held.live) {
+        mark.current = Math.round(spot.current)
+        return
+      }
 
       delete node.dataset.dragging
 
