@@ -35,6 +35,9 @@ const STACK_TOP = 100000
 const GLIDE = 1100
 const SETTLE = 520
 const DRAG_MIN = 4
+const TOUCH_SLOP = 12
+const TAP_REACH = 24
+const TAP_TIME = 260
 const FLICK = 160
 
 const HOLD_RAMP = 0.65
@@ -79,7 +82,15 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
   const mark = useRef(0)
   const rate = useRef(0)
   const grip = useRef<{ way: -1 | 1; since: number } | null>(null)
-  const grab = useRef<{ id: number; fromX: number; fromSpot: number; live: boolean } | null>(null)
+  const grab = useRef<{
+    id: number
+    fromX: number
+    fromSpot: number
+    at: number
+    from: Element | null
+    slop: number
+    live: boolean
+  } | null>(null)
   const samples = useRef<{ at: number; spot: number }[]>([])
   const eaten = useRef(0)
   const armed = useRef(-1)
@@ -304,6 +315,9 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
         id: event.pointerId,
         fromX: event.clientX,
         fromSpot: spot.current,
+        at: event.timeStamp,
+        from: event.target as Element | null,
+        slop: event.pointerType === 'mouse' ? DRAG_MIN : TOUCH_SLOP,
         live: false,
       }
       samples.current = [{ at: event.timeStamp, spot: spot.current }]
@@ -315,7 +329,7 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
       if (!held || held.id !== event.pointerId) return
 
       if (!held.live) {
-        if (Math.abs(event.clientX - held.fromX) < DRAG_MIN) return
+        if (Math.abs(event.clientX - held.fromX) < held.slop) return
         held.live = true
         moving.current = true
         node.dataset.dragging = ''
@@ -338,8 +352,25 @@ export function CoverFlow({ slides, label, previousLabel, nextLabel, action }: P
       grab.current = null
       if (!held.live) return
 
-      eaten.current = event.timeStamp
       delete node.dataset.dragging
+
+      const tap =
+        event.type === 'pointerup' &&
+        event.pointerType !== 'mouse' &&
+        Math.abs(event.clientX - held.fromX) < TAP_REACH &&
+        event.timeStamp - held.at < TAP_TIME
+
+      if (tap) {
+        spot.current = held.fromSpot
+        mark.current = Math.round(held.fromSpot)
+        rate.current = 0
+        draw()
+        held.from?.closest<HTMLElement>('a, button')?.click()
+        eaten.current = event.timeStamp
+        return
+      }
+
+      eaten.current = event.timeStamp
 
       const first = samples.current[0]
       const last = samples.current[samples.current.length - 1]
