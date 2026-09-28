@@ -173,7 +173,7 @@ const sheets: ProjectSheet[] = [
     liveUrl: 'https://sangilstudio.com',
     repoUrl: 'https://github.com/luisfdzs/sangilstudio',
     image: {
-      src: '/projects/shots/sangil-studio.webp',
+      src: '/projects/shots/sangil-studio-2.webp',
       width: 1280,
       height: 800,
       alt: {
