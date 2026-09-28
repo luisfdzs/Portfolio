@@ -11,9 +11,9 @@ export function monogramImage(side: number) {
         justifyContent: 'center',
         background: '#08090b',
         color: '#e0a458',
-        fontSize: Math.round(side * 0.53),
-        fontWeight: 600,
-        letterSpacing: '-0.05em',
+        fontSize: Math.round(side * 0.58),
+        fontWeight: 900,
+        letterSpacing: '-0.06em',
       }}
     >
       LF
