@@ -2662,6 +2662,7 @@ html[data-boot='hold'] {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .gilded-action::before,
   .social-card[data-popped],
   .social-card[data-popped] .social-card__float,
   .social-card[data-popped] .social-card__slot,
@@ -2831,5 +2832,62 @@ html[data-boot='hold'] {
 
   .hero-section {
     min-height: 0;
+  }
+}
+
+@property --gild-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes gild-spin {
+  to {
+    --gild-angle: 360deg;
+  }
+}
+
+@layer components {
+  .gilded-action {
+    position: relative;
+    isolation: isolate;
+    box-shadow: 0 0 1.25rem -0.4rem color-mix(in srgb, var(--color-signal) 60%, transparent);
+    transition:
+      color 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .gilded-action::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1.5px;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--gild-angle),
+      #7a4a17,
+      #e0a458 18%,
+      #fff4cf 25%,
+      #e0a458 32%,
+      #b8782e 50%,
+      #7a4a17 58%,
+      #e0a458 72%,
+      #fff4cf 78%,
+      #e0a458 84%,
+      #7a4a17
+    );
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: gild-spin 4s linear infinite;
+  }
+
+  .gilded-action:hover,
+  .gilded-action:focus-visible {
+    box-shadow:
+      0 0 1.75rem -0.2rem color-mix(in srgb, var(--color-signal) 85%, transparent),
+      inset 0 0 1rem -0.4rem color-mix(in srgb, #ffd98f 60%, transparent);
   }
 }

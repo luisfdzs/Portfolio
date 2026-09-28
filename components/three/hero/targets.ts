@@ -324,7 +324,7 @@ export function buildGeometry(count: number, portrait: boolean) {
         { text: 'Luis Fernández', font: `400 260px ${display}`, tone: 1, y: 24 },
         { text: 'Sangil', font: `400 260px ${display}`, tone: 1, y: -3 },
         {
-          text: 'INGENIERO DE SOFTWARE · SISTEMAS',
+          text: 'INGENIERO DE SOFTWARE',
           font: `500 60px ${family}`,
           tone: 0,
           y: -24,
@@ -333,7 +333,7 @@ export function buildGeometry(count: number, portrait: boolean) {
     : [
         { text: 'Luis Fernández Sangil', font: `400 280px ${display}`, tone: 1, y: 6 },
         {
-          text: 'INGENIERO DE SOFTWARE Y SISTEMAS',
+          text: 'INGENIERO DE SOFTWARE',
           font: `500 64px ${family}`,
           tone: 0,
           y: -13,

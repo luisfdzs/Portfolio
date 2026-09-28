@@ -976,7 +976,7 @@ function CoverFlowButton({
       onClick={(event) => {
         if (event.detail === 0) onStep()
       }}
-      className="cover-flow-arrow flex size-11 items-center justify-center rounded-full border border-signal bg-ink text-signal shadow-[0_0_0_1px_var(--color-ink),0_10px_30px_-8px_var(--color-ink)] transition-colors duration-300 hover:bg-signal hover:text-ink disabled:cursor-default disabled:border-signal-dim disabled:bg-ink disabled:text-signal-dim lg:size-14"
+      className="gilded-action cover-flow-arrow flex size-11 items-center justify-center rounded-full bg-ink text-paper transition-colors duration-300 hover:text-signal disabled:cursor-default disabled:text-signal-dim lg:size-14"
     >
       {children}
     </button>

@@ -61,7 +61,6 @@ const media: Record<string, ProjectMediaSet> = {
   'sangil-studio': {
     desktop: { src: '/projects/shots/sangil-studio.webp', width: 1280, height: 800 },
     mobile: { src: '/projects/shots/sangil-studio-mobile.webp', width: 430, height: 932 },
-    clip: { desktop: '/projects/sangil-studio.webm', mobile: '/projects/sangil-studio-mobile.webm' },
   },
   'bonsai-artesania': {
     desktop: { src: '/projects/shots/bonsai-artesania.webp', width: 1280, height: 800 },

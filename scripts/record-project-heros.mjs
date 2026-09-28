@@ -43,7 +43,6 @@ const TARGETS = [
   { slug: 'swiftmet', url: 'https://swiftmet.vercel.app', project: 'Swiftmet' },
   { slug: 'mila-barber', url: 'https://milabarber.vercel.app', project: 'MilaBarber' },
   { slug: 'cedece', url: 'https://cedece.vercel.app', project: 'Cedece' },
-  { slug: 'sangil-studio', url: 'https://sangilstudio.com', cycle: 26 },
   {
     slug: 'bonsai-artesania',
     url: 'https://bonsaiartesania.com',

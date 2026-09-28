@@ -104,12 +104,6 @@ export default async function ProjectPage({
       shot
     )
 
-  const facts = [
-    { label: t.projects.role, value: project.role[locale] },
-    { label: t.projects.year, value: project.year },
-    { label: t.projects.statusLabel, value: t.projects.status[project.status] },
-  ]
-
   const pageUrl = `${site.url}${projectHref(locale, project.slug)}`
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -173,7 +167,7 @@ export default async function ProjectPage({
           {project.liveUrl ? (
             <Action
               href={project.liveUrl}
-              variant="primary"
+              variant="gilded"
               external
               externalHint={t.a11y.externalLink}
             >
@@ -183,7 +177,7 @@ export default async function ProjectPage({
           {project.repoUrl ? (
             <Action
               href={project.repoUrl}
-              variant="secondary"
+              variant="gilded"
               external
               externalHint={t.a11y.externalLink}
             >
@@ -199,22 +193,15 @@ export default async function ProjectPage({
         )}
       </Reveal>
 
-      <dl className="mt-12 grid gap-8 border-y border-line py-8 sm:grid-cols-3">
-        {facts.map((fact) => (
-          <div key={fact.label}>
-            <dt className="eyebrow">{fact.label}</dt>
-            <dd className="mt-2 text-small text-paper">{fact.value}</dd>
-          </div>
-        ))}
-      </dl>
-
-      <div className="mt-14 mx-auto max-w-measure space-y-5">
-        {project.summary[locale].map((paragraph, index) => (
-          <Reveal key={paragraph.slice(0, 40)} step={index}>
-            <p className={index === 0 ? 'text-lead text-paper' : 'text-paper-soft'}>{paragraph}</p>
-          </Reveal>
-        ))}
-      </div>
+      {project.summary[locale].length > 0 ? (
+        <div className="mt-14 mx-auto max-w-measure space-y-5">
+          {project.summary[locale].map((paragraph, index) => (
+            <Reveal key={paragraph.slice(0, 40)} step={index}>
+              <p className={index === 0 ? 'text-lead text-paper' : 'text-paper-soft'}>{paragraph}</p>
+            </Reveal>
+          ))}
+        </div>
+      ) : null}
 
       {project.note ? (
         <Reveal className="mt-10 mx-auto max-w-measure border-t-2 border-signal-dim bg-ink-raised px-5 py-4">

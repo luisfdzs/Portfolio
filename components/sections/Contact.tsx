@@ -44,7 +44,7 @@ export function Contact({ locale, profile }: { locale: Locale; profile: Profile 
           href={cvHref(locale)}
           download
           data-print="hide"
-          className="group inline-flex items-center gap-2 rounded-full border border-line-strong px-5 py-2.5 text-small font-medium text-paper transition-colors duration-300 hover:border-signal hover:text-signal"
+          className="gilded-action group inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-small font-medium text-paper transition-colors duration-300 hover:text-signal"
         >
           <ArrowDown className="size-4 transition-transform duration-300 group-hover:translate-y-0.5" />
           {t.contact.downloadCv}

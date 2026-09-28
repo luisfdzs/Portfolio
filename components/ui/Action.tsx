@@ -3,14 +3,13 @@ import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import { ArrowUpRight } from './Icons'
 
-type Variant = 'primary' | 'secondary' | 'quiet' | 'beacon'
+type Variant = 'primary' | 'secondary' | 'quiet' | 'gilded'
 
 const variants: Record<Variant, string> = {
   primary: 'bg-signal text-ink hover:bg-paper',
   secondary: 'border border-line-strong text-paper hover:border-signal hover:text-signal',
   quiet: 'text-paper-soft hover:text-signal',
-  beacon:
-    'border border-signal bg-ink text-signal shadow-[0_0_0_1px_var(--color-ink),0_12px_34px_-10px_var(--color-ink)] hover:bg-signal hover:text-ink',
+  gilded: 'gilded-action text-paper hover:text-signal',
 }
 
 type Props = {

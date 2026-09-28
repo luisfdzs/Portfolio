@@ -39,7 +39,7 @@ export function Projects({
           previousLabel={t.projects.carouselPrevious}
           nextLabel={t.projects.carouselNext}
           action={
-            <Action href={projectsHref(locale)} variant="beacon">
+            <Action href={projectsHref(locale)} variant="gilded" className="bg-ink">
               {t.projects.seeAll}
             </Action>
           }
