@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { EducationEntry } from '@/content/types'
+import { formatYearRange } from '@/lib/format'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
 import { sections } from '@/lib/i18n/routes'
@@ -27,7 +28,11 @@ export function Education({
       <ol className="space-y-10">
         {entries.map((entry, index) => (
           <Reveal as="li" key={entry.slug} step={index}>
-            <h3 className="text-title text-paper">{entry.title[locale]}</h3>
+            <p className="figure-num text-small text-signal">
+              {formatYearRange(entry.range, t.experience.present)}
+            </p>
+
+            <h3 className="mt-2 text-title text-paper">{entry.title[locale]}</h3>
 
             <p className="mt-1.5 text-lead text-paper-soft">
               {entry.url ? (
