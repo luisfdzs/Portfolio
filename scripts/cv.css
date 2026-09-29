@@ -161,7 +161,6 @@ svg {
   top: 0;
   left: 0;
   overflow: hidden;
-  transform-origin: 0 0;
   color: var(--paper);
   background:
     radial-gradient(620px 300px at 1290px 190px, rgba(224, 164, 88, 0.2), transparent 70%),
@@ -423,6 +422,14 @@ svg {
   width: 560px;
   height: 396px;
   perspective: 1100px;
+}
+
+.banner__shot {
+  position: absolute;
+  top: 0;
+  left: 835px;
+  width: 800px;
+  height: 396px;
 }
 
 .banner__glow {

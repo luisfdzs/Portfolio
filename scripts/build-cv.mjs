@@ -181,7 +181,21 @@ function contacts(locale, favicon) {
     .join('')
 }
 
-function banner(locale, t, years, photo, covers) {
+function showcase(locale, covers) {
+  const cards = SHOWCASE.map(
+    ([slot, slug]) =>
+      `<div class="banner__card banner__card--${slot}"><img src="${covers[slug]}" alt=""></div>`,
+  ).join('')
+
+  return `<div class="banner__stage" style="left:120px">
+    <div class="banner__glow"></div>
+    ${cards}
+    <div class="banner__frame"><span></span><span></span><span></span><span></span></div>
+    <p class="banner__live">${escape(getDictionary(locale).cv.banner.live)}</p>
+  </div>`
+}
+
+function banner(locale, t, years, photo, stage) {
   const copy = t.cv.banner
   const points = copy.points
     .map((point) => {
@@ -190,13 +204,9 @@ function banner(locale, t, years, photo, covers) {
       return `<li class="banner__point"><i></i><span>${lead}${escape(point.text)}${accent}</span></li>`
     })
     .join('')
-  const cards = SHOWCASE.map(
-    ([slot, slug]) =>
-      `<div class="banner__card banner__card--${slot}"><img src="${covers[slug]}" alt=""></div>`,
-  ).join('')
   const home = `${site.url}/${locale}`
 
-  return `<div class="banner" style="width:${BANNER.width}px;height:${BANNER.height}px;transform:scale(${BANNER_SCALE})">
+  return `<div class="banner" style="width:${BANNER.width}px;height:${BANNER.height}px;zoom:${BANNER_SCALE}">
     <div class="banner__dots"></div>
     <div class="banner__lines"></div>
     <figure class="banner__portrait"><img src="${photo}" alt="${escape(profile.photo.alt[locale])}"></figure>
@@ -213,12 +223,7 @@ function banner(locale, t, years, photo, covers) {
         ${SPARKLE}
       </a>
     </div>
-    <div class="banner__stage">
-      <div class="banner__glow"></div>
-      ${cards}
-      <div class="banner__frame"><span></span><span></span><span></span><span></span></div>
-      <p class="banner__live">${escape(copy.live)}</p>
-    </div>
+    <img class="banner__shot" src="${stage}" alt="">
     <div class="banner__vignette"></div>
   </div>`
 }
@@ -288,7 +293,7 @@ function project(entry, locale, t) {
   </li>`
 }
 
-function documentFor(locale, css, photo, favicon, covers) {
+function documentFor(locale, css, photo, favicon, stage) {
   const t = getDictionary(locale)
   const today = currentYearMonth()
   const [year, month] = today.split('-').map(Number)
@@ -305,7 +310,7 @@ function documentFor(locale, css, photo, favicon, covers) {
 
   const first = `<article class="page">
     <header class="masthead">
-      <div class="masthead__banner">${banner(locale, t, years, photo, covers)}</div>
+      <div class="masthead__banner">${banner(locale, t, years, photo, stage)}</div>
       <ul class="contact">${contacts(locale, favicon)}</ul>
     </header>
     <div class="columns">
@@ -404,11 +409,23 @@ async function main() {
   let failed = false
 
   try {
+    const studio = await browser.newPage({
+      viewport: { width: 800, height: BANNER.height },
+      deviceScaleFactor: 3,
+    })
     const page = await browser.newPage({ viewport: { width: 900, height: 1300 } })
     await page.emulateMedia({ media: 'print' })
 
     for (const locale of targets) {
-      await page.setContent(documentFor(locale, css, photo, favicon, covers), {
+      await studio.setContent(
+        `<style>${fontFaces}${css}html,body{background:transparent}</style>${showcase(locale, covers)}`,
+        { waitUntil: 'networkidle' },
+      )
+      await studio.evaluate(() => document.fonts.ready)
+      const shot = await studio.screenshot({ omitBackground: true, type: 'png' })
+      const stage = `data:image/png;base64,${shot.toString('base64')}`
+
+      await page.setContent(documentFor(locale, css, photo, favicon, stage), {
         waitUntil: 'networkidle',
       })
       await page.evaluate(() => document.fonts.ready)
