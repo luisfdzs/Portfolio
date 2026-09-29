@@ -23,18 +23,21 @@ registerHooks({
 
 const load = (file) => import(new URL(file, ROOT).href)
 
-const [content, catalogue, identity, format, config, dictionaries, routes] = await Promise.all([
-  load('content/profile.ts'),
-  load('content/projects.ts'),
-  load('content/site.ts'),
-  load('lib/format.ts'),
-  load('lib/i18n/config.ts'),
-  load('lib/i18n/dictionaries.ts'),
-  load('lib/i18n/routes.ts'),
-])
+const [content, catalogue, shots, identity, format, config, dictionaries, routes] =
+  await Promise.all([
+    load('content/profile.ts'),
+    load('content/projects.ts'),
+    load('content/project-shots.ts'),
+    load('content/site.ts'),
+    load('lib/format.ts'),
+    load('lib/i18n/config.ts'),
+    load('lib/i18n/dictionaries.ts'),
+    load('lib/i18n/routes.ts'),
+  ])
 
 const { profile, experience, education, skills } = content
 const { projects } = catalogue
+const { projectMedia } = shots
 const { site } = identity
 const { currentYearMonth, formatRange, formatYearRange, totalYearsOfExperience } = format
 const { isLocale, locales } = config
@@ -54,6 +57,7 @@ const FACES = [
   ['Inter', 'inter', 400, 'normal'],
   ['Inter', 'inter', 500, 'normal'],
   ['Inter', 'inter', 600, 'normal'],
+  ['Inter', 'inter', 700, 'normal'],
   ['Instrument Serif', 'instrument-serif', 400, 'normal'],
   ['Instrument Serif', 'instrument-serif', 400, 'italic'],
   ['JetBrains Mono', 'jetbrains-mono', 400, 'normal'],
@@ -64,6 +68,15 @@ const DOT = '#edeef0'
 const SPARK = '#e0a458'
 const PX_PER_MM = 96 / 25.4
 const PAGES = 2
+const BANNER = { width: 1584, height: 396 }
+const BANNER_SCALE = (210 * PX_PER_MM) / BANNER.width
+const SHOWCASE = [
+  ['l2', 'sangil-studio'],
+  ['l1', 'bonsai-artesania'],
+  ['r2', 'cedece'],
+  ['r1', 'swiftmet'],
+  ['c0', 'ckm-combat-academy'],
+]
 
 const stroke = (body, width = 1.5) =>
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${width}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`
@@ -71,7 +84,7 @@ const solid = (d) =>
   `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${d}"/></svg>`
 
 const SPARKLE =
-  '<svg class="cta__spark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.7 6.4 5.6 11.3 12 12-6.4.7-11.3 5.6-12 12-.7-6.4-5.6-11.3-12-12C6.4 11.3 11.3 6.4 12 0Z" fill="currentColor"/></svg>'
+  '<svg class="banner__spark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c.7 6.4 5.6 11.3 12 12-6.4.7-11.3 5.6-12 12-.7-6.4-5.6-11.3-12-12C6.4 11.3 11.3 6.4 12 0Z" fill="currentColor"/></svg>'
 
 const ICONS = {
   mail: stroke('<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>'),
@@ -168,17 +181,46 @@ function contacts(locale, favicon) {
     .join('')
 }
 
-function summaryList(points, years) {
-  return `<ul class="summary-list">${points
+function banner(locale, t, years, photo, covers) {
+  const copy = t.cv.banner
+  const points = copy.points
     .map((point) => {
-      const items = point.items?.length
-        ? `<ul class="summary-sub">${point.items
-            .map((item) => `<li>${rich(interpolate(item, { years }))}</li>`)
-            .join('')}</ul>`
-        : ''
-      return `<li>${rich(interpolate(point.text, { years }))}${items}</li>`
+      const lead = point.lead ? `<b>${escape(interpolate(point.lead, { years }))}</b> ` : ''
+      const accent = point.accent ? `<br><b>${escape(point.accent)}</b>` : ''
+      return `<li class="banner__point"><i></i><span>${lead}${escape(point.text)}${accent}</span></li>`
     })
-    .join('')}</ul>`
+    .join('')
+  const cards = SHOWCASE.map(
+    ([slot, slug]) =>
+      `<div class="banner__card banner__card--${slot}"><img src="${covers[slug]}" alt=""></div>`,
+  ).join('')
+  const home = `${site.url}/${locale}`
+
+  return `<div class="banner" style="width:${BANNER.width}px;height:${BANNER.height}px;transform:scale(${BANNER_SCALE})">
+    <div class="banner__dots"></div>
+    <div class="banner__lines"></div>
+    <figure class="banner__portrait"><img src="${photo}" alt="${escape(profile.photo.alt[locale])}"></figure>
+    <div class="banner__copy">
+      <p class="banner__kicker"><i></i>${escape(copy.kicker)}</p>
+      <ul class="banner__points">${points}</ul>
+      <p class="banner__stack">${copy.stack.map(escape).join('<b>·</b>')}</p>
+      <a class="banner__cta" href="${escape(home)}">
+        <span class="banner__cta-text">
+          <span class="banner__cta-label">${escape(t.cv.portfolioButton)}</span>
+          <span class="banner__cta-url">${escape(bare(site.url))}</span>
+        </span>
+        <span class="banner__cta-go">${ICONS.arrow}</span>
+        ${SPARKLE}
+      </a>
+    </div>
+    <div class="banner__stage">
+      <div class="banner__glow"></div>
+      ${cards}
+      <div class="banner__frame"><span></span><span></span><span></span><span></span></div>
+      <p class="banner__live">${escape(copy.live)}</p>
+    </div>
+    <div class="banner__vignette"></div>
+  </div>`
 }
 
 function marker(current) {
@@ -246,7 +288,7 @@ function project(entry, locale, t) {
   </li>`
 }
 
-function documentFor(locale, css, photo, favicon) {
+function documentFor(locale, css, photo, favicon, covers) {
   const t = getDictionary(locale)
   const today = currentYearMonth()
   const [year, month] = today.split('-').map(Number)
@@ -262,26 +304,8 @@ function documentFor(locale, css, photo, favicon) {
   const title = escape(`${profile.name} — ${t.cv.documentTitle}`)
 
   const first = `<article class="page">
-    <header class="masthead field" ${field(210, 90, { seed: 3 })}>
-      <div class="masthead__body">
-        <div>
-          <p class="eyebrow">${escape(t.cv.eyebrow)}</p>
-          <div class="identity">
-            <h1 class="name">${link(`${site.url}/${locale}`, signature())}</h1>
-            <a class="cta" href="${escape(`${site.url}/${locale}`)}">
-              <span class="cta__text">
-                <span class="cta__label">${escape(t.cv.portfolioButton)}</span>
-                <span class="cta__url">${escape(bare(site.url))}</span>
-              </span>
-              <span class="cta__go">${ICONS.arrow}</span>
-              ${SPARKLE}
-            </a>
-          </div>
-          <p class="headline">${headline}</p>
-          ${summaryList(profile.summary[locale], years)}
-        </div>
-        <figure class="portrait"><img src="${photo}" alt="${escape(profile.photo.alt[locale])}"></figure>
-      </div>
+    <header class="masthead">
+      <div class="masthead__banner">${banner(locale, t, years, photo, covers)}</div>
       <ul class="contact">${contacts(locale, favicon)}</ul>
     </header>
     <div class="columns">
@@ -365,6 +389,16 @@ async function main() {
   const photo = `data:image/webp;base64,${image.toString('base64')}`
   const icon = await readFile(path.resolve('scripts/cv-favicon.png'))
   const favicon = `data:image/png;base64,${icon.toString('base64')}`
+  const covers = Object.fromEntries(
+    await Promise.all(
+      SHOWCASE.map(async ([, slug]) => {
+        const file = await readFile(
+          path.join(path.resolve('public'), projectMedia(slug).desktop.src),
+        )
+        return [slug, `data:image/webp;base64,${file.toString('base64')}`]
+      }),
+    ),
+  )
 
   const browser = await chromium.launch({ executablePath: CHROME })
   let failed = false
@@ -374,7 +408,9 @@ async function main() {
     await page.emulateMedia({ media: 'print' })
 
     for (const locale of targets) {
-      await page.setContent(documentFor(locale, css, photo, favicon), { waitUntil: 'networkidle' })
+      await page.setContent(documentFor(locale, css, photo, favicon, covers), {
+        waitUntil: 'networkidle',
+      })
       await page.evaluate(() => document.fonts.ready)
 
       const missing = await page.evaluate(

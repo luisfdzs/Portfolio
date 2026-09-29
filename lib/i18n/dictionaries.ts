@@ -118,6 +118,16 @@ const es = {
     portfolioButton: 'Visita',
     updated: 'Actualizado en {date}',
     duration: { year: 'año', years: 'años', month: 'mes', months: 'meses' },
+    banner: {
+      kicker: 'Ingeniero de software · Full stack',
+      points: [
+        { lead: '+10', text: 'webs en producción' },
+        { lead: '+{years}', text: 'años de experiencia' },
+        { text: 'Ingeniería Industrial', accent: 'Electrónica y Automática' },
+      ],
+      stack: ['C# / .NET', 'React / Next.js', 'SQL Server', 'En remoto'],
+      live: 'En producción',
+    },
   },
 
   footer: {
@@ -273,6 +283,16 @@ const en: Dictionary = {
     portfolioButton: 'Visit',
     updated: 'Updated {date}',
     duration: { year: 'year', years: 'years', month: 'month', months: 'months' },
+    banner: {
+      kicker: 'Software engineer · Full stack',
+      points: [
+        { lead: '10+', text: 'websites in production' },
+        { lead: '{years}+', text: 'years of experience' },
+        { text: 'Industrial Electronics &', accent: 'Automation Engineering' },
+      ],
+      stack: ['C# / .NET', 'React / Next.js', 'SQL Server', 'Remote'],
+      live: 'Live in production',
+    },
   },
 
   footer: {
