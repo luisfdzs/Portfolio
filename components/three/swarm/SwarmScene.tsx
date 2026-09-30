@@ -14,6 +14,7 @@ import {
 } from 'three'
 import type { AgvWorkerRequest, AgvWorkerResult } from '@/components/three/agv/agv.worker'
 import type { ShowcaseModelKey } from '@/components/three/agv/models'
+import { useRevealKey } from '@/lib/use-reveal-key'
 import {
   anchorsVersion,
   listAnchors,
@@ -549,9 +550,11 @@ function Scene({ count, calm }: { count: number; calm: boolean }) {
 
 export function SwarmScene({ calm }: { calm: boolean }) {
   const [count] = useState(() => (window.innerWidth < 1280 ? 32000 : 90000))
+  const reveal = useRevealKey()
 
   return (
     <Canvas
+      key={reveal}
       frameloop="demand"
       camera={{ position: [0, 0, DEPTH], fov: FOV, near: 0.1, far: 100 }}
       dpr={[1, 2]}

@@ -20,6 +20,7 @@ import {
   type Camera,
 } from 'three'
 import { useReducedMotion } from '@/lib/use-reduced-motion'
+import { useRevealKey } from '@/lib/use-reveal-key'
 import { swarmLink } from '@/components/three/swarm/registry'
 import {
   BEAM_LENGTH,
@@ -373,9 +374,11 @@ export const HeroScene = memo(function HeroScene({
 }) {
   const reduced = useReducedMotion()
   const aberration = useRef<ChromaticAberrationEffect | null>(null)
+  const reveal = useRevealKey()
 
   return (
     <Canvas
+      key={reveal}
       frameloop={paused ? 'never' : 'always'}
       camera={{ position: [0, 0, 6.9], fov: 37, near: 0.1, far: 300 }}
       dpr={1}
