@@ -2,8 +2,8 @@ import Link from 'next/link'
 import type { Profile } from '@/content/types'
 import type { Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionaries'
-import { cvHref, sections } from '@/lib/i18n/routes'
-import { ArrowDown, Mail } from '@/components/ui/Icons'
+import { sections } from '@/lib/i18n/routes'
+import { Mail } from '@/components/ui/Icons'
 import { Reveal } from '@/components/ui/Reveal'
 import { SocialCard } from '@/components/ui/SocialCard'
 
@@ -39,19 +39,7 @@ export function Contact({ locale, profile }: { locale: Locale; profile: Profile 
         </Link>
       </Reveal>
 
-      <Reveal step={3} className="mt-8">
-        <a
-          href={cvHref(locale)}
-          download
-          data-print="hide"
-          className="gilded-action group inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-small font-medium text-paper transition-colors duration-300 hover:text-signal"
-        >
-          <ArrowDown className="size-4 transition-transform duration-300 group-hover:translate-y-0.5" />
-          {t.contact.downloadCv}
-        </a>
-      </Reveal>
-
-      <div className="mt-12 flex justify-center border-t border-line pt-12">
+      <div className="mt-6 flex justify-center">
         <SocialCard locale={locale} profile={profile} />
       </div>
     </div>

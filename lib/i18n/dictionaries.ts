@@ -100,6 +100,8 @@ const es = {
     copyEmail: 'Copiar el correo',
     copied: 'Copiado',
     downloadCv: 'Descargar el CV en PDF',
+    cvKey: 'Descargar CV',
+    cvFormat: 'PDF',
   },
 
   cv: {
@@ -265,6 +267,8 @@ const en: Dictionary = {
     copyEmail: 'Copy email',
     copied: 'Copied',
     downloadCv: 'Download the CV as PDF',
+    cvKey: 'Download CV',
+    cvFormat: 'PDF',
   },
 
   cv: {

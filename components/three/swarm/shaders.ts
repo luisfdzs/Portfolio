@@ -1,3 +1,5 @@
+import { IGNITE } from './registry'
+
 export const swarmFragment = `
 varying vec3 vColor;
 varying float vAlpha;
@@ -42,12 +44,17 @@ uniform float uVisible;
 uniform float uOcclude;
 uniform float uDensity;
 uniform float uFormed;
+uniform vec4 uHeat;
+uniform vec4 uOrbit;
+uniform vec4 uPress;
 varying vec3 vColor;
 varying float vAlpha;
 
 const float PI = 3.14159265;
 const float PERSPECTIVE = 5.0;
 const float TILT = 0.344;
+const float AT = ${IGNITE.at.toFixed(3)};
+const float STAGGER = ${IGNITE.stagger.toFixed(3)};
 const vec3 GOLD = vec3(0.878, 0.643, 0.345);
 const vec3 CREAM = vec3(0.953, 0.890, 0.765);
 const vec3 HOT = vec3(1.0, 0.93, 0.8);
@@ -98,21 +105,47 @@ Side place(vec4 shape, vec4 nrm, float move, vec3 center, vec2 scale, float kind
   s.solid = 0.0;
   if (kind > 2.5) {
     float role = nrm.x;
-    float formed = step(0.0, uFormed);
-    float flash = formed * exp(-uFormed * 2.5);
-    float fade = formed * smoothstep(0.15, 1.6, uFormed);
-    float keep = 1.0 - step(0.5, role);
-    float head = uTime * 0.07;
-    float comet = keep * fade * max(exp(-fract(nrm.y - head) * 10.0), exp(-fract(nrm.y + 0.5 - head) * 10.0));
-    vec2 drift = (1.0 - keep) * fade * vec2(sin(seed * 40.0) * 0.05, 0.12 + 0.2 * seed);
-    vec2 local = shape.xy * (1.0 + 0.04 * keep * fade) + drift;
-    local += vec2(sin(uTime * 0.9 + seed * 40.0), cos(uTime * 0.7 + seed * 30.0)) * 0.002;
-    s.p = center + vec3(local * scale, 0.0);
-    s.color = mix(GOLD, CREAM, shape.w) + HOT * (flash * 0.8 + comet * 0.8);
-    float before = role > 2.5 ? 0.12 : role > 1.5 ? 0.5 : role > 0.5 ? 0.3 : 0.26;
-    float after = keep * (0.05 + 0.4 * comet);
-    s.alpha = (mix(before, after, fade) + 0.35 * flash) * uDensity * 0.22;
-    s.size = 1.0 + 0.8 * flash + 0.9 * comet;
+    float rim = 1.0 - step(0.5, role);
+    float glyph = step(0.5, role) * (1.0 - step(1.5, role));
+    float face = step(1.5, role) * (1.0 - step(2.5, role));
+    float dust = step(2.5, role);
+    float body = 1.0 - dust;
+    vec4 slot = 1.0 - min(abs(vec4(nrm.z) - vec4(0.0, 1.0, 2.0, 3.0)), 1.0);
+    float heat = dot(uHeat, slot) * body;
+    float orbit = dot(uOrbit, slot);
+    float wave = dot(sin(min(uPress * 6.0, PI)) * exp(-uPress * 2.0), slot) * body;
+    float local = uFormed - nrm.z * STAGGER;
+    float lit = step(0.0, uFormed) * step(0.0, local);
+    float pull = lit * smoothstep(0.0, AT, local) * (1.0 - smoothstep(AT, AT * 2.0, local));
+    float flash = lit * smoothstep(AT * 0.6, AT, local) * exp(-max(local - AT, 0.0) * 3.0);
+    float fade = lit * smoothstep(AT, AT + 1.1, local);
+    float sunk = lit * step(AT, local);
+    float absorb = lit * smoothstep(0.0, AT, local) * (1.0 - sunk);
+    float ember = smoothstep(AT + 0.6, AT + 2.6, local);
+    vec2 radial = vec2(cos(nrm.w), sin(nrm.w));
+    vec2 outward = vec2(cos(move), sin(move));
+    float dir = mod(nrm.z, 2.0) < 0.5 ? 1.0 : -1.0;
+    float along = fract((orbit * dir - nrm.y) * dir);
+    float comet = rim * fade * max(exp(-along * 11.0), exp(-fract(along + 0.5) * 11.0));
+    float rise = fract(nrm.y + uTime * 0.03);
+    float swirl = orbit * 9.0 + seed * 40.0;
+    vec2 shift = body * radial * shape.z * (0.04 * flash - 0.14 * pull);
+    shift -= dust * radial * shape.z * absorb * absorb;
+    shift += outward * rim * (heat * (1.0 + 5.0 * seed * seed) + wave * (6.0 + 8.0 * seed));
+    shift.y += 2.0 * heat;
+    shift += face * fade * vec2(cos(swirl), sin(swirl * 1.3)) * (1.5 + 2.5 * seed) * (1.0 + heat);
+    shift += dust * sunk * vec2(sin(uTime * 0.5 + seed * 40.0) * 6.0, rise * 48.0);
+    shift += vec2(sin(uTime * 0.9 + seed * 40.0), cos(uTime * 0.7 + seed * 30.0)) * 0.6;
+    s.p = center + vec3(shape.xy * scale + shift * uPixel, 0.0);
+    float glow = 0.9 * flash * body + 0.3 * comet + 0.9 * wave + 0.1 * heat * rim + 0.6 * absorb * dust;
+    s.color = mix(GOLD, CREAM, shape.w) + mix(PALE, HOT, 0.5) * glow;
+    float before = 0.26 * rim + 0.5 * glyph + 0.14 * face;
+    float after = rim * (0.07 + 0.18 * comet + heat * (0.1 + 0.16 * comet) + 0.5 * wave)
+      + glyph * 0.22 * heat
+      + face * (0.07 + 0.22 * heat + 0.3 * wave);
+    float cloud = mix(0.42 + 0.5 * absorb * (1.0 - absorb), 0.12 * sin(PI * rise) * ember, sunk);
+    s.alpha = (body * (mix(before, after, fade) + 0.35 * flash) + dust * cloud) * uDensity * 0.22;
+    s.size = 1.0 + 0.8 * flash * body + 0.6 * comet + 0.35 * heat * rim;
     return s;
   }
   if (kind > 1.5) {

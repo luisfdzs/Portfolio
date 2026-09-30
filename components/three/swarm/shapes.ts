@@ -1,5 +1,6 @@
 import { BufferAttribute } from 'three'
 import type { AgvWorkerResult } from '@/components/three/agv/agv.worker'
+import { GLYPH, STRIDE } from './social'
 
 export const MODEL = 0
 export const FRAME = 1
@@ -228,22 +229,25 @@ export function frameShape(count: number): Shape {
 }
 
 export function fillSocial(shape: Shape, source: Float32Array | null) {
-  const total = source ? source.length / 4 : 0
+  const total = source ? source.length / STRIDE : 0
   if (!source || total === 0) return false
   const position = shape.position.array as Float32Array
   const normal = shape.normal.array as Float32Array
   const meta = shape.meta.array as Float32Array
   const count = meta.length / 2
   for (let i = 0; i < count; i++) {
-    const pick = Math.floor(Math.random() * total)
-    const x = source[pick * 4] ?? 0
-    const role = source[pick * 4 + 2] ?? 0
+    const at = Math.floor(Math.random() * total) * STRIDE
+    const x = source[at] ?? 0
+    const role = source[at + 2] ?? 0
     position[i * 4] = x
-    position[i * 4 + 1] = source[pick * 4 + 1] ?? 0
-    position[i * 4 + 2] = 0
-    position[i * 4 + 3] = role > 1.5 && role < 2.5 ? 1 : 0.3 + Math.random() * 0.5
+    position[i * 4 + 1] = source[at + 1] ?? 0
+    position[i * 4 + 2] = source[at + 6] ?? 0
+    position[i * 4 + 3] = role === GLYPH ? 1 : 0.3 + Math.random() * 0.5
     normal[i * 4] = role
-    normal[i * 4 + 1] = source[pick * 4 + 3] ?? 0
+    normal[i * 4 + 1] = source[at + 3] ?? 0
+    normal[i * 4 + 2] = source[at + 4] ?? 0
+    normal[i * 4 + 3] = source[at + 5] ?? 0
+    meta[i * 2] = source[at + 7] ?? 0
     meta[i * 2 + 1] = Math.min(1, Math.max(0, x + 0.5) * 0.75 + Math.random() * 0.2)
   }
   shape.position.needsUpdate = true

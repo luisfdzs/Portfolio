@@ -12,6 +12,10 @@ export type SwarmAnchor = { element: HTMLElement; source: SwarmSource }
 
 export type HeroPose = 'button' | 'name'
 
+export const IGNITE = { at: 0.22, stagger: 0.14 }
+
+export const SOCIAL_KEYS = 4
+
 const anchors = new Set<SwarmAnchor>()
 const listeners = new Set<() => void>()
 let version = 0
@@ -54,9 +58,20 @@ export const swarmLink: {
     version: number
     live: boolean
     formed: boolean
+    focus: number
+    pressed: number
+    presses: number
   }
 } = {
   handoff: 0,
   hero: { pose: 'button', button: null, name: null, version: 0 },
-  social: { points: null, version: 0, live: false, formed: false },
+  social: {
+    points: null,
+    version: 0,
+    live: false,
+    formed: false,
+    focus: -1,
+    pressed: -1,
+    presses: 0,
+  },
 }

@@ -11,11 +11,13 @@ import {
   ShaderMaterial,
   Vector2,
   Vector3,
+  Vector4,
 } from 'three'
 import type { AgvWorkerRequest, AgvWorkerResult } from '@/components/three/agv/agv.worker'
 import type { ShowcaseModelKey } from '@/components/three/agv/models'
 import { useRevealKey } from '@/lib/use-reveal-key'
 import {
+  SOCIAL_KEYS,
   anchorsVersion,
   listAnchors,
   subscribeAnchors,
@@ -47,6 +49,10 @@ const SPIN = 0.35
 const REST = 0.0005
 const DOMINANT = 0.6
 const FRAME_INSET = 14
+const WARM = 9
+const ORBIT = 0.07
+const ORBIT_HEAT = 0.3
+const QUIET = 9
 
 type Rect = { x: number; y: number; w: number; h: number }
 
@@ -135,6 +141,9 @@ function buildSwarm(count: number) {
     uOcclude: { value: count < 40000 ? 4 : 3 },
     uDensity: { value: count < 40000 ? 1.8 : 1 },
     uFormed: { value: -1 },
+    uHeat: { value: new Vector4() },
+    uOrbit: { value: new Vector4() },
+    uPress: { value: new Vector4(QUIET, QUIET, QUIET, QUIET) },
   }
   const material = new ShaderMaterial({
     uniforms,
@@ -272,6 +281,10 @@ type Director = {
   flow: Flow | null
   pulse: number
   formed: number
+  heat: number[]
+  orbit: number[]
+  press: number[]
+  presses: number
 }
 
 function createDirector(count: number): Director {
@@ -294,7 +307,40 @@ function createDirector(count: number): Director {
     flow: null,
     pulse: 0,
     formed: -1,
+    heat: Array.from({ length: SOCIAL_KEYS }, () => 0),
+    orbit: Array.from({ length: SOCIAL_KEYS }, (_, index) => index * 0.31),
+    press: Array.from({ length: SOCIAL_KEYS }, () => QUIET),
+    presses: swarmLink.social.presses,
   }
+}
+
+function touch(director: Director, dt: number, calm: boolean) {
+  const { social } = swarmLink
+  if (director.presses !== social.presses) {
+    director.presses = social.presses
+    if (!calm && social.pressed >= 0 && social.pressed < SOCIAL_KEYS)
+      director.press[social.pressed] = 0
+  }
+  let stirring = false
+  for (let key = 0; key < SOCIAL_KEYS; key++) {
+    const goal = social.focus === key ? 1 : 0
+    const heat = director.heat[key] ?? 0
+    const next = calm ? goal : heat + (goal - heat) * (1 - Math.exp(-dt * WARM))
+    director.heat[key] = Math.abs(goal - next) < REST ? goal : next
+    if (director.heat[key] !== goal) stirring = true
+    if (!calm) director.orbit[key] = (director.orbit[key] ?? 0) + dt * (ORBIT + ORBIT_HEAT * next)
+    const press = Math.min(QUIET, (director.press[key] ?? QUIET) + dt)
+    director.press[key] = press
+    if (press < 2) stirring = true
+  }
+  const u = director.swarm.uniforms
+  const [h0 = 0, h1 = 0, h2 = 0, h3 = 0] = director.heat
+  const [o0 = 0, o1 = 0, o2 = 0, o3 = 0] = director.orbit
+  const [p0 = QUIET, p1 = QUIET, p2 = QUIET, p3 = QUIET] = director.press
+  u.uHeat.value.set(h0, h1, h2, h3)
+  u.uOrbit.value.set(o0, o1, o2, o3)
+  u.uPress.value.set(p0, p1, p2, p3)
+  return stirring
 }
 
 function direct(director: Director, state: RootState, delta: number, calm: boolean) {
@@ -435,6 +481,7 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
       station.spin += dt * SPIN
   }
   director.pulse = Math.max(0, director.pulse - dt * 1.4)
+  const stirring = touch(director, dt, calm)
 
   bind(swarm, f)
   applySide(swarm.from, f.from, library, wpp, width, height)
@@ -467,7 +514,7 @@ function direct(director: Director, state: RootState, delta: number, calm: boole
   swarm.points.visible = !hidden
 
   const settling = director.formed >= 0 && director.formed < 2
-  const busy = !resting || !matches || director.pulse > 0 || settling
+  const busy = !resting || !matches || director.pulse > 0 || settling || stirring
   const seen =
     inView(f.from.station.rect, width, height) || inView(f.to.station.rect, width, height)
   if (busy || (!hidden && seen)) state.invalidate()
