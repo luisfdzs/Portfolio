@@ -20,8 +20,6 @@ export function Experience({
 }) {
   const t = getDictionary(locale)
 
-  const timeline = [...entries].reverse()
-
   return (
     <section
       id={sections.experience}
@@ -35,7 +33,7 @@ export function Experience({
       />
 
       <ol className="exp-timeline mx-3 border-l border-transparent sm:mx-0">
-        {timeline.map((entry, index) => (
+        {entries.map((entry, index) => (
           <Reveal
             as="li"
             key={entry.slug}
