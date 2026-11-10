@@ -20,7 +20,7 @@ export const profile: Profile = {
     es: 'Vigo, Galicia · En remoto',
     en: 'Vigo, Spain · Remote',
   },
-  email: 'luisfsangil@gmail.com',
+  email: 'luis@luisfernandezsangil.com',
   linkedin: 'https://www.linkedin.com/in/luisfernandezsangil',
   github: 'https://github.com/luisfdzs',
   bio: {
