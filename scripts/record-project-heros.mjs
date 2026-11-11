@@ -48,6 +48,10 @@ const TARGETS = [
     url: 'https://bonsaiartesania.com',
     project: 'BonsaiArtesania',
   },
+  { slug: 'idemetro', url: 'https://idemetro.vercel.app/es', project: 'idemetro' },
+  { slug: 'laux-reformas', url: 'https://lauxreformas.vercel.app/es', project: 'LAUXReformas' },
+  { slug: 'domobis', url: 'https://domobis.vercel.app', project: 'Domobis' },
+  { slug: 'enboxes', url: 'https://enboxes.vercel.app', project: 'EnBoxes' },
   { slug: 'blablatour', url: 'https://blablatour.vercel.app' },
   { slug: 'almuerziko-san-fermin', url: 'https://almuerziko.vercel.app' },
 ]
@@ -98,7 +102,14 @@ async function probe(target, shot) {
     })
 
     if (media.span) {
-      return { ...target, ...media, lastChange: null, seconds: media.span, pixelsMove: true, ok: true }
+      return {
+        ...target,
+        ...media,
+        lastChange: null,
+        seconds: media.span,
+        pixelsMove: true,
+        ok: true,
+      }
     }
 
     const started = Date.now()
@@ -285,7 +296,10 @@ async function chrome(target, shot) {
             if (parts.length < 4 || !Number.isFinite(alpha)) return whole
             return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${Math.min(alpha, ceiling)})`
           })
-          .replace(/\/\s*([0-9.]+)\s*\)/g, (whole, alpha) => `/ ${Math.min(Number(alpha), ceiling)})`)
+          .replace(
+            /\/\s*([0-9.]+)\s*\)/g,
+            (whole, alpha) => `/ ${Math.min(Number(alpha), ceiling)})`,
+          )
 
       for (const element of document.querySelectorAll('html, body, body *')) {
         const style = getComputedStyle(element)

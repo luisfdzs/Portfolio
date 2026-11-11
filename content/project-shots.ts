@@ -62,6 +62,22 @@ const media: Record<string, ProjectMediaSet> = {
     desktop: { src: '/projects/shots/sangil-studio-2.webp', width: 1280, height: 800 },
     mobile: { src: '/projects/shots/sangil-studio-2-mobile.webp', width: 430, height: 932 },
   },
+  'idemetro': {
+    desktop: { src: '/projects/shots/idemetro.webp', width: 1280, height: 800 },
+    mobile: { src: '/projects/shots/idemetro-mobile.webp', width: 430, height: 932 },
+  },
+  'laux-reformas': {
+    desktop: { src: '/projects/shots/laux-reformas.webp', width: 1280, height: 800 },
+    mobile: { src: '/projects/shots/laux-reformas-mobile.webp', width: 430, height: 932 },
+  },
+  'domobis': {
+    desktop: { src: '/projects/shots/domobis.webp', width: 1280, height: 800 },
+    mobile: { src: '/projects/shots/domobis-mobile.webp', width: 430, height: 932 },
+  },
+  'enboxes': {
+    desktop: { src: '/projects/shots/enboxes.webp', width: 1280, height: 800 },
+    mobile: { src: '/projects/shots/enboxes-mobile.webp', width: 430, height: 932 },
+  },
   'bonsai-artesania': {
     desktop: { src: '/projects/shots/bonsai-artesania.webp', width: 1280, height: 800 },
     mobile: { src: '/projects/shots/bonsai-artesania-mobile.webp', width: 430, height: 932 },

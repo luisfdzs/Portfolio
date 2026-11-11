@@ -125,6 +125,10 @@ const loaders: Record<string, Loader> = {
   'sangil-studio': { mark: '#e9e6e1', art: bar, cycle: 2400 },
   blablatour: { mark: '#4ec2a3', ring: '#2f4a43', art: ring, cycle: 1000 },
   'almuerziko-san-fermin': { mark: '#f04a56', art: kerchief, cycle: 2400 },
+  idemetro: { mark: '#e6e6e6', art: bar, cycle: 2400 },
+  'laux-reformas': { mark: '#c69a5b', art: dots, cycle: 1500 },
+  domobis: { mark: '#617da5', art: dots, cycle: 1500 },
+  enboxes: { mark: '#2447f5', ring: '#1a2a6b', art: ring, cycle: 1000 },
 }
 
 const fallback: Loader = { mark: '#e0a458', art: dots, cycle: 1500 }

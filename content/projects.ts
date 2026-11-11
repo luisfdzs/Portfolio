@@ -183,6 +183,173 @@ const sheets: ProjectSheet[] = [
     },
   },
   {
+    slug: 'idemetro',
+    name: 'IDEMETRO',
+    tagline: {
+      es: 'Landing page para Samuel, que ofrece escaneado 3D e ingeniería inversa de piezas industriales en Pamplona',
+      en: 'Landing page for Samuel, who offers 3D scanning and reverse engineering of industrial parts in Pamplona',
+    },
+    year: '2026',
+    status: 'live',
+    role: {
+      es: 'Maquetación desde Figma, desarrollo y despliegue',
+      en: 'Figma build, development and deployment',
+    },
+    summary: {
+      es: [
+        'Web de una sola página maquetada desde el diseño en Figma, en castellano, inglés y francés, con una brida en 3D que se escanea en el propio hero y un formulario de presupuesto que admite fotos de la pieza.',
+        'El cambio de idioma se hace sin recargar la página, y las imágenes del formulario se comprimen en el navegador antes de enviarse, para que pedir presupuesto desde el móvil sea rápido aunque la conexión sea mala.',
+      ],
+      en: [
+        'One-page site built from the Figma design, in Spanish, English and French, with a 3D flange that gets scanned right in the hero and a quote form that accepts photos of the part.',
+        'Switching language never reloads the page, and the form images are compressed in the browser before sending, so asking for a quote from a phone stays fast even on a poor connection.',
+      ],
+    },
+    highlights: [],
+    stack: [
+      'Next.js 16',
+      'TypeScript',
+      'Tailwind CSS 4',
+      'Three.js',
+      'zod',
+      'Nodemailer',
+      'Vercel',
+    ],
+    liveUrl: 'https://idemetro.vercel.app',
+    image: {
+      src: '/projects/shots/idemetro.webp',
+      width: 1280,
+      height: 800,
+      alt: {
+        es: 'Primera pantalla de IDEMETRO: el titular “Del mundo físico al modelo digital” en blanco sobre fondo oscuro y, a la derecha, una brida metálica en 3D con la mitad convertida en malla de alambre y el rótulo “Escaneando”.',
+        en: 'IDEMETRO first screen: the «from the physical world to the digital model» headline in white on a dark background and, on the right, a 3D metal flange with half of it turned into a wireframe mesh under a «scanning» label.',
+      },
+    },
+  },
+  {
+    slug: 'laux-reformas',
+    name: 'LAUX Reformas',
+    tagline: {
+      es: 'Web corporativa para LAUX Reformas, una empresa de reformas de Salvaterra de Miño, Pontevedra',
+      en: 'Company website for LAUX Reformas, a home renovation firm in Salvaterra de Miño, Pontevedra',
+    },
+    year: '2026',
+    status: 'live',
+    role: {
+      es: 'Diseño, desarrollo y despliegue',
+      en: 'Design, development and deployment',
+    },
+    summary: {
+      es: [
+        'Web en castellano, gallego e inglés con una página por servicio, galería de proyectos, municipios en los que trabajan y formulario de presupuesto, pensada para aparecer en Google cuando alguien de la zona busca una reforma.',
+      ],
+      en: [
+        'Site in Spanish, Galician and English with a page per service, a project gallery, the towns they work in and a quote form, built to show up on Google when someone nearby looks for a renovation.',
+      ],
+    },
+    highlights: [],
+    stack: ['Next.js 16', 'TypeScript', 'Tailwind CSS 4', 'next-intl', 'zod', 'Resend', 'Vercel'],
+    liveUrl: 'https://lauxreformas.vercel.app',
+    repoUrl: 'https://github.com/luisfdzs/lauxreformas',
+    image: {
+      src: '/projects/shots/laux-reformas.webp',
+      width: 1280,
+      height: 800,
+      alt: {
+        es: 'Primera pantalla de LAUX Reformas: el titular “Reformas que mejoran tu vida” sobre la fotografía oscurecida de una cocina reformada, con los botones “Pide tu presupuesto” y “Escríbenos por WhatsApp” y el teléfono en la cabecera.',
+        en: 'LAUX Reformas first screen: the «renovations that improve your life» headline over a darkened photograph of a renovated kitchen, with the «get a quote» and «message us on WhatsApp» buttons and the phone number in the header.',
+      },
+    },
+  },
+  {
+    slug: 'domobis',
+    name: 'Domobis',
+    tagline: {
+      es: 'Migración a Next.js de la web de Domobis, un estudio de arquitectura e inversión inmobiliaria de Pamplona',
+      en: 'Next.js migration of the website of Domobis, an architecture and real estate investment studio in Pamplona',
+    },
+    year: '2026',
+    status: 'live',
+    role: {
+      es: 'Migración, desarrollo y despliegue',
+      en: 'Migration, development and deployment',
+    },
+    summary: {
+      es: [
+        'La web original era un WordPress con Divi que tenía malware inyectado en todos sus scripts. La rehíce en Next.js conservando estructura, maquetación y sistema visual, sin ejecutar ni copiar nada de su JavaScript.',
+        'Unos scripts rastrean el sitio original, organizan y optimizan las imágenes y regeneran el contenido, de modo que la web estática se puede resincronizar con el original cuando haga falta.',
+      ],
+      en: [
+        'The original site was a WordPress install with Divi and malware injected into every script. I rebuilt it in Next.js, keeping its structure, layout and visual system, without running or copying any of its JavaScript.',
+        'A set of scripts crawls the original site, organises and optimises the images and regenerates the content, so the static site can be resynced with the original whenever needed.',
+      ],
+    },
+    highlights: [],
+    stack: ['Next.js 16', 'TypeScript', 'sharp', 'node-html-parser', 'Resend', 'Vercel'],
+    liveUrl: 'https://domobis.vercel.app',
+    image: {
+      src: '/projects/shots/domobis.webp',
+      width: 1280,
+      height: 800,
+      alt: {
+        es: 'Primera pantalla de Domobis: el logotipo azul y gris sobre fondo blanco y, debajo, los bloques “Arquitectura” e “Inversión inmobiliaria” con sus iconos de casa y llave sobre una fotografía desenfocada de una maqueta de madera.',
+        en: 'Domobis first screen: the blue and grey logo on a white background and, below it, the «Architecture» and «Real estate investment» blocks with their house and key icons over a blurred photograph of a wooden house model.',
+      },
+    },
+  },
+  {
+    slug: 'enboxes',
+    name: 'EnBoxes',
+    tagline: {
+      es: 'Web y app para saber cuándo te toca la ITV y la próxima revisión del coche, qué incluye y cuánto cuesta',
+      en: 'Web app that tells you when your car’s next MOT and service are due, what they include and what they cost',
+    },
+    year: '2026',
+    status: 'live',
+    role: {
+      es: 'Idea, diseño, desarrollo y despliegue',
+      en: 'Concept, design, development and deployment',
+    },
+    summary: {
+      es: [
+        'Proyecto propio: un garaje en el móvil que calcula la próxima ITV y el plan de mantenimiento de cada coche, guarda facturas y papeles, avisa antes de cada vencimiento y muestra los talleres cercanos en un mapa.',
+        'Incluye un escáner de facturas que lee los códigos QR de VeriFactu y TicketBAI, un asistente con IA, avisos por push, correo y calendario, y una app Android publicada como Trusted Web Activity.',
+      ],
+      en: [
+        'A project of my own: a garage in your phone that works out the next MOT and the service plan of each car, keeps invoices and paperwork, warns you before every deadline and shows nearby garages on a map.',
+        'It includes an invoice scanner that reads VeriFactu and TicketBAI QR codes, an AI assistant, push, email and calendar reminders, and an Android app shipped as a Trusted Web Activity.',
+      ],
+    },
+    highlights: [],
+    stack: [
+      'Next.js 16',
+      'React 19',
+      'TypeScript',
+      'Tailwind CSS 4',
+      'MongoDB',
+      'Auth.js',
+      'AI SDK',
+      'Gemini',
+      'MapLibre',
+      'Three.js',
+      'Motion',
+      'Stripe',
+      'Web Push',
+      'zod',
+      'Vercel',
+    ],
+    liveUrl: 'https://enboxes.vercel.app',
+    image: {
+      src: '/projects/shots/enboxes.webp',
+      width: 1280,
+      height: 800,
+      alt: {
+        es: 'Primera pantalla de EnBoxes: el titular “Tu coche, siempre a punto” en mayúsculas sobre fondo oscuro, los botones “Añade tu coche gratis” y “Calcula tu próxima ITV” y, a la derecha, el plano técnico en 3D de un coche en azul eléctrico.',
+        en: 'EnBoxes first screen: the «your car, always ready» headline in capitals on a dark background, the «add your car for free» and «work out your next MOT» buttons and, on the right, a 3D technical drawing of a car in electric blue.',
+      },
+    },
+  },
+  {
     slug: 'bonsai-artesania',
     name: 'Bonsái Artesanía',
     tagline: {
