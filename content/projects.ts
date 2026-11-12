@@ -197,12 +197,12 @@ const sheets: ProjectSheet[] = [
     },
     summary: {
       es: [
-        'Web de una sola página maquetada desde el diseño en Figma, en castellano, inglés y francés, con una brida en 3D que se escanea en el propio hero y un formulario de presupuesto que admite fotos de la pieza.',
-        'El cambio de idioma se hace sin recargar la página, y las imágenes del formulario se comprimen en el navegador antes de enviarse, para que pedir presupuesto desde el móvil sea rápido aunque la conexión sea mala.',
+        'Página web para Samuel, diseñador gráfico de Pamplona especializado en impresión 3D.',
+        'Samuel escanea e imprime piezas en 3D, reconstruye su geometría mediante ingeniería inversa y recupera piezas que ya no se fabrican. También hace informes metrológicos y comprobaciones dimensionales, entre otros servicios.',
       ],
       en: [
-        'One-page site built from the Figma design, in Spanish, English and French, with a 3D flange that gets scanned right in the hero and a quote form that accepts photos of the part.',
-        'Switching language never reloads the page, and the form images are compressed in the browser before sending, so asking for a quote from a phone stays fast even on a poor connection.',
+        'Website for Samuel, a graphic designer from Pamplona who specialises in 3D printing.',
+        'Samuel scans and prints parts in 3D, rebuilds their geometry through reverse engineering and recovers parts that are no longer made. Other services include metrology reports and dimensional inspections.',
       ],
     },
     highlights: [],
