@@ -154,14 +154,20 @@ export default async function ProjectPage({
         <h1 className="text-display text-signal">{project.name}</h1>
       </Reveal>
 
-      <div className="mt-10 grid items-center gap-10 lg:grid-cols-[auto_minmax(0,1fr)_auto]">
+      <div
+        className={
+          neighbours
+            ? 'mt-10 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 sm:gap-6 lg:gap-10'
+            : 'mt-10'
+        }
+      >
         {neighbours ? (
           <NeighbourArrow
             href={projectHref(locale, neighbours.previous.slug)}
             rel="prev"
             label={`${t.projects.carouselPrevious}: ${neighbours.previous.name}`}
           >
-            <ArrowLeft className="size-6" />
+            <ArrowLeft className="size-5 lg:size-6" />
           </NeighbourArrow>
         ) : null}
 
@@ -186,7 +192,7 @@ export default async function ProjectPage({
             rel="next"
             label={`${t.projects.carouselNext}: ${neighbours.next.name}`}
           >
-            <ArrowRight className="size-6" />
+            <ArrowRight className="size-5 lg:size-6" />
           </NeighbourArrow>
         ) : null}
       </div>
@@ -294,7 +300,7 @@ function NeighbourArrow({
       rel={rel}
       aria-label={label}
       data-print="hide"
-      className="gilded-action hidden size-14 items-center justify-center rounded-full bg-ink text-paper transition-colors duration-300 hover:text-signal lg:flex"
+      className="gilded-action flex size-11 items-center justify-center rounded-full bg-ink text-paper transition-colors duration-300 hover:text-signal lg:size-14"
     >
       {children}
     </Link>
