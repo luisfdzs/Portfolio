@@ -1,3 +1,4 @@
+import type { CSSProperties, ReactNode } from 'react'
 import type { Metadata } from 'next'
 import { cacheLife } from 'next/cache'
 import Link from 'next/link'
@@ -104,6 +105,10 @@ export default async function ProjectPage({
       shot
     )
 
+  const heroRatio = {
+    '--hero-ratio': media ? `${media.desktop.width} / ${media.desktop.height}` : '2 / 1',
+  } as CSSProperties
+
   const pageUrl = `${site.url}${projectHref(locale, project.slug)}`
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -140,77 +145,99 @@ export default async function ProjectPage({
   }
 
   return (
-    <article className="page-gutter mx-auto max-w-5xl pt-28 pb-section text-center lg:pt-40">
+    <article className="page-gutter mx-auto max-w-[112rem] pt-28 pb-section text-center">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Reveal>
-        <Link
-          href={href(locale, 'projects')}
-          className="group inline-flex items-center gap-2 text-small text-paper-faint transition-colors hover:text-signal"
-        >
-          <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-1" />
-          {t.projects.backToProjects}
-        </Link>
+      <Reveal as="header">
+        <h1 className="text-display text-signal">{project.name}</h1>
       </Reveal>
 
-      <header className="mt-8">
-        <Reveal>
-          <h1 className="text-display text-paper">{project.name}</h1>
-          <p className="mt-5 mx-auto max-w-measure font-display text-title text-signal">
-            {project.tagline[locale]}
-          </p>
+      <div className="mt-10 grid items-center gap-10 lg:grid-cols-[auto_minmax(0,1fr)_auto]">
+        {neighbours ? (
+          <NeighbourArrow
+            href={projectHref(locale, neighbours.previous.slug)}
+            rel="prev"
+            label={`${t.projects.carouselPrevious}: ${neighbours.previous.name}`}
+          >
+            <ArrowLeft className="size-6" />
+          </NeighbourArrow>
+        ) : null}
+
+        <Reveal step={1} className="w-full">
+          <div
+            style={heroRatio}
+            className="mx-auto w-full max-w-5xl md:max-w-[min(64rem,calc((100svh_-_18rem_-_var(--text-display))_*_var(--hero-ratio)))]"
+          >
+            {framed ?? (
+              <Figure
+                image={project.image}
+                locale={locale}
+                sizes="(min-width: 1024px) 64rem, 100vw"
+              />
+            )}
+          </div>
         </Reveal>
 
-        <Reveal step={1} className="mt-10 flex flex-wrap items-center justify-center gap-3">
-          {project.liveUrl ? (
-            <Action
-              href={project.liveUrl}
-              variant="gilded"
-              external
-              externalHint={t.a11y.externalLink}
-            >
-              {t.projects.liveSite}
-            </Action>
-          ) : null}
-          {project.repoUrl ? (
-            <Action
-              href={project.repoUrl}
-              variant="gilded"
-              external
-              externalHint={t.a11y.externalLink}
-            >
-              {t.projects.sourceCode}
-            </Action>
-          ) : null}
-        </Reveal>
-      </header>
+        {neighbours ? (
+          <NeighbourArrow
+            href={projectHref(locale, neighbours.next.slug)}
+            rel="next"
+            label={`${t.projects.carouselNext}: ${neighbours.next.name}`}
+          >
+            <ArrowRight className="size-6" />
+          </NeighbourArrow>
+        ) : null}
+      </div>
 
-      <Reveal step={2} className="mt-14">
-        {framed ?? (
-          <Figure image={project.image} locale={locale} sizes="(min-width: 1024px) 64rem, 100vw" />
-        )}
-      </Reveal>
+      <div className="mt-16">
+        {project.summary[locale].length > 0 || project.note ? (
+          <div className="mx-auto flex max-w-measure flex-col gap-6">
+            {project.summary[locale].map((paragraph, index) => (
+              <Reveal key={paragraph.slice(0, 40)} step={index}>
+                <p className={index === 0 ? 'text-lead text-paper' : 'text-paper-soft'}>
+                  {paragraph}
+                </p>
+              </Reveal>
+            ))}
 
-      {project.summary[locale].length > 0 ? (
-        <div className="mt-14 mx-auto max-w-measure space-y-5">
-          {project.summary[locale].map((paragraph, index) => (
-            <Reveal key={paragraph.slice(0, 40)} step={index}>
-              <p className={index === 0 ? 'text-lead text-paper' : 'text-paper-soft'}>{paragraph}</p>
-            </Reveal>
-          ))}
-        </div>
-      ) : null}
+            {project.note ? (
+              <Reveal className="mt-5 border-t-2 border-signal-dim bg-ink-raised px-5 py-4">
+                <p className="text-small text-paper-soft">{project.note[locale]}</p>
+              </Reveal>
+            ) : null}
+          </div>
+        ) : null}
 
-      {project.note ? (
-        <Reveal className="mt-10 mx-auto max-w-measure border-t-2 border-signal-dim bg-ink-raised px-5 py-4">
-          <p className="text-small text-paper-soft">{project.note[locale]}</p>
-        </Reveal>
-      ) : null}
+        {project.liveUrl || project.repoUrl ? (
+          <Reveal step={1} className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            {project.liveUrl ? (
+              <Action
+                href={project.liveUrl}
+                variant="gilded"
+                external
+                externalHint={t.a11y.externalLink}
+              >
+                {t.projects.liveSite}
+              </Action>
+            ) : null}
+            {project.repoUrl ? (
+              <Action
+                href={project.repoUrl}
+                variant="gilded"
+                external
+                externalHint={t.a11y.externalLink}
+              >
+                {t.projects.sourceCode}
+              </Action>
+            ) : null}
+          </Reveal>
+        ) : null}
+      </div>
 
       {project.highlights && project.highlights.length > 0 ? (
-        <section className="mt-16">
+        <section className="mx-auto mt-16 max-w-6xl">
           <h2 className="figure-num border-b border-line pb-3 text-small text-signal uppercase">
             {t.projects.highlights}
           </h2>
@@ -230,7 +257,7 @@ export default async function ProjectPage({
       ) : null}
 
       {project.stack && project.stack.length > 0 ? (
-        <section className="mt-16">
+        <section className="mx-auto mt-16 max-w-6xl">
           <h2 className="figure-num border-b border-line pb-3 text-small text-signal uppercase">
             {t.projects.stackLabel}
           </h2>
@@ -240,38 +267,36 @@ export default async function ProjectPage({
         </section>
       ) : null}
 
-      {neighbours ? (
-        <nav
-          aria-label={t.projects.title}
-          className="mt-20 grid gap-6 border-t border-line pt-10 sm:grid-cols-2"
-        >
-          <Link
-            href={projectHref(locale, neighbours.previous.slug)}
-            className="group flex flex-col items-center gap-1"
-          >
-            <span className="eyebrow inline-flex items-center gap-2">
-              <ArrowLeft className="size-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
-              {t.projects.previous}
-            </span>
-            <span className="font-display text-lead text-paper transition-colors group-hover:text-signal">
-              {neighbours.previous.name}
-            </span>
-          </Link>
-
-          <Link
-            href={projectHref(locale, neighbours.next.slug)}
-            className="group flex flex-col items-center gap-1"
-          >
-            <span className="eyebrow inline-flex items-center gap-2">
-              {t.projects.next}
-              <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-            </span>
-            <span className="font-display text-lead text-paper transition-colors group-hover:text-signal">
-              {neighbours.next.name}
-            </span>
-          </Link>
-        </nav>
-      ) : null}
+      <Reveal className="mt-16 flex justify-center">
+        <Action href={href(locale, 'projects')} variant="gilded">
+          <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
+          {t.projects.backToProjects}
+        </Action>
+      </Reveal>
     </article>
+  )
+}
+
+function NeighbourArrow({
+  href: target,
+  rel,
+  label,
+  children,
+}: {
+  href: string
+  rel: 'prev' | 'next'
+  label: string
+  children: ReactNode
+}) {
+  return (
+    <Link
+      href={target}
+      rel={rel}
+      aria-label={label}
+      data-print="hide"
+      className="gilded-action hidden size-14 items-center justify-center rounded-full bg-ink text-paper transition-colors duration-300 hover:text-signal lg:flex"
+    >
+      {children}
+    </Link>
   )
 }
